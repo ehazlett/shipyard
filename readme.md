@@ -6,8 +6,9 @@ Shipyard needs Redis for caching and queueing.  By default, it assumes Redis
 is running on localhost.
 
 * `pip install -r requirements.txt`
-* `python manage.py syncdb`
+* `python manage.py syncdb --noinput`
 * `python manage.py migrate`
+* `python manage.py createsuperuser`
 * `python manage.py runserver`
 * `python manage.py rqworker` (in another terminal)
 * Open browser to http://localhost:8000
