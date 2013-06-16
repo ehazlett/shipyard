@@ -1,4 +1,4 @@
-# Copyright 2013 Arcus, Inc.
+# Copyright 2013 Evan Hazlett and contributors.
 #
 from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
