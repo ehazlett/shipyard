@@ -1,5 +1,5 @@
 # Shipyard
-Shipyard is a web UI for (Docker)[http://docker.io].
+Shipyard is a web UI for http://docker.io
 
 # Setup
 Shipyard needs Redis for caching and queueing.  By default, it assumes Redis
