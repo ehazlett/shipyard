@@ -46,6 +46,10 @@ class Host(models.Model):
         self.get_images.invalidate()
         self.get_images.invalidate(show_all=True)
 
+    def invalidate_cache(self):
+        self._invalidate_container_cache()
+        self._invalidate_image_cache()
+
     @cached(HOST_CACHE_TTL)
     def get_containers(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
@@ -62,6 +66,16 @@ class Host(models.Model):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports)
         c.start(cnt.get('Id'))
+        self._invalidate_container_cache()
+
+    def restart_container(self, container_id=None):
+        c = self._get_client()
+        c.restart(container_id)
+        self._invalidate_container_cache()
+
+    def stop_container(self, container_id=None):
+        c = self._get_client()
+        c.stop(container_id)
         self._invalidate_container_cache()
 
     def destroy_container(self, container_id=None):

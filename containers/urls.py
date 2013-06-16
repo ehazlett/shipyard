@@ -15,10 +15,15 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('containers.views',
     url(r'^addhost/$', 'add_host', name='containers.add_host'),
+    url(r'^refresh/$', 'refresh', name='containers.refresh'),
     url(r'^createcontainer/$', 'create_container',
         name='containers.create_container'),
     url(r'^destroycontainer/(?P<host>.*)/(?P<container_id>.*)/$',
         'destroy_container', name='containers.destroy_container'),
+    url(r'^restartcontainer/(?P<host>.*)/(?P<container_id>.*)/$',
+        'restart_container', name='containers.restart_container'),
+    url(r'^stopcontainer/(?P<host>.*)/(?P<container_id>.*)/$',
+        'stop_container', name='containers.stop_container'),
     url(r'^importimage/$', 'import_image',
         name='containers.import_image'),
 )

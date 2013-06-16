@@ -33,8 +33,8 @@
                         <td>{{k}}</td>
                         <td><span class="label label-{{c.Status|container_status}}">{{c.Status}}</span></td>
                         <td>
-                            <a href="#" rel="tooltip" data-host="{{k}}" data-container-id="{{c.Id}}" title="{% trans 'Restart' %}"><i class="icon-refresh"></i></a>
-                            <a href="#" rel="tooltip" title="{% trans 'Stop' %}"><i class="icon-stop"></i></a>
+                            <a href="#" rel="tooltip" class="restart-container" data-url="{% url 'containers.restart_container' host=k container_id=c.Id %}" title="{% trans 'Restart' %}"><i class="icon-refresh"></i></a>
+                            <a href="#" rel="tooltip" class="stop-container" data-url="{% url 'containers.stop_container' host=k container_id=c.Id %}" title="{% trans 'Stop' %}"><i class="icon-stop"></i></a>
                             <a href="#" rel="tooltip" class="destroy-container" data-url="{% url 'containers.destroy_container' host=k container_id=c.Id %}" title="{% trans 'Destroy' %}"><i class="icon-trash"></i></a>
                         </td>
                     </tr>
@@ -106,6 +106,20 @@
 <script type="text/javascript">
     $(function(){
         $("a[rel=tooltip]").tooltip();
+    });
+    $("a.restart-container").click(function(){
+        if (confirm("{% trans 'Are you sure you want to restart the container?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
+    });
+    $("a.stop-container").click(function(){
+        if (confirm("{% trans 'Are you sure you want to stop the container?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
     });
     $("a.destroy-container").click(function(){
         if (confirm("{% trans 'Are you sure you want to destroy the container?' %}")) {

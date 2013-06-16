@@ -48,6 +48,22 @@ def create_container(request):
     return redirect('dashboard.views.index')
 
 @login_required
+def restart_container(request, host, container_id):
+    h = Host.objects.get(name=host)
+    h.restart_container(container_id)
+    messages.add_message(request, messages.INFO, _('Restarted') + ' {0}'.format(
+        container_id))
+    return redirect('dashboard.views.index')
+
+@login_required
+def stop_container(request, host, container_id):
+    h = Host.objects.get(name=host)
+    h.stop_container(container_id)
+    messages.add_message(request, messages.INFO, _('Stopped') + ' {0}'.format(
+        container_id))
+    return redirect('dashboard.views.index')
+
+@login_required
 def destroy_container(request, host, container_id):
     h = Host.objects.get(name=host)
     h.destroy_container(container_id)
@@ -66,3 +82,14 @@ def import_image(request):
     messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
         form.data.get('repository')) + '. ' + _('This may take a few minutes...'))
     return redirect('dashboard.views.index')
+
+@login_required
+def refresh(request):
+    '''
+    Invalidates host cache and redirects to dashboard
+
+    '''
+    for h in Host.objects.filter(enabled=True):
+        h.invalidate_cache()
+    return redirect('dashboard.views.index')
+
