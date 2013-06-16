@@ -58,7 +58,7 @@ class CreateContainerForm(forms.Form):
             [(x.id, x.name) for x in Host.objects.filter(enabled=True)]
 
 class ImportImageForm(forms.Form):
-    repository = forms.CharField()
+    repository = forms.CharField(help_text='i.e. ehazlett/logstash')
     hosts = forms.MultipleChoiceField()
 
     def __init__(self, *args, **kwargs):
