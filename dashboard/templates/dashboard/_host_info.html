@@ -14,7 +14,6 @@
                 <thead>
                     <tr>
                         <th>{% trans 'ID' %}</th>
-                        <th>{% trans 'Name' %}</th>
                         <th>{% trans 'Image' %}</th>
                         <th>{% trans 'Command' %}</th>
                         <th>{% trans 'Ports' %}</th>
@@ -28,7 +27,6 @@
                     {% for c in v %}
                     <tr>
                         <td>{{c.Id|slice:":12"}}</td>
-                        <td></td>
                         <td>{{c.Image}}</td>
                         <td>{{c.Command}}</td>
                         <td>{{c.Ports}}</td>
