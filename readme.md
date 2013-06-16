@@ -11,6 +11,7 @@ is running on localhost.
 * `python manage.py createsuperuser`
 * `python manage.py runserver`
 * `python manage.py rqworker` (in another terminal)
+* Add a host (i.e. 127.0.0.1 for local docker)
 * Open browser to http://localhost:8000
 
 # Features
