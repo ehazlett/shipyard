@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %} :: dashboard{% endblock %}
+
+{% block main_content %}
+<div id="dialog-add-host" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>{% trans 'Add Host' %}</h3>
+  </div>
+  <div class="modal-body">
+    {% crispy form_add_host form_add_host.helper %}
+  </div>
+  <div class="modal-footer">
+    <a href="#" id="btn-add-host" class="btn btn-primary btn-large">{% trans 'Add' %}</a>
+    <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</a>
+  </div>
+</div>
+<div id="dialog-create-container" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>{% trans 'Create Container' %}</h3>
+  </div>
+  <div class="modal-body">
+    {% crispy form_create_container form_create_container.helper %}
+  </div>
+  <div class="modal-footer">
+    <a href="#" id="btn-create-container" class="btn btn-primary btn-large">{% trans 'Create' %}</a>
+    <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</a>
+  </div>
+</div>
+<div id="dialog-import-image" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>{% trans 'Import Image' %}</h3>
+  </div>
+  <div class="modal-body">
+    {% crispy form_import_image form_import_image.helper %}
+  </div>
+  <div class="modal-footer">
+    <a href="#" id="btn-import-image" class="btn btn-primary btn-large">{% trans 'Import' %}</a>
+    <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</a>
+  </div>
+</div>
+
+<div class="toolbar fill">
+    <div class="btn-group">
+        <a href="#dialog-add-host" role="button" data-toggle="modal" class="btn btn-primary">{% trans 'Add Host' %}</a>
+    </div>
+    <div class="btn-group">
+        <a href="#dialog-create-container" role="button" data-toggle="modal" class="btn btn-success">{% trans 'Create' %}</a>
+        <a href="#dialog-import-image" role="button" data-toggle="modal" class="btn">{% trans 'Import' %}</a>
+        <a href="{% url 'dashboard.views.index' %}" class="btn btn-default">{% trans 'Refresh' %}</a>
+    </div>
+</div>
+
+<div id="host-info" class="fill">
+    <div class="loading center"><img src="{{ STATIC_URL }}img/loader_64.gif" /></div>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $("#host-info").load("{% url 'dashboard.views._host_info' %}?");
+    });
+    $("#btn-add-host").click(function(){
+        $("#form-add-host").submit();
+    });
+    $("#btn-import-image").click(function(){
+        $("#form-import-image").submit();
+    });
+    $("#btn-create-container").click(function(){
+        $("#form-create-container").submit();
+    });
+</script>
+{% endblock %}

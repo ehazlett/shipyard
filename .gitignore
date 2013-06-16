@@ -1,0 +1,12 @@
+*.pyc
+*.sw*
+*.un*
+local_config.py
+*.log
+newrelic.ini
+*.egg-info/*
+*build/*
+*dist/*
+.vagrant*
+*.gz
+*.db

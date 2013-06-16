@@ -1,0 +1,119 @@
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load shipyard %}
+
+<div class="tabbable">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab-containers" data-toggle="tab">{% trans 'Containers' %}</a></li>
+        <li><a href="#tab-images" data-toggle="tab">{% trans 'Images' %}</a></li>
+        <li><a href="#tab-hosts" data-toggle="tab">{% trans 'Hosts' %}</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab-containers">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>{% trans 'ID' %}</th>
+                        <th>{% trans 'Name' %}</th>
+                        <th>{% trans 'Image' %}</th>
+                        <th>{% trans 'Command' %}</th>
+                        <th>{% trans 'Ports' %}</th>
+                        <th>{% trans 'Host' %}</th>
+                        <th>{% trans 'Status' %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k,v in containers.items %}
+                    {% for c in v %}
+                    <tr>
+                        <td>{{c.Id|slice:":12"}}</td>
+                        <td></td>
+                        <td>{{c.Image}}</td>
+                        <td>{{c.Command}}</td>
+                        <td>{{c.Ports}}</td>
+                        <td>{{k}}</td>
+                        <td><span class="label label-{{c.Status|container_status}}">{{c.Status}}</span></td>
+                        <td>
+                            <a href="#" rel="tooltip" data-host="{{k}}" data-container-id="{{c.Id}}" title="{% trans 'Restart' %}"><i class="icon-refresh"></i></a>
+                            <a href="#" rel="tooltip" title="{% trans 'Stop' %}"><i class="icon-stop"></i></a>
+                            <a href="#" rel="tooltip" class="destroy-container" data-url="{% url 'containers.destroy_container' host=k container_id=c.Id %}" title="{% trans 'Destroy' %}"><i class="icon-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">{% trans 'No containers' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="tab-images">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>{% trans 'ID' %}</th>
+                        <th>{% trans 'Repository' %}</th>
+                        <th>{% trans 'Tag' %}</th>
+                        <th>{% trans 'Host' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k,v in images.items %}
+                    {% for c in v %}
+                    <tr>
+                        <td>{{c.Id|slice:":12"}}</td>
+                        <td>{{c.Repository}}</td>
+                        <td>{{c.Tag}}</td>
+                        <td>{{k}}</td>
+                    </tr>
+                    {% endfor %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">{% trans 'No images' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="tab-hosts">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Name' %}</th>
+                        <th>{% trans 'Hostname' %}</th>
+                        <th>{% trans 'Port' %}</th>
+                        <th>{% trans 'Enabled' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in hosts %}
+                    <tr>
+                        <td>{{h.name}}</td>
+                        <td>{{h.hostname}}</td>
+                        <td>{{h.port}}</td>
+                        <td>{{h.enabled}}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">{% trans 'No hosts' %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $("a[rel=tooltip]").tooltip();
+    });
+    $("a.destroy-container").click(function(){
+        if (confirm("{% trans 'Are you sure you want to destroy the container?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
+    });
+</script>
