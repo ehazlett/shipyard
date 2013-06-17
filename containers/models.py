@@ -14,10 +14,12 @@
 from django.db import models
 from docker import client
 from django.conf import settings
-from cache_utils.decorators import cached
 from docker import client
+from django.core.cache import cache
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
+CONTAINER_KEY = '{0}:containers'
+IMAGE_KEY = '{0}:images'
 
 class Host(models.Model):
     name = models.CharField(max_length=64, null=True, blank=True,
@@ -38,29 +40,36 @@ class Host(models.Model):
 
     def _invalidate_container_cache(self):
         # invalidate cache
-        self.get_containers.invalidate()
-        self.get_containers.invalidate(show_all=True)
+        cache.delete(CONTAINER_KEY.format(self.name))
 
     def _invalidate_image_cache(self):
         # invalidate cache
-        self.get_images.invalidate()
-        self.get_images.invalidate(show_all=True)
+        cache.delete(IMAGE_KEY.format(self.name))
 
     def invalidate_cache(self):
         self._invalidate_container_cache()
         self._invalidate_image_cache()
 
-    @cached(HOST_CACHE_TTL)
     def get_containers(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
             self.port))
-        return c.containers(all=show_all)
+        key = CONTAINER_KEY.format(self.name)
+        containers = cache.get(key)
+        if containers is None:
+            containers = c.containers(all=show_all)
+            cache.set(key, containers, HOST_CACHE_TTL)
+        print(containers)
+        return containers
 
-    @cached(HOST_CACHE_TTL)
     def get_images(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
             self.port))
-        return c.images(all=show_all)
+        key = IMAGE_KEY.format(self.name)
+        images = cache.get(key)
+        if images is None:
+            images = c.images(all=show_all)
+            cache.set(key, images, HOST_CACHE_TTL)
+        return images
 
     def create_container(self, image=None, command=None, ports=[]):
         c = self._get_client()

@@ -31,15 +31,8 @@ def index(request):
 
 @login_required
 def _host_info(request):
-    containers = {}
-    images = {}
     hosts = Host.objects.all()
-    for h in hosts:
-        containers[h] = h.get_containers(show_all=True)
-        images[h] = h.get_images()
     ctx = {
-        'containers': containers,
-        'images': images,
         'hosts': Host.objects.all(),
     }
     return render_to_response('dashboard/_host_info.html', ctx,

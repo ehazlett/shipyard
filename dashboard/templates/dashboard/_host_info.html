@@ -23,14 +23,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for k,v in containers.items %}
-                    {% for c in v %}
+                    {% for h in hosts %}
+                    {% for c in h.get_containers %}
                     <tr>
                         <td>{{c.Id|slice:":12"}}</td>
                         <td>{{c.Image}}</td>
                         <td>{{c.Command}}</td>
                         <td>{{c.Ports}}</td>
-                        <td>{{k}}</td>
+                        <td>{{h.name}}</td>
                         <td><span class="label label-{{c.Status|container_status}}">{{c.Status}}</span></td>
                         <td>
                             <a href="#" rel="tooltip" class="restart-container" data-url="{% url 'containers.restart_container' host=k container_id=c.Id %}" title="{% trans 'Restart' %}"><i class="icon-refresh"></i></a>
@@ -58,13 +58,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for k,v in images.items %}
-                    {% for c in v %}
+                    {% for h in hosts %}
+                    {% for i in h.get_images %}
                     <tr>
-                        <td>{{c.Id|slice:":12"}}</td>
-                        <td>{{c.Repository}}</td>
-                        <td>{{c.Tag}}</td>
-                        <td>{{k}}</td>
+                        <td>{{i.Id|slice:":12"}}</td>
+                        <td>{{i.Repository}}</td>
+                        <td>{{i.Tag}}</td>
+                        <td>{{h.name}}</td>
                     </tr>
                     {% endfor %}
                     {% empty %}
