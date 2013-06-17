@@ -19,12 +19,15 @@ from django.core.urlresolvers import reverse
 def get_image_choices():
     hosts = Host.objects.all()
     choices = []
+    found_images = []
     for h in hosts:
         for i in h.get_images():
             image_name = '{0}:{1}'.format(i.get('Repository'), i.get('Tag'))
-            d = (image_name, '{0}/{1}'.format(
-                i.get('Repository'), i.get('Tag')))
-            choices.append(d)
+            if image_name not in found_images:
+                found_images.append(image_name)
+                d = (image_name, '{0}/{1}'.format(
+                    i.get('Repository'), i.get('Tag')))
+                choices.append(d)
     return choices
 
 class HostForm(forms.ModelForm):

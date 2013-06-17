@@ -58,7 +58,6 @@ class Host(models.Model):
         if containers is None:
             containers = c.containers(all=show_all)
             cache.set(key, containers, HOST_CACHE_TTL)
-        print(containers)
         return containers
 
     def get_images(self, show_all=False):

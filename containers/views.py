@@ -80,7 +80,7 @@ def import_image(request):
         host = Host.objects.get(id=i)
         django_rq.enqueue(host.import_image, form.data.get('repository'))
     messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
-        form.data.get('repository')) + '. ' + _('This may take a few minutes...'))
+        form.data.get('repository')) + '. ' + _('This may take a few minutes.'))
     return redirect('dashboard.views.index')
 
 @login_required
