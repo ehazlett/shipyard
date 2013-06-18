@@ -29,7 +29,7 @@
                         <td>{{c.Id|slice:":12"}}</td>
                         <td>{{c.Image}}</td>
                         <td>{{c.Command}}</td>
-                        <td>{{c.Ports}}</td>
+                        <td>{{c.Ports|container_port_links:h.name|safe}}</td>
                         <td>{{h.name}}</td>
                         <td><span class="label label-{{c.Status|container_status}}">{{c.Status}}</span></td>
                         <td>
