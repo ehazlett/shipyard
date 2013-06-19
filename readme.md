@@ -5,6 +5,9 @@ To run the latest version:
 
 `docker run ehazlett/shipyard`
 
+Username: admin
+Password: shipyard
+
 # Dev Setup
 Shipyard needs Redis for caching and queueing.  By default, it assumes Redis
 is running on localhost.
