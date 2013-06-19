@@ -1,7 +1,11 @@
 # Shipyard
 Shipyard is a web UI for http://docker.io
 
-# Setup
+To run the latest version:
+
+`docker run ehazlett/shipyard`
+
+# Dev Setup
 Shipyard needs Redis for caching and queueing.  By default, it assumes Redis
 is running on localhost.
 
