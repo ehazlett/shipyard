@@ -35,13 +35,12 @@ def container_port_links(value, host):
     if value:
         host = Host.objects.get(name=host)
         all_forwards = value.split(',')
-        print(all_forwards)
         for x in all_forwards:
             k,v = x.split('->')
             ports[k] = v
         for k,v in ports.items():
             link = '<a href="http://{0}:{1}" target="_blank">{1}->{2}</a>'.format(
-                host.hostname, k,v)
+                host.hostname, k.strip(), v.strip())
             links.append(link)
         ret = ', '.join(links)
     return ret

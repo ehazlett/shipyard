@@ -45,6 +45,7 @@ class HostForm(forms.ModelForm):
 class CreateContainerForm(forms.Form):
     image = forms.ChoiceField()
     command = forms.CharField(required=False)
+    environment = forms.CharField(required=False, help_text='key=value space separated pairs')
     ports = forms.CharField(required=False, help_text='space separated')
     hosts = forms.MultipleChoiceField()
 

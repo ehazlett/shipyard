@@ -70,9 +70,11 @@ class Host(models.Model):
             cache.set(key, images, HOST_CACHE_TTL)
         return images
 
-    def create_container(self, image=None, command=None, ports=[]):
+    def create_container(self, image=None, command=None, ports=[],
+        environment=[]):
         c = self._get_client()
-        cnt = c.create_container(image, command, detach=True, ports=ports)
+        cnt = c.create_container(image, command, detach=True, ports=ports,
+            environment=environment)
         c.start(cnt.get('Id'))
         self._invalidate_container_cache()
 

@@ -33,16 +33,20 @@ def add_host(request):
 @login_required
 def create_container(request):
     form = CreateContainerForm(request.POST)
-    # TODO: create / start container
     image = form.data.get('image')
+    environment = form.data.get('environment')
     command = form.data.get('command')
     if command.strip() == '':
         command = None
+    if environment.strip() == '':
+        environment = None
+    else:
+        environment = environment.split()
     ports = form.data.get('ports', '').split()
     hosts = form.data.getlist('hosts')
     for i in hosts:
         host = Host.objects.get(id=i)
-        host.create_container(image, command, ports)
+        host.create_container(image, command, ports, environment=environment)
     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
         image))
     return redirect('dashboard.views.index')
