@@ -1,9 +1,13 @@
 # Shipyard
 Shipyard is a web UI for http://docker.io
 
-To run the latest version:
+To run the latest version on port 8000:
 
-`docker run ehazlett/shipyard`
+`docker run -p :8000 ehazlett/shipyard`
+
+Or to run on a custom port (leave the `-p` option off to get random port):
+
+`docker run -p 8005:8000 ehazlett/shipyard`
 
 Username: admin
 Password: shipyard
