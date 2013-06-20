@@ -14,10 +14,12 @@
 from django import forms
 from containers.models import Host
 from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from django.core.urlresolvers import reverse
 
 def get_image_choices():
-    hosts = Host.objects.all()
+    hosts = Host.objects.filter(enabled=True)
     choices = []
     found_images = []
     for h in hosts:
@@ -25,9 +27,11 @@ def get_image_choices():
             image_name = '{0}:{1}'.format(i.get('Repository'), i.get('Tag'))
             if image_name not in found_images:
                 found_images.append(image_name)
-                d = (image_name, '{0}/{1}'.format(
-                    i.get('Repository'), i.get('Tag')))
-                choices.append(d)
+                if i.get('Repository'):
+                    d = (image_name, '{0}/{1}'.format(
+                        i.get('Repository'), i.get('Tag')))
+                    choices.append(d)
+    choices.sort()
     return choices
 
 class HostForm(forms.ModelForm):
@@ -61,14 +65,14 @@ class CreateContainerForm(forms.Form):
         self.fields['hosts'].choices = \
             [(x.id, x.name) for x in Host.objects.filter(enabled=True)]
 
-class ImportImageForm(forms.Form):
+class ImportRepositoryForm(forms.Form):
     repository = forms.CharField(help_text='i.e. ehazlett/logstash')
     hosts = forms.MultipleChoiceField()
 
     def __init__(self, *args, **kwargs):
-        super(ImportImageForm, self).__init__(*args, **kwargs)
+        super(ImportRepositoryForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_id = 'form-import-image'
+        self.helper.form_id = 'form-import-repository'
         self.helper.form_class = 'form-horizontal'
         self.helper.form_action = reverse('containers.views.import_image')
         self.helper.help_text_inline = True

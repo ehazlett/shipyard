@@ -31,17 +31,35 @@
     <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</a>
   </div>
 </div>
-<div id="dialog-import-image" class="modal hide">
+<div id="dialog-import-repository" class="modal hide">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>{% trans 'Import Image' %}</h3>
   </div>
   <div class="modal-body">
-    {% crispy form_import_image form_import_image.helper %}
+    {% crispy form_import_repository form_import_repository.helper %}
   </div>
   <div class="modal-footer">
-    <a href="#" id="btn-import-image" class="btn btn-primary btn-large">{% trans 'Import' %}</a>
+    <a href="#" id="btn-import-repository" class="btn btn-primary btn-large">{% trans 'Import' %}</a>
     <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</a>
+  </div>
+</div>
+<div id="dialog-search-repository" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>{% trans 'Search' %}</h3>
+  </div>
+  <div class="modal-body">
+    <form id="form-search-repository" class="form-search">
+      <div class="input-append">
+        <input class="span3 search-query" id="search-repository-query" type="text" placeholder="{% trans 'query (i.e. logstash)' %}" autofocus="true">
+        <a href="#" id="btn-search-repository" class="btn"><i class="icon-search"></i></a>
+      </div>
+    </form>
+    <div id="search-repository-results"></div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Close' %}</a>
   </div>
 </div>
 
@@ -51,8 +69,17 @@
     </div>
     <div class="btn-group">
         <a href="#dialog-create-container" role="button" data-toggle="modal" class="btn btn-success">{% trans 'Create' %}</a>
-        <a href="#dialog-import-image" role="button" data-toggle="modal" class="btn">{% trans 'Import' %}</a>
         <a href="{% url 'containers.views.refresh' %}" class="btn btn-default">{% trans 'Refresh' %}</a>
+    </div>
+    <div class="btn-group">
+        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
+          {% trans 'Images' %}
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li><a href="#dialog-import-repository" data-toggle="modal">{% trans 'Import' %}</a></li>
+            <li><a href="#dialog-search-repository" data-toggle="modal">{% trans 'Search' %}</a></li>
+        </ul>
     </div>
 </div>
 
@@ -61,16 +88,53 @@
 </div>
 <script type="text/javascript">
     $(function() {
-        $("#host-info").load("{% url 'dashboard.views._host_info' %}?");
+        $("#host-info").load("{% url 'dashboard.views._host_info' %}");
     });
     $("#btn-add-host").click(function(){
         $("#form-add-host").submit();
     });
-    $("#btn-import-image").click(function(){
-        $("#form-import-image").submit();
+    $("#btn-import-repository").click(function(){
+        $("#form-import-repository").submit();
     });
     $("#btn-create-container").click(function(){
         $("#form-create-container").submit();
+    });
+    $("#btn-search-repository").click(function(){
+        var qry = $("#search-repository-query").val();
+        $.getJSON("{% url 'containers.views.search_repository' %}?query=" + qry, function(data){
+            var d = '<table class="table table-bordered table-condensed">';
+            d += '<thead><th>{% trans "Name" %}</th><th>{% trans "Description" %}</th><th></th></thead>';
+            d += '<tbody>';
+            for (var i=0, l=data.length; i<l; i++) {
+                var o = data[i];
+                d += '<tr>';
+                d += '<td>' + o.Name + '</td>';
+                d += '<td>' + o.Description + '</td>';
+                d += '<td><a href="#" rel="tooltip" title="{% trans "Import" %}" class="import-repository" data-repository-name="' + o.Name + '"><i class="icon-plus"></i></a></td>';
+                d += '</tr>';
+            }
+            d += '</tbody></table>';
+            $("#search-repository-results").html(d);
+            $("a.import-repository").click(function(d) {
+                var repoName = (this).getAttribute('data-repository-name');
+                $("#dialog-search-repository").modal('toggle');
+                $("input#id_repository").val(repoName);
+                $("#dialog-import-repository").modal('toggle');
+                return false;
+            });
+        });
+        return false;
+    });
+    $("#form-search-repository").on('keypress', function(e) {
+        if (e.keyCode == 13) {
+            return false;
+        }
+    });
+    $("input#search-repository-query").on('keyup', function(e) {
+        if (e.keyCode == 13) {
+            $("#btn-search-repository").trigger('click');
+        }
+        return false;
     });
 </script>
 {% endblock %}

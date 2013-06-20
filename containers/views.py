@@ -16,10 +16,14 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+from django.http import HttpResponse
 import django_rq
 from containers.models import Host
-from containers.forms import HostForm, CreateContainerForm, ImportImageForm
+from containers.forms import HostForm, CreateContainerForm, ImportRepositoryForm
 from shipyard import utils
+from docker import client
+import random
+import json
 
 @require_http_methods(['POST'])
 @login_required
@@ -78,7 +82,7 @@ def destroy_container(request, host, container_id):
 @require_http_methods(['POST'])
 @login_required
 def import_image(request):
-    form = ImportImageForm(request.POST)
+    form = ImportRepositoryForm(request.POST)
     hosts = form.data.getlist('hosts')
     for i in hosts:
         host = Host.objects.get(id=i)
@@ -96,4 +100,23 @@ def refresh(request):
     for h in Host.objects.filter(enabled=True):
         h.invalidate_cache()
     return redirect('dashboard.views.index')
+
+@require_http_methods(['GET'])
+@login_required
+def search_repository(request):
+    '''
+    Searches the docker index for repositories
+
+    :param query: Query to search for
+
+    '''
+    query = request.GET.get('query', {})
+    # get random host for query -- just needs a connection
+    hosts = Host.objects.filter(enabled=True)
+    rnd = random.randint(0, len(hosts)-1)
+    host = hosts[rnd]
+    url = 'http://{0}:{1}'.format(host.hostname, host.port)
+    c = client.Client(url)
+    data = c.search(query)
+    return HttpResponse(json.dumps(data), content_type='application/json')
 

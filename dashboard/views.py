@@ -17,14 +17,14 @@ from django.template import RequestContext
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from containers.models import Host
-from containers.forms import HostForm, CreateContainerForm, ImportImageForm
+from containers.forms import (HostForm, CreateContainerForm, ImportRepositoryForm)
 
 @login_required
 def index(request):
     ctx = {
         'form_add_host': HostForm(),
         'form_create_container': CreateContainerForm(),
-        'form_import_image': ImportImageForm(),
+        'form_import_repository': ImportRepositoryForm(),
     }
     return render_to_response('dashboard/index.html', ctx,
         context_instance=RequestContext(request))
@@ -33,7 +33,7 @@ def index(request):
 def _host_info(request):
     hosts = Host.objects.all()
     ctx = {
-        'hosts': Host.objects.all(),
+        'hosts': Host.objects.filter(enabled=True),
     }
     return render_to_response('dashboard/_host_info.html', ctx,
         context_instance=RequestContext(request))
