@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from django.db import models
+from django.contrib.auth.models import User
 from docker import client
 from django.conf import settings
 from docker import client
 from django.core.cache import cache
+import json
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
 CONTAINER_KEY = '{0}:containers'
@@ -50,6 +52,9 @@ class Host(models.Model):
         self._invalidate_container_cache()
         self._invalidate_image_cache()
 
+    def _get_short_id(self, container_id):
+        return container_id[:12]
+
     def get_containers(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
             self.port))
@@ -57,8 +62,26 @@ class Host(models.Model):
         containers = cache.get(key)
         if containers is None:
             containers = c.containers(all=show_all)
+            # update meta data
+            for x in containers:
+                # only get first 12 chars of id (for metatdata)
+                c_id = self._get_short_id(x.get('Id'))
+                m, created = Container.objects.get_or_create(
+                    container_id=c_id, host=self)
+                m.meta = json.dumps(x)
+                m.save()
             cache.set(key, containers, HOST_CACHE_TTL)
         return containers
+
+    def get_containers_for_user(self, user=None, show_all=False):
+        containers = self.get_containers(show_all=show_all)
+        # don't filter staff
+        if user.is_staff:
+            return containers
+        # filter
+        ids = [x.container_id for x in Container.objects.all() \
+            if x.user == None or x.user == user]
+        return [x for x in containers if x.get('Id') in ids]
 
     def get_images(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
@@ -71,12 +94,20 @@ class Host(models.Model):
         return images
 
     def create_container(self, image=None, command=None, ports=[],
-        environment=[]):
+        environment=[], description=''):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports,
             environment=environment)
-        c.start(cnt.get('Id'))
+        c_id = cnt.get('Id')
+        c.start(c_id)
+        # create metadata
+        c, created = Container.objects.get_or_create(container_id=c_id,
+            host=self)
+        c.description = description
+        c.save()
+        # clear host cache
         self._invalidate_container_cache()
+        return c_id
 
     def restart_container(self, container_id=None):
         c = self._get_client()
@@ -90,10 +121,34 @@ class Host(models.Model):
 
     def destroy_container(self, container_id=None):
         c = self._get_client()
-        c.remove_container(container_id)
+        c_id = self._get_short_id(container_id)
+        c.kill(c_id)
+        c.remove_container(c_id)
+        # remove metadata
+        Container.objects.filter(container_id=c_id).delete()
         self._invalidate_container_cache()
 
     def import_image(self, repository=None):
         c = self._get_client()
         c.pull(repository)
         self._invalidate_image_cache()
+
+class Container(models.Model):
+    container_id = models.CharField(max_length=96, null=True, blank=True)
+    description = models.TextField(blank=True, null=True, default='')
+    meta = models.TextField(blank=True, null=True, default='{}')
+    host = models.ForeignKey(Host, null=True, blank=True)
+    user = models.ForeignKey(User, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.container_id
+
+    def is_public(self):
+        if self.user == None:
+            return True
+        else:
+            return False
+
+    def get_meta(self):
+        return json.loads(self.meta)
+

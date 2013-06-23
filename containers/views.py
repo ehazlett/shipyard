@@ -16,9 +16,11 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext as _
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.core import serializers
 import django_rq
-from containers.models import Host
+from containers.models import Host, Container
 from containers.forms import HostForm, CreateContainerForm, ImportRepositoryForm
 from shipyard import utils
 from docker import client
@@ -50,9 +52,13 @@ def create_container(request):
     hosts = form.data.getlist('hosts')
     for i in hosts:
         host = Host.objects.get(id=i)
-        host.create_container(image, command, ports, environment=environment)
-    messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
-        image))
+        host.create_container(image, command, ports,
+            environment=environment, description=form.data.get('description'))
+    if hosts:
+        messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
+            image))
+    else:
+        messages.add_message(request, messages.ERROR, _('No hosts selected'))
     return redirect('dashboard.views.index')
 
 @login_required
@@ -86,7 +92,8 @@ def import_image(request):
     hosts = form.data.getlist('hosts')
     for i in hosts:
         host = Host.objects.get(id=i)
-        django_rq.enqueue(host.import_image, form.data.get('repository'))
+        args = (form.data.get('repository'),)
+        django_rq.enqueue(host.import_image, args=args, timeout=1800)
     messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
         form.data.get('repository')) + '. ' + _('This may take a few minutes.'))
     return redirect('dashboard.views.index')
@@ -120,3 +127,19 @@ def search_repository(request):
     data = c.search(query)
     return HttpResponse(json.dumps(data), content_type='application/json')
 
+@login_required
+def container_info(request, container_id=None):
+    '''
+    Gets / Sets container metatdata
+
+    '''
+    if request.method == 'POST':
+        data = request.POST
+        container_id = data.get('container-id')
+        c = Container.objects.get(container_id=container_id)
+        c.description = data.get('description')
+        c.save()
+        return redirect(reverse('index'))
+    c = Container.objects.get(container_id=container_id)
+    data = serializers.serialize('json', [c], ensure_ascii=False)[1:-1]
+    return HttpResponse(data, content_type='application/json')
