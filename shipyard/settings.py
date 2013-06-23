@@ -55,30 +55,33 @@ CACHES = {
         }
     }
 }
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', None)
 RQ_QUEUES = {
     'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 1,
-        'PASSWORD': None,
+        'PASSWORD': REDIS_PASSWORD,
     },
     'shipyard': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 2,
-        'PASSWORD': None,
+        'PASSWORD': REDIS_PASSWORD,
     },
     'loadbalancer': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 3,
-        'PASSWORD': None,
+        'PASSWORD': REDIS_PASSWORD,
     },
     'builder': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 4,
-        'PASSWORD': None,
+        'PASSWORD': REDIS_PASSWORD,
     }
 }
 
