@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from django.contrib import admin
-from containers.models import Host
+from containers.models import Host, Container
 
 class HostAdmin(admin.ModelAdmin):
     list_display = ('name', 'hostname', 'port', 'enabled')
     search_fields = ('name', 'hostname', 'port')
     list_filter = ('enabled',)
 
+class ContainerAdmin(admin.ModelAdmin):
+    list_display = ('container_id', 'host', 'user')
+    search_fields = ('container_id', 'host__hostname')
+
 admin.site.register(Host, HostAdmin)
+admin.site.register(Container, ContainerAdmin)
