@@ -61,6 +61,24 @@ RQ_QUEUES = {
         'PORT': 6379,
         'DB': 1,
         'PASSWORD': None,
+    },
+    'shipyard': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 2,
+        'PASSWORD': None,
+    },
+    'loadbalancer': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 3,
+        'PASSWORD': None,
+    },
+    'builder': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 4,
+        'PASSWORD': None,
     }
 }
 

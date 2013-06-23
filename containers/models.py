@@ -94,7 +94,7 @@ class Host(models.Model):
         return images
 
     def create_container(self, image=None, command=None, ports=[],
-        environment=[], description=''):
+        environment=[], description='', user=None):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports,
             environment=environment)
@@ -104,6 +104,7 @@ class Host(models.Model):
         c, created = Container.objects.get_or_create(container_id=c_id,
             host=self)
         c.description = description
+        c.user = user
         c.save()
         # clear host cache
         self._invalidate_container_cache()

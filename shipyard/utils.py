@@ -11,20 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from docker import client
-from containers.models import Host
+import django_rq
 
-def create_container(image=None, command=None, ports=[], hosts=[]):
-    '''
-    Creates a container on one or more hosts
-
-    '''
-    c_ids = []
-    for i in hosts:
-        h = Host.objects.get(id=i)
-
-        c_ids.append(cnt.get('Id'))
-        # invalidate cache
-        h.get_containers.invalidate()
-    return c_ids
-
+def get_queue(name='shipyard'):
+    return django_rq.get_queue(name)

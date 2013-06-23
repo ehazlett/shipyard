@@ -53,6 +53,7 @@ class CreateContainerForm(forms.Form):
     environment = forms.CharField(required=False, help_text='key=value space separated pairs')
     ports = forms.CharField(required=False, help_text='space separated')
     hosts = forms.MultipleChoiceField()
+    private = forms.BooleanField()
 
     def __init__(self, *args, **kwargs):
         super(CreateContainerForm, self).__init__(*args, **kwargs)

@@ -50,10 +50,15 @@ def create_container(request):
         environment = environment.split()
     ports = form.data.get('ports', '').split()
     hosts = form.data.getlist('hosts')
+    private = form.data.get('private')
+    user = None
     for i in hosts:
         host = Host.objects.get(id=i)
+        if private:
+            user = request.user
         host.create_container(image, command, ports,
-            environment=environment, description=form.data.get('description'))
+            environment=environment, description=form.data.get('description'),
+            user=user)
     if hosts:
         messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
             image))
@@ -93,7 +98,7 @@ def import_image(request):
     for i in hosts:
         host = Host.objects.get(id=i)
         args = (form.data.get('repository'),)
-        django_rq.enqueue(host.import_image, args=args, timeout=1800)
+        utils.get_queue('shipyard').enqueue(host.import_image, args=args, timeout=3600)
     messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
         form.data.get('repository')) + '. ' + _('This may take a few minutes.'))
     return redirect('dashboard.views.index')
