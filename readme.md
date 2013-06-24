@@ -21,7 +21,7 @@ is running on localhost.
 * `python manage.py migrate`
 * `python manage.py createsuperuser`
 * `python manage.py runserver`
-* `python manage.py rqworker` (in another terminal)
+* `python manage.py rqworker shipyard` (in another terminal)
 * Open browser to http://localhost:8000
 * Add a host (i.e. 127.0.0.1 for local docker)
 
