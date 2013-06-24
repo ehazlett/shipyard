@@ -21,11 +21,21 @@ from django.http import HttpResponse
 from django.core import serializers
 import django_rq
 from containers.models import Host, Container
-from containers.forms import HostForm, CreateContainerForm, ImportRepositoryForm
+from containers.forms import (HostForm, CreateContainerForm,
+    ImportRepositoryForm, ImageBuildForm)
 from shipyard import utils
 from docker import client
+import urllib
 import random
 import json
+import tempfile
+
+def handle_upload(f):
+    tmp_file = tempfile.mktemp()
+    with open(tmp_file, 'w') as d:
+        for c in f.chunks():
+            d.write(c)
+    return tmp_file
 
 @require_http_methods(['POST'])
 @login_required
@@ -148,3 +158,30 @@ def container_info(request, container_id=None):
     c = Container.objects.get(container_id=container_id)
     data = serializers.serialize('json', [c], ensure_ascii=False)[1:-1]
     return HttpResponse(data, content_type='application/json')
+
+@require_http_methods(['POST'])
+@login_required
+def build_image(request):
+    '''
+    Builds a container image
+
+    '''
+    form = ImageBuildForm(request.POST)
+    url = form.data.get('url')
+    tag = form.data.get('tag')
+    hosts = form.data.getlist('hosts')
+    # dockerfile takes precedence
+    docker_file = None
+    if request.FILES.has_key('dockerfile'):
+        docker_file = handle_upload(request.FILES.get('dockerfile'))
+    else:
+        docker_file = tempfile.mktemp()
+        urllib.urlretrieve(url, docker_file)
+    for i in hosts:
+        host = Host.objects.get(id=i)
+        args = (docker_file, tag)
+        utils.get_queue('shipyard').enqueue(host.build_image, args=args,
+            timeout=3600)
+    messages.add_message(request, messages.INFO,
+        _('Building image from docker file.  This may take a few minutes.'))
+    return redirect(reverse('index'))

@@ -62,6 +62,20 @@
     <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Close' %}</a>
   </div>
 </div>
+<div id="dialog-build-image" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>{% trans 'Build' %}</h3>
+  </div>
+  <div class="modal-body">
+    {% crispy form_build_image form_build_image.helper %}
+  </div>
+  <div class="modal-footer">
+    <a href="#" id="btn-build-image" class="btn btn-primary btn-large">{% trans 'Build' %}</a>
+    <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</a>
+  </div>
+</div>
+
 
 <div class="toolbar fill">
     <div class="btn-group">
@@ -79,6 +93,8 @@
         <ul class="dropdown-menu">
             <li><a href="#dialog-import-repository" data-toggle="modal">{% trans 'Import' %}</a></li>
             <li><a href="#dialog-search-repository" data-toggle="modal">{% trans 'Search' %}</a></li>
+            <li class="divider"></li>
+            <li><a href="#dialog-build-image" data-toggle="modal">{% trans 'Build' %}</a></li>
         </ul>
     </div>
 </div>
@@ -98,6 +114,9 @@
     });
     $("#btn-create-container").click(function(){
         $("#form-create-container").submit();
+    });
+    $("#btn-build-image").click(function(){
+        $("#form-build-image").submit();
     });
     $("#btn-search-repository").click(function(){
         var qry = $("#search-repository-query").val();

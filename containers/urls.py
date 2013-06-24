@@ -32,4 +32,6 @@ urlpatterns = patterns('containers.views',
         'container_info', name='containers.container_info'),
     url(r'^importimage/$', 'import_image',
         name='containers.import_image'),
+    url(r'^buildimage/$', 'build_image',
+        name='containers.build_image'),
 )
