@@ -18,8 +18,11 @@ from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from django.core.urlresolvers import reverse
 
+def get_available_hosts():
+    return Host.objects.filter(enabled=True)
+
 def get_image_choices():
-    hosts = Host.objects.filter(enabled=True)
+    hosts = get_available_hosts()
     choices = []
     found_images = []
     for h in hosts:
@@ -65,7 +68,7 @@ class CreateContainerForm(forms.Form):
         self.fields['image'].choices = [('', '----------')] + \
             [x for x in get_image_choices()]
         self.fields['hosts'].choices = \
-            [(x.id, x.name) for x in Host.objects.filter(enabled=True)]
+            [(x.id, x.name) for x in get_available_hosts()]
 
 class ImportRepositoryForm(forms.Form):
     repository = forms.CharField(help_text='i.e. ehazlett/logstash')
@@ -79,7 +82,7 @@ class ImportRepositoryForm(forms.Form):
         self.helper.form_action = reverse('containers.views.import_image')
         self.helper.help_text_inline = True
         self.fields['hosts'].choices = \
-            [(x.id, x.name) for x in Host.objects.filter(enabled=True)]
+            [(x.id, x.name) for x in get_available_hosts()]
 
 class ContainerForm(forms.Form):
     image = forms.ChoiceField()
@@ -93,3 +96,20 @@ class ContainerForm(forms.Form):
         self.helper.form_action = reverse('containers.views.create_container')
         self.helper.help_text_inline = True
         self.fields['image'].widget.attrs['readonly'] = True
+
+class ImageBuildForm(forms.Form):
+    dockerfile = forms.FileField(required=False)
+    url = forms.URLField(help_text='Dockerfile URL', required=False)
+    tag = forms.CharField(help_text='i.e. app-v1', required=False)
+    hosts = forms.MultipleChoiceField()
+
+    def __init__(self, *args, **kwargs):
+        super(ImageBuildForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'form-build-image'
+        self.helper.form_class = 'form-horizontal'
+        self.helper.form_action = reverse('containers.views.build_image')
+        self.helper.help_text_inline = True
+        self.fields['hosts'].choices = \
+            [(x.id, x.name) for x in get_available_hosts()]
+

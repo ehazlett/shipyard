@@ -134,6 +134,11 @@ class Host(models.Model):
         c.pull(repository)
         self._invalidate_image_cache()
 
+    def build_image(self, docker_file=None, tag=None):
+        c = self._get_client()
+        f = open(docker_file, 'r')
+        c.build(f, tag)
+
 class Container(models.Model):
     container_id = models.CharField(max_length=96, null=True, blank=True)
     description = models.TextField(blank=True, null=True, default='')

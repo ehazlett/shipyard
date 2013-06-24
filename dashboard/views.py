@@ -18,7 +18,8 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from containers.models import Host, Container
-from containers.forms import (HostForm, CreateContainerForm, ImportRepositoryForm)
+from containers.forms import (HostForm, CreateContainerForm,
+    ImportRepositoryForm, ImageBuildForm)
 
 @login_required
 def index(request):
@@ -26,6 +27,7 @@ def index(request):
         'form_add_host': HostForm(),
         'form_create_container': CreateContainerForm(),
         'form_import_repository': ImportRepositoryForm(),
+        'form_build_image': ImageBuildForm(),
     }
     return render_to_response('dashboard/index.html', ctx,
         context_instance=RequestContext(request))
