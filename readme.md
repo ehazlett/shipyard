@@ -30,7 +30,10 @@ is running on localhost.
 * Multiple host support
 * Create / Delete containers
 * View Images
+* Build Images (via uploaded Dockerfile or URL)
 * Import repositories
+* Private containers
+* Container metadata (description, etc.)
 * ...more coming...
 
 # Screenshots
