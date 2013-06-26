@@ -52,12 +52,18 @@ def create_container(request):
     image = form.data.get('image')
     environment = form.data.get('environment')
     command = form.data.get('command')
+    memory = form.data.get('memory', 0)
     if command.strip() == '':
         command = None
     if environment.strip() == '':
         environment = None
     else:
         environment = environment.split()
+    if memory.strip() == '':
+        memory = 0
+    # convert memory from MB to bytes
+    if memory:
+        memory = int(memory) * 1048576
     ports = form.data.get('ports', '').split()
     hosts = form.data.getlist('hosts')
     private = form.data.get('private')
@@ -67,8 +73,8 @@ def create_container(request):
         if private:
             user = request.user
         host.create_container(image, command, ports,
-            environment=environment, description=form.data.get('description'),
-            user=user)
+            environment=environment, memory=memory,
+            description=form.data.get('description'), user=user)
     if hosts:
         messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
             image))

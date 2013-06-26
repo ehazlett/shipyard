@@ -68,7 +68,8 @@ class Host(models.Model):
                 c_id = self._get_short_id(x.get('Id'))
                 m, created = Container.objects.get_or_create(
                     container_id=c_id, host=self)
-                m.meta = json.dumps(x)
+                meta = c.inspect_container(c_id)
+                m.meta = json.dumps(meta)
                 m.save()
             cache.set(key, containers, HOST_CACHE_TTL)
         return containers
@@ -94,10 +95,10 @@ class Host(models.Model):
         return images
 
     def create_container(self, image=None, command=None, ports=[],
-        environment=[], description='', user=None):
+        environment=[], memory=0, description='', user=None):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports,
-            environment=environment)
+            mem_limit=memory, environment=environment)
         c_id = cnt.get('Id')
         c.start(c_id)
         # create metadata

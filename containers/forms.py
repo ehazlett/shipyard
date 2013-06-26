@@ -53,7 +53,9 @@ class CreateContainerForm(forms.Form):
     image = forms.ChoiceField()
     description = forms.CharField(required=False)
     command = forms.CharField(required=False)
-    environment = forms.CharField(required=False, help_text='key=value space separated pairs')
+    memory = forms.CharField(required=False, help_text='Memory in MB')
+    environment = forms.CharField(required=False,
+        help_text='key=value space separated pairs')
     ports = forms.CharField(required=False, help_text='space separated')
     hosts = forms.MultipleChoiceField()
     private = forms.BooleanField()
