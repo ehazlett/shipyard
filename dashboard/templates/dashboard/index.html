@@ -76,7 +76,6 @@
   </div>
 </div>
 
-
 <div class="toolbar fill">
     <div class="btn-group">
         <a href="#dialog-add-host" role="button" data-toggle="modal" class="btn btn-primary">{% trans 'Add Host' %}</a>
@@ -105,6 +104,7 @@
 <script type="text/javascript">
     $(function() {
         $("#host-info").load("{% url 'dashboard.views._host_info' %}");
+        $("#nav-dashboard").addClass('active');
     });
     $("#btn-add-host").click(function(){
         $("#form-add-host").submit();

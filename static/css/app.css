@@ -30,6 +30,9 @@ a:hover {
   top: 6px;
   margin-right: 5px;
 }
+.navbar .brand {
+  padding: 10px 20px 5px;
+}
 .hide {
   display: none;
 }

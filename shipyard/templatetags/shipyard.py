@@ -14,12 +14,13 @@ def container_status(value):
 
     """
     cls = ''
-    if value.get('Running'):
-        cls = 'success'
-    elif value.get('ExitCode') == 0:
-        cls = 'info'
-    else:
-        cls = 'important'
+    if value:
+        if value.get('Running'):
+            cls = 'success'
+        elif value.get('ExitCode') == 0:
+            cls = 'info'
+        else:
+            cls = 'important'
     return cls
 
 @register.filter
@@ -28,12 +29,14 @@ def container_uptime(value):
     Returns container uptime from date stamp
 
     """
-    tz = value.split('.')[-1]
-    now = time.mktime(datetime.fromtimestamp(time.time()).timetuple())
-    ts = time.mktime(datetime.fromtimestamp(time.mktime(time.strptime(value,
-        '%Y-%m-%dT%H:%M:%S.' + tz))).timetuple())
-    diff = now-ts
-    return timedelta(seconds=diff)
+    if value:
+        tz = value.split('.')[-1]
+        now = time.mktime(datetime.fromtimestamp(time.time()).timetuple())
+        ts = time.mktime(datetime.fromtimestamp(time.mktime(time.strptime(value,
+            '%Y-%m-%dT%H:%M:%S.' + tz))).timetuple())
+        diff = now-ts
+        return timedelta(seconds=diff)
+    return value
 
 @register.filter
 def container_port_links(value, host):

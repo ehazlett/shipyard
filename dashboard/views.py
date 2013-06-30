@@ -20,6 +20,7 @@ from django.contrib.auth.decorators import login_required
 from containers.models import Host, Container
 from containers.forms import (HostForm, CreateContainerForm,
     ImportRepositoryForm, ImageBuildForm)
+from shipyard import utils
 
 @login_required
 def index(request):
@@ -36,9 +37,11 @@ def index(request):
 def _host_info(request):
     hosts = Host.objects.filter(enabled=True)
     # load containers
-    [h.get_containers() for h in hosts]
+    cnt = [h.get_containers() for h in hosts][0]
+    # get list of ids to filter Container metadata
+    c_ids = [utils.get_short_id(x.get('Id')) for x in cnt]
     # return metadata objects
-    containers = Container.objects.filter(host__in=hosts).filter(
+    containers = Container.objects.filter(container_id__in=c_ids).filter(
         Q(user=None) | Q(user=request.user))
     ctx = {
         'hosts': hosts,

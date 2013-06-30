@@ -49,12 +49,12 @@
           <a class="brand" href="/"><img src="{{ STATIC_URL }}img/app.png" /> {{APP_NAME}}</a>
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
               <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
           </a>
           <div class="nav-collapse">
             <ul class="nav">
               {% if request.user.id != None %}
+              <li id="nav-dashboard"><a href="{% url 'dashboard.views.index' %}">{% trans 'dashboard' %}</a></li>
+              <li id="nav-applications"><a href="{% url 'applications.views.index' %}">{% trans 'applications' %}</a></li>
               {% endif %}
             </ul>
             <ul class="nav pull-right">

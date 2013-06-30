@@ -11,17 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.conf.urls import patterns, include, url
-from django.contrib import admin
-admin.autodiscover()
+from django.conf.urls import patterns, url
 
-urlpatterns = patterns('',
-    # Examples:
-    url(r'^$', 'shipyard.views.index', name='index'),
-    url(r'^accounts/', include('accounts.urls')),
-    url(r'^applications/', include('applications.urls')),
-    url(r'^dashboard/', include('dashboard.urls')),
-    url(r'^containers/', include('containers.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^rq/', include('django_rq.urls')),
+urlpatterns = patterns('applications.views',
+    url(r'^$', 'index', name='applications.index'),
 )

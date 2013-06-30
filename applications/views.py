@@ -11,17 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.conf.urls import patterns, include, url
-from django.contrib import admin
-admin.autodiscover()
+from django.shortcuts import render_to_response, redirect
+from django.core.urlresolvers import reverse
+from django.template import RequestContext
+from django.http import HttpResponse
+from django.db.models import Q
+from django.contrib.auth.decorators import login_required
+from applications.models import Application
 
-urlpatterns = patterns('',
-    # Examples:
-    url(r'^$', 'shipyard.views.index', name='index'),
-    url(r'^accounts/', include('accounts.urls')),
-    url(r'^applications/', include('applications.urls')),
-    url(r'^dashboard/', include('dashboard.urls')),
-    url(r'^containers/', include('containers.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^rq/', include('django_rq.urls')),
-)
+@login_required
+def index(request):
+    ctx = {
+        'applications': Application.objects.filter(Q(owner=None) |
+            Q(owner=request.user))
+    }
+    return render_to_response('applications/index.html', ctx,
+        context_instance=RequestContext(request))
+

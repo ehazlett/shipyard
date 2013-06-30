@@ -71,19 +71,16 @@ RQ_QUEUES = {
         'DB': 2,
         'PASSWORD': REDIS_PASSWORD,
     },
-    'loadbalancer': {
+    'builder': {
         'HOST': REDIS_HOST,
         'PORT': REDIS_PORT,
         'DB': 3,
         'PASSWORD': REDIS_PASSWORD,
-    },
-    'builder': {
-        'HOST': REDIS_HOST,
-        'PORT': REDIS_PORT,
-        'DB': 4,
-        'PASSWORD': REDIS_PASSWORD,
     }
 }
+HIPACHE_ENABLED = True
+HIPACHE_REDIS_HOST = REDIS_HOST
+HIPACHE_REDIS_PORT = REDIS_PORT
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -200,6 +197,7 @@ INSTALLED_APPS = (
     'shipyard',
     'accounts',
     'dashboard',
+    'applications',
     'containers',
 )
 
