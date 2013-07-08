@@ -18,5 +18,6 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'domain_name', 'backend_port',
         'owner')
     search_fields = ('name', 'description', 'domain_name')
+    readonly_fields = ('uuid',)
 
 admin.site.register(Application, ApplicationAdmin)

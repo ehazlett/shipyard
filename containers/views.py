@@ -75,7 +75,7 @@ def create_container(request):
             user = request.user
         c_id, status = host.create_container(image, command, ports,
             environment=environment, memory=memory,
-            description=form.data.get('description'), user=user)
+            description=form.data.get('description'), owner=user)
     if hosts:
         if status:
             messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(

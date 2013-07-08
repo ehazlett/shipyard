@@ -11,27 +11,11 @@
     <h3>{% trans 'Create Application' %}</h3>
   </div>
   <div class="modal-body">
+    {% crispy form_application form_application.helper %}
   </div>
   <div class="modal-footer">
-    <a href="#" id="btn-save-container-info" class="btn btn-primary btn-large">{% trans 'Create' %}</a>
+    <a href="#" id="btn-create-application" class="btn btn-primary btn-large">{% trans 'Create' %}</a>
     <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Cancel' %}</a>
-  </div>
-</div>
-<div id="dialog-application-info" class="modal hide">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>{% trans 'Application Info' %}</h3>
-  </div>
-  <div class="modal-body">
-    <form id="form-container-info" action="{% url 'containers.views.container_info' %}" method="post">
-      {% csrf_token %}
-      <input type="hidden" id="application-info-application-id" name="application-id" value=""/>
-      <input class="span3" id="application-info-description" name="description" type="text" placeholder="{% trans 'description' %}" autofocus="true">
-    </form>
-  </div>
-  <div class="modal-footer">
-    <a href="#" id="btn-save-container-info" class="btn btn-primary btn-large">{% trans 'Save' %}</a>
-    <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Close' %}</a>
   </div>
 </div>
 <div class="toolbar fill">
@@ -54,12 +38,14 @@
         <tbody>
             {% for app in applications %}
             <tr>
-                <td><a href="#" class="application-info" data-application-id="{{app.id}}">{{app.name}}</a></td>
+                <td><a href="{% url 'applications.views.details' app_uuid=app.uuid %}">{{app.name}}</a></td>
                 <td>{{app.description}}</td>
-                <td><a href="{{app.protocol}}://{{app.domain_name}}" target="_blank">{{app.domain_name}}</a></td>
+                <td><a href="{{app.get_app_url}}" target="_blank">{{app.domain_name}}</a></td>
                 <td>{{app.backend_port}}</td>
-                <td>{{app.protocol}}</td>
-                <td></td>
+                <td>{{app.get_protocol_display}}</td>
+                <td>
+                    <a href="#" rel="tooltip" class="remove-application" data-application-uuid="{{app.uuid}}" title="{% trans 'Remove Application' %}"><i class="icon-remove-circle"></i></a>
+                </td>
             </tr>
             {% empty %}
             <tr>
@@ -73,14 +59,15 @@
     $(function() {
         $("#nav-applications").addClass('active');
     });
-    $("a.application-info").click(function(){
-        var id = this.getAttribute('data-application-id');
-        //$.getJSON("{% url 'containers.views.container_info' %}" + id + '/', function(data){
-        //    $("#container-info-description").val(data.fields.description);
-        //    $("#container-info-container-id").val(id);
-        //    $("#dialog-container-info").modal('toggle');
-        //});
-        $("#dialog-application-info").modal('toggle');
+    $("a#btn-create-application").click(function(){
+        $("#form-create-application").submit();
+        return false;
+    });
+    $("a.remove-application").click(function(){
+        var appUuid = (this).getAttribute('data-application-uuid');
+        if (confirm("{% trans 'Are you sure you want to remove this application?' %}")) {
+            redirect("/applications/" + appUuid + "/delete/");
+        }
         return false;
     });
 </script>

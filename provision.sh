@@ -69,6 +69,9 @@ chown -R vagrant $VE_DIR
 # bashrc
 if [ "`grep \"source /opt/ve\" /home/vagrant/.bashrc`" = "" ]; then
     echo "source $VE_DIR/bin/activate" >> /home/vagrant/.bashrc
+    echo "alias pm='python manage.py \$*'" >> /home/vagrant/.bashrc
+    echo "alias pmr='python manage.py runserver 0.0.0.0:8000\$*'" >> /home/vagrant/.bashrc
+    echo "sudo service supervisor restart" >> /home/vagrant/.bashrc
     echo "cd $APP_DIR" >> /home/vagrant/.bashrc
 fi
 

@@ -15,4 +15,14 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('applications.views',
     url(r'^$', 'index', name='applications.index'),
+    url(r'^create/$', 'create', name='applications.create'),
+    url(r'^details/(?P<app_uuid>\w{32})/$', 'details',
+        name='applications.details'),
+    url(r'^edit/$', 'edit', name='applications.edit'),
+    url(r'^(?P<app_uuid>\w{32})/delete/$', 'delete',
+        name='applications.delete'),
+    url(r'^(?P<app_uuid>\w{32})/containers/attach/$',
+        'attach_containers', name='applications.attach_containers'),
+    url(r'^(?P<app_uuid>\w{32})/containers/(?P<container_id>\w{12})/remove/$',
+        'remove_container', name='applications.remove_container'),
 )

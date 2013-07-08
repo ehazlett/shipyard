@@ -42,7 +42,7 @@ def _host_info(request):
     c_ids = [utils.get_short_id(x.get('Id')) for x in cnt]
     # return metadata objects
     containers = Container.objects.filter(container_id__in=c_ids).filter(
-        Q(user=None) | Q(user=request.user))
+        Q(owner=None) | Q(owner=request.user))
     ctx = {
         'hosts': hosts,
         'containers': containers,

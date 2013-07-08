@@ -82,7 +82,7 @@ class Host(models.Model):
             return containers
         # filter
         ids = [x.container_id for x in Container.objects.all() \
-            if x.user == None or x.user == user]
+            if x.owner == None or x.owner == user]
         return [x for x in containers if x.get('Id') in ids]
 
     def get_images(self, show_all=False):
@@ -96,7 +96,7 @@ class Host(models.Model):
         return images
 
     def create_container(self, image=None, command=None, ports=[],
-        environment=[], memory=0, description='', user=None):
+        environment=[], memory=0, description='', owner=None):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports,
             mem_limit=memory, tty=True, stdin_open=True,
@@ -109,7 +109,7 @@ class Host(models.Model):
             c, created = Container.objects.get_or_create(container_id=c_id,
                 host=self)
             c.description = description
-            c.user = user
+            c.owner = owner
             c.save()
             status = True
         # clear host cache
@@ -150,7 +150,7 @@ class Container(models.Model):
     description = models.TextField(blank=True, null=True, default='')
     meta = models.TextField(blank=True, null=True, default='{}')
     host = models.ForeignKey(Host, null=True, blank=True)
-    user = models.ForeignKey(User, null=True, blank=True)
+    owner = models.ForeignKey(User, null=True, blank=True)
 
     def __unicode__(self):
         d = self.container_id
@@ -170,3 +170,11 @@ class Container(models.Model):
     def get_ports(self):
         meta = self.get_meta()
         return meta.get('NetworkSettings', {}).get('PortMapping', {})
+
+    def get_memory_limit(self):
+        mem = 0
+        meta = self.get_meta()
+        if meta:
+            mem = int(meta.get('Config', {}).get('Memory')) / 1048576
+        return mem
+
