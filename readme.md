@@ -27,9 +27,10 @@ is running on localhost.
 
 Alternate dev setup using vagrant:
 
-* vagrant up
-* vagrant ssh
-* ./manage.py runserver 0.0.0.0:8000
+* `vagrant up`
+* `vagrant ssh`
+* `./manage.py runserver 0.0.0.0:8000`
+* `./manage.py rqworker shipyard` (in separate ssh session)
 * Open browser to http://localhost:8000
 
 # Features
@@ -51,6 +52,18 @@ Alternate dev setup using vagrant:
 ![Dashboard](http://i.imgur.com/pQrk3mu.png)
 
 ![Create Container](http://i.imgur.com/jLgyxUz.png)
+
+# Applications
+Applications are groups of containers that are accessible by a domain name.  The easiest
+way to test this is to add some local `/etc/hosts` entries for fake domains pointed to `10.10.10.25` (the vagrant vm).  For example:
+
+```
+10.10.10.25 foo.local
+```
+
+Then you can create a new application with the domain `foo.local`.  Attach one or more containers and then access http://foo.local in your browser and it should hit Hipache and be routed to the contianers.
+
+For more info on applications, see [here](https://github.com/ehazlett/shipyard/wiki/Applications)
 
 # License
 
