@@ -55,7 +55,7 @@ Alternate dev setup using vagrant:
 
 # Applications
 Applications are groups of containers that are accessible by a domain name.  The easiest
-way to test this is to add some local `/etc/hosts` entries for fake domains pointed to `10.10.10.25` (the vagrant vm).  For example:
+way to test this is to add some local `/etc/hosts` entries for fake domains pointed to `10.10.10.25` (the vagrant vm).  For example, add the following to `/etc/hosts`:
 
 ```
 10.10.10.25 foo.local
