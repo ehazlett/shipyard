@@ -67,12 +67,14 @@ $VE_DIR/bin/pip install -r requirements.txt
 chown -R vagrant $VE_DIR
 
 # bashrc
-if [ "`grep \"source /opt/ve\" /home/vagrant/.bashrc`" = "" ]; then
-    echo "source $VE_DIR/bin/activate" >> /home/vagrant/.bashrc
-    echo "alias pm='python manage.py \$*'" >> /home/vagrant/.bashrc
-    echo "alias pmr='python manage.py runserver 0.0.0.0:8000\$*'" >> /home/vagrant/.bashrc
-    echo "sudo service supervisor restart" >> /home/vagrant/.bashrc
-    echo "cd $APP_DIR" >> /home/vagrant/.bashrc
+VAGRANT_BASHRC=/home/vagrant/.bashrc
+if [ "`grep \"source /opt/ve\" $VAGRANT_BASHRC`" = "" ]; then
+    echo "source $VE_DIR/bin/activate" >> $VAGRANT_BASHRC
+    echo "alias pm='python manage.py \$*'" >> $VAGRANT_BASHRC
+    echo "alias pmr='python manage.py runserver 0.0.0.0:8000\$*'" >> $VAGRANT_BASHRC
+    echo "sudo /etc/init.d/supervisor restart" >> $VAGRANT_BASHRC
+    echo "echo ''" >> $VAGRANT_BASHRC
+    echo "cd $APP_DIR" >> $VAGRANT_BASHRC
 fi
 
 cat << EOF > /etc/supervisor/conf.d/shipyard.conf

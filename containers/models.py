@@ -117,9 +117,16 @@ class Host(models.Model):
         return c_id, status
 
     def restart_container(self, container_id=None):
+        from applications.models import Application
         c = self._get_client()
         c.restart(container_id)
         self._invalidate_container_cache()
+        # reload containers to get proper port
+        self.get_containers()
+        # update hipache
+        apps = Application.objects.filter(containers__in=[self])
+        for app in apps:
+            app.update_config()
 
     def stop_container(self, container_id=None):
         c = self._get_client()

@@ -39,7 +39,7 @@
     </form>
   </div>
 </div>
-<div id="application" class="container">
+<div id="application" class="fill">
     <div class="app-info">
         {% with application.get_memory_limit as mem_limit %}
         <span class="app-name">{{application.name}}</span> <span class="app-url"> @ <a href="{{application.get_app_url}}" target="_blank">{{application.get_app_url}}</a></span>

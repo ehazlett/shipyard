@@ -49,6 +49,10 @@ class Application(models.Model):
                 tasks.remove_hipache_config(original_domain)
         super(Application, self).save(*args, **kwargs)
 
+    def update_config(self):
+        args = (self.id,)
+        utils.get_queue('shipyard').enqueue(tasks.update_hipache, args=args)
+
 def application_post_config(sender, **kwargs):
     app = kwargs.get('instance')
     args = (app.id,)
