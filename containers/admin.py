@@ -20,7 +20,7 @@ class HostAdmin(admin.ModelAdmin):
     list_filter = ('enabled',)
 
 class ContainerAdmin(admin.ModelAdmin):
-    list_display = ('container_id', 'host', 'user')
+    list_display = ('container_id', 'host', 'owner')
     search_fields = ('container_id', 'host__hostname')
 
 admin.site.register(Host, HostAdmin)

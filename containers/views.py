@@ -68,16 +68,21 @@ def create_container(request):
     hosts = form.data.getlist('hosts')
     private = form.data.get('private')
     user = None
+    status = False
     for i in hosts:
         host = Host.objects.get(id=i)
         if private:
             user = request.user
-        host.create_container(image, command, ports,
+        c_id, status = host.create_container(image, command, ports,
             environment=environment, memory=memory,
-            description=form.data.get('description'), user=user)
+            description=form.data.get('description'), owner=user)
     if hosts:
-        messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
-            image))
+        if status:
+            messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
+                image))
+        else:
+            messages.add_message(request, messages.ERROR,
+                _('Container failed to start'))
     else:
         messages.add_message(request, messages.ERROR, _('No hosts selected'))
     return redirect('dashboard.views.index')

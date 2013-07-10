@@ -17,6 +17,7 @@ from docker import client
 from django.conf import settings
 from docker import client
 from django.core.cache import cache
+from shipyard import utils
 import json
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
@@ -52,25 +53,25 @@ class Host(models.Model):
         self._invalidate_container_cache()
         self._invalidate_image_cache()
 
-    def _get_short_id(self, container_id):
-        return container_id[:12]
-
     def get_containers(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
             self.port))
         key = CONTAINER_KEY.format(self.name)
         containers = cache.get(key)
+        container_ids = []
         if containers is None:
             containers = c.containers(all=show_all)
             # update meta data
             for x in containers:
                 # only get first 12 chars of id (for metatdata)
-                c_id = self._get_short_id(x.get('Id'))
+                c_id = utils.get_short_id(x.get('Id'))
+                # ignore stopped containers
+                meta = c.inspect_container(c_id)
                 m, created = Container.objects.get_or_create(
                     container_id=c_id, host=self)
-                meta = c.inspect_container(c_id)
                 m.meta = json.dumps(meta)
                 m.save()
+                container_ids.append(c_id)
             cache.set(key, containers, HOST_CACHE_TTL)
         return containers
 
@@ -81,7 +82,7 @@ class Host(models.Model):
             return containers
         # filter
         ids = [x.container_id for x in Container.objects.all() \
-            if x.user == None or x.user == user]
+            if x.owner == None or x.owner == user]
         return [x for x in containers if x.get('Id') in ids]
 
     def get_images(self, show_all=False):
@@ -95,26 +96,37 @@ class Host(models.Model):
         return images
 
     def create_container(self, image=None, command=None, ports=[],
-        environment=[], memory=0, description='', user=None):
+        environment=[], memory=0, description='', owner=None):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports,
-            mem_limit=memory, environment=environment)
+            mem_limit=memory, tty=True, stdin_open=True,
+            environment=environment)
         c_id = cnt.get('Id')
         c.start(c_id)
-        # create metadata
-        c, created = Container.objects.get_or_create(container_id=c_id,
-            host=self)
-        c.description = description
-        c.user = user
-        c.save()
+        status = False
+        # create metadata only if container starts successfully
+        if c.inspect_container(c_id).get('State', {}).get('Running'):
+            c, created = Container.objects.get_or_create(container_id=c_id,
+                host=self)
+            c.description = description
+            c.owner = owner
+            c.save()
+            status = True
         # clear host cache
         self._invalidate_container_cache()
-        return c_id
+        return c_id, status
 
     def restart_container(self, container_id=None):
+        from applications.models import Application
         c = self._get_client()
         c.restart(container_id)
         self._invalidate_container_cache()
+        # reload containers to get proper port
+        self.get_containers()
+        # update hipache
+        apps = Application.objects.filter(containers__in=[self])
+        for app in apps:
+            app.update_config()
 
     def stop_container(self, container_id=None):
         c = self._get_client()
@@ -123,7 +135,7 @@ class Host(models.Model):
 
     def destroy_container(self, container_id=None):
         c = self._get_client()
-        c_id = self._get_short_id(container_id)
+        c_id = utils.get_short_id(container_id)
         c.kill(c_id)
         c.remove_container(c_id)
         # remove metadata
@@ -145,10 +157,13 @@ class Container(models.Model):
     description = models.TextField(blank=True, null=True, default='')
     meta = models.TextField(blank=True, null=True, default='{}')
     host = models.ForeignKey(Host, null=True, blank=True)
-    user = models.ForeignKey(User, null=True, blank=True)
+    owner = models.ForeignKey(User, null=True, blank=True)
 
     def __unicode__(self):
-        return self.container_id
+        d = self.container_id
+        if self.description:
+            d += '({0})'.format(self.description)
+        return d
 
     def is_public(self):
         if self.user == None:
@@ -158,4 +173,15 @@ class Container(models.Model):
 
     def get_meta(self):
         return json.loads(self.meta)
+
+    def get_ports(self):
+        meta = self.get_meta()
+        return meta.get('NetworkSettings', {}).get('PortMapping', {})
+
+    def get_memory_limit(self):
+        mem = 0
+        meta = self.get_meta()
+        if meta:
+            mem = int(meta.get('Config', {}).get('Memory')) / 1048576
+        return mem
 

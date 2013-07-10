@@ -25,6 +25,13 @@ is running on localhost.
 * Open browser to http://localhost:8000
 * Add a host (i.e. 127.0.0.1 for local docker)
 
+Alternate dev setup using vagrant:
+
+* vagrant up
+* vagrant ssh
+* ./manage.py runserver 0.0.0.0:8000
+* Open browser to http://localhost:8000
+
 # Features
 
 * Multiple host support
@@ -34,6 +41,7 @@ is running on localhost.
 * Import repositories
 * Private containers
 * Container metadata (description, etc.)
+* Applications: bind containers to applications that are setup with [hipache](https://github.com/dotcloud/hipache)
 * ...more coming...
 
 # Screenshots

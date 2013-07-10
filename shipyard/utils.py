@@ -15,3 +15,6 @@ import django_rq
 
 def get_queue(name='shipyard'):
     return django_rq.get_queue(name)
+
+def get_short_id(container_id):
+    return container_id[:12]

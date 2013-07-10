@@ -30,6 +30,9 @@ a:hover {
   top: 6px;
   margin-right: 5px;
 }
+.navbar .brand {
+  padding: 10px 20px 5px;
+}
 .hide {
   display: none;
 }
@@ -299,4 +302,20 @@ ul.footer-links li a {
 }
 ul.footer-links li a:hover {
   color: #cacaca;
+}
+.app-info {
+  margin: 15px 0 5px 0;
+}
+.app-name {
+  font-size: 32px;
+}
+.app-url {
+  position: relative;
+  top: -3px;
+}
+#application {
+}
+h3 a {
+    position: relative;
+    top: -3px;
 }
