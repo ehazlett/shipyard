@@ -19,6 +19,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.core import serializers
+from django.shortcuts import render_to_response
 import django_rq
 from containers.models import Host, Container
 from containers.forms import (HostForm, CreateContainerForm,
@@ -110,6 +111,11 @@ def destroy_container(request, host, container_id):
     messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
         container_id))
     return redirect('dashboard.views.index')
+
+@login_required
+def attach_container(request, host, container_id):
+    h = Host.objects.get(name=host)
+    return render_to_response("containers/attach.html", {'id': container_id})
 
 @require_http_methods(['POST'])
 @login_required
