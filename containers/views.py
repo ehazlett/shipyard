@@ -22,6 +22,7 @@ from django.core import serializers
 from django.shortcuts import render_to_response
 import django_rq
 from containers.models import Host, Container
+from django.template import RequestContext
 from containers.forms import (HostForm, CreateContainerForm,
     ImportRepositoryForm, ImageBuildForm)
 from shipyard import utils
@@ -115,7 +116,15 @@ def destroy_container(request, host, container_id):
 @login_required
 def attach_container(request, host, container_id):
     h = Host.objects.get(name=host)
-    return render_to_response("containers/attach.html", {'id': container_id})
+    c_id = utils.get_short_id(container_id)
+    c = Container.objects.get(container_id=c_id)
+    ctx = {
+        'container_id': c_id,
+        'container_name': c.description or c_id,
+        'host_url': '{0}:{1}'.format(h.hostname, h.port),
+    }
+    return render_to_response("containers/attach.html", ctx,
+        context_instance=RequestContext(request))
 
 @require_http_methods(['POST'])
 @login_required

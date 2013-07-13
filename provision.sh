@@ -78,7 +78,7 @@ if [ "`grep \"source /opt/ve\" $VAGRANT_BASHRC`" = "" ]; then
 fi
 
 cat << EOF > /etc/supervisor/conf.d/shipyard.conf
-[program:shipyard-lb]
+[program:hipache]
 directory=/tmp
 command=hipache -c /etc/hipache.config.json
 user=root
