@@ -1,7 +1,7 @@
 #!/bin/sh
 VE_DIR=./.ve
 if [ -e "/etc/lsb-release" ]; then
-    apt-get install -y python-setuptools python-dev
+    DEBCONF_FRONTEND=noninteractive apt-get install -y python-setuptools python-dev
 fi
 easy_install virtualenv
 virtualenv --no-site-packages $VE_DIR
