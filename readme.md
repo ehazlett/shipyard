@@ -65,6 +65,8 @@ Then you can create a new application with the domain `foo.local`.  Attach one o
 
 For more info on applications, see [here](https://github.com/ehazlett/shipyard/wiki/Applications)
 
+
+
 # License
 
 Licensed under the Apache License, Version 2.0 (the "License");

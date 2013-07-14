@@ -57,6 +57,9 @@ class CreateContainerForm(forms.Form):
     environment = forms.CharField(required=False,
         help_text='key=value space separated pairs')
     ports = forms.CharField(required=False, help_text='space separated')
+    volume = forms.CharField(required=False, help_text='container volume (i.e. /mnt/volume)')
+    volumes_from = forms.CharField(required=False,
+        help_text='mount volumes from specified container')
     hosts = forms.MultipleChoiceField()
     private = forms.BooleanField()
 
