@@ -177,7 +177,7 @@ class Container(models.Model):
 
     def get_ports(self):
         meta = self.get_meta()
-        return meta.get('NetworkSettings', {}).get('PortMapping', {})
+        return meta.get('NetworkSettings', {}).get('PortMapping', {}).get('Tcp', {})
 
     def get_memory_limit(self):
         mem = 0
