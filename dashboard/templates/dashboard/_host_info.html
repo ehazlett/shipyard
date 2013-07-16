@@ -50,7 +50,7 @@
                         <td>{{c.description}}</td>
                         <td>{{c.get_meta.Config.Image}}</td>
                         <td>{{c.get_meta.Config.Cmd|join:" "}}</td>
-                        <td>{{c.get_meta.NetworkSettings.PortMapping.Tcp|container_port_links:c.host.name|safe}}</td>
+                        <td>{{c.get_ports|container_port_links:c.host.name|safe}}</td>
                         <td>{{c.get_meta.Config.Memory|container_memory_to_mb}}</td>
                         <td>{{c.host.name}}</td>
                         <td><span class="label label-{{c.get_meta.State|container_status}}">{% if c.get_meta.State.Running %}{% trans 'running' %}{% else %}{% trans 'stopped' %}{% endif %}</span></td>
