@@ -20,6 +20,12 @@
   </div>
 </div>
 
+<div class="pull-right">
+<select id="visible-containers">
+    <option value="running">{% trans 'Running' %}</option>
+    <option value="all" {% if show_all %}selected="true"{% endif %}>{% trans 'Show All' %}</option>
+</select>
+</div>
 <div class="tabbable">
     <ul class="nav nav-tabs">
         <li class="active"><a href="#tab-containers" data-toggle="tab">{% trans 'Containers' %}</a></li>
@@ -128,6 +134,13 @@
 <script type="text/javascript">
     $(function(){
         $("a[rel=tooltip]").tooltip();
+    });
+    $("select#visible-containers").change(function(){
+        var showAll = false;
+        if ($("select#visible-containers").val() == 'all') {
+            showAll = true;
+        }
+        loadContainers(showAll);
     });
     $("a.container-info").click(function(){
         var id = this.getAttribute('data-container-id');

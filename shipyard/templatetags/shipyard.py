@@ -30,12 +30,15 @@ def container_uptime(value):
 
     """
     if value:
-        tz = value.split('.')[-1]
-        now = time.mktime(datetime.fromtimestamp(time.time()).timetuple())
-        ts = time.mktime(datetime.fromtimestamp(time.mktime(time.strptime(value,
-            '%Y-%m-%dT%H:%M:%S.' + tz))).timetuple())
-        diff = now-ts
-        return timedelta(seconds=diff)
+        try:
+            tz = value.split('.')[-1]
+            now = time.mktime(datetime.fromtimestamp(time.time()).timetuple())
+            ts = time.mktime(datetime.fromtimestamp(time.mktime(time.strptime(value,
+                '%Y-%m-%dT%H:%M:%S.' + tz))).timetuple())
+            diff = now-ts
+            return timedelta(seconds=diff)
+        except:
+            return ''
     return value
 
 @register.filter

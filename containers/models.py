@@ -19,6 +19,7 @@ from docker import client
 from django.core.cache import cache
 from shipyard import utils
 import json
+import hashlib
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
 CONTAINER_KEY = '{0}:containers'
@@ -56,7 +57,7 @@ class Host(models.Model):
     def get_containers(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
             self.port))
-        key = CONTAINER_KEY.format(self.name)
+        key = hashlib.sha224(CONTAINER_KEY.format(self.name) + str(show_all)).hexdigest()
         containers = cache.get(key)
         container_ids = []
         if containers is None:
@@ -177,7 +178,10 @@ class Container(models.Model):
 
     def get_ports(self):
         meta = self.get_meta()
-        return meta.get('NetworkSettings', {}).get('PortMapping', {}).get('Tcp', {})
+        port_mapping = meta.get('NetworkSettings', {}).get('PortMapping')
+        if port_mapping:
+            return port_mapping.get('Tcp', {})
+        return None
 
     def get_memory_limit(self):
         mem = 0
