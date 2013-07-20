@@ -175,4 +175,14 @@
         }
         return false;
     });
+    $('a[data-toggle="tab"]').on('shown', function (e) {
+        console.log($(e.target).attr('href'));
+        var tab = $(e.target).attr('href');
+        if (tab == '#tab-containers') {
+            $("select#visible-containers").removeClass('hide');
+        } else {
+            $("select#visible-containers").addClass('hide');
+        }
+        return false;
+    });
 </script>
