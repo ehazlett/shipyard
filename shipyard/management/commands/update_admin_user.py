@@ -25,5 +25,7 @@ class Command(BaseCommand):
             raise StandardError('You must specify a username and password')
         user, created = User.objects.get_or_create(username=username)
         user.set_password(password)
+        user.is_staff = True
+        user.is_superuser = True
         user.save()
         print('{0} updated'.format(username))
