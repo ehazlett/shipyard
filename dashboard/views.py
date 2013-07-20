@@ -36,13 +36,15 @@ def index(request):
 @login_required
 def _host_info(request):
     hosts = Host.objects.filter(enabled=True)
+    containers = None
     # load containers
-    cnt = [h.get_containers() for h in hosts][0]
-    # get list of ids to filter Container metadata
-    c_ids = [utils.get_short_id(x.get('Id')) for x in cnt]
-    # return metadata objects
-    containers = Container.objects.filter(container_id__in=c_ids).filter(
-        Q(owner=None) | Q(owner=request.user))
+    if hosts:
+        cnt = [h.get_containers() for h in hosts][0]
+        # get list of ids to filter Container metadata
+        c_ids = [utils.get_short_id(x.get('Id')) for x in cnt]
+        # return metadata objects
+        containers = Container.objects.filter(container_id__in=c_ids).filter(
+            Q(owner=None) | Q(owner=request.user))
     ctx = {
         'hosts': hosts,
         'containers': containers,

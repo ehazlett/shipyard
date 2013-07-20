@@ -121,6 +121,7 @@
     $("#btn-search-repository").click(function(){
         var qry = $("#search-repository-query").val();
         $.getJSON("{% url 'containers.views.search_repository' %}?query=" + qry, function(data){
+            console.log(data);
             var d = '<table class="table table-bordered table-condensed">';
             d += '<thead><th>{% trans "Name" %}</th><th>{% trans "Description" %}</th><th></th></thead>';
             d += '<tbody>';
