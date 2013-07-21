@@ -113,3 +113,4 @@ def remove_container(request, app_uuid=None, container_id=None):
     app.save()
     return redirect(reverse('applications.views.details',
         kwargs={'app_uuid': app_uuid}))
+

@@ -154,6 +154,11 @@ class Host(models.Model):
         f = open(docker_file, 'r')
         c.build(f, tag)
 
+    def remove_image(self, image_id=None):
+        c = self._get_client()
+        c.remove_image(image_id)
+        self._invalidate_image_cache()
+
 class Container(models.Model):
     container_id = models.CharField(max_length=96, null=True, blank=True)
     description = models.TextField(blank=True, null=True, default='')

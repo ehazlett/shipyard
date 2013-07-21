@@ -83,6 +83,7 @@
                         <th>{% trans 'Repository' %}</th>
                         <th>{% trans 'Tag' %}</th>
                         <th>{% trans 'Host' %}</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,6 +94,9 @@
                         <td>{{i.Repository}}</td>
                         <td>{{i.Tag}}</td>
                         <td>{{h.name}}</td>
+                        <td>
+                            <a href="#" rel="tooltip" class="remove-image" data-url="{% url 'containers.remove_image' host_id=h.id image_id=i.Id %}" title="{% trans 'Remove Image' %}"><i class="icon-trash"></i></a>
+                        </td>
                     </tr>
                     {% endfor %}
                     {% empty %}
@@ -170,6 +174,13 @@
     });
     $("a.destroy-container").click(function(){
         if (confirm("{% trans 'Are you sure you want to destroy the container?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
+    });
+    $("a.remove-image").click(function(){
+        if (confirm("{% trans 'Are you sure you want to remove the image?' %}")) {
             var url = this.getAttribute('data-url');
             redirect(url);
         }

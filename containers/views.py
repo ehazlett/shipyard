@@ -204,3 +204,12 @@ def build_image(request):
     messages.add_message(request, messages.INFO,
         _('Building image from docker file.  This may take a few minutes.'))
     return redirect(reverse('index'))
+
+@login_required
+def remove_image(request, host_id, image_id):
+    h = Host.objects.get(id=host_id)
+    h.remove_image(image_id)
+    messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
+        image_id))
+    return redirect('dashboard.views.index')
+

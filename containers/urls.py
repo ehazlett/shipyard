@@ -34,4 +34,6 @@ urlpatterns = patterns('containers.views',
         name='containers.import_image'),
     url(r'^buildimage/$', 'build_image',
         name='containers.build_image'),
+    url(r'^removeimage/(?P<host_id>.*)/(?P<image_id>.*)/$',
+        'remove_image', name='containers.remove_image'),
 )
