@@ -21,18 +21,20 @@ def update_hipache(app_id=None):
         redis_host = getattr(settings, 'HIPACHE_REDIS_HOST')
         redis_port = getattr(settings, 'HIPACHE_REDIS_PORT')
         rds = redis.Redis(host=redis_host, port=redis_port)
-        app = Application.objects.get(id=app_id)
-        domain_key = 'frontend:{0}'.format(app.domain_name)
-        # remove existing
-        rds.delete(domain_key)
-        rds.rpush(domain_key, app.id)
-        # add upstreams
-        for c in app.containers.all():
-            port = c.get_ports()[app.backend_port]
-            upstream = '{0}://{1}:{2}'.format(app.protocol, c.host.hostname,
-                port)
-            rds.rpush(domain_key, upstream)
-        return True
+        with rds.pipeline() as pipe:
+            app = Application.objects.get(id=app_id)
+            domain_key = 'frontend:{0}'.format(app.domain_name)
+            # remove existing
+            pipe.delete(domain_key)
+            pipe.rpush(domain_key, app.id)
+            # add upstreams
+            for c in app.containers.all():
+                port = c.get_ports()[app.backend_port]
+                upstream = '{0}://{1}:{2}'.format(app.protocol, c.host.hostname,
+                    port)
+                pipe.rpush(domain_key, upstream)
+            pipe.execute()
+            return True
     return False
 
 def remove_hipache_config(domain_name=None):
