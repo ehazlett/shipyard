@@ -44,11 +44,15 @@ class Host(models.Model):
 
     def _invalidate_container_cache(self):
         # invalidate cache
-        cache.delete(CONTAINER_KEY.format(self.name))
+        cache.delete('{0}:*'.format(CONTAINER_KEY.format(self.name)))
 
     def _invalidate_image_cache(self):
         # invalidate cache
         cache.delete(IMAGE_KEY.format(self.name))
+
+    def _generate_container_cache_key(self, seed=None):
+        key = '{0}:{1}'.format(CONTAINER_KEY.format(self.name), str(seed))
+        return hashlib.sha224(key).hexdigest()
 
     def invalidate_cache(self):
         self._invalidate_container_cache()
@@ -57,7 +61,7 @@ class Host(models.Model):
     def get_containers(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
             self.port))
-        key = hashlib.sha224(CONTAINER_KEY.format(self.name) + str(show_all)).hexdigest()
+        key = self._generate_container_cache_key(show_all)
         containers = cache.get(key)
         container_ids = []
         if containers is None:
