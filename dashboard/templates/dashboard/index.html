@@ -82,7 +82,7 @@
     </div>
     <div class="btn-group">
         <a href="#dialog-create-container" role="button" data-toggle="modal" class="btn btn-success">{% trans 'Create' %}</a>
-        <a id="btn-refresh-containers" href="#" class="btn btn-default">{% trans 'Refresh' %}</a>
+        <a id="btn-refresh-containers" href="{% url 'containers.views.refresh' %}" class="btn btn-default">{% trans 'Refresh' %}</a>
     </div>
     <div class="btn-group">
         <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
@@ -109,14 +109,6 @@
         }
         $("#host-info").load("{% url 'dashboard.views._host_info' %}" + extra);
     }
-    $("a#btn-refresh-containers").click(function(){
-        var showAll = false;
-        if ($("select#visible-containers").val() == 'all') {
-            showAll = true;
-        }
-        console.log(showAll);
-        loadContainers(showAll);
-    });
     $(function() {
         loadContainers();
         $("#nav-dashboard").addClass('active');
