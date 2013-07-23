@@ -44,15 +44,17 @@ class Host(models.Model):
 
     def _invalidate_container_cache(self):
         # invalidate cache
-        cache.delete('{0}:*'.format(CONTAINER_KEY.format(self.name)))
+        key = CONTAINER_KEY.format(self.name)
+        cache.delete_pattern('*{0}*'.format(key))
 
     def _invalidate_image_cache(self):
         # invalidate cache
         cache.delete(IMAGE_KEY.format(self.name))
 
     def _generate_container_cache_key(self, seed=None):
-        key = '{0}:{1}'.format(CONTAINER_KEY.format(self.name), str(seed))
-        return hashlib.sha224(key).hexdigest()
+        gen_id = hashlib.sha224(self.name + str(seed)).hexdigest()
+        key = '{0}:{1}'.format(CONTAINER_KEY.format(self.name), gen_id)
+        return key
 
     def invalidate_cache(self):
         self._invalidate_container_cache()
