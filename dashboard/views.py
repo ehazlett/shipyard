@@ -40,12 +40,14 @@ def _host_info(request):
     containers = None
     # load containers
     if hosts:
-        cnt = [h.get_containers(show_all=show_all) for h in hosts][0]
-        # get list of ids to filter Container metadata
-        c_ids = [utils.get_short_id(x.get('Id')) for x in cnt]
+        c_ids = []
+        for h in hosts:
+            for c in h.get_containers(show_all=show_all):
+                c_ids.append(utils.get_short_id(c.get('Id')))
         # return metadata objects
         containers = Container.objects.filter(container_id__in=c_ids).filter(
             Q(owner=None) | Q(owner=request.user))
+    print(containers)
     ctx = {
         'hosts': hosts,
         'containers': containers,
