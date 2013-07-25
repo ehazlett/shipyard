@@ -47,7 +47,6 @@ def _host_info(request):
         # return metadata objects
         containers = Container.objects.filter(container_id__in=c_ids).filter(
             Q(owner=None) | Q(owner=request.user))
-    print(containers)
     ctx = {
         'hosts': hosts,
         'containers': containers,
