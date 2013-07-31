@@ -20,12 +20,26 @@
   </div>
 </div>
 
+<div id="dialog-container-logs" class="modal hide">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>{% trans 'Logs' %}</h3>
+  </div>
+  <div class="modal-body">
+    <div id="container-logs"></div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn btn-large" data-dismiss="modal" aria-hidden="true">{% trans 'Close' %}</a>
+  </div>
+</div>
+
 <div class="pull-right">
 <select id="visible-containers">
     <option value="running">{% trans 'Running' %}</option>
     <option value="all" {% if show_all %}selected="true"{% endif %}>{% trans 'Show All' %}</option>
 </select>
 </div>
+
 <div class="tabbable">
     <ul class="nav nav-tabs">
         <li class="active"><a href="#tab-containers" data-toggle="tab">{% trans 'Containers' %}</a></li>
@@ -62,6 +76,7 @@
                         <td><span class="label label-{{c.get_meta.State|container_status}}">{% if c.get_meta.State.Running %}{% trans 'running' %}{% else %}{% trans 'stopped' %}{% endif %}</span></td>
                         <td>{{c.get_meta.State.StartedAt|container_uptime}}</td>
                         <td>
+                            <a href="#" rel="tooltip" class="container-logs" data-container-id="{{c.container_id}}" data-url="{% url 'containers.get_logs' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Logs' %}"><i class="icon-list-alt"></i></a>
                             <a href="#" rel="tooltip" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Restart' %}"><i class="icon-refresh"></i></a>
                             <a href="#" rel="tooltip" class="stop-container" data-url="{% url 'containers.stop_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Stop' %}"><i class="icon-stop"></i></a>
                             <a href="#" rel="tooltip" class="destroy-container" data-url="{% url 'containers.destroy_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Destroy' %}"><i class="icon-trash"></i></a>
@@ -145,6 +160,16 @@
             showAll = true;
         }
         loadContainers(showAll);
+    });
+    $("a.container-logs").click(function(){
+        var id = this.getAttribute('data-container-id');
+        var url = this.getAttribute('data-url');
+        $.get(url, function(data){
+            $("#container-logs").html(data);
+            console.log(data);
+            $("#dialog-container-logs").modal('toggle');
+            return false;
+        });
     });
     $("a.container-info").click(function(){
         var id = this.getAttribute('data-container-id');
