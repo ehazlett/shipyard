@@ -141,6 +141,10 @@ class Host(models.Model):
         c.stop(container_id)
         self._invalidate_container_cache()
 
+    def get_container_logs(self, container_id=None):
+        c = self._get_client()
+        return c.logs(container_id)
+
     def destroy_container(self, container_id=None):
         c = self._get_client()
         c_id = utils.get_short_id(container_id)

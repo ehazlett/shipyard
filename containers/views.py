@@ -112,6 +112,14 @@ def stop_container(request, host, container_id):
     return redirect('dashboard.views.index')
 
 @login_required
+def get_logs(request, host, container_id):
+    h = Host.objects.get(name=host)
+    logs = h.get_container_logs(container_id)
+    # format
+    logs =  '<br />'.join(logs.split('\n'))
+    return HttpResponse(logs)
+
+@login_required
 def destroy_container(request, host, container_id):
     h = Host.objects.get(name=host)
     h.destroy_container(container_id)
