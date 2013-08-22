@@ -50,6 +50,8 @@ def container_port_links(value, host):
     ret = ""
     if value:
         host = Host.objects.get(name=host)
+        if value.has_key('Tcp'):
+            value = value.get('Tcp')
         for k,v in value.items():
             link = '<a href="http://{0}:{2}" target="_blank">{1} -> {2}</a>'.format(
                 host.hostname, k.strip(), v.strip())

@@ -1,0 +1,15 @@
+body {
+    background-color: rgb(0,0,0);
+}
+.terminal {
+  border: #000 solid 5px;
+  font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+  font-size: 11px;
+  color: #f0f0f0;
+  background: #000;
+}
+
+.reverse-video {
+  color: #000;
+  background: #f0f0f0;
+}

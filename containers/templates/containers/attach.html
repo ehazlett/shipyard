@@ -1,0 +1,63 @@
+<!doctype html>
+<!--
+  tty.js
+  Copyright (c) 2012-2013, Christopher Jeffrey (MIT License)
+-->
+<html>
+<head><title>Console: {{container_name}}</title></head>
+{% block extra_head_css %}
+<link href="{{STATIC_URL}}css/terminal.css" rel="stylesheet">
+{% endblock %}
+<script src="{{STATIC_URL}}js/term.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script type="text/javascript">
+window.docker = (function(docker) {
+  docker.terminal = {
+    startTerminalForContainer: function(container) {
+      var term = new Terminal();
+      term.open();
+
+      var wsUri = "ws://{{host_url}}/v1.3/containers/" +
+        container +
+        "/attach/ws?logs=1&stderr=1&stdout=1&stream=1&stdin=1";
+
+      var websocket = new WebSocket(wsUri);
+      websocket.onopen = function(evt) { onOpen(evt) };
+      websocket.onclose = function(evt) { onClose(evt) };
+      websocket.onmessage = function(evt) { onMessage(evt) };
+      websocket.onerror = function(evt) { onError(evt) };
+
+      term.on('data', function(data) {
+        websocket.send(data);
+      });
+
+      function onOpen(evt) {
+        //term.write("Session started");
+      }
+
+      function onClose(evt) {
+        term.write("Session terminated");
+      }
+
+      function onMessage(evt) {
+        term.write(evt.data);
+      }
+
+      function onError(evt) {
+      }
+    }
+  };
+
+  return docker;
+})(window.docker || {});
+
+$(function() {
+  $("[data-docker-terminal]").each(function(i, el) {
+    var container = $(el).data('docker-terminal');
+    docker.terminal.startTerminalForContainer(container);
+  });
+});
+</script>
+
+<div id="container-terminal" data-docker-terminal="{{container_id}}"></div>
+</html>
