@@ -36,16 +36,21 @@ def index(request):
 @login_required
 def _host_info(request):
     hosts = Host.objects.filter(enabled=True)
+    show_all = True if request.GET.has_key('showall') else False
+    containers = None
     # load containers
-    cnt = [h.get_containers() for h in hosts][0]
-    # get list of ids to filter Container metadata
-    c_ids = [utils.get_short_id(x.get('Id')) for x in cnt]
-    # return metadata objects
-    containers = Container.objects.filter(container_id__in=c_ids).filter(
-        Q(owner=None) | Q(owner=request.user))
+    if hosts:
+        c_ids = []
+        for h in hosts:
+            for c in h.get_containers(show_all=show_all):
+                c_ids.append(utils.get_short_id(c.get('Id')))
+        # return metadata objects
+        containers = Container.objects.filter(container_id__in=c_ids).filter(
+            Q(owner=None) | Q(owner=request.user))
     ctx = {
         'hosts': hosts,
         'containers': containers,
+        'show_all': show_all,
     }
     return render_to_response('dashboard/_host_info.html', ctx,
         context_instance=RequestContext(request))

@@ -64,8 +64,8 @@
                 <ul class="dropdown-menu">
                   {% if request.user.is_superuser %}
                   <li><a href="/admin/" target="_sh_admin">{% trans 'administration' %}</a></li>
-                  {% endif %}
                   <li class="divider"></li>
+                  {% endif %}
                   <li><a href="{% url "accounts.views.logout" %}">{% trans 'logout' %}</a></li>
                 </ul>
               </li>

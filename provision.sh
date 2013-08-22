@@ -7,7 +7,7 @@ NODE_URL='http://nodejs.org/dist/v0.10.12/node-v0.10.12.tar.gz'
 GIT_RECEIVER_URL='https://raw.github.com/ehazlett/gitreceive/master/gitreceive'
 
 apt-get -qq update
-DEBCONF_FRONTEND=noninteractive apt-get -qq install -y python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server
+DEBCONF_FRONTEND=noninteractive apt-get -qq install -y python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server supervisor
 
 mkdir -p $VE_ROOT
 

@@ -319,3 +319,6 @@ h3 a {
     position: relative;
     top: -3px;
 }
+select#visible-containers {
+  margin-bottom: 0px;
+}

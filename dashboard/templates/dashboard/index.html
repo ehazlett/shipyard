@@ -82,7 +82,7 @@
     </div>
     <div class="btn-group">
         <a href="#dialog-create-container" role="button" data-toggle="modal" class="btn btn-success">{% trans 'Create' %}</a>
-        <a href="{% url 'containers.views.refresh' %}" class="btn btn-default">{% trans 'Refresh' %}</a>
+        <a id="btn-refresh-containers" href="{% url 'containers.views.refresh' %}" class="btn btn-default">{% trans 'Refresh' %}</a>
     </div>
     <div class="btn-group">
         <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">
@@ -99,11 +99,18 @@
 </div>
 
 <div id="host-info" class="fill">
-    <div class="loading center"><img src="{{ STATIC_URL }}img/loader_64.gif" /></div>
 </div>
 <script type="text/javascript">
+    function loadContainers(showAll) {
+        $("div#host-info").html('<div class="loading center"><img src="{{ STATIC_URL }}img/loader_64.gif" /></div>');
+        var extra = '';
+        if (showAll) {
+            extra = '?showall=True';
+        }
+        $("#host-info").load("{% url 'dashboard.views._host_info' %}" + extra);
+    }
     $(function() {
-        $("#host-info").load("{% url 'dashboard.views._host_info' %}");
+        loadContainers();
         $("#nav-dashboard").addClass('active');
     });
     $("#btn-add-host").click(function(){
@@ -121,6 +128,7 @@
     $("#btn-search-repository").click(function(){
         var qry = $("#search-repository-query").val();
         $.getJSON("{% url 'containers.views.search_repository' %}?query=" + qry, function(data){
+            console.log(data);
             var d = '<table class="table table-bordered table-condensed">';
             d += '<thead><th>{% trans "Name" %}</th><th>{% trans "Description" %}</th><th></th></thead>';
             d += '<tbody>';

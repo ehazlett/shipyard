@@ -19,6 +19,7 @@ from docker import client
 from django.core.cache import cache
 from shipyard import utils
 import json
+import hashlib
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
 CONTAINER_KEY = '{0}:containers'
@@ -43,11 +44,17 @@ class Host(models.Model):
 
     def _invalidate_container_cache(self):
         # invalidate cache
-        cache.delete(CONTAINER_KEY.format(self.name))
+        key = CONTAINER_KEY.format(self.name)
+        cache.delete_pattern('*{0}*'.format(key))
 
     def _invalidate_image_cache(self):
         # invalidate cache
         cache.delete(IMAGE_KEY.format(self.name))
+
+    def _generate_container_cache_key(self, seed=None):
+        gen_id = hashlib.sha224(self.name + str(seed)).hexdigest()
+        key = '{0}:{1}'.format(CONTAINER_KEY.format(self.name), gen_id)
+        return key
 
     def invalidate_cache(self):
         self._invalidate_container_cache()
@@ -56,7 +63,7 @@ class Host(models.Model):
     def get_containers(self, show_all=False):
         c = client.Client(base_url='http://{0}:{1}'.format(self.hostname,
             self.port))
-        key = CONTAINER_KEY.format(self.name)
+        key = self._generate_container_cache_key(show_all)
         containers = cache.get(key)
         container_ids = []
         if containers is None:
@@ -134,6 +141,10 @@ class Host(models.Model):
         c.stop(container_id)
         self._invalidate_container_cache()
 
+    def get_container_logs(self, container_id=None):
+        c = self._get_client()
+        return c.logs(container_id)
+
     def destroy_container(self, container_id=None):
         c = self._get_client()
         c_id = utils.get_short_id(container_id)
@@ -152,6 +163,11 @@ class Host(models.Model):
         c = self._get_client()
         f = open(docker_file, 'r')
         c.build(f, tag)
+
+    def remove_image(self, image_id=None):
+        c = self._get_client()
+        c.remove_image(image_id)
+        self._invalidate_image_cache()
 
 class Container(models.Model):
     container_id = models.CharField(max_length=96, null=True, blank=True)
@@ -177,7 +193,10 @@ class Container(models.Model):
 
     def get_ports(self):
         meta = self.get_meta()
-        return meta.get('NetworkSettings', {}).get('PortMapping', {})
+        port_mapping = meta.get('NetworkSettings', {}).get('PortMapping')
+        if port_mapping:
+            return port_mapping.get('Tcp', {})
+        return None
 
     def get_memory_limit(self):
         mem = 0

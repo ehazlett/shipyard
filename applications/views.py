@@ -59,11 +59,15 @@ def details(request, app_uuid=None):
         'backend_port': app.backend_port,
         'protocol': app.protocol,
     }
+    all_containers = Container.objects.filter(Q(owner=None) |
+        Q(owner=request.user)) \
+        .exclude(container_id__in=attached_container_ids)
+    containers = [c for c in all_containers if c.get_meta().get('State', {}) \
+        .get('Running') == True]
     ctx = {
         'application': app,
         'form_edit_application': EditApplicationForm(initial=initial),
-        'containers': Container.objects.filter(Q(owner=None) |
-            Q(owner=request.user)).exclude(container_id__in=attached_container_ids),
+        'containers': containers,
     }
     return render_to_response('applications/details.html', ctx,
         context_instance=RequestContext(request))
@@ -113,3 +117,4 @@ def remove_container(request, app_uuid=None, container_id=None):
     app.save()
     return redirect(reverse('applications.views.details',
         kwargs={'app_uuid': app_uuid}))
+

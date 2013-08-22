@@ -2,8 +2,7 @@ from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.translation import ugettext as _
 from containers.models import Host
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
 
 register = template.Library()
 
@@ -30,12 +29,12 @@ def container_uptime(value):
 
     """
     if value:
-        tz = value.split('.')[-1]
-        now = time.mktime(datetime.fromtimestamp(time.time()).timetuple())
-        ts = time.mktime(datetime.fromtimestamp(time.mktime(time.strptime(value,
-            '%Y-%m-%dT%H:%M:%S.' + tz))).timetuple())
-        diff = now-ts
-        return timedelta(seconds=diff)
+        try:
+            tz = value.split('.')[-1]
+            ts = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.' + tz)
+            return datetime.utcnow().replace(microsecond=0) - ts
+        except:
+            return ''
     return value
 
 @register.filter
