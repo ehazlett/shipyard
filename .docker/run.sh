@@ -7,6 +7,7 @@ DB_USER=${DB_USER:-}
 DB_PASS=${DB_PASS:-}
 DB_HOST=${DB_HOST:-}
 DB_PORT=${DB_PORT:-}
+EXTRA_CMD=${EXTRA_CMD:-}
 CONFIG=/opt/apps/shipyard/shipyard/local_settings.py
 cd /opt/apps/shipyard
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
@@ -24,6 +25,7 @@ DATABASES = {
 }
 EOF
 git pull origin master
+$EXTRA_CMD
 /opt/ve/shipyard/bin/pip install -r requirements.txt
 /opt/ve/shipyard/bin/python manage.py syncdb --noinput
 /opt/ve/shipyard/bin/python manage.py migrate --noinput
