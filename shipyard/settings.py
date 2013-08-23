@@ -153,6 +153,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+    'djangosecure.middleware.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -194,6 +195,7 @@ INSTALLED_APPS = (
     'south',
     'crispy_forms',
     'django_rq',
+    'djangosecure',
     'shipyard',
     'accounts',
     'dashboard',
@@ -229,6 +231,11 @@ LOGGING = {
         },
     }
 }
+
+SECURE_SSL_REDIRECT = False # set to true to redirect all non-ssl to ssl
+SECURE_FRAME_DENY = False # set to true to prevent framing of your pages and protect them from clickjacking
+SESSION_COOKIE_SECURE = False # set to true if using ssl
+SESSION_COOKIE_HTTPONLY = False # set to true if using ssl
 
 try:
     from local_settings import *
