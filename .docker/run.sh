@@ -25,7 +25,7 @@ DATABASES = {
 }
 EOF
 git pull origin master
-$EXTRA_CMD
+/bin/bash -c "$EXTRA_CMD"
 /opt/ve/shipyard/bin/pip install -r requirements.txt
 /opt/ve/shipyard/bin/python manage.py syncdb --noinput
 /opt/ve/shipyard/bin/python manage.py migrate --noinput
