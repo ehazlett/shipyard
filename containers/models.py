@@ -20,6 +20,7 @@ from django.core.cache import cache
 from shipyard import utils
 import json
 import hashlib
+import requests
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
 CONTAINER_KEY = '{0}:containers'
@@ -67,7 +68,10 @@ class Host(models.Model):
         containers = cache.get(key)
         container_ids = []
         if containers is None:
-            containers = c.containers(all=show_all)
+            try:
+                containers = c.containers(all=show_all)
+            except requests.ConnectionError:
+                containers = []
             # update meta data
             for x in containers:
                 # only get first 12 chars of id (for metatdata)
@@ -98,8 +102,11 @@ class Host(models.Model):
         key = IMAGE_KEY.format(self.name)
         images = cache.get(key)
         if images is None:
-            images = c.images(all=show_all)
-            cache.set(key, images, HOST_CACHE_TTL)
+            try:
+                images = c.images(all=show_all)
+                cache.set(key, images, HOST_CACHE_TTL)
+            except requests.ConnectionError:
+                images = []
         return images
 
     def create_container(self, image=None, command=None, ports=[],
