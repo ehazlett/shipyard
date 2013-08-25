@@ -43,6 +43,7 @@ Alternate dev setup using vagrant:
 * Private containers
 * Container metadata (description, etc.)
 * Applications: bind containers to applications that are setup with [hipache](https://github.com/dotcloud/hipache)
+* Attach container (terminal emulation in the browser)
 * ...more coming...
 
 # Screenshots
@@ -52,6 +53,8 @@ Alternate dev setup using vagrant:
 ![Dashboard](http://i.imgur.com/pQrk3mu.png)
 
 ![Create Container](http://i.imgur.com/jLgyxUz.png)
+
+![Attach Container](http://i.imgur.com/qlutzmH.png)
 
 # Applications
 Applications are groups of containers that are accessible by a domain name.  The easiest
