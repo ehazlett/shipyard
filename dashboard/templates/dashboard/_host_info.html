@@ -80,7 +80,7 @@
                             <a href="#" rel="tooltip" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Restart' %}"><i class="icon-refresh"></i></a>
                             <a href="#" rel="tooltip" class="stop-container" data-url="{% url 'containers.stop_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Stop' %}"><i class="icon-stop"></i></a>
                             <a href="#" rel="tooltip" class="destroy-container" data-url="{% url 'containers.destroy_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Destroy' %}"><i class="icon-trash"></i></a>
-                            <a rel="tooltip" class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Attach' %}"><i class="icon-list-alt"></i></a>
+                            <a rel="tooltip" class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Attach' %}"><i class="icon-cog"></i></a>
                         </td>
                     </tr>
                     {% empty %}
