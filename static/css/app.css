@@ -322,13 +322,7 @@ h3 a {
 select#visible-containers {
   margin-bottom: 0px;
 }
-div.tab-content {
-  min-height: 500px;
-}
 /* allow dropdown menu to be right anchored */
-.dropdown-menu {
-  z-index: 9999;
-}
 .dropdown-menu.right {
   left: auto;
   right: 0px;
@@ -340,4 +334,18 @@ div.tab-content {
 .dropdown-menu.right::after {
   left: auto !important;
   right: 10px;
+}
+/* dropup for dropdown-menu */
+.bottom-up {
+  top: auto;
+  bottom: 100%;
+}
+.navbar .dropdown-menu.bottom-up:before {
+  border-bottom: 0px solid transparent !important;
+  border-top: 7px solid rgba(0, 0, 0, 0.2);
+  top: auto !important; bottom: -7px; }
+.navbar .dropdown-menu.bottom-up:after {
+  border-bottom: 0px solid transparent !important;
+  border-top: 6px solid white;
+  top: auto !important; bottom: -6px;
 }

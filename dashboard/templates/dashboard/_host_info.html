@@ -79,7 +79,9 @@
                                     <i class="icon-cog"></i>
                                     <span class="caret"></span>
                                 </a>
-                                <ul class="dropdown-menu right">
+                                {% comment %} HACK: this is to prevent hiding from the ajax loaded div.  This must be set to however
+                                many context menu items there are.  I suck at css.{% endcomment %}
+                                <ul class="dropdown-menu {% if forloop.counter > 5 %}bottom-up {% endif %}right">
                                     <li><a href="#" class="container-logs" data-container-id="{{c.container_id}}" data-url="{% url 'containers.get_logs' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Get Logs' %}</a></li>
                                     <li><a class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Attach' %}</a></li>
                                     <li><a href="#" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Restart' %}</a></li>
@@ -158,8 +160,18 @@
     </div>
 </div>
 <script type="text/javascript">
+    function resizeContent() {
+        var tht = $("div.tab-content table").height();
+        var ht = $("div.tab-content").height(tht+150);
+    }
     $(function(){
         $("a[rel=tooltip]").tooltip();
+        // hack: to prevent hiding the overflow of the dropdown menu, resize
+        // the parent container to add room.  i suck as css.
+        //var ht = $("div.tab-content").height();
+        //$("div.tab-content").height(ht+125);
+    });
+    $('a[data-toggle="tab"]').on('shown', function (e) {
     });
     $("select#visible-containers").change(function(){
         var showAll = false;
@@ -173,7 +185,6 @@
         var url = this.getAttribute('data-url');
         $.get(url, function(data){
             $("#container-logs").html(data);
-            console.log(data);
             $("#dialog-container-logs").modal('toggle');
             return false;
         });
