@@ -103,7 +103,8 @@ class Host(models.Model):
         images = cache.get(key)
         if images is None:
             try:
-                images = c.images(all=show_all)
+                # only show images with a repository name
+                images = [x for x in c.images(all=show_all) if x.get('Repository')]
                 cache.set(key, images, HOST_CACHE_TTL)
             except requests.ConnectionError:
                 images = []
