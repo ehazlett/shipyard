@@ -322,6 +322,9 @@ h3 a {
 select#visible-containers {
   margin-bottom: 0px;
 }
+div.tab-content {
+  min-height: 300px;
+}
 /* allow dropdown menu to be right anchored */
 .dropdown-menu.right {
   left: auto;
