@@ -58,9 +58,8 @@
                         <th>{% trans 'Ports' %}</th>
                         <th>{% trans 'Memory Limit' %}</th>
                         <th>{% trans 'Host' %}</th>
-                        <th>{% trans 'Status' %}</th>
                         <th>{% trans 'Uptime' %}</th>
-                        <th></th>
+                        <th>{% trans 'Actions' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -73,14 +72,21 @@
                         <td>{{c.get_ports|container_port_links:c.host.name|safe}}</td>
                         <td>{{c.get_meta.Config.Memory|container_memory_to_mb}}</td>
                         <td>{{c.host.name}}</td>
-                        <td><span class="label label-{{c.get_meta.State|container_status}}">{% if c.get_meta.State.Running %}{% trans 'running' %}{% else %}{% trans 'stopped' %}{% endif %}</span></td>
                         <td>{{c.get_meta.State.StartedAt|container_uptime}}</td>
                         <td>
-                            <a href="#" rel="tooltip" class="container-logs" data-container-id="{{c.container_id}}" data-url="{% url 'containers.get_logs' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Logs' %}"><i class="icon-list-alt"></i></a>
-                            <a href="#" rel="tooltip" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Restart' %}"><i class="icon-refresh"></i></a>
-                            <a href="#" rel="tooltip" class="stop-container" data-url="{% url 'containers.stop_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Stop' %}"><i class="icon-stop"></i></a>
-                            <a href="#" rel="tooltip" class="destroy-container" data-url="{% url 'containers.destroy_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Destroy' %}"><i class="icon-trash"></i></a>
-                            <a rel="tooltip" class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}" title="{% trans 'Attach' %}"><i class="icon-cog"></i></a>
+                            <div class="btn-group">
+                                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="icon-cog"></i>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu right">
+                                    <li><a href="#" class="container-logs" data-container-id="{{c.container_id}}" data-url="{% url 'containers.get_logs' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Get Logs' %}</a></li>
+                                    <li><a class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Attach' %}</a></li>
+                                    <li><a href="#" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Restart' %}</a></li>
+                                    <li><a href="#" class="stop-container" data-url="{% url 'containers.stop_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Stop' %}</a></li>
+                                    <li><a href="#" class="destroy-container" data-url="{% url 'containers.destroy_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Destroy' %}</a></li>
+                                </ul>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
