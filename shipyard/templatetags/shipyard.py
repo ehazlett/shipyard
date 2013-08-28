@@ -70,3 +70,7 @@ def container_memory_to_mb(value):
         return '{0} MB'.format(int(value) / 1048576)
     else:
         return _('unlimited')
+
+@register.filter()
+def split(value, arg):
+    return value.split(arg)
