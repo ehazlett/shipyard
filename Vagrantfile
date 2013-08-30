@@ -17,11 +17,11 @@ end
 
 Vagrant.configure("2") do |config|
     config.vm.provider :virtualbox do |v|
-        v.customize ["modifyvm", :id, "--memory", 2048]
+        v.customize ["modifyvm", :id, "--memory", 3072]
     end
     config.vm.provider :vmware_fusion do |v|
       config.vm.define :shipyard do |s|
-        v.vmx["memsize"] = "2048"
+        v.vmx["memsize"] = "3072"
       end
       config.vm.define :shipyard do |s|
         v.vmx["displayName"] = "shipyard"

@@ -6,6 +6,11 @@ VE_DIR=$VE_ROOT/shipyard
 NODE_URL='http://nodejs.org/dist/v0.10.12/node-v0.10.12.tar.gz'
 GIT_RECEIVER_URL='https://raw.github.com/ehazlett/gitreceive/master/gitreceive'
 
+if [ -e "/etc/.provisioned" ] ; then
+    echo "VM already provisioned.  Remove /etc/.provisioned to force"
+    exit 0
+fi
+
 apt-get -qq update
 DEBIAN_FRONTEND=noninteractive apt-get -qq install -y python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server supervisor
 echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
@@ -82,3 +87,4 @@ EOF
 
 supervisorctl update
 
+touch /etc/.provisioned
