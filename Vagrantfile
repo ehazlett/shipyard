@@ -5,7 +5,6 @@ Vagrant::Config.run do |config|
   config.vm.box = "raring64"
   config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/raring/current/raring-server-cloudimg-amd64-vagrant-disk1.box"
   config.vm.provision :shell, :path => "provision.sh"
-  config.vm.customize ["modifyvm", :id, "--memory", 2048]
   config.ssh.forward_agent = true
   config.vm.forward_port 8000, 8000
 
@@ -17,6 +16,9 @@ Vagrant::Config.run do |config|
 end
 
 Vagrant.configure("2") do |config|
+    config.vm.provider :virtualbox do |v|
+        v.customize ["modifyvm", :id, "--memory", 2048]
+    end
     config.vm.provider :vmware_fusion do |v|
       config.vm.define :shipyard do |s|
         v.vmx["memsize"] = "2048"

@@ -10,7 +10,7 @@ apt-get -qq update
 DEBIAN_FRONTEND=noninteractive apt-get -qq install -y python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server supervisor
 echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
 apt-get -qq update
-DEBIAN_FRONTEND=noninteractive apt-get install -y lxc-docker
+DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes lxc-docker
 # edit docker upstart to listen on tcp
 sed -i 's/\/usr\/bin\/docker.*/\/usr\/bin\/docker -d -H tcp:\/\/0.0.0.0:4243/g' /etc/init/docker.conf
 service docker restart
