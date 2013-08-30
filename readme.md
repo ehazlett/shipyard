@@ -29,6 +29,9 @@ Alternate dev setup using vagrant:
 
 * `vagrant up`
 * `vagrant ssh`
+* `python manage.py syncdb --noinput`
+* `python manage.py migrate`
+* `python manage.py createsuperuser`
 * `./manage.py runserver 0.0.0.0:8000`
 * `./manage.py rqworker shipyard` (in separate ssh session)
 * Open browser to http://localhost:8000
