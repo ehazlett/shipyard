@@ -81,7 +81,7 @@
                                 </a>
                                 {% comment %} HACK: this is to prevent hiding from the ajax loaded div.  This must be set to however
                                 many context menu items there are.  I suck at css.{% endcomment %}
-                                <ul class="dropdown-menu {% if forloop.counter > 5 %}bottom-up {% endif %}right">
+                                <ul class="dropdown-menu {% if forloop.counter > 4 %}bottom-up {% endif %}right">
                                     <li><a href="#" class="container-logs" data-container-id="{{c.container_id}}" data-url="{% url 'containers.get_logs' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Get Logs' %}</a></li>
                                     <li><a class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Attach' %}</a></li>
                                     <li><a href="#" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Restart' %}</a></li>
