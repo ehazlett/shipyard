@@ -18,6 +18,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.utils.html import strip_tags
 from django.core import serializers
 from django.shortcuts import render_to_response
 import django_rq
@@ -43,8 +44,12 @@ def handle_upload(f):
 @login_required
 def add_host(request):
     form = HostForm(request.POST)
-    host = form.save()
-    messages.add_message(request, messages.INFO, _('Added ') + host.name)
+    try:
+        host = form.save()
+        messages.add_message(request, messages.INFO, _('Added ') + host.name)
+    except Exception, e:
+        msg = strip_tags('.'.join([x[1][0] for x in form.errors.items()]))
+        messages.add_message(request, messages.ERROR, msg)
     return redirect('dashboard.views.index')
 
 @require_http_methods(['POST'])

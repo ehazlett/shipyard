@@ -17,6 +17,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 def get_available_hosts():
     return Host.objects.filter(enabled=True)
@@ -44,6 +45,12 @@ class HostForm(forms.ModelForm):
         self.helper.form_id = 'form-add-host'
         self.helper.form_class = 'form-horizontal'
         self.helper.form_action = reverse('containers.views.add_host')
+
+    def clean_hostname(self):
+        data = self.cleaned_data['hostname']
+        if '/' in data:
+            raise forms.ValidationError(_('Please enter a hostname or IP only'))
+        return data
 
     class Meta:
         model = Host
