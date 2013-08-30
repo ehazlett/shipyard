@@ -25,7 +25,8 @@ is running on localhost.
 * Open browser to http://localhost:8000
 * Add a host (i.e. 127.0.0.1 for local docker)
 
-Alternate dev setup using vagrant:
+Alternate dev setup using vagrant (this will install all dependencies including
+docker itself for a self-contained dev environment):
 
 * `vagrant up`
 * `vagrant ssh`
