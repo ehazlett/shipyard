@@ -18,7 +18,6 @@
   <link href="{{STATIC_URL}}css/bootstrap.min.css" rel="stylesheet">
   <link href="{{STATIC_URL}}css/fonts.css" rel="stylesheet">
   <link href="{{STATIC_URL}}css/app.css" rel="stylesheet">
-  <link href="{{STATIC_URL}}css/bootstrap-responsive.min.css" rel="stylesheet">
   {% block extra_head_css %}{% endblock %}
 
   <!-- fav and touch icons -->
@@ -43,55 +42,49 @@
         {% endif %}
     </div>
     {% if request.user.is_authenticated %}
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="brand" href="/"><img src="{{ STATIC_URL }}img/app.png" /> {{APP_NAME}}</a>
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-              <span class="icon-bar"></span>
-          </a>
-          <div class="nav-collapse">
-            <ul class="nav">
-              {% if request.user.id != None %}
-              <li id="nav-dashboard"><a href="{% url 'dashboard.views.index' %}">{% trans 'dashboard' %}</a></li>
-              <li id="nav-applications"><a href="{% url 'applications.views.index' %}">{% trans 'applications' %}</a></li>
-              {% endif %}
-            </ul>
-            <ul class="nav pull-right">
-              {% if request.user.id != None %}
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{request.user.username}} <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  {% if request.user.is_superuser %}
-                  <li><a href="/admin/" target="_sh_admin">{% trans 'administration' %}</a></li>
-                  <li class="divider"></li>
-                  {% endif %}
-                  <li><a href="{% url "accounts.views.logout" %}">{% trans 'logout' %}</a></li>
-                </ul>
-              </li>
-              {% else %}
-              <li><a href="{% url "accounts.views.login" %}">{% trans 'login' %}</a></li>
-              {% endif %}
-            </ul>
-          </div>
-        </div>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">{% trans 'Toggle Navigation' %}</span>
+        </button>
+        <a class="navbar-brand" href="{% url 'index' %}"><img src="{{STATIC_URL}}img/app.png" /> {{APP_NAME}}</a>
       </div>
-    </div>
+      <ul class="nav navbar-nav navbar-right">
+        {% if request.user.id != None %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{request.user.username}} <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            {% if request.user.is_superuser %}
+            <li><a href="/admin/" target="_sh_admin">{% trans 'administration' %}</a></li>
+            <li class="divider"></li>
+            {% endif %}
+            <li><a href="{% url "accounts.views.logout" %}">{% trans 'logout' %}</a></li>
+          </ul>
+        </li>
+        {% else %}
+        <li><a href="{% url "accounts.views.login" %}">{% trans 'login' %}</a></li>
+        {% endif %}
+      </ul>
+    </nav>
     {% endif %}
 
     {% block base_content %}
-    <div class="container-fluid content">
-      {% block main_content %}{% endblock %}
+    <div class="sidenav col-md-2">
+      <ul>
+        <li class="active"><a href="#"><span class="glyphicon glyphicon-th"></span>{% trans 'Containers' %}</a></li>
+        <li><a href="#"><span class="glyphicon glyphicon-hdd"></span>{% trans 'Images' %}</a></li>
+        <li><a href="#"><span class="glyphicon glyphicon-list-alt"></span>{% trans 'Applications' %}</a></li>
+        <li><a href="#"><span class="glyphicon glyphicon-tasks"></span>{% trans 'Hosts' %}</a></li>
+      </ul>
+    </div>
+    <div class="main-content col-md-10">
+      {% block content %}{% endblock %}
     </div>
     {% endblock %}
-
-    <div id="footer">
-      <div id="footer-info">
-        <ul class="inline footer-links">
-        </ul>
-      </div>
-      <div id="copyright" class="center">&copy; <a href="https://github.com/ehazlett/shipyard" target="_gh">Shipyard Project</a> version {{APP_REVISION}}</div>
-    </div>
+    <nav class="navbar navbar-fixed-bottom navbar-footer" role="navigation">
+      <div id="copyright" class="navbar-bottom center lead">&copy; <a href="https://github.com/ehazlett/shipyard" target="_gh">Shipyard Project</a> version <a href="https://github.com/ehazlett/shipyard/commit/{{APP_REVISION}}" target="_gh">{{APP_REVISION}}</a></div>
+    </nav>
 
     <!-- scripts -->
     <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap.min.js"></script>

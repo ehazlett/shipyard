@@ -20,4 +20,4 @@ def index(request):
     if not request.user.is_authenticated():
         return redirect(reverse('accounts.views.login'))
     else:
-        return redirect(reverse('dashboard.views.index'))
+        return redirect(reverse('containers.views.index'))

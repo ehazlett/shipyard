@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load shipyard %}
+
+{% block content %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="panel-title section-title">{% trans 'Containers' %}</span>
+        <span class="section-toolbar">
+            <a href="{% url 'containers.views.refresh' %}"><span class="glyphicon glyphicon-refresh"></span></a>
+        </span>
+        <span class="pull-right">
+            <a href="#" class="btn btn-primary btn-sm">{% trans 'Create' %}</a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {% if containers %}
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>{% trans 'ID' %}</th>
+                    <th>{% trans 'Description' %}</th>
+                    <th>{% trans 'Image' %}</th>
+                    <th>{% trans 'Command' %}</th>
+                    <th>{% trans 'Ports' %}</th>
+                    <th>{% trans 'Memory Limit' %}</th>
+                    <th>{% trans 'Host' %}</th>
+                    <th>{% trans 'Uptime' %}</th>
+                    <th>{% trans 'Actions' %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in containers %}
+                <tr>
+                    <td><a href="#" class="container-info" data-container-id="{{c.container_id}}">{{c.get_meta.ID|slice:":12"}}</a></td>
+                    <td>{{c.description}}</td>
+                    <td>{{c.get_meta.Config.Image}}</td>
+                    <td>{{c.get_meta.Config.Cmd|join:" "}}</td>
+                    <td>{{c.get_ports|container_port_links:c.host.name|safe}}</td>
+                    <td>{{c.get_meta.Config.Memory|container_memory_to_mb}}</td>
+                    <td>{{c.host.name}}</td>
+                    <td>{{c.get_meta.State.StartedAt|container_uptime}}</td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="#" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-cog"></span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu right">
+                                <li><a href="#" class="container-logs" data-container-id="{{c.container_id}}" data-url="{% url 'containers.get_logs' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Get Logs' %}</a></li>
+                                <li><a class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Attach' %}</a></li>
+                                <li><a href="#" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Restart' %}</a></li>
+                                <li><a href="#" class="stop-container" data-url="{% url 'containers.stop_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Stop' %}</a></li>
+                                <li><a href="#" class="destroy-container" data-url="{% url 'containers.destroy_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Destroy' %}</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10">{% trans 'No containers' %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="small">{% trans 'No containers' %}</div>
+        {% endif %}
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $("a[rel=tooltip]").tooltip();
+    });
+    $("a.restart-container").click(function(){
+        if (confirm("{% trans 'Are you sure you want to restart the container?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
+    });
+    $("a.stop-container").click(function(){
+        if (confirm("{% trans 'Are you sure you want to stop the container?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
+    });
+    $("a.destroy-container").click(function(){
+        if (confirm("{% trans 'Are you sure you want to destroy the container?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
+    });
+</script>
+{% endblock %}

@@ -18,6 +18,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.db.models import Q
 from django.utils.html import strip_tags
 from django.core import serializers
 from django.shortcuts import render_to_response
@@ -40,6 +41,28 @@ def handle_upload(f):
             d.write(c)
     return tmp_file
 
+@login_required
+def index(request):
+    hosts = Host.objects.filter(enabled=True)
+    show_all = True if request.GET.has_key('showall') else False
+    containers = None
+    # load containers
+    if hosts:
+        c_ids = []
+        for h in hosts:
+            for c in h.get_containers(show_all=show_all):
+                c_ids.append(utils.get_short_id(c.get('Id')))
+        # return metadata objects
+        containers = Container.objects.filter(container_id__in=c_ids).filter(
+            Q(owner=None) | Q(owner=request.user))
+    ctx = {
+        'hosts': hosts,
+        'containers': containers,
+        'show_all': show_all,
+    }
+    return render_to_response('containers/index.html', ctx,
+        context_instance=RequestContext(request))
+
 @require_http_methods(['POST'])
 @login_required
 def add_host(request):
@@ -50,7 +73,7 @@ def add_host(request):
     except Exception, e:
         msg = strip_tags('.'.join([x[1][0] for x in form.errors.items()]))
         messages.add_message(request, messages.ERROR, msg)
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @require_http_methods(['POST'])
 @login_required
@@ -82,6 +105,7 @@ def create_container(request):
     hosts = form.data.getlist('hosts')
     private = form.data.get('private')
     privileged = form.data.get('privileged')
+    # convert to bool
     if privileged:
         privileged = True
     user = None
@@ -103,7 +127,7 @@ def create_container(request):
                 _('Container failed to start'))
     else:
         messages.add_message(request, messages.ERROR, _('No hosts selected'))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def restart_container(request, host, container_id):
@@ -111,7 +135,7 @@ def restart_container(request, host, container_id):
     h.restart_container(container_id)
     messages.add_message(request, messages.INFO, _('Restarted') + ' {0}'.format(
         container_id))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def stop_container(request, host, container_id):
@@ -119,7 +143,7 @@ def stop_container(request, host, container_id):
     h.stop_container(container_id)
     messages.add_message(request, messages.INFO, _('Stopped') + ' {0}'.format(
         container_id))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def get_logs(request, host, container_id):
@@ -135,7 +159,7 @@ def destroy_container(request, host, container_id):
     h.destroy_container(container_id)
     messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
         container_id))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def attach_container(request, host, container_id):
@@ -161,17 +185,17 @@ def import_image(request):
         utils.get_queue('shipyard').enqueue(host.import_image, args=args, timeout=3600)
     messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
         form.data.get('repository')) + '. ' + _('This may take a few minutes.'))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def refresh(request):
     '''
-    Invalidates host cache and redirects to dashboard
+    Invalidates host cache and redirects to container view
 
     '''
     for h in Host.objects.filter(enabled=True):
         h.invalidate_cache()
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @require_http_methods(['GET'])
 @login_required
@@ -242,5 +266,5 @@ def remove_image(request, host_id, image_id):
     h.remove_image(image_id)
     messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
         image_id))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 

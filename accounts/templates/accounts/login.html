@@ -8,13 +8,13 @@
 {% block main_content %}
 <div id="login" class="center">
   <div class="logo"><img src="{{ STATIC_URL }}img/logo.png"/></div>
-  <form id="login" method="POST">
+  <form id="login" class="form-login" method="POST">
     {% csrf_token %}
     <div class="control-group">
-      <input type="text" name="username" class="required" autofocus="true" placeholder="{% trans 'username' %}" value="{{username}}" />
+      <input type="text" name="username" class="form-control required" autofocus="true" placeholder="{% trans 'username' %}" value="{{username}}" />
     </div>
     <div class="control-group">
-      <input id="password" type="password" name="password" class="required" placeholder="{% trans 'password' %}" />
+      <input id="password" type="password" name="password" class="form-control required" placeholder="{% trans 'password' %}" />
     </div>
     <div class="controls">
       <a id="btn-submit" href="#" class="btn btn-large btn-primary">{% trans 'Login' %}</a>
