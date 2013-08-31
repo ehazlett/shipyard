@@ -69,6 +69,7 @@ class CreateContainerForm(forms.Form):
         help_text='mount volumes from specified container')
     hosts = forms.MultipleChoiceField()
     private = forms.BooleanField()
+    privileged = forms.BooleanField()
 
     def __init__(self, *args, **kwargs):
         super(CreateContainerForm, self).__init__(*args, **kwargs)

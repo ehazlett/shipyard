@@ -81,6 +81,9 @@ def create_container(request):
     ports = form.data.get('ports', '').split()
     hosts = form.data.getlist('hosts')
     private = form.data.get('private')
+    privileged = form.data.get('privileged')
+    if privileged:
+        privileged = True
     user = None
     status = False
     for i in hosts:
@@ -90,7 +93,7 @@ def create_container(request):
         c_id, status = host.create_container(image, command, ports,
             environment=environment, memory=memory,
             description=form.data.get('description'), volumes=volume,
-            volumes_from=volumes_from, owner=user)
+            volumes_from=volumes_from, privileged=privileged, owner=user)
     if hosts:
         if status:
             messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
