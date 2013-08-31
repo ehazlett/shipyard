@@ -1,3 +1,11 @@
+html {
+  margin: 0px;
+  padding: 0px;
+  background-color: transparent;
+}
 body {
+  margin: 0px;
+  padding: 0px;
   background: url('/static/img/bg.png');
+  background-color: transparent;
 }
