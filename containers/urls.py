@@ -15,6 +15,8 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('containers.views',
     url(r'^$', 'index'),
+    url(r'^details/(?P<container_id>.*)/$', 'container_details'),
+
     url(r'^addhost/$', 'add_host', name='containers.add_host'),
     url(r'^refresh/$', 'refresh', name='containers.refresh'),
     url(r'^searchrepository/$', 'search_repository',

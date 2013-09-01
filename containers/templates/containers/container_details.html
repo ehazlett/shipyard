@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load shipyard %}
+
+{% block content %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="panel-title section-title">{% trans 'Container' %}: {% if container.description %}{{container.description}}{% else %}{{container.container_id}}{% endif %}</span>
+        <span class="pull-right">
+            <a href="{% url 'containers.attach_container' host=container.host.name container_id=container.get_meta.ID %}" class="attach-container btn btn-default btn-sm" target="_blank" >{% trans 'Attach' %}</a>
+            <a href="#" class="btn btn-default btn-sm restart-container" data-url="{% url 'containers.restart_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Restart' %}</a></li>
+            <a href="#" class="btn btn-warning btn-sm stop-container" data-url="{% url 'containers.stop_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Stop' %}</a>
+            <a href="#" class="btn btn-danger btn-sm destroy-container" data-url="{% url 'containers.destroy_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Destroy' %}</a>
+        </span>
+    </div>
+    <div class="panel-body">
+        {{container.get_meta}}
+    </div>
+</div>
+{% include "containers/_common.html" %}
+<script type="text/javascript">
+</script>
+{% endblock %}

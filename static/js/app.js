@@ -1,3 +1,6 @@
+$(function() {
+    $("a[rel=tooltip]").tooltip();
+});
 function flash(text, status){
   var msg = $("<div class='alert'></div>");
   msg.addClass('alert-'+status);

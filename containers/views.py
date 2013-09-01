@@ -63,6 +63,15 @@ def index(request):
     return render_to_response('containers/index.html', ctx,
         context_instance=RequestContext(request))
 
+@login_required
+def container_details(request, container_id=None):
+    c = Container.objects.get(container_id=container_id)
+    ctx = {
+        'container': c,
+    }
+    return render_to_response('containers/container_details.html', ctx,
+        context_instance=RequestContext(request))
+
 @require_http_methods(['POST'])
 @login_required
 def add_host(request):
