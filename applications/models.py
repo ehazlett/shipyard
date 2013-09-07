@@ -18,12 +18,12 @@ def generate_uuid():
 class Application(models.Model):
     uuid = models.CharField(max_length=36, null=True, blank=True, unique=True,
         default=generate_uuid)
-    name = models.CharField(max_length=64, null=True, blank=True)
+    name = models.CharField(max_length=64, null=True)
     description = models.TextField(null=True, blank=True)
-    domain_name = models.CharField(max_length=96, null=True, blank=True,
+    domain_name = models.CharField(max_length=96, null=True,
         unique=True)
-    backend_port = models.CharField(max_length=5, null=True, blank=True)
-    protocol = models.CharField(max_length=6, null=True, blank=True,
+    backend_port = models.CharField(max_length=5, null=True)
+    protocol = models.CharField(max_length=6, null=True,
         default='http', choices=PROTOCOL_CHOICES)
     containers = models.ManyToManyField(Container, null=True, blank=True)
     owner = models.ForeignKey(User, null=True, blank=True)

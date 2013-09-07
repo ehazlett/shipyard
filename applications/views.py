@@ -26,29 +26,31 @@ from containers.models import Container
 
 @login_required
 def index(request):
+    apps = Application.objects.filter(Q(owner=None) |
+        Q(owner=request.user))
     ctx = {
-        'applications': Application.objects.filter(Q(owner=None) |
-            Q(owner=request.user)),
-        'form_application': ApplicationForm(),
+        'applications': apps,
     }
+    print(apps)
     return render_to_response('applications/index.html', ctx,
         context_instance=RequestContext(request))
 
 @login_required
 def create(request):
-    form = ApplicationForm(request.POST)
-    form.owner = request.user
-    if form.is_valid():
-        form.save()
-    else:
-        # report errors (just the text)
-        for k,v in form.errors.iteritems():
-            messages.add_message(request,
-                messages.ERROR, v[0].capitalize())
-    return redirect(reverse('applications.views.index'))
+    form = ApplicationForm()
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST)
+        form.owner = request.user
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('applications.views.index'))
+    ctx = {
+        'form': form
+    }
+    return render_to_response('applications/create_application.html', ctx,
+        context_instance=RequestContext(request))
 
 @login_required
-#@owner_required # TODO
 def details(request, app_uuid=None):
     app = Application.objects.get(uuid=app_uuid)
     attached_container_ids = [x.container_id for x in app.containers.all()]

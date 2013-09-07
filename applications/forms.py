@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from django import forms
+from django.utils.translation import ugettext as _
 from applications.models import Application
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
-from crispy_forms.bootstrap import FieldWithButtons, StrictButton
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton, FormActions
 from django.core.urlresolvers import reverse
 from applications.models import PROTOCOL_CHOICES
 
@@ -26,6 +27,19 @@ class ApplicationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ApplicationForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Fieldset(
+                None,
+                'name',
+                'description',
+                'domain_name',
+                'backend_port',
+                'protocol',
+            ),
+            FormActions(
+                Submit('save', _('Create'), css_class="btn btn-lg btn-success"),
+            )
+        )
         self.helper.form_id = 'form-create-application'
         self.helper.form_class = 'form-horizontal'
         self.helper.form_action = reverse('applications.views.create')
