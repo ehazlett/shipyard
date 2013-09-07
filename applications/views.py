@@ -31,7 +31,6 @@ def index(request):
     ctx = {
         'applications': apps,
     }
-    print(apps)
     return render_to_response('applications/index.html', ctx,
         context_instance=RequestContext(request))
 

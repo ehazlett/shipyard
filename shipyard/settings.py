@@ -200,6 +200,7 @@ INSTALLED_APPS = (
     'applications',
     'containers',
     'images',
+    'hosts',
 )
 
 # A sample logging configuration. The only tangible logging

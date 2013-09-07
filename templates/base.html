@@ -75,7 +75,7 @@
         <li id="sidenav-containers"><a href="{% url 'containers.views.index' %}"><span class="glyphicon glyphicon-th"></span>{% trans 'Containers' %}</a></li>
         <li id="sidenav-images"><a href="{% url 'images.views.index' %}"><span class="glyphicon glyphicon-hdd"></span>{% trans 'Images' %}</a></li>
         <li id="sidenav-applications"><a href="{% url 'applications.views.index' %}"><span class="glyphicon glyphicon-list-alt"></span>{% trans 'Applications' %}</a></li>
-        <li id="sidenav-hosts"><a href="#"><span class="glyphicon glyphicon-tasks"></span>{% trans 'Hosts' %}</a></li>
+        <li id="sidenav-hosts"><a href="{% url 'hosts.views.index' %}"><span class="glyphicon glyphicon-tasks"></span>{% trans 'Hosts' %}</a></li>
       </ul>
     </div>
     <div class="main-content col-md-10">

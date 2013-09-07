@@ -175,18 +175,6 @@ def container_logs(request, host, container_id):
 
 @require_http_methods(['POST'])
 @login_required
-def add_host(request):
-    form = HostForm(request.POST)
-    try:
-        host = form.save()
-        messages.add_message(request, messages.INFO, _('Added ') + host.name)
-    except Exception, e:
-        msg = strip_tags('.'.join([x[1][0] for x in form.errors.items()]))
-        messages.add_message(request, messages.ERROR, msg)
-    return redirect('containers.views.index')
-
-@require_http_methods(['POST'])
-@login_required
 def _create_container(request):
     form = CreateContainerForm(request.POST)
     image = form.data.get('image')
