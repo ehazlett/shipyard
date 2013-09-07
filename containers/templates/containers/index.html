@@ -29,7 +29,7 @@
             <tbody>
                 {% for c in containers %}
                 <tr>
-                    <td><a href="{% url 'containers.views.container_details' container_id=c.container_id %}" class="container-info" data-container-id="{{c.container_id}}">{{c.get_meta.ID|slice:":12"}}</a></td>
+                    <td><a href="{% url 'containers.views.container_details' container_id=c.container_id %}" class="container-info" data-container-id="{{c.container_id}}">{{c.container_id}}</a></td>
                     <td>{{c.description}}</td>
                     <td>{{c.get_meta.Config.Image}}</td>
                     <td>{{c.get_meta.Config.Cmd|join:" "}}</td>
@@ -48,10 +48,6 @@
                             </ul>
                         </div>
                     </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6"><span class="text-muted">{% trans 'No containers' %}</span></td>
                 </tr>
                 {% endfor %}
             </tbody>

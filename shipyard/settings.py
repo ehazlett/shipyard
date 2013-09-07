@@ -199,6 +199,7 @@ INSTALLED_APPS = (
     'dashboard',
     'applications',
     'containers',
+    'images',
 )
 
 # A sample logging configuration. The only tangible logging

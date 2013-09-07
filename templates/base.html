@@ -48,7 +48,7 @@
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
           <span class="sr-only">{% trans 'Toggle Navigation' %}</span>
         </button>
-        <a class="navbar-brand" href="{% url 'index' %}"><img src="{{STATIC_URL}}img/app.png" /> {{APP_NAME}}</a>
+        <a class="navbar-brand" href="/"><img src="{{STATIC_URL}}img/app.png" /> {{APP_NAME}}</a>
       </div>
       <ul class="nav navbar-nav navbar-right">
         {% if request.user.id != None %}
@@ -73,7 +73,7 @@
     <div class="sidenav col-md-2">
       <ul>
         <li id="sidenav-containers"><a href="{% url 'containers.views.index' %}"><span class="glyphicon glyphicon-th"></span>{% trans 'Containers' %}</a></li>
-        <li id="sidenav-images"><a href="#"><span class="glyphicon glyphicon-hdd"></span>{% trans 'Images' %}</a></li>
+        <li id="sidenav-images"><a href="{% url 'images.views.index' %}"><span class="glyphicon glyphicon-hdd"></span>{% trans 'Images' %}</a></li>
         <li id="sidenav-applications"><a href="#"><span class="glyphicon glyphicon-list-alt"></span>{% trans 'Applications' %}</a></li>
         <li id="sidenav-hosts"><a href="#"><span class="glyphicon glyphicon-tasks"></span>{% trans 'Hosts' %}</a></li>
       </ul>
