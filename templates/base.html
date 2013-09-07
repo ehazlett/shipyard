@@ -82,9 +82,7 @@
       {% block content %}{% endblock %}
     </div>
     {% endblock %}
-    <nav class="navbar navbar-fixed-bottom navbar-footer" role="navigation">
-      <div id="copyright" class="navbar-bottom center lead">&copy; <a href="https://github.com/ehazlett/shipyard" target="_gh">Shipyard Project</a> version <a href="https://github.com/ehazlett/shipyard/commit/{{APP_REVISION}}" target="_gh">{{APP_REVISION}}</a></div>
-    </nav>
+    <div id="copyright" class="center">&copy; <a href="https://github.com/ehazlett/shipyard" target="_gh">Shipyard Project</a> version <a href="https://github.com/ehazlett/shipyard/commit/{{APP_REVISION}}" target="_gh">{{APP_REVISION}}</a></div>
 
     <!-- scripts -->
     <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap.min.js"></script>

@@ -71,6 +71,18 @@ def container_memory_to_mb(value):
     else:
         return _('unlimited')
 
+@register.filter
+@stringfilter
+def container_cpu(value):
+    """
+    Returns container memory as MB
+
+    """
+    if value.strip() and int(value) != 0:
+        return '{}%'.format(value)
+    else:
+        return _('unlimited')
+
 @register.filter()
 def split(value, arg):
     return value.split(arg)

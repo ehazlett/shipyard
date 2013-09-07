@@ -72,6 +72,68 @@ def container_details(request, container_id=None):
     return render_to_response('containers/container_details.html', ctx,
         context_instance=RequestContext(request))
 
+@login_required
+def create_container(request):
+    form = CreateContainerForm()
+    if request.method == 'POST':
+        # save
+        form = CreateContainerForm(request.POST)
+        if form.is_valid():
+            image = form.data.get('image')
+            environment = form.data.get('environment')
+            command = form.data.get('command')
+            memory = form.data.get('memory', 0)
+            volume = form.data.get('volume')
+            volumes_from = form.data.get('volumes_from')
+            if command.strip() == '':
+                command = None
+            if environment.strip() == '':
+                environment = None
+            else:
+                environment = environment.split()
+            if memory.strip() == '':
+                memory = 0
+            # build volumes
+            if volume == '':
+                volume = None
+            if volume:
+                volume = { volume: {}}
+            # convert memory from MB to bytes
+            if memory:
+                memory = int(memory) * 1048576
+            ports = form.data.get('ports', '').split()
+            hosts = form.data.getlist('hosts')
+            private = form.data.get('private')
+            privileged = form.data.get('privileged')
+            # convert to bool
+            if privileged:
+                privileged = True
+            user = None
+            status = False
+            for i in hosts:
+                host = Host.objects.get(id=i)
+                if private:
+                    user = request.user
+                c_id, status = host.create_container(image, command, ports,
+                    environment=environment, memory=memory,
+                    description=form.data.get('description'), volumes=volume,
+                    volumes_from=volumes_from, privileged=privileged, owner=user)
+            if hosts:
+                if status:
+                    messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
+                        image))
+                else:
+                    messages.add_message(request, messages.ERROR,
+                        _('Container failed to start'))
+            else:
+                messages.add_message(request, messages.ERROR, _('No hosts selected'))
+            return redirect(reverse('containers.views.index'))
+    ctx = {
+        'form_create_container': form,
+    }
+    return render_to_response('containers/create_container.html', ctx,
+        context_instance=RequestContext(request))
+
 @require_http_methods(['POST'])
 @login_required
 def add_host(request):
@@ -86,7 +148,7 @@ def add_host(request):
 
 @require_http_methods(['POST'])
 @login_required
-def create_container(request):
+def _create_container(request):
     form = CreateContainerForm(request.POST)
     image = form.data.get('image')
     environment = form.data.get('environment')

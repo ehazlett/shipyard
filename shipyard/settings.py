@@ -230,6 +230,8 @@ LOGGING = {
     }
 }
 
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
 try:
     from local_settings import *
 except ImportError:

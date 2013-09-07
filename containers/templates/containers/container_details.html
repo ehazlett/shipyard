@@ -4,17 +4,143 @@
 
 {% block content %}
 <div class="panel panel-default">
-    <div class="panel-heading">
-        <span class="panel-title section-title">{% trans 'Container' %}: {% if container.description %}{{container.description}}{% else %}{{container.container_id}}{% endif %}</span>
+    <div class="panel-heading heading-large">
+        <span class="panel-title section-title">{% if container.description %}{{container.description}}{% else %}{{container.container_id}}{% endif %} {% if container.privileged %}<span class="label label-success">{% trans 'Privileged' %}</span>{% endif %}</span>
         <span class="pull-right">
-            <a href="{% url 'containers.attach_container' host=container.host.name container_id=container.get_meta.ID %}" class="attach-container btn btn-default btn-sm" target="_blank" >{% trans 'Attach' %}</a>
-            <a href="#" class="btn btn-default btn-sm restart-container" data-url="{% url 'containers.restart_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Restart' %}</a></li>
+            <a href="{% url 'containers.attach_container' host=container.host.name container_id=container.get_meta.ID %}" class="attach-container btn btn-info btn-sm" target="_blank" >{% trans 'Attach' %}</a>
+            <a href="#" class="btn btn-info btn-sm restart-container" data-url="{% url 'containers.restart_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Restart' %}</a></li>
             <a href="#" class="btn btn-warning btn-sm stop-container" data-url="{% url 'containers.stop_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Stop' %}</a>
             <a href="#" class="btn btn-danger btn-sm destroy-container" data-url="{% url 'containers.destroy_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Destroy' %}</a>
         </span>
     </div>
     <div class="panel-body">
-        {{container.get_meta}}
+        <div class="col-md-6">
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Container ID' %}</dt>
+                <dd>{{container.container_id}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Image' %}</dt>
+                <dd>{{container.get_meta.Config.Image}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Command' %}</dt>
+                <dd>{{container.get_meta.Config.Cmd|join:" "}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'CPU' %}</dt>
+                {% with cpu=container.get_meta.Config.CpuShares %}
+                <dd><span class="label label-{% if cpu %}info{% else %}default{% endif %}">{{cpu|container_cpu}}</dd>
+                {% endwith %}
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Memory' %}</dt>
+                {% with mem=container.get_meta.Config.Memory %}
+                <dd><span class="label label-{% if mem %}info{% else %}default{% endif %}">{{mem|container_memory_to_mb}}</dd>
+                {% endwith %}
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Uptime' %}</dt>
+                <dd>{{container.get_meta.State.StartedAt|container_uptime}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Host' %}</dt>
+                <dd>{{container.host.name}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Privileged' %}</dt>
+                {% with priv=container.get_meta.Config.Privileged %}
+                <dd><span class="label label-{% if priv %}success{% else %}default{% endif %}">{{priv}}</span></dd>
+                {% endwith %}
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'IP' %}</dt>
+                <dd>{{container.get_meta.NetworkSettings.IPAddress}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Bridge' %}</dt>
+                <dd>{{container.get_meta.NetworkSettings.Bridge}}</dd>
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="panel-title">{% trans 'Environment' %}</span>
+                </div>
+                <div class="panel-body">
+                    {% with env=container.get_meta.Config.Env %}
+                    {% if env %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Key' %}</th>
+                                <th>{% trans 'Value' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k in env %}
+                            {% with v=k|split:"=" %}
+                            <tr>
+                                <td>{{v.0}}</td>
+                                <td>{{v.1}}</td>
+                            </tr>
+                            {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <span class="text-muted">{% trans 'No environment variables' %}</span>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="panel-title">{% trans 'Ports' %}</span>
+                </div>
+                <div class="panel-body">
+                    {% with net=container.get_meta.NetworkSettings %}
+                    {% with tcp=net.PortMapping.Tcp %}
+                    {% with udp=net.PortMapping.Udp %}
+                    {% if tcp or udp %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Protocol' %}</th>
+                                <th>{% trans 'Port' %}</th>
+                                <th>{% trans 'Mapping' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k,v in tcp.items %}
+                            <tr>
+                                <td>TCP</td>
+                                <td>{{k}}</td>
+                                <td>{{v}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% for k,v in udp.items %}
+                            <tr>
+                                <td>UDP</td>
+                                <td>{{k}}</td>
+                                <td>{{v}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <span class="text-muted">{% trans 'No port mappings' %}</span>
+                    {% endif %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% include "containers/_common.html" %}

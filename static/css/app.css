@@ -2,11 +2,11 @@ html, body {
   height: 100%;
   background-color: #fdfdfd;
   padding-top: 25px;
-  padding-bottom: 25px;
 }
-div.content {
+div.main-content {
   margin: 0px
   padding: 0px;
+  min-height: 500px;
 }
 .control-label {
   color: #777777;
@@ -240,9 +240,8 @@ div.welcome {
   border-top: 1px solid rgb(231, 231, 231);
 }
 div#copyright {
-  margin-top: 15px;
+  padding: 10px 0 25px 0;
   font-size: 12px;
-  text-align: center;
 }
 div#copyright a {
   text-decoration: none;
@@ -338,9 +337,7 @@ div.tab-content {
   height: 100%;
   top: 0px;
   margin: 0px;
-  padding: 10px 0px;
-  background-color: #fafafa;
-  border-right: 1px solid #dadada;
+  padding: 10px 0px 0px 0px;
 }
 .sidenav ul {
   padding: 0px;
@@ -371,6 +368,7 @@ div.tab-content {
 }
 .main-content {
   margin-top: 10px;
+  margin-bottom: 80px;
 }
 .section-title {
   font-size: 16px;
@@ -385,6 +383,9 @@ div.tab-content {
 a span.glyphicon {
   color: #5a5a5a;
 }
-.panel-heading {
+.heading-large {
   height: 50px;
+}
+.app-form {
+  width: 50%;
 }

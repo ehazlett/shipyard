@@ -10,7 +10,7 @@
             <a href="{% url 'containers.views.refresh' %}"><span class="glyphicon glyphicon-refresh"></span></a>
         </span>
         <span class="pull-right">
-            <a href="#" class="btn btn-primary btn-sm">{% trans 'Create' %}</a>
+            <a href="{% url 'containers.views.create_container' %}" class="btn btn-primary btn-sm">{% trans 'Create' %}</a>
         </span>
     </div>
     <div class="panel-body">
@@ -51,13 +51,13 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6">{% trans 'No containers' %}</td>
+                    <td colspan="6"><span class="text-muted">{% trans 'No containers' %}</span></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="small">{% trans 'No containers' %}</div>
+        <div class="text-muted">{% trans 'No containers' %}</div>
         {% endif %}
     </div>
 </div>

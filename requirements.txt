@@ -1,7 +1,7 @@
 Django==1.5.1
 South==0.8.1
 argparse==1.2.1
-django-crispy-forms==1.3.0
+django-crispy-forms==1.4.0
 django-redis==3.3
 django-rq==0.5.1
 https://github.com/ehazlett/docker-py/archive/master.zip
