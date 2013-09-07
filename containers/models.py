@@ -27,11 +27,11 @@ CONTAINER_KEY = '{0}:containers'
 IMAGE_KEY = '{0}:images'
 
 class Host(models.Model):
-    name = models.CharField(max_length=64, null=True, blank=True,
+    name = models.CharField(max_length=64, null=True,
         unique=True)
-    hostname = models.CharField(max_length=128, null=True, blank=True,
+    hostname = models.CharField(max_length=128, null=True,
         unique=True)
-    port = models.SmallIntegerField(null=True, blank=True, default=4243)
+    port = models.SmallIntegerField(null=True, default=4243)
     enabled = models.NullBooleanField(null=True, default=True)
 
     def __unicode__(self):

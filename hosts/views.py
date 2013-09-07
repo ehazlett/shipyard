@@ -14,10 +14,12 @@
 from django.shortcuts import render_to_response, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from containers.models import Host
+from hosts.forms import HostForm
 
 @login_required
 def index(request):
@@ -28,17 +30,20 @@ def index(request):
     return render_to_response('hosts/index.html', ctx,
         context_instance=RequestContext(request))
 
-@require_http_methods(['POST'])
 @login_required
 def add_host(request):
-    form = HostForm(request.POST)
-    try:
-        host = form.save()
-        messages.add_message(request, messages.INFO, _('Added ') + host.name)
-    except Exception, e:
-        msg = strip_tags('.'.join([x[1][0] for x in form.errors.items()]))
-        messages.add_message(request, messages.ERROR, msg)
-    return redirect('hosts.views.index')
+    form = HostForm()
+    if request.method == 'POST':
+        form = HostForm(request.POST)
+        form.owner = request.user
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('hosts.views.index'))
+    ctx = {
+        'form': form
+    }
+    return render_to_response('hosts/add_host.html', ctx,
+        context_instance=RequestContext(request))
 
 @login_required
 def remove_host(request, host_id):

@@ -25,7 +25,7 @@ from django.shortcuts import render_to_response
 import django_rq
 from containers.models import Host, Container
 from django.template import RequestContext
-from containers.forms import (HostForm, CreateContainerForm,
+from containers.forms import (CreateContainerForm,
     ImportRepositoryForm, ImageBuildForm)
 from shipyard import utils
 from docker import client

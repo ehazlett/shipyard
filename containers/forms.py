@@ -38,24 +38,6 @@ def get_image_choices():
     choices.sort()
     return choices
 
-class HostForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(HostForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_id = 'form-add-host'
-        self.helper.form_class = 'form-horizontal'
-        self.helper.form_action = reverse('containers.views.add_host')
-
-    def clean_hostname(self):
-        data = self.cleaned_data['hostname']
-        if '/' in data:
-            raise forms.ValidationError(_('Please enter a hostname or IP only'))
-        return data
-
-    class Meta:
-        model = Host
-        fields = ('name', 'hostname', 'port')
-
 class CreateContainerForm(forms.Form):
     image = forms.ChoiceField(required=True)
     description = forms.CharField(required=False)
