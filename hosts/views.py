@@ -46,6 +46,24 @@ def add_host(request):
         context_instance=RequestContext(request))
 
 @login_required
+def enable_host(request, host_id):
+    h = Host.objects.get(id=host_id)
+    h.enabled = True
+    h.save()
+    messages.add_message(request, messages.INFO, _('Enabled') + ' {0}'.format(
+        h.name))
+    return redirect('hosts.views.index')
+
+@login_required
+def disable_host(request, host_id):
+    h = Host.objects.get(id=host_id)
+    h.enabled = False
+    h.save()
+    messages.add_message(request, messages.INFO, _('Disabled') + ' {0}'.format(
+        h.name))
+    return redirect('hosts.views.index')
+
+@login_required
 def remove_host(request, host_id):
     h = Host.objects.get(id=host_id)
     h.delete()

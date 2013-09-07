@@ -16,5 +16,7 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('hosts.views',
     url(r'^$', 'index'),
     url(r'^add/$', 'add_host'),
+    url(r'^enable/(?P<host_id>.*)/$', 'enable_host'),
+    url(r'^disable/(?P<host_id>.*)/$', 'disable_host'),
     url(r'^remove/(?P<host_id>.*)/$', 'remove_host'),
 )
