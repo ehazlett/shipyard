@@ -3,9 +3,36 @@
 {% load shipyard %}
 
 {% block content %}
+<div id="dialog-container-info" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% trans 'Edit Description' %}</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-container-info" role="form" action="{% url 'containers.views.container_info' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                          <input type="hidden" id="container-info-container-id" name="container-id" value=""/>
+                          <input class="form-control" id="container-info-description" name="description" type="text" placeholder="{% trans 'description' %}" autofocus="true">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-save-container-info" type="button" class="btn btn-primary">{% trans 'Save' %}</button>
+                <button type="button" data-dismiss="modal" class="btn btn-default">{% trans 'Cancel' %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="panel panel-default">
     <div class="panel-heading heading-large">
         <span class="panel-title section-title">{% if container.description %}{{container.description}}{% else %}{{container.container_id}}{% endif %} {% if container.privileged %}<span class="label label-success">{% trans 'Privileged' %}</span>{% endif %}</span>
+        <span class="section-toolbar">
+            <a href="#" class="container-info" data-container-id="{{container.container_id}}"><span class="glyphicon glyphicon-edit"></span></a>
+        </span>
         <span class="pull-right">
             <a href="{% url 'containers.attach_container' host=container.host.name container_id=container.get_meta.ID %}" class="attach-container btn btn-info btn-sm" target="_blank" >{% trans 'Attach' %}</a>
             <a href="#" class="btn btn-info btn-sm restart-container" data-url="{% url 'containers.restart_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Restart' %}</a></li>
@@ -147,5 +174,17 @@
 </div>
 {% include "containers/_common.html" %}
 <script type="text/javascript">
+    $("a.container-info").click(function(){
+        var id = this.getAttribute('data-container-id');
+        $.getJSON("{% url 'containers.views.container_info' %}" + id + '/', function(data){
+            $("#container-info-description").val(data.fields.description);
+            $("#container-info-container-id").val(id);
+            $("#dialog-container-info").modal('toggle');
+        });
+    });
+    $("#btn-save-container-info").click(function(){
+        $("#form-container-info").submit();
+        return false;
+    });
 </script>
 {% endblock %}

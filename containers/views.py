@@ -299,7 +299,8 @@ def container_info(request, container_id=None):
         c = Container.objects.get(container_id=container_id)
         c.description = data.get('description')
         c.save()
-        return redirect(reverse('index'))
+        return redirect(reverse('containers.views.container_details',
+            args=(c.container_id,)))
     c = Container.objects.get(container_id=container_id)
     data = serializers.serialize('json', [c], ensure_ascii=False)[1:-1]
     return HttpResponse(data, content_type='application/json')
