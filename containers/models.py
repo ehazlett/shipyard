@@ -214,3 +214,8 @@ class Container(models.Model):
             mem = int(meta.get('Config', {}).get('Memory')) / 1048576
         return mem
 
+    def get_name(self):
+        d = self.container_id
+        if self.description:
+            d = self.description
+        return d

@@ -134,6 +134,45 @@ def create_container(request):
     return render_to_response('containers/create_container.html', ctx,
         context_instance=RequestContext(request))
 
+@login_required
+def container_info(request, container_id=None):
+    '''
+    Gets / Sets container metatdata
+
+    '''
+    if request.method == 'POST':
+        data = request.POST
+        container_id = data.get('container-id')
+        c = Container.objects.get(container_id=container_id)
+        c.description = data.get('description')
+        c.save()
+        return redirect(reverse('containers.views.container_details',
+            args=(c.container_id,)))
+    c = Container.objects.get(container_id=container_id)
+    data = serializers.serialize('json', [c], ensure_ascii=False)[1:-1]
+    return HttpResponse(data, content_type='application/json')
+
+@login_required
+def container_logs(request, host, container_id):
+    '''
+    Gets the specified container logs
+
+    '''
+    h = Host.objects.get(name=host)
+    c = Container.objects.get(container_id=container_id)
+    logs = h.get_container_logs(container_id).strip()
+    # format
+    if logs:
+        logs = utils.convert_ansi_to_html(logs)
+    else:
+        logs = None
+    ctx = {
+        'container': c,
+        'logs': logs
+    }
+    return render_to_response('containers/container_logs.html', ctx,
+        context_instance=RequestContext(request))
+
 @require_http_methods(['POST'])
 @login_required
 def add_host(request):
@@ -217,14 +256,6 @@ def stop_container(request, host, container_id):
     return redirect('containers.views.index')
 
 @login_required
-def get_logs(request, host, container_id):
-    h = Host.objects.get(name=host)
-    logs = h.get_container_logs(container_id)
-    # format
-    logs =  '<br />'.join(logs.split('\n'))
-    return HttpResponse(logs)
-
-@login_required
 def destroy_container(request, host, container_id):
     h = Host.objects.get(name=host)
     h.destroy_container(container_id)
@@ -286,24 +317,6 @@ def search_repository(request):
     c = client.Client(url)
     data = c.search(query)
     return HttpResponse(json.dumps(data), content_type='application/json')
-
-@login_required
-def container_info(request, container_id=None):
-    '''
-    Gets / Sets container metatdata
-
-    '''
-    if request.method == 'POST':
-        data = request.POST
-        container_id = data.get('container-id')
-        c = Container.objects.get(container_id=container_id)
-        c.description = data.get('description')
-        c.save()
-        return redirect(reverse('containers.views.container_details',
-            args=(c.container_id,)))
-    c = Container.objects.get(container_id=container_id)
-    data = serializers.serialize('json', [c], ensure_ascii=False)[1:-1]
-    return HttpResponse(data, content_type='application/json')
 
 @require_http_methods(['POST'])
 @login_required
