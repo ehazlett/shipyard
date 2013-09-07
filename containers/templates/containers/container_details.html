@@ -60,8 +60,10 @@
                 <dd>{{container.get_meta.NetworkSettings.IPAddress}}</dd>
             </dl>
             <dl class="dl-horizontal">
-                <dt>{% trans 'Bridge' %}</dt>
-                <dd>{{container.get_meta.NetworkSettings.Bridge}}</dd>
+                <dt>{% trans 'DNS' %}</dt>
+                {% with dns=container.get_meta.Config.Dns %}
+                <dd>{% if dns %}{{dns}}{% else %}<span class="text-muted">{% trans 'default' %}</span>{% endif %}</dd>
+                {% endwith %}
             </dl>
         </div>
         <div class="col-md-6">
