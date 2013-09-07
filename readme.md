@@ -1,6 +1,11 @@
 # Shipyard
 Shipyard is a web UI for http://docker.io
 
+# Help
+To report issues please use [Github](https://github.com/ehazlett/shipyard/issues)
+
+There is also an IRC channel setup on Freenode:  `irc.freenode.net` `#shipyard`
+
 To run the latest version on port 8000:
 
 `docker run -p :8000 ehazlett/shipyard`
