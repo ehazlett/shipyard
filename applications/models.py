@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, m2m_changed
 from django.contrib.auth.models import User
 from containers.models import Container
 from shipyard import utils, tasks
@@ -65,4 +65,6 @@ def remove_application_config(sender, **kwargs):
     utils.get_queue('shipyard').enqueue(tasks.remove_hipache_config, args=args)
 
 post_save.connect(application_post_config, sender=Application)
+m2m_changed.connect(application_post_config,
+    sender=Application.containers.through)
 pre_delete.connect(remove_application_config, sender=Application)

@@ -18,11 +18,11 @@ import redis
 def update_hipache(app_id=None):
     from applications.models import Application
     if getattr(settings, 'HIPACHE_ENABLED'):
+        app = Application.objects.get(id=app_id)
         redis_host = getattr(settings, 'HIPACHE_REDIS_HOST')
         redis_port = getattr(settings, 'HIPACHE_REDIS_PORT')
         rds = redis.Redis(host=redis_host, port=redis_port)
         with rds.pipeline() as pipe:
-            app = Application.objects.get(id=app_id)
             domain_key = 'frontend:{0}'.format(app.domain_name)
             # remove existing
             pipe.delete(domain_key)
