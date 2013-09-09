@@ -57,7 +57,7 @@ docker itself for a self-contained dev environment):
 
 # Screenshots
 
-![Login](http://i.imgur.com/SxiAVKnh.png)
+![Login](http://i.imgur.com/8WGsK2Gh.png)
 
 ![Containers](http://i.imgur.com/5DAMDw8h.png)
 
