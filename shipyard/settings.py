@@ -197,7 +197,6 @@ INSTALLED_APPS = (
     'django_rq',
     'shipyard',
     'accounts',
-    'dashboard',
     'applications',
     'containers',
     'images',

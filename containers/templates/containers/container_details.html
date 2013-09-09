@@ -150,7 +150,7 @@
                             <tr>
                                 <td>TCP</td>
                                 <td>{{k}}</td>
-                                <td>{{v}}</td>
+                                <td>{{v|container_port_link:container.host.name|safe}}</td>
                             </tr>
                             {% endfor %}
                             {% for k,v in udp.items %}
