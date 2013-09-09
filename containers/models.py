@@ -86,7 +86,7 @@ class Host(models.Model):
                 m.save()
                 container_ids.append(c_id)
             # set extra containers to not running
-            Container.objects.all().exclude(
+            Container.objects.filter(host=self).exclude(
                 container_id__in=container_ids).update(is_running=False)
             cache.set(key, containers, HOST_CACHE_TTL)
         return containers
