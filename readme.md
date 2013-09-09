@@ -57,13 +57,21 @@ docker itself for a self-contained dev environment):
 
 # Screenshots
 
-![Login](http://i.imgur.com/7xYjQ5a.png)
+![Login](http://i.imgur.com/SxiAVKnh.png)
 
-![Dashboard](http://i.imgur.com/pQrk3mu.png)
+![Containers](http://i.imgur.com/5DAMDw8h.png)
 
-![Create Container](http://i.imgur.com/jLgyxUz.png)
+![Container Details](http://i.imgur.com/QFDtF7C.png)
 
-![Attach Container](http://i.imgur.com/qlutzmH.png)
+![Container Logs](http://i.imgur.com/k2aZld8h.png)
+
+![Images](http://i.imgur.com/fMXZ92lh.png)
+
+![Applications](http://i.imgur.com/CgSwTRnh.png)
+
+![Hosts](http://i.imgur.com/KC7D1s0h.png)
+
+![Attach Container](http://i.imgur.com/YhiFq1gh.png)
 
 # Applications
 Applications are groups of containers that are accessible by a domain name.  The easiest
