@@ -57,6 +57,7 @@ def details(request, app_uuid=None):
         form = ApplicationForm(request.POST, instance=app)
         if form.is_valid():
             form.save()
+            app.update_config()
             messages.add_message(request, messages.INFO,
                 _('Application updated'))
             return redirect(reverse('applications.views.index'))
