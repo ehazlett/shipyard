@@ -52,6 +52,24 @@ def create(request):
 @login_required
 def details(request, app_uuid=None):
     app = Application.objects.get(uuid=app_uuid)
+    form = ApplicationForm(instance=app)
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST, instance=app)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO,
+                _('Application updated'))
+            return redirect(reverse('applications.views.index'))
+    ctx = {
+        'application': app,
+        'form': ApplicationForm(instance=app),
+    }
+    return render_to_response('applications/application_details.html', ctx,
+        context_instance=RequestContext(request))
+
+@login_required
+def _details(request, app_uuid=None):
+    app = Application.objects.get(uuid=app_uuid)
     attached_container_ids = [x.container_id for x in app.containers.all()]
     initial = {
         'name': app.name,
@@ -70,23 +88,8 @@ def details(request, app_uuid=None):
         'form_edit_application': EditApplicationForm(initial=initial),
         'containers': containers,
     }
-    return render_to_response('applications/details.html', ctx,
+    return render_to_response('applications/application_details.html', ctx,
         context_instance=RequestContext(request))
-
-@login_required
-#@owner_required # TODO
-def edit(request):
-    data = request.POST
-    app_uuid = data.get('uuid')
-    app = Application.objects.get(uuid=app_uuid)
-    app.name = data.get('name')
-    app.description = data.get('description')
-    app.domain_name = data.get('domain_name')
-    app.backend_port = data.get('backend_port')
-    app.protocol = data.get('protocol')
-    app.save()
-    return redirect(reverse('applications.views.details',
-        kwargs={'app_uuid': app_uuid}))
 
 @login_required
 #@owner_required # TODO

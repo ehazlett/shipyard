@@ -15,6 +15,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from docker import client
 from django.conf import settings
+from django.db.models import Q
 from docker import client
 from django.core.cache import cache
 from shipyard import utils
@@ -190,6 +191,22 @@ class Container(models.Model):
         if self.description:
             d += '({0})'.format(self.description)
         return d
+
+    @classmethod
+    def get_running(cls, user=None):
+        hosts = Host.objects.filter(enabled=True)
+        containers = None
+        if hosts:
+            c_ids = []
+            for h in hosts:
+                for c in h.get_containers():
+                    c_ids.append(utils.get_short_id(c.get('Id')))
+            # return metadata objects
+            containers = Container.objects.filter(container_id__in=c_ids).filter(
+                Q(owner=None))
+            if user:
+                containers = containers.filter(Q(owner=request.user))
+        return containers
 
     def is_public(self):
         if self.user == None:

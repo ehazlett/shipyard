@@ -25,7 +25,8 @@ class Application(models.Model):
     backend_port = models.CharField(max_length=5, null=True)
     protocol = models.CharField(max_length=6, null=True,
         default='http', choices=PROTOCOL_CHOICES)
-    containers = models.ManyToManyField(Container, null=True, blank=True)
+    containers = models.ManyToManyField(Container, null=True, blank=True,
+        limit_choices_to=dict(id__in=[x.id for x in Container.get_running()]))
     owner = models.ForeignKey(User, null=True, blank=True)
 
     def __unicode__(self):

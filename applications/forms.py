@@ -14,8 +14,9 @@
 from django import forms
 from django.utils.translation import ugettext as _
 from applications.models import Application
+from containers.models import Container
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
+from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Field
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton, FormActions
 from django.core.urlresolvers import reverse
 from applications.models import PROTOCOL_CHOICES
@@ -26,6 +27,10 @@ def get_available_hosts():
 class ApplicationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ApplicationForm, self).__init__(*args, **kwargs)
+        # set height for container select
+        container_list_length = len(Container.get_running())
+        if container_list_length > 20:
+            container_list_length = 20
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Fieldset(
@@ -35,9 +40,10 @@ class ApplicationForm(forms.ModelForm):
                 'domain_name',
                 'backend_port',
                 'protocol',
+                Field('containers', size=container_list_length),
             ),
             FormActions(
-                Submit('save', _('Create'), css_class="btn btn-lg btn-success"),
+                Submit('save', _('Update'), css_class="btn btn-lg btn-success"),
             )
         )
         self.helper.form_id = 'form-create-application'
@@ -47,7 +53,7 @@ class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = ('name', 'description', 'domain_name', 'backend_port',
-            'protocol')
+            'protocol', 'containers')
 
 class EditApplicationForm(forms.Form):
     uuid = forms.CharField(required=True, widget=forms.HiddenInput())
