@@ -15,6 +15,12 @@ PROTOCOL_CHOICES = (
 def generate_uuid():
     return str(uuid.uuid4()).replace('-', '')
 
+def get_container_choices():
+    c = []
+    if Container.objects.count() > 0:
+        c = [x.id for x in Container.get_running()]
+    return c
+
 class Application(models.Model):
     uuid = models.CharField(max_length=36, null=True, blank=True, unique=True,
         default=generate_uuid)
@@ -26,7 +32,7 @@ class Application(models.Model):
     protocol = models.CharField(max_length=6, null=True,
         default='http', choices=PROTOCOL_CHOICES)
     containers = models.ManyToManyField(Container, null=True, blank=True,
-        limit_choices_to=dict(id__in=[x.id for x in Container.get_running()]))
+        limit_choices_to=dict(id__in=get_container_choices))
     owner = models.ForeignKey(User, null=True, blank=True)
 
     def __unicode__(self):
