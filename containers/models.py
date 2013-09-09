@@ -81,9 +81,13 @@ class Host(models.Model):
                 meta = c.inspect_container(c_id)
                 m, created = Container.objects.get_or_create(
                     container_id=c_id, host=self)
+                m.is_running = meta.get('State', {}).get('Running', False)
                 m.meta = json.dumps(meta)
                 m.save()
                 container_ids.append(c_id)
+            # set extra containers to not running
+            Container.objects.all().exclude(
+                container_id__in=container_ids).update(is_running=False)
             cache.set(key, containers, HOST_CACHE_TTL)
         return containers
 
@@ -183,13 +187,14 @@ class Container(models.Model):
     container_id = models.CharField(max_length=96, null=True, blank=True)
     description = models.TextField(blank=True, null=True, default='')
     meta = models.TextField(blank=True, null=True, default='{}')
+    is_running = models.BooleanField(default=True)
     host = models.ForeignKey(Host, null=True, blank=True)
     owner = models.ForeignKey(User, null=True, blank=True)
 
     def __unicode__(self):
         d = self.container_id
         if self.description:
-            d += '({0})'.format(self.description)
+            d += ' ({0})'.format(self.description)
         return d
 
     @classmethod
