@@ -18,13 +18,14 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.db.models import Q
 from django.utils.html import strip_tags
 from django.core import serializers
 from django.shortcuts import render_to_response
 import django_rq
 from containers.models import Host, Container
 from django.template import RequestContext
-from containers.forms import (HostForm, CreateContainerForm,
+from containers.forms import (CreateContainerForm,
     ImportRepositoryForm, ImageBuildForm)
 from shipyard import utils
 from docker import client
@@ -40,21 +41,141 @@ def handle_upload(f):
             d.write(c)
     return tmp_file
 
-@require_http_methods(['POST'])
 @login_required
-def add_host(request):
-    form = HostForm(request.POST)
-    try:
-        host = form.save()
-        messages.add_message(request, messages.INFO, _('Added ') + host.name)
-    except Exception, e:
-        msg = strip_tags('.'.join([x[1][0] for x in form.errors.items()]))
-        messages.add_message(request, messages.ERROR, msg)
-    return redirect('dashboard.views.index')
+def index(request):
+    hosts = Host.objects.filter(enabled=True)
+    show_all = True if request.GET.has_key('showall') else False
+    containers = None
+    # load containers
+    if hosts:
+        c_ids = []
+        for h in hosts:
+            for c in h.get_containers(show_all=show_all):
+                c_ids.append(utils.get_short_id(c.get('Id')))
+        # return metadata objects
+        containers = Container.objects.filter(container_id__in=c_ids).filter(
+            Q(owner=None) | Q(owner=request.user))
+    ctx = {
+        'hosts': hosts,
+        'containers': containers,
+        'show_all': show_all,
+    }
+    return render_to_response('containers/index.html', ctx,
+        context_instance=RequestContext(request))
+
+@login_required
+def container_details(request, container_id=None):
+    c = Container.objects.get(container_id=container_id)
+    ctx = {
+        'container': c,
+    }
+    return render_to_response('containers/container_details.html', ctx,
+        context_instance=RequestContext(request))
+
+@login_required
+def create_container(request):
+    form = CreateContainerForm()
+    if request.method == 'POST':
+        # save
+        form = CreateContainerForm(request.POST)
+        if form.is_valid():
+            image = form.data.get('image')
+            environment = form.data.get('environment')
+            command = form.data.get('command')
+            memory = form.data.get('memory', 0)
+            volume = form.data.get('volume')
+            volumes_from = form.data.get('volumes_from')
+            if command.strip() == '':
+                command = None
+            if environment.strip() == '':
+                environment = None
+            else:
+                environment = environment.split()
+            if memory.strip() == '':
+                memory = 0
+            # build volumes
+            if volume == '':
+                volume = None
+            if volume:
+                volume = { volume: {}}
+            # convert memory from MB to bytes
+            if memory:
+                memory = int(memory) * 1048576
+            ports = form.data.get('ports', '').split()
+            hosts = form.data.getlist('hosts')
+            private = form.data.get('private')
+            privileged = form.data.get('privileged')
+            # convert to bool
+            if privileged:
+                privileged = True
+            user = None
+            status = False
+            for i in hosts:
+                host = Host.objects.get(id=i)
+                if private:
+                    user = request.user
+                c_id, status = host.create_container(image, command, ports,
+                    environment=environment, memory=memory,
+                    description=form.data.get('description'), volumes=volume,
+                    volumes_from=volumes_from, privileged=privileged, owner=user)
+            if hosts:
+                if status:
+                    messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
+                        image))
+                else:
+                    messages.add_message(request, messages.ERROR,
+                        _('Container failed to start'))
+            else:
+                messages.add_message(request, messages.ERROR, _('No hosts selected'))
+            return redirect(reverse('containers.views.index'))
+    ctx = {
+        'form_create_container': form,
+    }
+    return render_to_response('containers/create_container.html', ctx,
+        context_instance=RequestContext(request))
+
+@login_required
+def container_info(request, container_id=None):
+    '''
+    Gets / Sets container metatdata
+
+    '''
+    if request.method == 'POST':
+        data = request.POST
+        container_id = data.get('container-id')
+        c = Container.objects.get(container_id=container_id)
+        c.description = data.get('description')
+        c.save()
+        return redirect(reverse('containers.views.container_details',
+            args=(c.container_id,)))
+    c = Container.objects.get(container_id=container_id)
+    data = serializers.serialize('json', [c], ensure_ascii=False)[1:-1]
+    return HttpResponse(data, content_type='application/json')
+
+@login_required
+def container_logs(request, host, container_id):
+    '''
+    Gets the specified container logs
+
+    '''
+    h = Host.objects.get(name=host)
+    c = Container.objects.get(container_id=container_id)
+    logs = h.get_container_logs(container_id).strip()
+    # format
+    if logs:
+        logs = utils.convert_ansi_to_html(logs)
+    else:
+        logs = None
+    ctx = {
+        'container': c,
+        'logs': logs
+    }
+    return render_to_response('containers/container_logs.html', ctx,
+        context_instance=RequestContext(request))
 
 @require_http_methods(['POST'])
 @login_required
-def create_container(request):
+def _create_container(request):
     form = CreateContainerForm(request.POST)
     image = form.data.get('image')
     environment = form.data.get('environment')
@@ -82,6 +203,7 @@ def create_container(request):
     hosts = form.data.getlist('hosts')
     private = form.data.get('private')
     privileged = form.data.get('privileged')
+    # convert to bool
     if privileged:
         privileged = True
     user = None
@@ -103,7 +225,7 @@ def create_container(request):
                 _('Container failed to start'))
     else:
         messages.add_message(request, messages.ERROR, _('No hosts selected'))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def restart_container(request, host, container_id):
@@ -111,7 +233,7 @@ def restart_container(request, host, container_id):
     h.restart_container(container_id)
     messages.add_message(request, messages.INFO, _('Restarted') + ' {0}'.format(
         container_id))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def stop_container(request, host, container_id):
@@ -119,15 +241,7 @@ def stop_container(request, host, container_id):
     h.stop_container(container_id)
     messages.add_message(request, messages.INFO, _('Stopped') + ' {0}'.format(
         container_id))
-    return redirect('dashboard.views.index')
-
-@login_required
-def get_logs(request, host, container_id):
-    h = Host.objects.get(name=host)
-    logs = h.get_container_logs(container_id)
-    # format
-    logs =  '<br />'.join(logs.split('\n'))
-    return HttpResponse(logs)
+    return redirect('containers.views.index')
 
 @login_required
 def destroy_container(request, host, container_id):
@@ -135,7 +249,7 @@ def destroy_container(request, host, container_id):
     h.destroy_container(container_id)
     messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
         container_id))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def attach_container(request, host, container_id):
@@ -161,17 +275,17 @@ def import_image(request):
         utils.get_queue('shipyard').enqueue(host.import_image, args=args, timeout=3600)
     messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
         form.data.get('repository')) + '. ' + _('This may take a few minutes.'))
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @login_required
 def refresh(request):
     '''
-    Invalidates host cache and redirects to dashboard
+    Invalidates host cache and redirects to container view
 
     '''
     for h in Host.objects.filter(enabled=True):
         h.invalidate_cache()
-    return redirect('dashboard.views.index')
+    return redirect('containers.views.index')
 
 @require_http_methods(['GET'])
 @login_required
@@ -191,23 +305,6 @@ def search_repository(request):
     c = client.Client(url)
     data = c.search(query)
     return HttpResponse(json.dumps(data), content_type='application/json')
-
-@login_required
-def container_info(request, container_id=None):
-    '''
-    Gets / Sets container metatdata
-
-    '''
-    if request.method == 'POST':
-        data = request.POST
-        container_id = data.get('container-id')
-        c = Container.objects.get(container_id=container_id)
-        c.description = data.get('description')
-        c.save()
-        return redirect(reverse('index'))
-    c = Container.objects.get(container_id=container_id)
-    data = serializers.serialize('json', [c], ensure_ascii=False)[1:-1]
-    return HttpResponse(data, content_type='application/json')
 
 @require_http_methods(['POST'])
 @login_required
@@ -235,12 +332,4 @@ def build_image(request):
     messages.add_message(request, messages.INFO,
         _('Building image from docker file.  This may take a few minutes.'))
     return redirect(reverse('index'))
-
-@login_required
-def remove_image(request, host_id, image_id):
-    h = Host.objects.get(id=host_id)
-    h.remove_image(image_id)
-    messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
-        image_id))
-    return redirect('dashboard.views.index')
 

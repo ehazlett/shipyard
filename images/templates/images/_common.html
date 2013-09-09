@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<script type="text/javascript">
+    $(function() {
+        $("li#sidenav-images").addClass("active");
+    });
+    $("a.remove-image").click(function(){
+        if (confirm("{% trans 'Are you sure you want to remove the image?' %}")) {
+            var url = this.getAttribute('data-url');
+            redirect(url);
+        }
+        return false;
+    });
+</script>

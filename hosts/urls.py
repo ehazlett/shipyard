@@ -11,5 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.db import models
+from django.conf.urls import patterns, url
 
+urlpatterns = patterns('hosts.views',
+    url(r'^$', 'index'),
+    url(r'^add/$', 'add_host'),
+    url(r'^enable/(?P<host_id>.*)/$', 'enable_host'),
+    url(r'^disable/(?P<host_id>.*)/$', 'disable_host'),
+    url(r'^remove/(?P<host_id>.*)/$', 'remove_host'),
+)

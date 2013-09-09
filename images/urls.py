@@ -13,7 +13,8 @@
 # limitations under the License.
 from django.conf.urls import patterns, url
 
-urlpatterns = patterns('dashboard.views',
-    url(r'^$', 'index', name='dashboard.index'),
-    url(r'^hostinfo/$', '_host_info', name='dashboard.host_info'),
+urlpatterns = patterns('images.views',
+    url(r'^$', 'index'),
+    url(r'^remove/(?P<host_id>.*)/(?P<image_id>.*)/$',
+        'remove_image'),
 )

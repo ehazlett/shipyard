@@ -14,6 +14,7 @@
 # Django settings for shipyard project.
 import os
 import subprocess
+from django.contrib.messages import constants as messages
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '../')
 
 DEBUG = True
@@ -196,9 +197,10 @@ INSTALLED_APPS = (
     'django_rq',
     'shipyard',
     'accounts',
-    'dashboard',
     'applications',
     'containers',
+    'images',
+    'hosts',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -228,6 +230,11 @@ LOGGING = {
             'propagate': True,
         },
     }
+}
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
 }
 
 try:

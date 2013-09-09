@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<script type="text/javascript">
+    $(function() {
+        $("li#sidenav-applications").addClass("active");
+    });
+    $("a.remove-application").click(function(){
+        var appUuid = (this).getAttribute('data-application-uuid');
+        if (confirm("{% trans 'Are you sure you want to remove this application?' %}")) {
+            redirect("/applications/" + appUuid + "/delete/");
+        }
+        return false;
+    });
+</script>

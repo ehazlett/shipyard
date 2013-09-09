@@ -5,34 +5,32 @@
 {% block content %}
 <div class="panel panel-default">
     <div class="panel-heading heading-large">
-        <span class="panel-title section-title">{% trans 'Applications' %}</span>
+        <span class="panel-title section-title">{% trans 'Images' %}</span>
         <span class="section-toolbar">
         </span>
         <span class="pull-right">
-            <a href="{% url 'applications.views.create' %}" class="btn btn-success btn-sm">{% trans 'Create' %}</a>
         </span>
     </div>
     <div class="panel-body">
-        {% if applications %}
+        {% if images %}
         <table class="table table-hover table-bordered">
             <thead>
                 <tr>
-                    <th>{% trans 'Name' %}</th>
-                    <th>{% trans 'Description' %}</th>
-                    <th>{% trans 'Domain Name' %}</th>
-                    <th>{% trans 'Backend Port' %}</th>
-                    <th>{% trans 'Protocol' %}</th>
+                    <th>{% trans 'ID' %}</th>
+                    <th>{% trans 'Repository' %}</th>
+                    <th>{% trans 'Tag' %}</th>
+                    <th>{% trans 'Host' %}</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                {% for app in applications %}
+                {% for h,host_images in images.items %}
+                {% for i in host_images %}
                 <tr>
-                    <td><a href="{% url 'applications.views.details' app_uuid=app.uuid %}">{{app.name}}</a></td>
-                    <td>{{app.description}}</td>
-                    <td><a href="{{app.get_app_url}}" target="_blank">{{app.domain_name}}</a></td>
-                    <td>{{app.backend_port}}</td>
-                    <td>{{app.get_protocol_display}}</td>
+                    <td>{{i.Id|slice:":12"}}</td>
+                    <td>{{i.Repository}}</td>
+                    <td>{{i.Tag}}</td>
+                    <td>{{h.name}}</td>
                     <td>
                         <div class="btn-group">
                             <a href="#" data-toggle="dropdown">
@@ -40,20 +38,21 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu right">
-                                <li><a href="#" class="remove-application" data-application-uuid="{{app.uuid}}">{% trans 'Remove Application' %}</a></li>
+                                <li><a href="#" rel="tooltip" class="remove-image" data-url="{% url 'images.views.remove_image' host_id=h.id image_id=i.Id %}">{% trans 'Remove Image' %}</a></li>
                             </ul>
                         </div>
                     </td>
                 </tr>
                 {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="text-muted">{% trans 'No applications' %}</div>
+        <div class="text-muted">{% trans 'No images' %}</div>
         {% endif %}
     </div>
 </div>
-{% include "applications/_common.html" %}
+{% include "images/_common.html" %}
 <script type="text/javascript">
 </script>
 {% endblock %}

@@ -26,30 +26,55 @@ from containers.models import Container
 
 @login_required
 def index(request):
+    apps = Application.objects.filter(Q(owner=None) |
+        Q(owner=request.user))
     ctx = {
-        'applications': Application.objects.filter(Q(owner=None) |
-            Q(owner=request.user)),
-        'form_application': ApplicationForm(),
+        'applications': apps,
     }
     return render_to_response('applications/index.html', ctx,
         context_instance=RequestContext(request))
 
 @login_required
 def create(request):
-    form = ApplicationForm(request.POST)
-    form.owner = request.user
-    if form.is_valid():
-        form.save()
-    else:
-        # report errors (just the text)
-        for k,v in form.errors.iteritems():
-            messages.add_message(request,
-                messages.ERROR, v[0].capitalize())
-    return redirect(reverse('applications.views.index'))
+    form = ApplicationForm()
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST)
+        form.owner = request.user
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('applications.views.index'))
+    ctx = {
+        'form': form
+    }
+    return render_to_response('applications/create_application.html', ctx,
+        context_instance=RequestContext(request))
 
 @login_required
-#@owner_required # TODO
 def details(request, app_uuid=None):
+    app = Application.objects.get(uuid=app_uuid)
+    form = ApplicationForm(instance=app)
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST, instance=app)
+        if form.is_valid():
+            form.save()
+            try:
+                app.update_config()
+                messages.add_message(request, messages.INFO,
+                    _('Application updated'))
+                return redirect(reverse('applications.views.index'))
+            except KeyError, e:
+                messages.add_message(request, messages.ERROR,
+                    _('Error updating hipache.  Invalid container port') + \
+                        ': {}'.format(e[0]))
+    ctx = {
+        'application': app,
+        'form': ApplicationForm(instance=app),
+    }
+    return render_to_response('applications/application_details.html', ctx,
+        context_instance=RequestContext(request))
+
+@login_required
+def _details(request, app_uuid=None):
     app = Application.objects.get(uuid=app_uuid)
     attached_container_ids = [x.container_id for x in app.containers.all()]
     initial = {
@@ -69,23 +94,8 @@ def details(request, app_uuid=None):
         'form_edit_application': EditApplicationForm(initial=initial),
         'containers': containers,
     }
-    return render_to_response('applications/details.html', ctx,
+    return render_to_response('applications/application_details.html', ctx,
         context_instance=RequestContext(request))
-
-@login_required
-#@owner_required # TODO
-def edit(request):
-    data = request.POST
-    app_uuid = data.get('uuid')
-    app = Application.objects.get(uuid=app_uuid)
-    app.name = data.get('name')
-    app.description = data.get('description')
-    app.domain_name = data.get('domain_name')
-    app.backend_port = data.get('backend_port')
-    app.protocol = data.get('protocol')
-    app.save()
-    return redirect(reverse('applications.views.details',
-        kwargs={'app_uuid': app_uuid}))
 
 @login_required
 #@owner_required # TODO

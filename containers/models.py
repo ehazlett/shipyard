@@ -15,6 +15,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from docker import client
 from django.conf import settings
+from django.db.models import Q
 from docker import client
 from django.core.cache import cache
 from shipyard import utils
@@ -27,11 +28,11 @@ CONTAINER_KEY = '{0}:containers'
 IMAGE_KEY = '{0}:images'
 
 class Host(models.Model):
-    name = models.CharField(max_length=64, null=True, blank=True,
+    name = models.CharField(max_length=64, null=True,
         unique=True)
-    hostname = models.CharField(max_length=128, null=True, blank=True,
+    hostname = models.CharField(max_length=128, null=True,
         unique=True)
-    port = models.SmallIntegerField(null=True, blank=True, default=4243)
+    port = models.SmallIntegerField(null=True, default=4243)
     enabled = models.NullBooleanField(null=True, default=True)
 
     def __unicode__(self):
@@ -191,6 +192,22 @@ class Container(models.Model):
             d += '({0})'.format(self.description)
         return d
 
+    @classmethod
+    def get_running(cls, user=None):
+        hosts = Host.objects.filter(enabled=True)
+        containers = None
+        if hosts:
+            c_ids = []
+            for h in hosts:
+                for c in h.get_containers():
+                    c_ids.append(utils.get_short_id(c.get('Id')))
+            # return metadata objects
+            containers = Container.objects.filter(container_id__in=c_ids).filter(
+                Q(owner=None))
+            if user:
+                containers = containers.filter(Q(owner=request.user))
+        return containers
+
     def is_public(self):
         if self.user == None:
             return True
@@ -214,3 +231,8 @@ class Container(models.Model):
             mem = int(meta.get('Config', {}).get('Memory')) / 1048576
         return mem
 
+    def get_name(self):
+        d = self.container_id
+        if self.description:
+            d = self.description
+        return d

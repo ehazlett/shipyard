@@ -38,25 +38,20 @@ def container_uptime(value):
     return value
 
 @register.filter
-def container_port_links(value, host):
+def container_port_link(port, host):
     """
-    Returns container ports as links
+    Returns container port as link
 
+    :param port: Container port
     :param host: Container host name
 
     """
-    links = []
-    ports = {}
-    ret = ""
-    if value:
+    ret = port
+    if port:
         host = Host.objects.get(name=host)
-        if value.has_key('Tcp'):
-            value = value.get('Tcp')
-        for k,v in value.items():
-            link = '<a href="http://{0}:{2}" target="_blank">{1} -> {2}</a>'.format(
-                host.hostname, k.strip(), v.strip())
-            links.append(link)
-        ret = ', '.join(links)
+        link = '<a href="http://{0}:{1}" target="_blank">{1}</a>'.format(
+            host.hostname, port)
+        ret = link
     return ret
 
 @register.filter
@@ -68,6 +63,18 @@ def container_memory_to_mb(value):
     """
     if value.strip() and int(value) != 0:
         return '{0} MB'.format(int(value) / 1048576)
+    else:
+        return _('unlimited')
+
+@register.filter
+@stringfilter
+def container_cpu(value):
+    """
+    Returns container memory as MB
+
+    """
+    if value.strip() and int(value) != 0:
+        return '{}%'.format(value)
     else:
         return _('unlimited')
 

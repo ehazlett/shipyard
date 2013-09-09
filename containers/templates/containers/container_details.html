@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load shipyard %}
+
+{% block content %}
+<div id="dialog-container-info" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% trans 'Edit Description' %}</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-container-info" role="form" action="{% url 'containers.views.container_info' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                          <input type="hidden" id="container-info-container-id" name="container-id" value=""/>
+                          <input class="form-control" id="container-info-description" name="description" type="text" placeholder="{% trans 'description' %}" autofocus="true">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-save-container-info" type="button" class="btn btn-primary">{% trans 'Save' %}</button>
+                <button type="button" data-dismiss="modal" class="btn btn-default">{% trans 'Cancel' %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading heading-large">
+        <span class="panel-title section-title">{{container.get_name}} {% if container.privileged %}<span class="label label-success">{% trans 'Privileged' %}</span>{% endif %}</span>
+        <span class="section-toolbar">
+            <a href="#" class="container-info" data-container-id="{{container.container_id}}"><span class="glyphicon glyphicon-edit"></span></a>
+        </span>
+        <span class="pull-right">
+            <a href="{% url 'containers.views.container_logs' host=container.host.name container_id=container.container_id %}" class="btn btn-default btn-sm">{% trans 'Logs' %}</a>
+            <a href="{% url 'containers.attach_container' host=container.host.name container_id=container.get_meta.ID %}" class="attach-container btn btn-info btn-sm" target="_blank" >{% trans 'Attach' %}</a>
+            <a href="#" class="btn btn-info btn-sm restart-container" data-url="{% url 'containers.restart_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Restart' %}</a></li>
+            <a href="#" class="btn btn-warning btn-sm stop-container" data-url="{% url 'containers.stop_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Stop' %}</a>
+            <a href="#" class="btn btn-danger btn-sm destroy-container" data-url="{% url 'containers.destroy_container' host=container.host.name container_id=container.get_meta.ID %}">{% trans 'Destroy' %}</a>
+        </span>
+    </div>
+    <div class="panel-body">
+        <div class="col-md-6">
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Container ID' %}</dt>
+                <dd>{{container.container_id}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Image' %}</dt>
+                <dd>{{container.get_meta.Config.Image}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Command' %}</dt>
+                <dd>{{container.get_meta.Config.Cmd|join:" "}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'CPU' %}</dt>
+                {% with cpu=container.get_meta.Config.CpuShares %}
+                <dd><span class="label label-{% if cpu %}info{% else %}default{% endif %}">{{cpu|container_cpu}}</dd>
+                {% endwith %}
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Memory' %}</dt>
+                {% with mem=container.get_meta.Config.Memory %}
+                <dd><span class="label label-{% if mem %}info{% else %}default{% endif %}">{{mem|container_memory_to_mb}}</dd>
+                {% endwith %}
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Uptime' %}</dt>
+                <dd>{{container.get_meta.State.StartedAt|container_uptime}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Host' %}</dt>
+                <dd>{{container.host.name}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'Privileged' %}</dt>
+                {% with priv=container.get_meta.Config.Privileged %}
+                <dd><span class="label label-{% if priv %}success{% else %}default{% endif %}">{{priv}}</span></dd>
+                {% endwith %}
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'IP' %}</dt>
+                <dd>{{container.get_meta.NetworkSettings.IPAddress}}</dd>
+            </dl>
+            <dl class="dl-horizontal">
+                <dt>{% trans 'DNS' %}</dt>
+                {% with dns=container.get_meta.Config.Dns %}
+                <dd>{% if dns %}{{dns}}{% else %}<span class="text-muted">{% trans 'default' %}</span>{% endif %}</dd>
+                {% endwith %}
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="panel-title">{% trans 'Environment' %}</span>
+                </div>
+                <div class="panel-body">
+                    {% with env=container.get_meta.Config.Env %}
+                    {% if env %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Key' %}</th>
+                                <th>{% trans 'Value' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k in env %}
+                            {% with v=k|split:"=" %}
+                            <tr>
+                                <td>{{v.0}}</td>
+                                <td>{{v.1}}</td>
+                            </tr>
+                            {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <span class="text-muted">{% trans 'No environment variables' %}</span>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span class="panel-title">{% trans 'Ports' %}</span>
+                </div>
+                <div class="panel-body">
+                    {% with net=container.get_meta.NetworkSettings %}
+                    {% with tcp=net.PortMapping.Tcp %}
+                    {% with udp=net.PortMapping.Udp %}
+                    {% if tcp or udp %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Protocol' %}</th>
+                                <th>{% trans 'Port' %}</th>
+                                <th>{% trans 'Mapping' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for k,v in tcp.items %}
+                            <tr>
+                                <td>TCP</td>
+                                <td>{{k}}</td>
+                                <td>{{v|container_port_link:container.host.name|safe}}</td>
+                            </tr>
+                            {% endfor %}
+                            {% for k,v in udp.items %}
+                            <tr>
+                                <td>UDP</td>
+                                <td>{{k}}</td>
+                                <td>{{v}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <span class="text-muted">{% trans 'No port mappings' %}</span>
+                    {% endif %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "containers/_common.html" %}
+<script type="text/javascript">
+    $("a.container-info").click(function(){
+        var id = this.getAttribute('data-container-id');
+        $.getJSON("{% url 'containers.views.container_info' %}" + id + '/', function(data){
+            $("#container-info-description").val(data.fields.description);
+            $("#container-info-container-id").val(id);
+            $("#dialog-container-info").modal('toggle');
+        });
+    });
+    $("#btn-save-container-info").click(function(){
+        $("#form-container-info").submit();
+        return false;
+    });
+</script>
+{% endblock %}
