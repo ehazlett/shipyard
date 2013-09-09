@@ -27,7 +27,7 @@
                 {% for h,host_images in images.items %}
                 {% for i in host_images %}
                 <tr>
-                    <td><a href="#" data-image-id="{{i.Id}}">{{i.Id|slice:":12"}}</a></td>
+                    <td>{{i.Id|slice:":12"}}</td>
                     <td>{{i.Repository}}</td>
                     <td>{{i.Tag}}</td>
                     <td>{{h.name}}</td>
