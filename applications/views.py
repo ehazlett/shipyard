@@ -57,9 +57,14 @@ def details(request, app_uuid=None):
         form = ApplicationForm(request.POST, instance=app)
         if form.is_valid():
             form.save()
-            app.update_config()
-            messages.add_message(request, messages.INFO,
-                _('Application updated'))
+            try:
+                app.update_config()
+                messages.add_message(request, messages.INFO,
+                    _('Application updated'))
+            except KeyError, e:
+                messages.add_message(request, messages.ERROR,
+                    _('Error updating hipache.  Invalid container port') + \
+                        ': {}'.format(e[0]))
             return redirect(reverse('applications.views.index'))
     ctx = {
         'application': app,

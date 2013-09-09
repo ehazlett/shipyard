@@ -14,6 +14,7 @@
 # Django settings for shipyard project.
 import os
 import subprocess
+from django.contrib.messages import constants as messages
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '../')
 
 DEBUG = True
@@ -233,6 +234,9 @@ LOGGING = {
 }
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+}
 
 try:
     from local_settings import *
