@@ -75,6 +75,17 @@ if [ "`grep \"source /opt/ve\" $VAGRANT_BASHRC`" = "" ]; then
     echo "cd $APP_DIR" >> $VAGRANT_BASHRC
 fi
 
+# install go
+if [ ! -e "/usr/local/go" ] ; then
+    wget -O /tmp/go.tar.gz http://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz
+    cd /usr/local ;  tar xzf /tmp/go.tar.gz
+    rm -rf /tmp/go.tar.gz
+fi
+
+cat << EOF > /etc/environment
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/go/bin"
+EOF
+
 cat << EOF > /etc/supervisor/conf.d/shipyard.conf
 [program:hipache]
 directory=/tmp
