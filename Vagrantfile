@@ -12,7 +12,6 @@ Vagrant::Config.run do |config|
     pm_config.vm.host_name = "shipyard.local"
     pm_config.vm.network :hostonly, "10.10.10.25"
     pm_config.vm.share_folder "shipyard", "/opt/app", "./"
-    pm_config.vm.share_folder "shipyard_agent", "/opt/agent", "../shipyard-agent"
   end
 end
 
