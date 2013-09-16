@@ -40,7 +40,7 @@ class HostForm(forms.ModelForm):
 
     def clean_hostname(self):
         data = self.cleaned_data['hostname']
-        if '/' in data:
+        if '/' in data and 'unix' not in data:
             raise forms.ValidationError(_('Please enter a hostname or IP only'))
         return data
 

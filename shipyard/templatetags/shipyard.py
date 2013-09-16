@@ -49,8 +49,11 @@ def container_port_link(port, host):
     ret = port
     if port:
         host = Host.objects.get(name=host)
+        host_url = host.hostname
+        if 'unix' in host.hostname:
+            host_url = '127.0.0.1'
         link = '<a href="http://{0}:{1}" target="_blank">{1}</a>'.format(
-            host.hostname, port)
+            host_url, port)
         ret = link
     return ret
 
