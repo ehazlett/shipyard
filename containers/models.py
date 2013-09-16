@@ -146,7 +146,9 @@ class Host(models.Model):
         # reload containers to get proper port
         self.get_containers()
         # update hipache
-        apps = Application.objects.filter(containers__in=[self])
+        container = Container.objects.get(
+            container_id=utils.get_short_id(container_id))
+        apps = Application.objects.filter(containers__in=[container])
         for app in apps:
             app.update_config()
 
