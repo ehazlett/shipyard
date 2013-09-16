@@ -41,7 +41,8 @@ def create(request):
         form = ApplicationForm(request.POST)
         form.owner = request.user
         if form.is_valid():
-            form.save()
+            app = form.save()
+            app.update_config()
             return redirect(reverse('applications.views.index'))
     ctx = {
         'form': form
