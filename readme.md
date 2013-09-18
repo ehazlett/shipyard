@@ -81,7 +81,7 @@ way to test this is to add some local `/etc/hosts` entries for fake domains poin
 10.10.10.25 foo.local
 ```
 
-Then you can create a new application with the domain `foo.local`.  Attach one or more containers and then access http://foo.local in your browser and it should hit Hipache and be routed to the contianers.
+Then you can create a new application with the domain `foo.local`.  Attach one or more containers and then access http://foo.local in your browser and it should hit Hipache and be routed to the containers.
 
 For more info on applications, see [here](https://github.com/ehazlett/shipyard/wiki/Applications)
 
