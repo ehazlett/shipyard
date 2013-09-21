@@ -228,6 +228,10 @@ class Container(models.Model):
     def get_meta(self):
         return json.loads(self.meta)
 
+    def get_applications(self):
+        from applications.models import Application
+        return Application.objects.filter(containers__in=[self])
+
     def get_ports(self):
         meta = self.get_meta()
         port_mapping = meta.get('NetworkSettings', {}).get('PortMapping')

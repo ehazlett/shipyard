@@ -32,8 +32,7 @@ def check_protected_containers():
             cfg = meta.get('Config')
             image = cfg.get('Image')
             command = ' '.join(cfg.get('Cmd'))
-            # TODO: update port spec to specify the NAT'd port
-            # to maintain connectivity
+            # update port spec to specify the original NAT'd port
             port_mapping = meta.get('NetworkSettings').get('PortMapping')
             port_specs = []
             for x,y in port_mapping.items():
@@ -52,9 +51,11 @@ def check_protected_containers():
             # mark new container as protected
             new_c.protected = True
             new_c.save()
-            # TODO: add new container to any applications that
-            # previous container belonged to
-
+            # add new container to any applications that
+            # previous container belonged
+            for app in c.get_applications():
+                app.containers.add(new_c)
+                app.save()
             # remove old container meta
             c.delete()
     return True
