@@ -21,6 +21,7 @@ def check_protected_containers():
     protected_containers = Container.objects.filter(protected=True)
     for c in protected_containers:
         # get host containers
+        c.host.invalidate_cache()
         cnt_ids = [utils.get_short_id(x.get('Id'))
             for x in c.host.get_containers()]
         # check if container is still running
@@ -33,7 +34,11 @@ def check_protected_containers():
             command = ' '.join(cfg.get('Cmd'))
             # TODO: update port spec to specify the NAT'd port
             # to maintain connectivity
-            ports = cfg.get('PortSpecs')
+            port_mapping = meta.get('NetworkSettings').get('PortMapping')
+            port_specs = []
+            for x,y in port_mapping.items():
+                for k,v in y.items():
+                    port_specs.append('{}:{}/{}'.format(v,k,x.lower()))
             env = cfg.get('Env')
             mem = cfg.get('Memory')
             description = c.description
@@ -41,8 +46,8 @@ def check_protected_containers():
             volumes_from = cfg.get('VolumesFrom')
             privileged = cfg.get('Privileged')
             owner = c.owner
-            c_id, status = host.create_container(image, command, ports, env, mem, description,
-                volumes, volumes_from, privileged, owner)
+            c_id, status = host.create_container(image, command, port_specs,
+                env, mem, description, volumes, volumes_from, privileged, owner)
             new_c = Container.objects.get(container_id=c_id)
             # mark new container as protected
             new_c.protected = True
