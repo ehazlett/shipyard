@@ -238,17 +238,23 @@ def restart_container(request, host, container_id):
 @login_required
 def stop_container(request, host, container_id):
     h = Host.objects.get(name=host)
-    h.stop_container(container_id)
-    messages.add_message(request, messages.INFO, _('Stopped') + ' {0}'.format(
-        container_id))
+    try:
+        h.stop_container(container_id)
+        messages.add_message(request, messages.INFO, _('Stopped') + ' {0}'.format(
+            container_id))
+    except Exception, e:
+        messages.add_message(request, messages.ERROR, e)
     return redirect('containers.views.index')
 
 @login_required
 def destroy_container(request, host, container_id):
     h = Host.objects.get(name=host)
-    h.destroy_container(container_id)
-    messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
-        container_id))
+    try:
+        h.destroy_container(container_id)
+        messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
+            container_id))
+    except Exception, e:
+        messages.add_message(request, messages.ERROR, e)
     return redirect('containers.views.index')
 
 @login_required

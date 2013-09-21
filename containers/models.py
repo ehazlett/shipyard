@@ -15,6 +15,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from docker import client
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from django.db.models import Q
 from docker import client
 from django.core.cache import cache
@@ -22,6 +23,7 @@ from shipyard import utils
 import json
 import hashlib
 import requests
+from shipyard.exceptions import ProtectedContainerError
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
 CONTAINER_KEY = '{0}:containers'
@@ -156,8 +158,13 @@ class Host(models.Model):
             app.update_config()
 
     def stop_container(self, container_id=None):
+        c_id = utils.get_short_id(container_id)
+        c = Container.objects.get(container_id=c_id)
+        if c.protected:
+            raise ProtectedContainerError(
+                _('Unable to stop container.  Container is protected.'))
         c = self._get_client()
-        c.stop(container_id)
+        c.stop(c_id)
         self._invalidate_container_cache()
 
     def get_container_logs(self, container_id=None):
@@ -165,8 +172,12 @@ class Host(models.Model):
         return c.logs(container_id)
 
     def destroy_container(self, container_id=None):
-        c = self._get_client()
         c_id = utils.get_short_id(container_id)
+        c = Container.objects.get(container_id=c_id)
+        if c.protected:
+            raise ProtectedContainerError(
+                _('Unable to destroy container.  Container is protected.'))
+        c = self._get_client()
         c.kill(c_id)
         c.remove_container(c_id)
         # remove metadata
