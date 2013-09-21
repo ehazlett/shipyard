@@ -23,5 +23,4 @@ urlpatterns = patterns('',
     url(r'^images/', include('images.urls')),
     url(r'^hosts/', include('hosts.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^rq/', include('django_rq.urls')),
 )

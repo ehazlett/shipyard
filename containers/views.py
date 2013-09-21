@@ -14,6 +14,7 @@
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.core.urlresolvers import reverse
@@ -22,7 +23,6 @@ from django.db.models import Q
 from django.utils.html import strip_tags
 from django.core import serializers
 from django.shortcuts import render_to_response
-import django_rq
 from containers.models import Host, Container
 from django.template import RequestContext
 from containers.forms import (CreateContainerForm,
@@ -272,7 +272,8 @@ def import_image(request):
     for i in hosts:
         host = Host.objects.get(id=i)
         args = (form.data.get('repository'),)
-        utils.get_queue('shipyard').enqueue(host.import_image, args=args, timeout=3600)
+        # TODO: update to use celery
+        #utils.get_queue('shipyard').enqueue(host.import_image, args=args, timeout=3600)
     messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
         form.data.get('repository')) + '. ' + _('This may take a few minutes.'))
     return redirect('containers.views.index')
@@ -327,9 +328,24 @@ def build_image(request):
     for i in hosts:
         host = Host.objects.get(id=i)
         args = (docker_file, tag)
-        utils.get_queue('shipyard').enqueue(host.build_image, args=args,
-            timeout=3600)
+        # TODO: update to celery
+        #utils.get_queue('shipyard').enqueue(host.build_image, args=args,
+        #    timeout=3600)
     messages.add_message(request, messages.INFO,
         _('Building image from docker file.  This may take a few minutes.'))
     return redirect(reverse('index'))
+
+@csrf_exempt
+@require_http_methods(['POST'])
+@login_required
+def toggle_protect_container(request, host_id, container_id):
+    enabled = request.POST.get('enabled')
+    host = Host.objects.get(id=host_id)
+    container = Container.objects.get(host=host, container_id=container_id)
+    if enabled == 'true':
+        container.protected = True
+    else:
+        container.protected = False
+    container.save()
+    return HttpResponse('done')
 

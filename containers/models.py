@@ -195,6 +195,7 @@ class Container(models.Model):
     is_running = models.BooleanField(default=True)
     host = models.ForeignKey(Host, null=True, blank=True)
     owner = models.ForeignKey(User, null=True, blank=True)
+    protected = models.BooleanField(default=False)
 
     def __unicode__(self):
         d = self.container_id

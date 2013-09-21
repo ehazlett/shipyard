@@ -18,6 +18,8 @@
   <link href="{{STATIC_URL}}css/bootstrap.min.css" rel="stylesheet">
   <link href="{{STATIC_URL}}css/fonts.css" rel="stylesheet">
   <link href="{{STATIC_URL}}css/app.css" rel="stylesheet">
+  <link href="{{STATIC_URL}}css/bootstrap-switch.css" rel="stylesheet">
+  <link href="{{STATIC_URL}}css/flat-ui-fonts.css" rel="stylesheet">
   {% block extra_head_css %}{% endblock %}
 
   <!-- fav and touch icons -->
@@ -25,6 +27,7 @@
   <!-- scripts -->
   <script type="text/javascript" src="{{STATIC_URL}}js/jquery.min.js"></script>
   <script type="text/javascript" src="{{STATIC_URL}}js/jquery.validate.min.js"></script>
+  <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-switch.min.js"></script>
   {% block extra_head_js %}{% endblock %}
 </head>
 <body>
@@ -94,8 +97,8 @@
       localStorage.setItem('lastTab', $(e.target).attr('href'));
     });
     $(function(){
-        $("a[rel=tooltip]").tooltip();
-        $("a[rel=popover]").popover();
+        $("[rel=tooltip]").tooltip();
+        $("[rel=popover]").popover();
         {% if messages %}
         $(".alert").alert();
         {% endif %}

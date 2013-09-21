@@ -14,6 +14,7 @@
 # Django settings for shipyard project.
 import os
 import subprocess
+from datetime import timedelta
 from django.contrib.messages import constants as messages
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '../')
 
@@ -56,9 +57,10 @@ CACHES = {
         }
     }
 }
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
-REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', None)
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+REDIS_DB = os.getenv('REDIS_DB', 0)
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', None)
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -169,8 +171,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'south',
+    'djcelery',
     'crispy_forms',
-    'django_rq',
     'shipyard',
     'accounts',
     'applications',
@@ -213,32 +215,33 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
+# amount of time in seconds to check protected containers
+RECOVERY_INTERVAL = 15
+# number of times to restart a container before aborting
+RECOVYER_THRESHOLD = 3
+
 try:
     from local_settings import *
 except ImportError:
     pass
 
-RQ_QUEUES = {
-    'default': {
-        'HOST': REDIS_HOST,
-        'PORT': REDIS_PORT,
-        'DB': 1,
-        'PASSWORD': REDIS_PASSWORD,
-    },
-    'shipyard': {
-        'HOST': REDIS_HOST,
-        'PORT': REDIS_PORT,
-        'DB': 2,
-        'PASSWORD': REDIS_PASSWORD,
-    },
-    'builder': {
-        'HOST': REDIS_HOST,
-        'PORT': REDIS_PORT,
-        'DB': 3,
-        'PASSWORD': REDIS_PASSWORD,
-    }
-}
+# enable the hipache load balancer integration (needed for applications)
 HIPACHE_ENABLED = True
 HIPACHE_REDIS_HOST = REDIS_HOST
 HIPACHE_REDIS_PORT = REDIS_PORT
+BROKER_URL = 'redis://'
+if REDIS_PASSWORD:
+    BROKER_URL += ':{}@'.format(REDIS_PASSWORD)
+BROKER_URL += '{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB)
+CELERY_TIMEZONE = 'UTC'
 
+# celery scheduled tasks
+CELERYBEAT_SCHEDULE = {
+    'check-protected-containers': {
+        'task': 'shipyard.tasks.check_protected_containers',
+        'schedule': timedelta(seconds=RECOVERY_INTERVAL),
+    }
+}
+
+import djcelery
+djcelery.setup_loader()
