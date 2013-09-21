@@ -49,7 +49,10 @@ class Host(models.Model):
     def _invalidate_container_cache(self):
         # invalidate cache
         key = CONTAINER_KEY.format(self.name)
-        cache.delete_pattern('*{0}*'.format(key))
+        try:
+            cache.delete_pattern('*{0}*'.format(key))
+        except: # ignore cache bust errors
+            pass
 
     def _invalidate_image_cache(self):
         # invalidate cache

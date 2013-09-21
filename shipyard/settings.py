@@ -59,30 +59,6 @@ CACHES = {
 REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', None)
-RQ_QUEUES = {
-    'default': {
-        'HOST': REDIS_HOST,
-        'PORT': REDIS_PORT,
-        'DB': 1,
-        'PASSWORD': REDIS_PASSWORD,
-    },
-    'shipyard': {
-        'HOST': REDIS_HOST,
-        'PORT': REDIS_PORT,
-        'DB': 2,
-        'PASSWORD': REDIS_PASSWORD,
-    },
-    'builder': {
-        'HOST': REDIS_HOST,
-        'PORT': REDIS_PORT,
-        'DB': 3,
-        'PASSWORD': REDIS_PASSWORD,
-    }
-}
-HIPACHE_ENABLED = True
-HIPACHE_REDIS_HOST = REDIS_HOST
-HIPACHE_REDIS_PORT = REDIS_PORT
-
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -241,4 +217,28 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
+        'DB': 1,
+        'PASSWORD': REDIS_PASSWORD,
+    },
+    'shipyard': {
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
+        'DB': 2,
+        'PASSWORD': REDIS_PASSWORD,
+    },
+    'builder': {
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
+        'DB': 3,
+        'PASSWORD': REDIS_PASSWORD,
+    }
+}
+HIPACHE_ENABLED = True
+HIPACHE_REDIS_HOST = REDIS_HOST
+HIPACHE_REDIS_PORT = REDIS_PORT
 
