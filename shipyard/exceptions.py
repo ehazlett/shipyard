@@ -14,3 +14,6 @@
 
 class ProtectedContainerError(Exception):
     pass
+
+class RecoveryThresholdError(Exception):
+    pass

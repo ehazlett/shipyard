@@ -218,7 +218,12 @@ MESSAGE_TAGS = {
 # amount of time in seconds to check protected containers
 RECOVERY_INTERVAL = 15
 # number of times to restart a container before aborting
-RECOVYER_THRESHOLD = 3
+RECOVERY_THRESHOLD = 3
+# amount of time in seconds to allow for recovery.  if the container
+# goes past the number in RECOVERY_THRESHOLD in this time span
+# the container an exception will be raised and it won't be attempted
+# to be recovered
+RECOVERY_TIME = 60
 
 try:
     from local_settings import *

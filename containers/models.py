@@ -65,6 +65,15 @@ class Host(models.Model):
         key = '{0}:{1}'.format(CONTAINER_KEY.format(self.name), gen_id)
         return key
 
+    def _load_container_data(self, container_id):
+        c = self._get_client()
+        meta = c.inspect_container(container_id)
+        m, created = Container.objects.get_or_create(
+            container_id=container_id, host=self)
+        m.is_running = meta.get('State', {}).get('Running', False)
+        m.meta = json.dumps(meta)
+        m.save()
+
     def invalidate_cache(self):
         self._invalidate_container_cache()
         self._invalidate_image_cache()
@@ -84,12 +93,7 @@ class Host(models.Model):
                 # only get first 12 chars of id (for metatdata)
                 c_id = utils.get_short_id(x.get('Id'))
                 # ignore stopped containers
-                meta = c.inspect_container(c_id)
-                m, created = Container.objects.get_or_create(
-                    container_id=c_id, host=self)
-                m.is_running = meta.get('State', {}).get('Running', False)
-                m.meta = json.dumps(meta)
-                m.save()
+                self._load_container_data(c_id)
                 container_ids.append(c_id)
             # set extra containers to not running
             Container.objects.filter(host=self).exclude(
