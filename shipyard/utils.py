@@ -11,13 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import django_rq
 from ansi2html import Ansi2HTMLConverter
 from django.conf import settings
 import redis
-
-def get_queue(name='shipyard'):
-    return django_rq.get_queue(name)
 
 def get_short_id(container_id):
     return container_id[:12]

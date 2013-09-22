@@ -42,58 +42,75 @@
         </span>
     </div>
     <div class="panel-body">
-        <div class="col-md-6">
-            <dl class="dl-horizontal">
-                <dt>{% trans 'Container ID' %}</dt>
-                <dd>{{container.container_id}}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'Image' %}</dt>
-                <dd>{{container.get_meta.Config.Image}}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'Command' %}</dt>
-                <dd>{{container.get_meta.Config.Cmd|join:" "}}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'CPU' %}</dt>
-                {% with cpu=container.get_meta.Config.CpuShares %}
-                <dd><span class="label label-{% if cpu %}info{% else %}default{% endif %}">{{cpu|container_cpu}}</dd>
-                {% endwith %}
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'Memory' %}</dt>
-                {% with mem=container.get_meta.Config.Memory %}
-                <dd><span class="label label-{% if mem %}info{% else %}default{% endif %}">{{mem|container_memory_to_mb}}</dd>
-                {% endwith %}
-            </dl>
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Container ID' %}</dt>
+                    <dd>{{container.container_id}}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Image' %}</dt>
+                    <dd>{{container.get_meta.Config.Image}}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Command' %}</dt>
+                    <dd>{{container.get_meta.Config.Cmd|join:" "}}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'CPU' %}</dt>
+                    {% with cpu=container.get_meta.Config.CpuShares %}
+                    <dd><span class="label label-{% if cpu %}info{% else %}default{% endif %}">{{cpu|container_cpu}}</dd>
+                    {% endwith %}
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Memory' %}</dt>
+                    {% with mem=container.get_meta.Config.Memory %}
+                    <dd><span class="label label-{% if mem %}info{% else %}default{% endif %}">{{mem|container_memory_to_mb}}</dd>
+                    {% endwith %}
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Memory Swap' %}</dt>
+                    {% with mem=container.get_meta.Config.MemorySwap %}
+                    <dd><span class="label label-{% if mem %}info{% else %}default{% endif %}">{{mem|container_memory_to_mb}}</dd>
+                    {% endwith %}
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Uptime' %}</dt>
+                    <dd>{{container.get_meta.State.StartedAt|container_uptime}}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Host' %}</dt>
+                    <dd>{{container.host.name}}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'Privileged' %}</dt>
+                    {% with priv=container.get_meta.Config.Privileged %}
+                    <dd><span class="label label-{% if priv %}success{% else %}default{% endif %}">{{priv}}</span></dd>
+                    {% endwith %}
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'IP' %}</dt>
+                    <dd>{{container.get_meta.NetworkSettings.IPAddress}}</dd>
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt>{% trans 'DNS' %}</dt>
+                    {% with dns=container.get_meta.Config.Dns %}
+                    <dd>{% if dns %}{{dns|join:", "}}{% else %}<span class="text-muted">{% trans 'default' %}</span>{% endif %}</dd>
+                    {% endwith %}
+                </dl>
+                <dl class="dl-horizontal">
+                    <dt><span rel="tooltip" title="{% trans 'Restart container if destroyed' %}">{% trans 'Protected' %}</span></dt>
+                    <dd>
+                        <div id="switch" class="make-switch switch-mini" data-on="success" data-off="default">
+                            <input id="protected-switch" type="checkbox" {% if container.protected %}checked="checked"{% endif %}>
+                        </div>
+                    </dd>
+                </dl>
+            </div>
         </div>
-        <div class="col-md-6">
-            <dl class="dl-horizontal">
-                <dt>{% trans 'Uptime' %}</dt>
-                <dd>{{container.get_meta.State.StartedAt|container_uptime}}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'Host' %}</dt>
-                <dd>{{container.host.name}}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'Privileged' %}</dt>
-                {% with priv=container.get_meta.Config.Privileged %}
-                <dd><span class="label label-{% if priv %}success{% else %}default{% endif %}">{{priv}}</span></dd>
-                {% endwith %}
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'IP' %}</dt>
-                <dd>{{container.get_meta.NetworkSettings.IPAddress}}</dd>
-            </dl>
-            <dl class="dl-horizontal">
-                <dt>{% trans 'DNS' %}</dt>
-                {% with dns=container.get_meta.Config.Dns %}
-                <dd>{% if dns %}{{dns}}{% else %}<span class="text-muted">{% trans 'default' %}</span>{% endif %}</dd>
-                {% endwith %}
-            </dl>
-        </div>
+
         <div class="col-md-6">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -175,6 +192,20 @@
 </div>
 {% include "containers/_common.html" %}
 <script type="text/javascript">
+    $("#switch").on('click', function() {
+        $("#switch").bootstrapSwitch('toggleState');
+    });
+    $("#switch").on('switch-change', function (e, data){
+        var enabled = $("#protected-switch").is(':checked');
+        // update
+        var data = {'enabled': enabled};
+        $.ajax({
+            type: "POST",
+            url: "{% url 'containers.views.toggle_protect_container' host_id=container.host.id container_id=container.container_id %}",
+            data: data
+        });
+        return false;
+    });
     $("a.container-info").click(function(){
         var id = this.getAttribute('data-container-id');
         $.getJSON("{% url 'containers.views.container_info' %}" + id + '/', function(data){
