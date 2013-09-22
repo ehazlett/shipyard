@@ -11,16 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.conf.urls import patterns, include, url
-from django.contrib import admin
-admin.autodiscover()
 
-urlpatterns = patterns('',
-    url(r'^$', 'shipyard.views.index', name='index'),
-    url(r'^accounts/', include('accounts.urls')),
-    url(r'^applications/', include('applications.urls')),
-    url(r'^containers/', include('containers.urls')),
-    url(r'^images/', include('images.urls')),
-    url(r'^hosts/', include('hosts.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-)
+class ProtectedContainerError(Exception):
+    pass
+
+class RecoveryThresholdError(Exception):
+    pass

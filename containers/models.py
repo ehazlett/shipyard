@@ -15,6 +15,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from docker import client
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from django.db.models import Q
 from docker import client
 from django.core.cache import cache
@@ -22,6 +23,7 @@ from shipyard import utils
 import json
 import hashlib
 import requests
+from shipyard.exceptions import ProtectedContainerError
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
 CONTAINER_KEY = '{0}:containers'
@@ -63,6 +65,15 @@ class Host(models.Model):
         key = '{0}:{1}'.format(CONTAINER_KEY.format(self.name), gen_id)
         return key
 
+    def _load_container_data(self, container_id):
+        c = self._get_client()
+        meta = c.inspect_container(container_id)
+        m, created = Container.objects.get_or_create(
+            container_id=container_id, host=self)
+        m.is_running = meta.get('State', {}).get('Running', False)
+        m.meta = json.dumps(meta)
+        m.save()
+
     def invalidate_cache(self):
         self._invalidate_container_cache()
         self._invalidate_image_cache()
@@ -82,12 +93,7 @@ class Host(models.Model):
                 # only get first 12 chars of id (for metatdata)
                 c_id = utils.get_short_id(x.get('Id'))
                 # ignore stopped containers
-                meta = c.inspect_container(c_id)
-                m, created = Container.objects.get_or_create(
-                    container_id=c_id, host=self)
-                m.is_running = meta.get('State', {}).get('Running', False)
-                m.meta = json.dumps(meta)
-                m.save()
+                self._load_container_data(c_id)
                 container_ids.append(c_id)
             # set extra containers to not running
             Container.objects.filter(host=self).exclude(
@@ -156,8 +162,13 @@ class Host(models.Model):
             app.update_config()
 
     def stop_container(self, container_id=None):
+        c_id = utils.get_short_id(container_id)
+        c = Container.objects.get(container_id=c_id)
+        if c.protected:
+            raise ProtectedContainerError(
+                _('Unable to stop container.  Container is protected.'))
         c = self._get_client()
-        c.stop(container_id)
+        c.stop(c_id)
         self._invalidate_container_cache()
 
     def get_container_logs(self, container_id=None):
@@ -165,8 +176,12 @@ class Host(models.Model):
         return c.logs(container_id)
 
     def destroy_container(self, container_id=None):
-        c = self._get_client()
         c_id = utils.get_short_id(container_id)
+        c = Container.objects.get(container_id=c_id)
+        if c.protected:
+            raise ProtectedContainerError(
+                _('Unable to destroy container.  Container is protected.'))
+        c = self._get_client()
         c.kill(c_id)
         c.remove_container(c_id)
         # remove metadata
@@ -195,6 +210,7 @@ class Container(models.Model):
     is_running = models.BooleanField(default=True)
     host = models.ForeignKey(Host, null=True, blank=True)
     owner = models.ForeignKey(User, null=True, blank=True)
+    protected = models.BooleanField(default=False)
 
     def __unicode__(self):
         d = self.container_id
@@ -226,6 +242,10 @@ class Container(models.Model):
 
     def get_meta(self):
         return json.loads(self.meta)
+
+    def get_applications(self):
+        from applications.models import Application
+        return Application.objects.filter(containers__in=[self])
 
     def get_ports(self):
         meta = self.get_meta()
