@@ -26,7 +26,7 @@ is running on localhost.
 * `python manage.py migrate`
 * `python manage.py createsuperuser`
 * `python manage.py runserver`
-* `python manage.py rqworker shipyard` (in another terminal)
+* `python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E` (in another terminal)
 * Open browser to http://localhost:8000
 * Add a host (i.e. 127.0.0.1 for local docker)
 
@@ -39,7 +39,7 @@ docker itself for a self-contained dev environment):
 * `python manage.py migrate`
 * `python manage.py createsuperuser`
 * `./manage.py runserver 0.0.0.0:8000`
-* `./manage.py rqworker shipyard` (in separate ssh session)
+* `./manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E` (in separate ssh session)
 * Open browser to http://localhost:8000
 
 # Features
@@ -53,6 +53,7 @@ docker itself for a self-contained dev environment):
 * Container metadata (description, etc.)
 * Applications: bind containers to applications that are setup with [hipache](https://github.com/dotcloud/hipache)
 * Attach container (terminal emulation in the browser)
+* Container recovery (mark container as "protected" and it will auto-restart upon fail/destroy/stop)
 * ...more coming...
 
 # Screenshots
@@ -72,6 +73,9 @@ docker itself for a self-contained dev environment):
 ![Hosts](http://i.imgur.com/KC7D1s0h.png)
 
 ![Attach Container](http://i.imgur.com/YhiFq1gh.png)
+
+* Note: for attaching to containers you must have access to the docker host.  This
+will change in the future.
 
 # Applications
 Applications are groups of containers that are accessible by a domain name.  The easiest

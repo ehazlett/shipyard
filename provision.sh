@@ -70,7 +70,7 @@ if [ "`grep \"source /opt/ve\" $VAGRANT_BASHRC`" = "" ]; then
     echo "source $VE_DIR/bin/activate" >> $VAGRANT_BASHRC
     echo "alias pm='python manage.py \$*'" >> $VAGRANT_BASHRC
     echo "alias pmr='python manage.py runserver 0.0.0.0:8000\$*'" >> $VAGRANT_BASHRC
-    echo "alias pmq='python manage.py rqworker shipyard\$*'" >> $VAGRANT_BASHRC
+    echo "alias pmq='python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E\$*'" >> $VAGRANT_BASHRC
     echo "echo ''" >> $VAGRANT_BASHRC
     echo "cd $APP_DIR" >> $VAGRANT_BASHRC
 fi
