@@ -17,7 +17,7 @@ echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/dock
 apt-get -qq update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes lxc-docker
 # edit docker upstart to listen on tcp
-sed -i 's/\/usr\/bin\/docker.*/\/usr\/bin\/docker -d -H tcp:\/\/0.0.0.0:4243/g' /etc/init/docker.conf
+sed -i 's/\/usr\/bin\/docker.*/\/usr\/bin\/docker -d -H tcp:\/\/0.0.0.0:4243 -H unix:\/\/\/var\/run\/docker\.sock/g' /etc/init/docker.conf
 service docker restart
 
 mkdir -p $VE_ROOT

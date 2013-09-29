@@ -17,13 +17,16 @@ from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from containers.models import Host
+from shipyard import tasks
 
 @login_required
 def index(request):
     hosts = Host.objects.filter(enabled=True)
     images = {}
     for h in hosts:
-        images[h] = h.get_images()
+        img = h.get_images()
+        if img:
+            images[h] = img
     ctx = {
         'images': images
     }
@@ -34,7 +37,25 @@ def index(request):
 def remove_image(request, host_id, image_id):
     h = Host.objects.get(id=host_id)
     h.remove_image(image_id)
-    messages.add_message(request, messages.INFO, _('Removed') + ' {0}'.format(
+    messages.add_message(request, messages.INFO, _('Removed') + ' {}'.format(
         image_id))
     return redirect('images.views.index')
 
+@login_required
+def refresh(request):
+    '''
+    Invalidates host cache and redirects to images view
+
+    '''
+    for h in Host.objects.filter(enabled=True):
+        h._invalidate_image_cache()
+    return redirect('images.views.index')
+
+@login_required
+def import_image(request):
+    repo = request.POST.get('repo_name')
+    if repo:
+        tasks.import_image.delay(repo)
+        messages.add_message(request, messages.INFO, _('Importing') + \
+            ' {}'.format(repo) + _('.  This could take a few minutes.'))
+    return redirect('images.views.index')
