@@ -9,7 +9,8 @@ celery==3.0.23
 django-celery==3.0.23
 django-crispy-forms==1.4.0
 django-redis==3.3
-https://github.com/ehazlett/docker-py/archive/master.zip
+django-tastypie==0.10.0
+docker-py==0.2.0
 kombu==2.5.14
 python-dateutil==2.1
 pytz==2013b
