@@ -203,6 +203,31 @@ class Host(models.Model):
         c.remove_image(image_id)
         self._invalidate_image_cache()
 
+    def clone_container(self, container_id=None):
+        c_id = utils.get_short_id(container_id)
+        c = Container.objects.get(container_id=c_id)
+        meta = c.get_meta()
+        cfg = meta.get('Config')
+        image = cfg.get('Image')
+        command = ' '.join(cfg.get('Cmd'))
+        # update port spec to specify the original NAT'd port
+        port_mapping = meta.get('NetworkSettings').get('PortMapping')
+        port_specs = []
+        if port_mapping:
+            for x,y in port_mapping.items():
+                for k,v in y.items():
+                    port_specs.append('{}/{}'.format(k,x.lower()))
+        env = cfg.get('Env')
+        mem = cfg.get('Memory')
+        description = c.description
+        volumes = cfg.get('Volumes')
+        volumes_from = cfg.get('VolumesFrom')
+        privileged = cfg.get('Privileged')
+        owner = c.owner
+        c_id, status = self.create_container(image, command, port_specs,
+            env, mem, description, volumes, volumes_from, privileged, owner)
+        return c_id, status
+
 class Container(models.Model):
     container_id = models.CharField(max_length=96, null=True, blank=True)
     description = models.TextField(blank=True, null=True, default='')
