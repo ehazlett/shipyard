@@ -59,3 +59,13 @@ def import_image(request):
         messages.add_message(request, messages.INFO, _('Importing') + \
             ' {}'.format(repo) + _('.  This could take a few minutes.'))
     return redirect('images.views.index')
+
+@login_required
+def build_image(request):
+    path = request.POST.get('path')
+    tag = request.POST.get('tag', None)
+    if path:
+        tasks.build_image.delay(path, tag)
+        messages.add_message(request, messages.INFO, _('Building.  This ' \
+            'could take a few minutes.'))
+    return redirect('images.views.index')

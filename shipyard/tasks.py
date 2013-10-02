@@ -106,3 +106,20 @@ def import_image_to_host(host, repo_name):
     print('Importing {} on {}'.format(repo_name, host.name))
     host.import_image(repo_name)
     return 'Imported {} on {}'.format(repo_name, host.name)
+
+@celery.task
+def build_image(path=None, tag=None):
+    if not path:
+        raise StandardError('You must specify a path')
+    hosts = Host.objects.filter(enabled=True)
+    for h in hosts:
+        build_image_on_host.subtask((h, path, tag)).apply_async()
+    return True
+
+@celery.task
+def build_image_on_host(host, path, tag):
+    if not host or not path:
+        raise StandardError('You must specify a host and path')
+    print('Building {} on {}'.format(tag, host.name))
+    host.build_image(path, tag)
+    return 'Built {} on {}'.format(tag, host.name)

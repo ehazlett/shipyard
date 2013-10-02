@@ -193,9 +193,13 @@ class Host(models.Model):
         c.pull(repository)
         self._invalidate_image_cache()
 
-    def build_image(self, docker_file=None, tag=None):
+    def build_image(self, path=None, tag=None):
         c = self._get_client()
-        f = open(docker_file, 'r')
+        if path.startswith('http://') or path.startswith('https://') or \
+        path.startswith('git://') or path.startswith('github.com/'):
+            f = path
+        else:
+            f = open(path, 'r')
         c.build(f, tag)
 
     def remove_image(self, image_id=None):
