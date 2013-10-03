@@ -94,10 +94,16 @@ def create_container(request):
             if memory.strip() == '':
                 memory = 0
             # build volumes
+            binds = None
             if volume == '':
                 volume = None
             if volume:
-                volume = { volume: {}}
+                if volume.find(':') > -1:
+                    mnt, vol = volume.split(':')
+                    volume = { mnt: {}}
+                    binds = { vol: mnt }
+                else:
+                    volume = { volume: {}}
             # convert memory from MB to bytes
             if memory:
                 memory = int(memory) * 1048576
@@ -117,7 +123,8 @@ def create_container(request):
                 c_id, status = host.create_container(image, command, ports,
                     environment=environment, memory=memory,
                     description=form.data.get('description'), volumes=volume,
-                    volumes_from=volumes_from, privileged=privileged, owner=user)
+                    volumes_from=volumes_from, privileged=privileged,
+                    binds=binds, owner=user)
             if hosts:
                 if status:
                     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(

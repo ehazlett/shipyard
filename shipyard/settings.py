@@ -216,6 +216,9 @@ RECOVERY_THRESHOLD = 3
 # to be recovered
 RECOVERY_TIME = 60
 
+HIPACHE_ENABLED = True
+CELERY_TIMEZONE = 'UTC'
+
 try:
     from local_settings import *
 except ImportError:
@@ -231,14 +234,12 @@ CACHES = {
     }
 }
 # enable the hipache load balancer integration (needed for applications)
-HIPACHE_ENABLED = True
 HIPACHE_REDIS_HOST = REDIS_HOST
 HIPACHE_REDIS_PORT = REDIS_PORT
 BROKER_URL = 'redis://'
 if REDIS_PASSWORD:
     BROKER_URL += ':{}@'.format(REDIS_PASSWORD)
 BROKER_URL += '{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB)
-CELERY_TIMEZONE = 'UTC'
 
 # celery scheduled tasks
 CELERYBEAT_SCHEDULE = {
