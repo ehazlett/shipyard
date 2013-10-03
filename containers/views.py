@@ -100,8 +100,8 @@ def create_container(request):
             if volume:
                 if volume.find(':') > -1:
                     mnt, vol = volume.split(':')
-                    volume = { mnt: {}}
-                    binds = { vol: mnt }
+                    volume = { vol: {}}
+                    binds = { mnt: vol }
                 else:
                     volume = { volume: {}}
             # convert memory from MB to bytes
