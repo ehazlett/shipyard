@@ -14,20 +14,15 @@
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.bundle import Bundle
+from tastypie.authorization import Authorization
 from django.conf.urls import url
 from applications.models import Application
 from containers.api import ContainerResource
 
 class ApplicationResource(ModelResource):
-    containers = fields.ToManyField(ContainerResource, 'containers')
+    containers = fields.ToManyField(ContainerResource, 'containers', null=True)
 
     class Meta:
         queryset = Application.objects.all()
         resource_name = 'application'
-        detail_uri_name = 'uuid'
-        excludes = ['id',]
-
-    def prepend_urls(self):
-        return [
-            url(r"^(?P<resource_name>%s)/(?P<uuid>[\w\d_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
-        ]
+        authorization = Authorization()
