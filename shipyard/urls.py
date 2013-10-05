@@ -12,11 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from django.conf.urls import patterns, include, url
+from tastypie.api import Api
 from django.contrib import admin
 admin.autodiscover()
 
+from containers.api import ContainerResource
+from applications.api import ApplicationResource
+from hosts.api import HostResource
+
+v1_api = Api(api_name='v1')
+v1_api.register(ContainerResource())
+v1_api.register(ApplicationResource())
+v1_api.register(HostResource())
+
 urlpatterns = patterns('',
     url(r'^$', 'shipyard.views.index', name='index'),
+    url(r'^api/', include(v1_api.urls)),
     url(r'^accounts/', include('accounts.urls')),
     url(r'^applications/', include('applications.urls')),
     url(r'^containers/', include('containers.urls')),

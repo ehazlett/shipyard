@@ -74,6 +74,21 @@ class Host(models.Model):
         m.meta = json.dumps(meta)
         m.save()
 
+    @classmethod
+    def get_all_containers(cls, show_all=False, owner=None):
+        hosts = Host.objects.filter(enabled=True)
+        containers = None
+        # load containers
+        if hosts:
+            c_ids = []
+            for h in hosts:
+                for c in h.get_containers(show_all=show_all):
+                    c_ids.append(utils.get_short_id(c.get('Id')))
+            # return metadata objects
+            containers = Container.objects.filter(container_id__in=c_ids).filter(
+                Q(owner=None) | Q(owner=owner))
+        return containers
+
     def invalidate_cache(self):
         self._invalidate_container_cache()
         self._invalidate_image_cache()
@@ -264,7 +279,7 @@ class Container(models.Model):
         return containers
 
     def is_public(self):
-        if self.user == None:
+        if self.owner == None:
             return True
         else:
             return False
