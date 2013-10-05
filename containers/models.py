@@ -126,14 +126,14 @@ class Host(models.Model):
 
     def create_container(self, image=None, command=None, ports=[],
         environment=[], memory=0, description='', volumes=[],
-        volumes_from='', privileged=False, owner=None):
+        volumes_from='', privileged=False, binds=None, owner=None):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports,
             mem_limit=memory, tty=True, stdin_open=True,
             environment=environment, volumes=volumes, volumes_from=volumes_from,
             privileged=privileged)
         c_id = cnt.get('Id')
-        c.start(c_id)
+        c.start(c_id, binds=binds)
         status = False
         # create metadata only if container starts successfully
         if c.inspect_container(c_id).get('State', {}).get('Running'):
@@ -193,15 +193,44 @@ class Host(models.Model):
         c.pull(repository)
         self._invalidate_image_cache()
 
-    def build_image(self, docker_file=None, tag=None):
+    def build_image(self, path=None, tag=None):
         c = self._get_client()
-        f = open(docker_file, 'r')
+        if path.startswith('http://') or path.startswith('https://') or \
+        path.startswith('git://') or path.startswith('github.com/'):
+            f = path
+        else:
+            f = open(path, 'r')
         c.build(f, tag)
 
     def remove_image(self, image_id=None):
         c = self._get_client()
         c.remove_image(image_id)
         self._invalidate_image_cache()
+
+    def clone_container(self, container_id=None):
+        c_id = utils.get_short_id(container_id)
+        c = Container.objects.get(container_id=c_id)
+        meta = c.get_meta()
+        cfg = meta.get('Config')
+        image = cfg.get('Image')
+        command = ' '.join(cfg.get('Cmd'))
+        # update port spec to specify the original NAT'd port
+        port_mapping = meta.get('NetworkSettings').get('PortMapping')
+        port_specs = []
+        if port_mapping:
+            for x,y in port_mapping.items():
+                for k,v in y.items():
+                    port_specs.append('{}/{}'.format(k,x.lower()))
+        env = cfg.get('Env')
+        mem = cfg.get('Memory')
+        description = c.description
+        volumes = cfg.get('Volumes')
+        volumes_from = cfg.get('VolumesFrom')
+        privileged = cfg.get('Privileged')
+        owner = c.owner
+        c_id, status = self.create_container(image, command, port_specs,
+            env, mem, description, volumes, volumes_from, privileged, owner)
+        return c_id, status
 
 class Container(models.Model):
     container_id = models.CharField(max_length=96, null=True, blank=True)

@@ -11,6 +11,13 @@ $("a.restart-container").click(function(){
     }
     return false;
 });
+$("a.clone-container").click(function(){
+    if (confirm("{% trans 'Are you sure you want to clone the container?' %}")) {
+        var url = this.getAttribute('data-url');
+        redirect(url);
+    }
+    return false;
+});
 $("a.stop-container").click(function(){
     if (confirm("{% trans 'Are you sure you want to stop the container?' %}")) {
         var url = this.getAttribute('data-url');

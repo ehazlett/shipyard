@@ -94,10 +94,16 @@ def create_container(request):
             if memory.strip() == '':
                 memory = 0
             # build volumes
+            binds = None
             if volume == '':
                 volume = None
             if volume:
-                volume = { volume: {}}
+                if volume.find(':') > -1:
+                    mnt, vol = volume.split(':')
+                    volume = { vol: {}}
+                    binds = { mnt: vol }
+                else:
+                    volume = { volume: {}}
             # convert memory from MB to bytes
             if memory:
                 memory = int(memory) * 1048576
@@ -117,7 +123,8 @@ def create_container(request):
                 c_id, status = host.create_container(image, command, ports,
                     environment=environment, memory=memory,
                     description=form.data.get('description'), volumes=volume,
-                    volumes_from=volumes_from, privileged=privileged, owner=user)
+                    volumes_from=volumes_from, privileged=privileged,
+                    binds=binds, owner=user)
             if hosts:
                 if status:
                     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
@@ -270,18 +277,15 @@ def attach_container(request, host, container_id):
     return render_to_response("containers/attach.html", ctx,
         context_instance=RequestContext(request))
 
-@require_http_methods(['POST'])
 @login_required
-def import_image(request):
-    form = ImportRepositoryForm(request.POST)
-    hosts = form.data.getlist('hosts')
-    for i in hosts:
-        host = Host.objects.get(id=i)
-        args = (form.data.get('repository'),)
-        # TODO: update to use celery
-        #utils.get_queue('shipyard').enqueue(host.import_image, args=args, timeout=3600)
-    messages.add_message(request, messages.INFO, _('Importing') + ' {0}'.format(
-        form.data.get('repository')) + '. ' + _('This may take a few minutes.'))
+def clone_container(request, host, container_id):
+    h = Host.objects.get(name=host)
+    try:
+        h.clone_container(container_id)
+        messages.add_message(request, messages.INFO, _('Cloned') + ' {0}'.format(
+            container_id))
+    except Exception, e:
+        messages.add_message(request, messages.ERROR, e)
     return redirect('containers.views.index')
 
 @login_required

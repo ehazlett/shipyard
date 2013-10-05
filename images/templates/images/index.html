@@ -3,12 +3,64 @@
 {% load shipyard %}
 
 {% block content %}
+<div id="dialog-import-image" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% trans 'Import' %}</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-import-image" role="form" action="{% url 'images.views.import_image' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                          <input class="form-control" name="repo_name" type="text" placeholder="{% trans 'i.e. ehazlett/shipyard' %}" autofocus="true">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-import" type="button" class="btn btn-primary">{% trans 'Import' %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="dialog-build-image" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% trans 'Build' %}</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-build-image" role="form" action="{% url 'images.views.build_image' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                          <label class="sr-only" for="path">{% trans 'Path' %}</label>
+                          <input class="form-control" id="path" name="path" type="text" placeholder="{% trans 'i.e. github.com/ehazlett/docker-py-helloworld' %}" autofocus="true">
+                    </div>
+                    <div class="form-group">
+                          <label class="sr-only" for="tag">{% trans 'Tag' %}</label>
+                          <input class="form-control" id="tag" name="tag" type="text" placeholder="{% trans 'i.e. helloworld' %}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-build" type="button" class="btn btn-primary">{% trans 'Build' %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="panel panel-default">
     <div class="panel-heading heading-large">
         <span class="panel-title section-title">{% trans 'Images' %}</span>
         <span class="section-toolbar">
+            <a href="{% url 'images.views.refresh' %}"><span class="glyphicon glyphicon-refresh"></span></a>
         </span>
         <span class="pull-right">
+            <a href="#dialog-import-image" id="import-image" class="btn btn-success btn-sm" data-toggle="modal">{% trans 'Import' %}</a>
+            <a href="#dialog-build-image" id="build-image" class="btn btn-success btn-sm" data-toggle="modal">{% trans 'Build' %}</a>
         </span>
     </div>
     <div class="panel-body">
@@ -54,5 +106,11 @@
 </div>
 {% include "images/_common.html" %}
 <script type="text/javascript">
+    $("#btn-build").click(function(){
+        $("#form-build-image").submit();
+    });
+    $("#btn-import").click(function(){
+        $("#form-import-image").submit();
+    });
 </script>
 {% endblock %}

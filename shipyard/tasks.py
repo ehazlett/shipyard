@@ -15,7 +15,7 @@ import celery
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from containers.models import Container
+from containers.models import Container, Host
 from exceptions import RecoveryThresholdError
 import utils
 import hashlib
@@ -90,3 +90,36 @@ def check_protected_containers():
             c.delete()
     return True
 
+@celery.task
+def import_image(repo_name=None):
+    if not repo_name:
+        raise StandardError('You must specify a repo name')
+    hosts = Host.objects.filter(enabled=True)
+    for h in hosts:
+        import_image_to_host.subtask((h, repo_name)).apply_async()
+    return True
+
+@celery.task
+def import_image_to_host(host, repo_name):
+    if not host or not repo_name:
+        raise StandardError('You must specify a host and repo name')
+    print('Importing {} on {}'.format(repo_name, host.name))
+    host.import_image(repo_name)
+    return 'Imported {} on {}'.format(repo_name, host.name)
+
+@celery.task
+def build_image(path=None, tag=None):
+    if not path:
+        raise StandardError('You must specify a path')
+    hosts = Host.objects.filter(enabled=True)
+    for h in hosts:
+        build_image_on_host.subtask((h, path, tag)).apply_async()
+    return True
+
+@celery.task
+def build_image_on_host(host, path, tag):
+    if not host or not path:
+        raise StandardError('You must specify a host and path')
+    print('Building {} on {}'.format(tag, host.name))
+    host.build_image(path, tag)
+    return 'Built {} on {}'.format(tag, host.name)

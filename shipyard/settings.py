@@ -48,15 +48,6 @@ DATABASES = {
         'PORT': '',
     }
 }
-CACHES = {
-    "default": {
-        "BACKEND": "redis_cache.cache.RedisCache",
-        "LOCATION": "127.0.0.1:6379:0",
-        "OPTIONS": {
-            "CLIENT_CLASS": "redis_cache.client.DefaultClient",
-        }
-    }
-}
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 REDIS_DB = os.getenv('REDIS_DB', 0)
@@ -225,20 +216,30 @@ RECOVERY_THRESHOLD = 3
 # to be recovered
 RECOVERY_TIME = 60
 
+HIPACHE_ENABLED = True
+CELERY_TIMEZONE = 'UTC'
+
 try:
     from local_settings import *
 except ImportError:
     pass
 
+CACHES = {
+    "default": {
+        "BACKEND": "redis_cache.cache.RedisCache",
+        "LOCATION": "{}:{}:{}".format(REDIS_HOST, REDIS_PORT, REDIS_DB),
+        "OPTIONS": {
+            "CLIENT_CLASS": "redis_cache.client.DefaultClient",
+        }
+    }
+}
 # enable the hipache load balancer integration (needed for applications)
-HIPACHE_ENABLED = True
 HIPACHE_REDIS_HOST = REDIS_HOST
 HIPACHE_REDIS_PORT = REDIS_PORT
 BROKER_URL = 'redis://'
 if REDIS_PASSWORD:
     BROKER_URL += ':{}@'.format(REDIS_PASSWORD)
 BROKER_URL += '{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB)
-CELERY_TIMEZONE = 'UTC'
 
 # celery scheduled tasks
 CELERYBEAT_SCHEDULE = {

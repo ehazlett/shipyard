@@ -17,4 +17,7 @@ urlpatterns = patterns('images.views',
     url(r'^$', 'index'),
     url(r'^remove/(?P<host_id>.*)/(?P<image_id>.*)/$',
         'remove_image'),
+    url(r'^refresh/$', 'refresh'),
+    url(r'^import/$', 'import_image'),
+    url(r'^build/$', 'build_image'),
 )
