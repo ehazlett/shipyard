@@ -1,6 +1,8 @@
 # Shipyard
 Shipyard is a web UI for http://docker.io
 
+[![Build Status](https://travis-ci.org/ehazlett/shipyard.png)](https://travis-ci.org/ehazlett/shipyard)
+
 # Help
 To report issues please use [Github](https://github.com/ehazlett/shipyard/issues)
 
