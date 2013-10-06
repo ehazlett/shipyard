@@ -9,4 +9,4 @@ if [ "$1" != "-s" ]; then
     $VE_DIR/bin/pip install -r requirements.txt
     source $VE_DIR/bin/activate
 fi
-python manage.py test accounts applications containers shipyard
+python manage.py test accounts applications containers hosts images shipyard
