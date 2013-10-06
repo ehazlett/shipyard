@@ -36,5 +36,6 @@ if [ ! -z "$EXTRA_REQUIREMENTS" ]; then
 fi
 $VE_DIR/bin/python manage.py syncdb --noinput
 $VE_DIR/bin/python manage.py migrate --noinput
+$VE_DIR/bin/python manage.py create_api_keys
 supervisord -c /opt/supervisor.conf
 supervisorctl

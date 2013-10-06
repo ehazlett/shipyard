@@ -9,7 +9,7 @@ celery==3.0.23
 django-celery==3.0.23
 django-crispy-forms==1.4.0
 django-redis==3.3
-django-tastypie==0.10.0
+django-tastypie==0.9.16
 docker-py==0.2.0
 kombu==2.5.14
 mimeparse==0.1.3

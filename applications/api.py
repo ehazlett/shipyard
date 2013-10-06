@@ -15,6 +15,7 @@ from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.bundle import Bundle
 from tastypie.authorization import Authorization
+from tastypie.authentication import ApiKeyAuthentication
 from django.conf.urls import url
 from applications.models import Application
 from containers.api import ContainerResource
@@ -26,3 +27,5 @@ class ApplicationResource(ModelResource):
         queryset = Application.objects.all()
         resource_name = 'application'
         authorization = Authorization()
+        authentication = ApiKeyAuthentication()
+

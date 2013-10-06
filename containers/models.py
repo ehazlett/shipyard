@@ -77,7 +77,7 @@ class Host(models.Model):
     @classmethod
     def get_all_containers(cls, show_all=False, owner=None):
         hosts = Host.objects.filter(enabled=True)
-        containers = None
+        containers = []
         # load containers
         if hosts:
             c_ids = []
@@ -265,7 +265,7 @@ class Container(models.Model):
     @classmethod
     def get_running(cls, user=None):
         hosts = Host.objects.filter(enabled=True)
-        containers = None
+        containers = []
         if hosts:
             c_ids = []
             for h in hosts:

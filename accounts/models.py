@@ -15,6 +15,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+from tastypie.models import create_api_key
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, null=True, unique=True)
@@ -28,4 +29,7 @@ def create_profile(sender, **kwargs):
         profile = UserProfile(user=user)
         profile.save()
 
+# profile creation
 post_save.connect(create_profile, sender=User)
+# api key creation
+post_save.connect(create_api_key, sender=User)

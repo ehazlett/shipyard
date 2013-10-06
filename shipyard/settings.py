@@ -164,6 +164,7 @@ INSTALLED_APPS = (
     'south',
     'djcelery',
     'crispy_forms',
+    'tastypie',
     'shipyard',
     'accounts',
     'applications',
