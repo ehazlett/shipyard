@@ -35,7 +35,6 @@ class ContainerResourceTest(ResourceTestCase):
         """
         Test get application details
         """
-        from containers.models import Container
         url = '{}1/'.format(self.api_list_url)
         resp = self.api_client.get(url, format='json',
             authentication=self.get_credentials())
