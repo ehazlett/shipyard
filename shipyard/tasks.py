@@ -58,6 +58,11 @@ def check_protected_containers():
             volumes_from = cfg.get('VolumesFrom')
             privileged = cfg.get('Privileged')
             owner = c.owner
+            hostname = cfg.get("Hostname")
+            # volume mapping
+            binds = {}
+            for k in meta.get("Volumes"):
+                binds[meta.get("Volumes")[k]] = k
             # check/update cache for recovery
             c_hash = hashlib.sha256(
                 str(host.id)+str(image)+''.join(port_specs)).hexdigest()
@@ -74,7 +79,7 @@ def check_protected_containers():
                 cache.set(key, 1, settings.RECOVERY_TIME)
             print('Recovering: {}'.format(c.description))
             c_id, status = host.create_container(image, command, port_specs,
-                env, mem, description, volumes, volumes_from, privileged, owner)
+                env, mem, description, volumes, volumes_from, privileged, binds, owner, hostname)
             # load new container data
             host._load_container_data(c.container_id)
             new_c = Container.objects.get(container_id=c_id)
