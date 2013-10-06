@@ -25,7 +25,7 @@ class ApplicationResource(ModelResource):
 
     class Meta:
         queryset = Application.objects.all()
-        resource_name = 'application'
+        resource_name = 'applications'
         authorization = Authorization()
         authentication = ApiKeyAuthentication()
 

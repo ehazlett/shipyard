@@ -14,6 +14,8 @@
 from tastypie import fields
 from tastypie.resources import Resource, ModelResource
 from tastypie.bundle import Bundle
+from tastypie.authorization import Authorization
+from tastypie.authentication import ApiKeyAuthentication
 from containers.models import Container, Host
 
 class ContainerResource(ModelResource):
@@ -22,5 +24,7 @@ class ContainerResource(ModelResource):
     class Meta:
         valid_container_ids = [x.container_id for x in Host.get_all_containers()]
         queryset = Container.objects.filter(container_id__in=valid_container_ids)
-        resource_name = 'container'
+        resource_name = 'containers'
+        authorization = Authorization()
+        authentication = ApiKeyAuthentication()
 

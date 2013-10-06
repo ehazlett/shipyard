@@ -6,7 +6,7 @@ class ApplicationResourceTest(ResourceTestCase):
 
     def setUp(self):
         super(ApplicationResourceTest, self).setUp()
-        self.api_list_url = '/api/v1/application/'
+        self.api_list_url = '/api/v1/applications/'
         self.username = 'testuser'
         self.password = 'testpass'
         self.user = User.objects.create_user(self.username,

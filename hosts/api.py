@@ -13,6 +13,8 @@
 # limitations under the License.
 from tastypie import fields
 from tastypie.resources import ModelResource
+from tastypie.authorization import Authorization
+from tastypie.authentication import ApiKeyAuthentication
 from tastypie.bundle import Bundle
 from django.conf.urls import url
 from containers.models import Host
@@ -20,5 +22,7 @@ from containers.models import Host
 class HostResource(ModelResource):
     class Meta:
         queryset = Host.objects.filter(enabled=True)
-        resource_name = 'host'
+        resource_name = 'hosts'
+        authorization = Authorization()
+        authentication = ApiKeyAuthentication()
 
