@@ -33,6 +33,7 @@ if [ ! -e "/usr/local/bin/node" ] ; then
     cd node-*
     ./configure ; make ; make install
 fi
+pip install virtualenv uwsgi
 
 npm install git+http://github.com/ehazlett/hipache.git -g
 
