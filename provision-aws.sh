@@ -10,6 +10,7 @@ if [ -e "/etc/.provisioned" ] ; then
     exit 0
 fi
 
+echo "Install OS dependencies"
 apt-get -qq update
 DEBIAN_FRONTEND=noninteractive apt-get -qq install -y build-essential python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server supervisor
 
@@ -31,9 +32,11 @@ service docker restart
 
 mkdir -p $VE_ROOT
 
+echo "Install pip, virtualenv and uwsgi"
 easy_install pip
 pip install virtualenv uwsgi
 
+echo "Install Hipache"
 npm install git+http://github.com/ehazlett/hipache.git -g
 
 cp $APP_DIR/shipyard/.docker/hipache.config.json /etc/hipache.config.json
@@ -46,10 +49,11 @@ if [ ! -e "/home/git" ]; then
     /usr/local/bin/gitreceive init
 fi
 
-# app
+echo "Create virtualenv"
 virtualenv --no-site-packages $VE_DIR
 
-cd $APP_DIR
+echo "Install requirements"
+cd $APP_DIR/shipyard
 $VE_DIR/bin/pip install -r requirements.txt
 chown -R ubuntu $VE_DIR
 
@@ -69,7 +73,7 @@ if [ "`grep \"source /opt/ve\" $UBUNTU_BASHRC`" = "" ]; then
     echo "cd $APP_DIR" >> $UBUNTU_BASHRC
 fi
 
-# install go
+echo "Install Go"
 if [ ! -e "/usr/local/go" ] ; then
     wget -O /tmp/go.tar.gz http://go.googlecode.com/files/go1.1.2.linux-amd64.tar.gz
     cd /usr/local ;  tar xzf /tmp/go.tar.gz
@@ -85,6 +89,7 @@ cp $APP_DIR/shipyard/.docker/supervisor.conf /etc/supervisor/conf.d/shipyard.con
 echo "Stop the Redis server so we can control it from Supervisor"
 service redis-server stop
 
+echo "Update supervisor and start the processes"
 supervisorctl update
 
 touch /etc/.provisioned
