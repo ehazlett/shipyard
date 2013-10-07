@@ -12,7 +12,7 @@ if [ -e "/etc/.provisioned" ] ; then
 fi
 
 apt-get -qq update
-DEBIAN_FRONTEND=noninteractive apt-get -qq install -y python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server supervisor
+DEBIAN_FRONTEND=noninteractive apt-get -qq install -y build-essential python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server supervisor
 echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
 apt-get -qq update
 DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes lxc-docker
