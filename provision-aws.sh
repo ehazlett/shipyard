@@ -3,7 +3,6 @@
 APP_DIR=/opt/apps
 VE_ROOT=/opt/ve
 VE_DIR=$VE_ROOT/shipyard
-NODE_URL='http://nodejs.org/dist/v0.10.12/node-v0.10.12.tar.gz'
 GIT_RECEIVER_URL='https://raw.github.com/ehazlett/gitreceive/master/gitreceive'
 
 if [ -e "/etc/.provisioned" ] ; then
@@ -13,26 +12,26 @@ fi
 
 apt-get -qq update
 DEBIAN_FRONTEND=noninteractive apt-get -qq install -y build-essential python-software-properties s3cmd git-core linux-image-extra-`uname -r` bridge-utils bsdtar lxc wget ruby python-dev libxml2-dev python-setuptools redis-server supervisor
+
+# Install Node.js
+# from https://chrislea.com/2013/03/15/upgrading-from-node-js-0-8-x-to-0-10-0-from-my-ppa/
+echo deb http://ppa.launchpad.net/chris-lea/node.js/ubuntu raring main > /etc/apt/sources.list.d/nodejs.list
+echo deb-src http://ppa.launchpad.net/chris-lea/node.js/ubuntu raring main >> /etc/apt/sources.list.d/nodejs.list
+
+# Add the Docker sources
 echo deb https://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
 apt-get -qq update
-DEBIAN_FRONTEND=noninteractive apt-get install -y --force-yes lxc-docker
-# edit docker upstart to listen on tcp
+
+echo "Install docker and nodejs"
+DEBIAN_FRONTEND=noninteractive apt-get -qq install -y --force-yes lxc-docker nodejs
+
+echo "Edit docker upstart to listen on tcp"
 sed -i 's/\/usr\/bin\/docker.*/\/usr\/bin\/docker -d -H tcp:\/\/0.0.0.0:4243 -H unix:\/\/\/var\/run\/docker\.sock/g' /etc/init/docker.conf
 service docker restart
 
 mkdir -p $VE_ROOT
 
 easy_install pip
-pip install virtualenv
-
-# install hipache
-if [ ! -e "/usr/local/bin/node" ] ; then
-    cd /tmp
-    wget $NODE_URL -O nodejs.tar.gz
-    tar zxf nodejs.tar.gz
-    cd node-*
-    ./configure ; make ; make install
-fi
 pip install virtualenv uwsgi
 
 npm install git+http://github.com/ehazlett/hipache.git -g
