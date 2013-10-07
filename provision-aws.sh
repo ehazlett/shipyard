@@ -53,6 +53,11 @@ cd $APP_DIR
 $VE_DIR/bin/pip install -r requirements.txt
 chown -R ubuntu $VE_DIR
 
+echo "Run syncdb, migrate and create superuser"
+cd $APP_DIR/shipyard && $VE_DIR/bin/python manage.py syncdb --noinput
+cd $APP_DIR/shipyard && $VE_DIR/bin/python manage.py migrate
+cd $APP_DIR/shipyard && $VE_DIR/bin/python manage.py update_admin_user --username=admin --password=shipyard
+
 # bashrc
 UBUNTU_BASHRC=/home/ubuntu/.bashrc
 if [ "`grep \"source /opt/ve\" $UBUNTU_BASHRC`" = "" ]; then
