@@ -12,5 +12,6 @@ export AWS_KEYPAIR_NAME='shipyard'
 #override.ssh.private_key_path = ENV["AWS_SSH_PRIVKEY"]
 export AWS_SSH_PRIVKEY='/home/username/.ssh/shipyard.pem'
 
+#export AWS_SECURITY_GROUPS='["shipyard"]'
 #AWS_REGION = ENV['AWS_REGION'] || "us-east-1"
 #AWS_AMI    = ENV['AWS_AMI']    || "ami-d0f89fb9"
