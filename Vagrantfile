@@ -1,9 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-AWS_REGION = ENV['AWS_REGION'] || "us-east-1"
-AWS_AMI    = ENV['AWS_AMI']    || "ami-d0f89fb9"
-
 Vagrant::Config.run do |config|
   config.vm.box = "raring64"
   config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/raring/current/raring-server-cloudimg-amd64-vagrant-disk1.box"
@@ -18,12 +15,10 @@ Vagrant::Config.run do |config|
   end
 end
 
-# Providers were added on Vagrant >= 1.1.0
 Vagrant.configure("2") do |config|
     config.vm.provider :virtualbox do |v|
         v.customize ["modifyvm", :id, "--memory", 2048]
     end
-
     config.vm.provider :vmware_fusion do |v|
       config.vm.define :shipyard do |s|
         v.vmx["memsize"] = "2048"
@@ -32,27 +27,4 @@ Vagrant.configure("2") do |config|
         v.vmx["displayName"] = "shipyard"
       end
     end
-
-    config.vm.provider :aws do |aws, override|
-      override.provision :shell, :path => "provision-aws.sh"
-      aws.access_key_id = ENV["AWS_ACCESS_KEY_ID"]
-      aws.secret_access_key = ENV["AWS_SECRET_ACCESS_KEY"]
-      aws.keypair_name = ENV["AWS_KEYPAIR_NAME"]
-      override.ssh.private_key_path = ENV["AWS_SSH_PRIVKEY"]
-      override.ssh.username = "ubuntu"
-      aws.region = AWS_REGION
-      aws.ami    = AWS_AMI
-      aws.instance_type = "m1.small"
-    end
-
-    config.vm.provider :rackspace do |rs|
-      config.ssh.private_key_path = ENV["RS_PRIVATE_KEY"]
-      rs.username = ENV["RS_USERNAME"]
-      rs.api_key  = ENV["RS_API_KEY"]
-      rs.public_key_path = ENV["RS_PUBLIC_KEY"]
-      rs.flavor   = /512MB/
-      rs.image    = /Ubuntu/
-    end
 end
-
-
