@@ -75,13 +75,7 @@ cat << EOF > /etc/environment
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/go/bin"
 EOF
 
-cat << EOF > /etc/supervisor/conf.d/shipyard.conf
-[program:hipache]
-directory=/tmp
-command=hipache -c /etc/hipache.config.json
-user=root
-autostart=true
-autorestart=true
+cp $APP_DIR/shipyard/.docker/supervisor.conf /etc/supervisor/conf.d/shipyard.conf
 
 EOF
 
