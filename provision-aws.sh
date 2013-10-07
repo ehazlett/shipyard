@@ -82,7 +82,8 @@ EOF
 
 cp $APP_DIR/shipyard/.docker/supervisor.conf /etc/supervisor/conf.d/shipyard.conf
 
-EOF
+echo "Stop the Redis server so we can control it from Supervisor"
+service redis-server stop
 
 supervisorctl update
 
