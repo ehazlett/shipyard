@@ -36,20 +36,9 @@ pip install virtualenv uwsgi
 
 npm install git+http://github.com/ehazlett/hipache.git -g
 
-cat << EOF > /etc/hipache.config.json
-{
-    "server": {
-        "accessLog": "/var/log/hipache_access.log",
-        "port": 80,
-        "workers": 5,
-        "maxSockets": 100,
-        "deadBackendTTL": 30
-    },
-    "redisHost": "127.0.0.1",
-    "redisPort": 6379
-}
-EOF
-# install gitreceiver
+cp $APP_DIR/shipyard/.docker/hipache.config.json /etc/hipache.config.json
+
+echo "Install gitreceiver"
 cd /tmp
 wget $GIT_RECEIVER_URL -O /usr/local/bin/gitreceive --no-check-certificate
 chmod +x /usr/local/bin/gitreceive
