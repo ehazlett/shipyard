@@ -36,5 +36,4 @@ if [ ! -z "$EXTRA_REQUIREMENTS" ]; then
 fi
 $VE_DIR/bin/python manage.py syncdb --noinput
 $VE_DIR/bin/python manage.py migrate --noinput
-supervisord -c /opt/supervisor.conf
-supervisorctl
+supervisord -c /opt/supervisor.conf -n
