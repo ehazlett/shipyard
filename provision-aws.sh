@@ -1,6 +1,6 @@
 #!/bin/bash
 
-APP_DIR=/opt/app
+APP_DIR=/opt/apps
 VE_ROOT=/opt/ve
 VE_DIR=$VE_ROOT/shipyard
 NODE_URL='http://nodejs.org/dist/v0.10.12/node-v0.10.12.tar.gz'
