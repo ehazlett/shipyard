@@ -33,6 +33,7 @@ import urllib
 import random
 import json
 import tempfile
+import shlex
 
 def handle_upload(f):
     tmp_file = tempfile.mktemp()
@@ -82,7 +83,7 @@ def create_container(request):
             if environment.strip() == '':
                 environment = None
             else:
-                environment = environment.split()
+                environment = shlex.split(environment)
             if memory.strip() == '':
                 memory = 0
             # build volumes

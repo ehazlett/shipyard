@@ -141,12 +141,12 @@ class Host(models.Model):
 
     def create_container(self, image=None, command=None, ports=[],
         environment=[], memory=0, description='', volumes=[],
-        volumes_from='', privileged=False, binds=None, owner=None):
+        volumes_from='', privileged=False, binds=None, owner=None, hostname=None):
         c = self._get_client()
         cnt = c.create_container(image, command, detach=True, ports=ports,
             mem_limit=memory, tty=True, stdin_open=True,
             environment=environment, volumes=volumes, volumes_from=volumes_from,
-            privileged=privileged)
+            privileged=privileged, hostname=hostname)
         c_id = cnt.get('Id')
         c.start(c_id, binds=binds)
         status = False
