@@ -17,6 +17,7 @@ from tastypie.bundle import Bundle
 from tastypie.authorization import Authorization
 from tastypie.authentication import ApiKeyAuthentication
 from containers.models import Container, Host
+from shipyard import utils
 
 class ContainerResource(ModelResource):
     meta = fields.DictField(attribute='get_meta')
@@ -27,4 +28,26 @@ class ContainerResource(ModelResource):
         resource_name = 'containers'
         authorization = Authorization()
         authentication = ApiKeyAuthentication()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post', 'delete']
 
+    def obj_create(self, bundle, request=None, **kwargs):
+        """
+        Override obj_create to launch containers and return metadata
+
+        """
+        # HACK: get host id -- this should probably be some type of
+        # reverse lookup from tastypie
+        host_urls = bundle.data.get('hosts')
+        # remove 'hosts' from data and pass rest to create_container
+        del bundle.data['hosts']
+        # launch on hosts
+        for host_url in host_urls:
+            host_id = host_url.split('/')[-2]
+            host = Host.objects.get(id=host_id)
+            data = bundle.data
+            c_id, status = host.create_container(**data)
+            bundle.obj = Container.objects.get(
+                container_id=utils.get_short_id(c_id))
+        bundle = self.full_hydrate(bundle)
+        return bundle

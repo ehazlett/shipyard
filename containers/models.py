@@ -140,13 +140,18 @@ class Host(models.Model):
         return images
 
     def create_container(self, image=None, command=None, ports=[],
-        environment=[], memory=0, description='', volumes=[],
-        volumes_from='', privileged=False, binds=None, owner=None, hostname=None):
+        environment=[], memory=0, description='', volumes=None, volumes_from='',
+        privileged=False, binds=None, owner=None, hostname=None):
         c = self._get_client()
-        cnt = c.create_container(image, command, detach=True, ports=ports,
-            mem_limit=memory, tty=True, stdin_open=True,
-            environment=environment, volumes=volumes, volumes_from=volumes_from,
-            privileged=privileged, hostname=hostname)
+        try:
+            cnt = c.create_container(image=image, command=command, detach=True,
+                ports=ports, mem_limit=memory, tty=True, stdin_open=True,
+                environment=environment, volumes=volumes,
+                volumes_from=volumes_from, privileged=privileged,
+                hostname=hostname)
+        except:
+            import traceback
+            traceback.print_exc()
         c_id = cnt.get('Id')
         c.start(c_id, binds=binds)
         status = False
@@ -258,7 +263,7 @@ class Container(models.Model):
 
     def __unicode__(self):
         d = self.container_id
-        if self.description:
+        if d and self.description:
             d += ' ({0})'.format(self.description)
         return d
 
