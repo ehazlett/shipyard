@@ -202,8 +202,12 @@ class Host(models.Model):
             raise ProtectedContainerError(
                 _('Unable to destroy container.  Container is protected.'))
         c = self._get_client()
-        c.kill(c_id)
-        c.remove_container(c_id)
+        try:
+            c.kill(c_id)
+            c.remove_container(c_id)
+        except client.APIError:
+            # ignore 404s from api if container not found
+            pass
         # remove metadata
         Container.objects.filter(container_id=c_id).delete()
         self._invalidate_container_cache()

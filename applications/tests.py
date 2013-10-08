@@ -1,9 +1,10 @@
 from tastypie.test import ResourceTestCase
 from django.contrib.auth.models import User
-from containers.models import Container
+from applications.models import Application
+from containers.models import Container, Host
 
 class ApplicationResourceTest(ResourceTestCase):
-    fixtures = ['test_applications.json', 'test_containers.json']
+    #fixtures = ['test_applications.json']
 
     def setUp(self):
         super(ApplicationResourceTest, self).setUp()
@@ -21,6 +22,29 @@ class ApplicationResourceTest(ResourceTestCase):
             'backend_port': 1234,
             'protocol': 'http'
         }
+        host = Host()
+        host.name = 'local'
+        host.hostname = '127.0.0.1'
+        host.save()
+        self.host = host
+        self.container_data = {
+            'image': 'base',
+            'command': '/bin/bash',
+            'description': 'test app',
+            'ports': [],
+            'hosts': ['/api/v1/hosts/1/']
+        }
+        resp = self.api_client.post(self.container_list_url, format='json',
+            data=self.container_data, authentication=self.get_credentials())
+        self.app = Application(**self.data)
+        self.app.save()
+
+    def tearDown(self):
+        # clear apps
+        Application.objects.all().delete()
+        # remove all test containers
+        for c in self.host.get_all_containers():
+            self.host.destroy_container(c.container_id)
 
     def get_credentials(self):
         return self.create_apikey(self.username, self.api_key)
@@ -60,16 +84,18 @@ class ApplicationResourceTest(ResourceTestCase):
         """
         Tests that applications can be created via api
         """
+        app_data = self.data
+        app_data['domain_name'] = 'sample.example.com'
         resp = self.api_client.post(self.api_list_url, format='json',
-            data=self.data, authentication=self.get_credentials())
+            data=app_data, authentication=self.get_credentials())
         self.assertHttpCreated(resp)
         resp = self.api_client.get(self.api_list_url, format='json',
             authentication=self.get_credentials())
         self.assertValidJSONResponse(resp)
         data = self.deserialize(resp)
         d = data.get('objects')[-1]
-        self.assertTrue(d.get('name') == self.data.get('name'))
-        self.assertTrue(d.get('domain_name') == self.data.get('domain_name'))
+        self.assertTrue(d.get('name') == app_data.get('name'))
+        self.assertTrue(d.get('domain_name') == app_data.get('domain_name'))
 
     def test_update_application(self):
         """

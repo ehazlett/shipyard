@@ -12,24 +12,59 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from tastypie import fields
-from tastypie.resources import Resource, ModelResource
+from tastypie.resources import Resource
 from tastypie.bundle import Bundle
 from tastypie.authorization import Authorization
 from tastypie.authentication import ApiKeyAuthentication
 from containers.models import Container, Host
+from hosts.api import HostResource
+from django.contrib.auth.models import User
 from shipyard import utils
 
-class ContainerResource(ModelResource):
+def get_containers():
+    valid_container_ids = [x.container_id for x in Host.get_all_containers()]
+    return Container.objects.filter(container_id__in=valid_container_ids)
+
+class ContainerResource(Resource):
+    container_id = fields.CharField(attribute='container_id')
+    description = fields.CharField(attribute='description')
     meta = fields.DictField(attribute='get_meta')
+    is_running = fields.BooleanField(attribute='is_running')
+    host = fields.ToOneField(HostResource, attribute='host')
+    protected = fields.BooleanField(attribute='protected')
 
     class Meta:
-        valid_container_ids = [x.container_id for x in Host.get_all_containers()]
-        queryset = Container.objects.filter(container_id__in=valid_container_ids)
         resource_name = 'containers'
         authorization = Authorization()
         authentication = ApiKeyAuthentication()
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'delete']
+
+    def detail_uri_kwargs(self, bundle_or_obj):
+        kwargs = {}
+        if isinstance(bundle_or_obj, Bundle):
+            kwargs['pk'] = bundle_or_obj.obj.id
+        else:
+            kwargs['pk'] = bundle_or_obj.id
+        return kwargs
+
+    def get_object_list(self, request):
+        containers = get_containers()
+        return containers
+
+    def obj_get_list(self, request=None, **kwargs):
+        return self.get_object_list(request)
+
+    def obj_get(self, request=None, **kwargs):
+        # TODO: refactor Container to use a Manager to automatically
+        # update container metadata
+        id = kwargs.get('pk')
+        c = Container.objects.get(id=id)
+        # refresh metadata
+        c.host._load_container_data(c.container_id)
+        # re-run query to get new data
+        c = Container.objects.get(id=id)
+        return c
 
     def obj_create(self, bundle, request=None, **kwargs):
         """
@@ -51,3 +86,14 @@ class ContainerResource(ModelResource):
                 container_id=utils.get_short_id(c_id))
         bundle = self.full_hydrate(bundle)
         return bundle
+
+    def obj_delete(self, request=None, **kwargs):
+        id = kwargs.get('pk')
+        c = Container.objects.get(id=id)
+        h = c.host
+        h.destroy_container(c.container_id)
+
+    def obj_delete_list(self, request=None, **kwargs):
+        for c in Container.objects.all():
+            h = c.host
+            h.destroy_container(c.container_id)
