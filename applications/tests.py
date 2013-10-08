@@ -1,12 +1,14 @@
 from tastypie.test import ResourceTestCase
 from django.contrib.auth.models import User
+from containers.models import Container
 
 class ApplicationResourceTest(ResourceTestCase):
-    fixtures = ['test_applications.json']
+    fixtures = ['test_applications.json', 'test_containers.json']
 
     def setUp(self):
         super(ApplicationResourceTest, self).setUp()
         self.api_list_url = '/api/v1/applications/'
+        self.container_list_url = '/api/v1/containers/'
         self.username = 'testuser'
         self.password = 'testpass'
         self.user = User.objects.create_user(self.username,
@@ -86,3 +88,32 @@ class ApplicationResourceTest(ResourceTestCase):
         data = self.deserialize(resp)
         self.assertTrue(data.get('name') == app_name)
 
+    def test_update_application_with_containers(self):
+        """
+        Test update application with containers
+        """
+        url = '{}1/'.format(self.api_list_url)
+        container_url = '{}1/'.format(self.container_list_url)
+        data = self.data
+        data['containers'] = [container_url]
+        resp = self.api_client.put(url, format='json',
+            data=data, authentication=self.get_credentials())
+        self.assertHttpAccepted(resp)
+        resp = self.api_client.get(url, format='json',
+            authentication=self.get_credentials())
+        self.assertValidJSONResponse(resp)
+        data = self.deserialize(resp)
+        self.assertTrue(data.get('name') == self.data.get('name'))
+        self.assertTrue(container_url in data.get('containers'))
+
+    def test_delete_application(self):
+        """
+        Test delete application
+        """
+        url = '{}1/'.format(self.api_list_url)
+        resp = self.api_client.delete(url, format='json',
+            authentication=self.get_credentials())
+        self.assertHttpAccepted(resp)
+        resp = self.api_client.get(url, format='json',
+            authentication=self.get_credentials())
+        self.assertHttpNotFound(resp)
