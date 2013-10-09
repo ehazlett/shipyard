@@ -62,14 +62,16 @@ If you want to access Shipyard on port 80 rather than port 8000, you can add an 
 
 ```
 $ redis-ctl
-redis 127.0.0.1:6379> rpush frontend:ec2-54-211-218-200.compute-1.amazonaws.com shipyard
-redis 127.0.0.1:6379> rpush frontend:ec2-54-211-218-200.compute-1.amazonaws.com http://127.0.0.1:8000
+redis 127.0.0.1:6379> rpush frontend:ec2-xxx-xxx-xxx-xxx.compute-1.amazonaws.com shipyard
+redis 127.0.0.1:6379> rpush frontend:ec2-xxx-xxx-xxx-xxx.compute-1.amazonaws.com http://127.0.0.1:8000
 ```
+
+Note: replace ``ec2-xxx-xxx-xxx-xxx.compute-1.amazonaws.com`` with whatever your EC2 instance's public DNS is.
 
 Confirm that they are in the datastore.
 
 ```
-redis 127.0.0.1:6379> lrange frontend:ec2-54-211-218-200.compute-1.amazonaws.com 0 -1
+redis 127.0.0.1:6379> lrange frontend:ec2-xxx-xxx-xxx-xxx.compute-1.amazonaws.com 0 -1
 1) "shipyard"
 2) "http://127.0.0.1:8000"
 ```
