@@ -54,6 +54,7 @@ docker itself for a self-contained dev environment):
 * Applications: bind containers to applications that are setup with [hipache](https://github.com/dotcloud/hipache)
 * Attach container (terminal emulation in the browser)
 * Container recovery (mark container as "protected" and it will auto-restart upon fail/destroy/stop)
+* RESTful API
 * ...more coming...
 
 # Screenshots
@@ -76,6 +77,11 @@ docker itself for a self-contained dev environment):
 
 * Note: for attaching to containers you must have access to the docker host.  This
 will change in the future.
+
+# API
+Shipyard also has a RESTful JSON based API.
+
+See https://github.com/ehazlett/shipyard/wiki/API for API details.
 
 # Applications
 Applications are groups of containers that are accessible by a domain name.  The easiest
