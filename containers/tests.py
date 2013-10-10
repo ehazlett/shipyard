@@ -1,16 +1,80 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+from tastypie.test import ResourceTestCase
+from django.contrib.auth.models import User
+from containers.models import Container, Host
 
-Replace this with more appropriate tests for your application.
-"""
+class ContainerResourceTest(ResourceTestCase):
 
-from django.test import TestCase
+    def setUp(self):
+        super(ContainerResourceTest, self).setUp()
+        self.api_list_url = '/api/v1/containers/'
+        self.username = 'testuser'
+        self.password = 'testpass'
+        self.user = User.objects.create_user(self.username,
+            'testuser@example.com', self.password)
+        self.api_key = self.user.api_key.key
+        host = Host()
+        host.name = 'local'
+        host.hostname = '127.0.0.1'
+        host.save()
+        self.host = host
+        self.data = {
+            'image': 'base',
+            'command': '/bin/bash',
+            'description': 'test app',
+            'ports': [],
+            'hosts': ['/api/v1/hosts/1/']
+        }
+        resp = self.api_client.post(self.api_list_url, format='json',
+            data=self.data, authentication=self.get_credentials())
 
+    def tearDown(self):
+        for c in self.host.get_all_containers():
+            self.host.destroy_container(c.container_id)
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+    def get_credentials(self):
+        return self.create_apikey(self.username, self.api_key)
+
+    def test_get_list_unauthorzied(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Test get without key returns unauthorized
         """
-        self.assertEqual(1 + 1, 2)
+        self.assertHttpUnauthorized(self.api_client.get(self.api_list_url,
+            format='json'))
+
+    def test_get_list_json(self):
+        """
+        Test get application list
+        """
+        resp = self.api_client.get(self.api_list_url, format='json',
+            authentication=self.get_credentials())
+        self.assertValidJSONResponse(resp)
+        data = self.deserialize(resp)
+        self.assertTrue(len(data.get('objects')) == 1)
+
+    def test_get_detail_json(self):
+        """
+        Test get application details
+        """
+        url = '{}1/'.format(self.api_list_url)
+        resp = self.api_client.get(url, format='json',
+            authentication=self.get_credentials())
+        self.assertValidJSONResponse(resp)
+        data = self.deserialize(resp)
+        keys = data.keys()
+        self.assertTrue('container_id' in keys)
+        self.assertTrue('meta' in keys)
+
+    def test_create_container(self):
+        """
+        Tests create container
+        """
+        resp = self.api_client.post(self.api_list_url, format='json',
+            data=self.data, authentication=self.get_credentials())
+        self.assertHttpCreated(resp)
+
+    def test_delete_container(self):
+        url = '{}1/'.format(self.api_list_url)
+        resp = self.api_client.delete(url, format='json',
+            authentication=self.get_credentials())
+        self.assertHttpAccepted(resp)
+

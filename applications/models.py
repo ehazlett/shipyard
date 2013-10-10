@@ -49,6 +49,7 @@ class Application(models.Model):
                 # if not original domain, remove hipache config
                 utils.remove_hipache_config(original_domain)
         super(Application, self).save(*args, **kwargs)
+        self.update_config()
 
     def update_config(self):
         utils.update_hipache(self.id)

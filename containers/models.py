@@ -74,6 +74,21 @@ class Host(models.Model):
         m.meta = json.dumps(meta)
         m.save()
 
+    @classmethod
+    def get_all_containers(cls, show_all=False, owner=None):
+        hosts = Host.objects.filter(enabled=True)
+        containers = []
+        # load containers
+        if hosts:
+            c_ids = []
+            for h in hosts:
+                for c in h.get_containers(show_all=show_all):
+                    c_ids.append(utils.get_short_id(c.get('Id')))
+            # return metadata objects
+            containers = Container.objects.filter(container_id__in=c_ids).filter(
+                Q(owner=None) | Q(owner=owner))
+        return containers
+
     def invalidate_cache(self):
         self._invalidate_container_cache()
         self._invalidate_image_cache()
@@ -125,13 +140,18 @@ class Host(models.Model):
         return images
 
     def create_container(self, image=None, command=None, ports=[],
-        environment=[], memory=0, description='', volumes=[],
-        volumes_from='', privileged=False, binds=None, owner=None, hostname=None):
+        environment=[], memory=0, description='', volumes=None, volumes_from='',
+        privileged=False, binds=None, owner=None, hostname=None):
         c = self._get_client()
-        cnt = c.create_container(image, command, detach=True, ports=ports,
-            mem_limit=memory, tty=True, stdin_open=True,
-            environment=environment, volumes=volumes, volumes_from=volumes_from,
-            privileged=privileged, hostname=hostname)
+        try:
+            cnt = c.create_container(image=image, command=command, detach=True,
+                ports=ports, mem_limit=memory, tty=True, stdin_open=True,
+                environment=environment, volumes=volumes,
+                volumes_from=volumes_from, privileged=privileged,
+                hostname=hostname)
+        except:
+            import traceback
+            traceback.print_exc()
         c_id = cnt.get('Id')
         c.start(c_id, binds=binds)
         status = False
@@ -182,8 +202,12 @@ class Host(models.Model):
             raise ProtectedContainerError(
                 _('Unable to destroy container.  Container is protected.'))
         c = self._get_client()
-        c.kill(c_id)
-        c.remove_container(c_id)
+        try:
+            c.kill(c_id)
+            c.remove_container(c_id)
+        except client.APIError:
+            # ignore 404s from api if container not found
+            pass
         # remove metadata
         Container.objects.filter(container_id=c_id).delete()
         self._invalidate_container_cache()
@@ -243,14 +267,14 @@ class Container(models.Model):
 
     def __unicode__(self):
         d = self.container_id
-        if self.description:
+        if d and self.description:
             d += ' ({0})'.format(self.description)
         return d
 
     @classmethod
     def get_running(cls, user=None):
         hosts = Host.objects.filter(enabled=True)
-        containers = None
+        containers = []
         if hosts:
             c_ids = []
             for h in hosts:
@@ -264,7 +288,7 @@ class Container(models.Model):
         return containers
 
     def is_public(self):
-        if self.user == None:
+        if self.owner == None:
             return True
         else:
             return False
