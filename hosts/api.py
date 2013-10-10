@@ -21,7 +21,7 @@ from containers.models import Host
 
 class HostResource(ModelResource):
     class Meta:
-        queryset = Host.objects.filter(enabled=True)
+        queryset = Host.objects.all()
         resource_name = 'hosts'
         authorization = Authorization()
         authentication = ApiKeyAuthentication()
