@@ -14,7 +14,8 @@
 from tastypie import fields
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
-from tastypie.authentication import ApiKeyAuthentication
+from tastypie.authentication import (ApiKeyAuthentication,
+    SessionAuthentication, MultiAuthentication)
 from tastypie.bundle import Bundle
 from django.conf.urls import url
 from containers.models import Host
@@ -24,5 +25,6 @@ class HostResource(ModelResource):
         queryset = Host.objects.all()
         resource_name = 'hosts'
         authorization = Authorization()
-        authentication = ApiKeyAuthentication()
+        authentication = MultiAuthentication(
+            ApiKeyAuthentication(), SessionAuthentication())
 
