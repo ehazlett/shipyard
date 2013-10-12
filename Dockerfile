@@ -11,9 +11,7 @@ RUN pip install virtualenv
 RUN pip install uwsgi
 RUN virtualenv --no-site-packages /opt/ve/shipyard
 ADD . /opt/apps/shipyard
-ADD .docker/supervisor.conf /opt/supervisor.conf
 ADD .docker/known_hosts /root/.ssh/known_hosts
-ADD .docker/run.sh /usr/local/bin/run
 RUN (find /opt/apps/shipyard -name "*.db" -delete)
 RUN (cd /opt/apps/shipyard && git remote rm origin)
 RUN (cd /opt/apps/shipyard && git remote add origin https://github.com/ehazlett/shipyard.git)
@@ -25,4 +23,4 @@ RUN (cd /opt/apps/shipyard && /opt/ve/shipyard/bin/python manage.py update_admin
 EXPOSE 80
 EXPOSE 6379
 EXPOSE 8000
-CMD ["/bin/sh", "-e", "/usr/local/bin/run"]
+CMD ["/bin/sh", "-e", "/opt/apps/shipyard/.docker/run.sh"]
