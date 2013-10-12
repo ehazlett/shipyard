@@ -37,4 +37,4 @@ fi
 $VE_DIR/bin/python manage.py syncdb --noinput
 $VE_DIR/bin/python manage.py migrate --noinput
 $VE_DIR/bin/python manage.py create_api_keys
-supervisord -c /opt/supervisor.conf -n
+supervisord -c /opt/apps/shipyard/.docker/supervisor.conf -n
