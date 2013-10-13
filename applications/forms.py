@@ -50,6 +50,20 @@ class ApplicationForm(forms.ModelForm):
         self.helper.form_class = 'form-horizontal'
         self.helper.form_action = reverse('applications.views.create')
 
+    def clean(self):
+        data = super(ApplicationForm, self).clean()
+
+        if len(data.get('containers', [])) == 0:
+            msg = _(u'Select the containers you want this application to use.')
+            self._errors['containers'] = self.error_class([msg])
+
+        port = data.get('backend_port')
+        for c in data.get('containers', []):
+            if not port in c.get_ports():
+                msg = _(u'Port %s is not available on the selected containers.' % port)
+                self._errors['backend_port'] = self.error_class([msg])
+        return data
+
     class Meta:
         model = Application
         fields = ('name', 'description', 'domain_name', 'backend_port',
