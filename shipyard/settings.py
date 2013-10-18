@@ -167,8 +167,8 @@ INSTALLED_APPS = (
     'tastypie',
     'shipyard',
     'accounts',
-    'applications',
     'containers',
+    'applications',
     'images',
     'hosts',
 )
