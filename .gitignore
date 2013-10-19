@@ -12,3 +12,4 @@ newrelic.ini
 *.db
 *.iml
 *.idea
+dump.rdb
