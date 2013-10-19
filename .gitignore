@@ -10,3 +10,5 @@ newrelic.ini
 .vagrant*
 *.gz
 *.db
+*.iml
+*.idea
