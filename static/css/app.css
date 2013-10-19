@@ -490,3 +490,7 @@ div.info {
 .container-change-view {
     margin-right: 15px;
 }
+
+.container-image-column {
+    width: 200px;
+}
