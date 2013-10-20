@@ -1,6 +1,10 @@
 # Shipyard
 Shipyard is a web UI for http://docker.io
 
+# Quickstart
+Use the [Quickstart](https://github.com/ehazlett/shipyard/wiki/QuickStart) to get
+started.
+
 # Help
 To report issues please use [Github](https://github.com/ehazlett/shipyard/issues)
 
