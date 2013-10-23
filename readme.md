@@ -1,6 +1,8 @@
 # Shipyard
 Shipyard is a web UI for http://docker.io
 
+![Status](https://badge.waffle.io/ehazlett/shipyard.png?label=ready)
+
 # Quickstart
 Use the [Quickstart](https://github.com/ehazlett/shipyard/wiki/QuickStart) to get
 started.
