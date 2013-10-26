@@ -11,6 +11,8 @@ VE_DIR=/opt/ve/shipyard
 EXTRA_CMD=${EXTRA_CMD:-}
 EXTRA_REQUIREMENTS=${EXTRA_REQUIREMENTS:-}
 CONFIG=/opt/apps/shipyard/shipyard/local_settings.py
+SKIP_DEPLOY=${SKIP_DEPLOY:-}
+REVISION=${REVISION:-master}
 cd /opt/apps/shipyard
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
 echo "REDIS_PORT=$REDIS_PORT" >> $CONFIG
@@ -26,7 +28,12 @@ DATABASES = {
     }
 }
 EOF
-git pull origin master --rebase
+if [ -z "$SKIP_DEPLOY" ] ; then
+    git fetch
+    git branch --track $REVISION origin/$REVISION
+    git checkout --force $REVISION
+    git pull --ff-only origin $REVISION
+fi
 if [ ! -z "$EXTRA_CMD" ]; then
     /bin/bash -c "$EXTRA_CMD"
 fi
