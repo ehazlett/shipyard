@@ -32,7 +32,6 @@ DATABASES = {
 EOF
 if [ -z "$SKIP_DEPLOY" ] ; then
     git fetch
-    git branch --track $REVISION origin/$REVISION
     git checkout --force $REVISION
     git pull --ff-only origin $REVISION
 fi
