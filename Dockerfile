@@ -1,11 +1,13 @@
 FROM base
 MAINTAINER Evan Hazlett "ejhazlett@gmail.com"
 RUN apt-get -qq update
-RUN apt-get install -y python-dev python-setuptools libxml2-dev libxslt-dev libmysqlclient-dev supervisor redis-server git-core wget make g++
+RUN apt-get install -y python-dev python-setuptools libxml2-dev libxslt-dev libmysqlclient-dev supervisor redis-server git-core wget make g++ libreadline-dev libncurses5-dev libpcre3-dev 
 RUN wget http://nodejs.org/dist/v0.10.12/node-v0.10.12.tar.gz -O /tmp/node.tar.gz
 RUN (cd /tmp && tar zxf node.tar.gz && cd node-* && ./configure ; make install)
 RUN npm install git+http://github.com/ehazlett/hipache.git -g
 ADD .docker/hipache.config.json /etc/hipache.config.json
+RUN wget http://openresty.org/download/ngx_openresty-1.4.2.9.tar.gz -O /tmp/nginx.tar.gz
+RUN (cd /tmp && tar zxf nginx.tar.gz && cd ngx_* && ./configure --with-luajit && make && make install)
 RUN easy_install pip
 RUN pip install virtualenv
 RUN pip install uwsgi

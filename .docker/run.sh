@@ -26,7 +26,7 @@ DATABASES = {
     }
 }
 EOF
-git pull origin master
+git pull origin master --rebase
 if [ ! -z "$EXTRA_CMD" ]; then
     /bin/bash -c "$EXTRA_CMD"
 fi
