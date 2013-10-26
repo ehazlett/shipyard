@@ -13,7 +13,7 @@
 # limitations under the License.
 from ansi2html import Ansi2HTMLConverter
 from django.conf import settings
-from md5 import md5
+from hashlib import md5
 import redis
 import uuid
 
