@@ -13,7 +13,10 @@
 # limitations under the License.
 from ansi2html import Ansi2HTMLConverter
 from django.conf import settings
+from hashlib import md5
 import redis
+import uuid
+
 
 def get_short_id(container_id):
     return container_id[:12]
@@ -26,6 +29,21 @@ def convert_ansi_to_html(text, full=False):
     except Exception, e:
         converted = text
     return converted
+
+def generate_console_session(host, container):
+    session_id = md5(str(uuid.uuid4())).hexdigest()
+    
+    redis_host = getattr(settings, 'HIPACHE_REDIS_HOST')
+    redis_port = getattr(settings, 'HIPACHE_REDIS_PORT')
+    rds = redis.Redis(host=redis_host, port=redis_port)
+    
+    key = 'console:{0}'.format(session_id)
+    docker_host = '{0}:{1}'.format(host.hostname, host.port)
+    attach_path = '/v1.3/containers/{0}/attach/ws'.format(container.container_id)
+
+    rds.hmset(key, { 'host': docker_host, 'path': attach_path })
+    rds.expire(key, 120)
+    return session_id
 
 def update_hipache(app_id=None):
     from applications.models import Application
