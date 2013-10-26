@@ -14,6 +14,14 @@ CONFIG=/opt/apps/shipyard/shipyard/local_settings.py
 SKIP_DEPLOY=${SKIP_DEPLOY:-}
 REVISION=${REVISION:-master}
 LOG_DIR=/var/log/shipyard
+HIPACHE_CONFIG=/etc/hipache.config.json
+HIPACHE_WORKERS=${HIPACHE_WORKERS:-5}
+HIPACHE_MAX_SOCKETS=${HIPACHE_MAX_SOCKETS:-100}
+HIPACHE_DEAD_BACKEND_TTL=${HIPACHE_DEAD_BACKEND_TTL:-30}
+HIPACHE_HTTP_PORT=${HIPACHE_HTTP_PORT:-80}
+HIPACHE_HTTPS_PORT=${HIPACHE_HTTPS_PORT:-443}
+HIPACHE_SSL_CERT=${HIPACHE_SSL_CERT:-}
+HIPACHE_SSL_KEY=${HIPACHE_SSL_KEY:-}
 mkdir -p $LOG_DIR
 cd /opt/apps/shipyard
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
@@ -30,6 +38,33 @@ DATABASES = {
     }
 }
 EOF
+# hipache config
+cat << EOF > $HIPACHE_CONFIG
+{
+    "server": {
+        "accessLog": "/var/log/shipyard/hipache.log",
+        "port": $HIPACHE_HTTP_PORT,
+        "workers": $HIPACHE_WORKERS,
+        "maxSockets": $HIPACHE_MAX_SOCKETS,
+EOF
+# hipache ssl support
+if [ ! -z "$HIPACHE_SSL_CERT" ] ; then
+    cat << EOF >> $HIPACHE_CONFIG
+        "https": {
+            "port": $HIPACHE_HTTPS_PORT,
+            "key": "$HIPACHE_SSL_KEY",
+            "cert": "$HIPACHE_SSL_CERT"
+        },
+EOF
+fi
+cat << EOF >> $HIPACHE_CONFIG
+        "deadBackendTTL": $HIPACHE_DEAD_BACKEND_TTL
+    },
+    "redisHost": "$REDIS_HOST",
+    "redisPort": $REDIS_PORT
+}
+EOF
+
 if [ -z "$SKIP_DEPLOY" ] ; then
     git fetch
     git checkout --force $REVISION

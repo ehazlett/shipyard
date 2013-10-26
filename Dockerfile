@@ -24,6 +24,7 @@ RUN (cd /opt/apps/shipyard && /opt/ve/shipyard/bin/python manage.py update_admin
 
 VOLUME /var/log/shipyard
 EXPOSE 80
+EXPOSE 443
 EXPOSE 6379
 EXPOSE 8000
 CMD ["/bin/sh", "-e", "/opt/apps/shipyard/.docker/run.sh"]
