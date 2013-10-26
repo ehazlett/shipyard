@@ -13,6 +13,8 @@ EXTRA_REQUIREMENTS=${EXTRA_REQUIREMENTS:-}
 CONFIG=/opt/apps/shipyard/shipyard/local_settings.py
 SKIP_DEPLOY=${SKIP_DEPLOY:-}
 REVISION=${REVISION:-master}
+LOG_DIR=/var/log/shipyard
+mkdir -p $LOG_DIR
 cd /opt/apps/shipyard
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
 echo "REDIS_PORT=$REDIS_PORT" >> $CONFIG

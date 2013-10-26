@@ -22,6 +22,7 @@ RUN (cd /opt/apps/shipyard && /opt/ve/shipyard/bin/python manage.py syncdb --noi
 RUN (cd /opt/apps/shipyard && /opt/ve/shipyard/bin/python manage.py migrate)
 RUN (cd /opt/apps/shipyard && /opt/ve/shipyard/bin/python manage.py update_admin_user --username=admin --password=shipyard)
 
+VOLUME /var/log/shipyard
 EXPOSE 80
 EXPOSE 6379
 EXPOSE 8000
