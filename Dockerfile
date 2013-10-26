@@ -1,8 +1,8 @@
 FROM base
-MAINTAINER Evan Hazlett "ejhazlett@gmail.com"
+MAINTAINER Shipyard Project "http://shipyard-project.com"
 RUN apt-get -qq update
 RUN apt-get install -y python-dev python-setuptools libxml2-dev libxslt-dev libmysqlclient-dev supervisor redis-server git-core wget make g++ libreadline-dev libncurses5-dev libpcre3-dev 
-RUN wget http://nodejs.org/dist/v0.10.12/node-v0.10.12.tar.gz -O /tmp/node.tar.gz
+RUN wget http://nodejs.org/dist/v0.8.26/node-v0.8.26.tar.gz -O /tmp/node.tar.gz
 RUN (cd /tmp && tar zxf node.tar.gz && cd node-* && ./configure ; make install)
 RUN npm install git+http://github.com/ehazlett/hipache.git -g
 ADD .docker/hipache.config.json /etc/hipache.config.json

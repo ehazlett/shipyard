@@ -1,4 +1,4 @@
-# Shipyard
+# Shipyard [![Stories in Ready](https://badge.waffle.io/ehazlett/shipyard.png?label=ready)](https://waffle.io/ehazlett/shipyard)
 Shipyard is a web UI for http://docker.io
 
 # Quickstart
