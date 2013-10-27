@@ -1,4 +1,5 @@
 #!/bin/bash
+APP_DIR=/opt/apps/shipyard
 REDIS_HOST=${REDIS_HOST:-localhost}
 REDIS_PORT=${REDIS_PORT:-6379}
 DB_TYPE=${DB_TYPE:-sqlite3}
@@ -10,7 +11,7 @@ DB_PORT=${DB_PORT:-}
 VE_DIR=/opt/ve/shipyard
 EXTRA_CMD=${EXTRA_CMD:-}
 EXTRA_REQUIREMENTS=${EXTRA_REQUIREMENTS:-}
-CONFIG=/opt/apps/shipyard/shipyard/local_settings.py
+CONFIG=$APP_DIR/shipyard/local_settings.py
 SKIP_DEPLOY=${SKIP_DEPLOY:-}
 REVISION=${REVISION:-master}
 LOG_DIR=/var/log/shipyard
@@ -22,8 +23,9 @@ HIPACHE_HTTP_PORT=${HIPACHE_HTTP_PORT:-80}
 HIPACHE_HTTPS_PORT=${HIPACHE_HTTPS_PORT:-443}
 HIPACHE_SSL_CERT=${HIPACHE_SSL_CERT:-}
 HIPACHE_SSL_KEY=${HIPACHE_SSL_KEY:-}
+NGINX_RESOLVER=${NGINX_RESOLVER:-}
 mkdir -p $LOG_DIR
-cd /opt/apps/shipyard
+cd $APP_DIR
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
 echo "REDIS_PORT=$REDIS_PORT" >> $CONFIG
 cat << EOF >> $CONFIG
@@ -65,10 +67,18 @@ cat << EOF >> $HIPACHE_CONFIG
 }
 EOF
 
+# deploy
 if [ -z "$SKIP_DEPLOY" ] ; then
     git fetch
+    git reset --HARD
     git checkout --force $REVISION
     git pull --ff-only origin $REVISION
+fi
+# nginx resolver
+if [ ! -z "$NGINX_RESOLVER" ] ; then
+    sed -i 's/resolver*/resolver $NGINX_RESOLVER;/g' $APP_DIR/.docker/nginx.conf
+
+EOF
 fi
 if [ ! -z "$EXTRA_CMD" ]; then
     /bin/bash -c "$EXTRA_CMD"
