@@ -23,7 +23,7 @@ TEMPLATE_DEBUG = DEBUG
 APP_NAME = 'shipyard'
 # app rev
 try:
-    p = subprocess.Popen(['foogit', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     APP_REVISION = out[:6]
 except OSError:
