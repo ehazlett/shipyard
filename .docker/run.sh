@@ -78,7 +78,6 @@ fi
 cat << EOF >> $APP_DIR/.docker/nginx.conf
 daemon off;
 worker_processes  1;
-access_log $LOG_DIR/nginx_access.log
 error_log $LOG_DIR/nginx_error.log;
 
 events {
@@ -88,6 +87,7 @@ events {
 http {
   server {
     listen 8000;
+    access_log $LOG_DIR/nginx_access.log
 
     location / {
       proxy_pass http://127.0.0.1:8001;
