@@ -121,7 +121,7 @@ http {
 
         red:set_timeout(1000) -- 1 second
 
-        local ok, err = red:connect($REDIS_HOST, $REDIS_PORT)
+        local ok, err = red:connect("$REDIS_HOST", $REDIS_PORT)
         if not ok then
             ngx.log(ngx.ERR, "failed to connect to redis: ", err)
             return ngx.exit(500)
