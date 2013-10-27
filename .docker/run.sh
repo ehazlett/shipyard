@@ -76,7 +76,7 @@ if [ -z "$SKIP_DEPLOY" ] ; then
 fi
 # nginx resolver
 if [ ! -z "$NGINX_RESOLVER" ] ; then
-    sed -i "s/resolver*/resolver $NGINX_RESOLVER;/g" $APP_DIR/.docker/nginx.conf
+    sed -i "s/resolver.*/resolver $NGINX_RESOLVER;/g" $APP_DIR/.docker/nginx.conf
 
 EOF
 fi
