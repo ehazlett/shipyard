@@ -70,13 +70,13 @@ EOF
 # deploy
 if [ -z "$SKIP_DEPLOY" ] ; then
     git fetch
-    git reset --HARD
+    git reset --hard
     git checkout --force $REVISION
     git pull --ff-only origin $REVISION
 fi
 # nginx resolver
 if [ ! -z "$NGINX_RESOLVER" ] ; then
-    sed -i 's/resolver*/resolver $NGINX_RESOLVER;/g' $APP_DIR/.docker/nginx.conf
+    sed -i "s/resolver*/resolver $NGINX_RESOLVER;/g" $APP_DIR/.docker/nginx.conf
 
 EOF
 fi
