@@ -1,6 +1,6 @@
 #!/bin/bash
 APP_DIR=/opt/apps/shipyard
-REDIS_HOST=${REDIS_HOST:-localhost}
+REDIS_HOST=${REDIS_HOST:-127.0.0.1}
 REDIS_PORT=${REDIS_PORT:-6379}
 DB_TYPE=${DB_TYPE:-sqlite3}
 DB_NAME=${DB_NAME:-shipyard.db}
