@@ -12,7 +12,7 @@ There is also an IRC channel setup on Freenode:  `irc.freenode.net` `#shipyard`
 
 To run the latest version on port 8000:
 
-`docker run -p :8000 ehazlett/shipyard`
+`docker run -p 8000:8000 ehazlett/shipyard`
 
 Or to run on a custom port (leave the `-p` option off to get random port):
 
