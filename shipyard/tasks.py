@@ -128,3 +128,20 @@ def build_image_on_host(host, path, tag):
     print('Building {} on {}'.format(tag, host.name))
     host.build_image(path, tag)
     return 'Built {} on {}'.format(tag, host.name)
+
+@celery.task
+def docker_host_info():
+    hosts = Host.objects.filter(enabled=True)
+    for h in hosts:
+        get_docker_host_info.subtask((h.id,)).apply_async()
+    return True
+
+@celery.task
+def get_docker_host_info(host_id):
+    if not host_id:
+        raise StandardError('You must specify a host_id')
+    host = Host.objects.get(id=host_id)
+    print('Getting docker host info: {}'.format(host.name))
+    host.get_containers()
+    host.get_images()
+    return True
