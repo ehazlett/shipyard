@@ -75,7 +75,7 @@ if [ -z "$SKIP_DEPLOY" ] ; then
     git pull --ff-only origin $REVISION
 fi
 # nginx resolver
-cat << EOF >> $APP_DIR/.docker/nginx.conf
+cat << EOF > $APP_DIR/.docker/nginx.conf
 daemon off;
 worker_processes  1;
 error_log $LOG_DIR/nginx_error.log;
