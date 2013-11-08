@@ -2,21 +2,21 @@
 Shipyard is a web UI for http://docker.io
 
 # Quickstart
-Use the [Quickstart](https://github.com/ehazlett/shipyard/wiki/QuickStart) to get
+Use the [Quickstart](https://github.com/shipyard/shipyard/wiki/QuickStart) to get
 started.
 
 # Help
-To report issues please use [Github](https://github.com/ehazlett/shipyard/issues)
+To report issues please use [Github](https://github.com/shipyard/shipyard/issues)
 
 There is also an IRC channel setup on Freenode:  `irc.freenode.net` `#shipyard`
 
 To run the latest version on port 8000:
 
-`docker run -p 8000:8000 ehazlett/shipyard`
+`docker run -p 8000:8000 shipyard/shipyard`
 
 Or to run on a custom port (leave the `-p` option off to get random port):
 
-`docker run -p 8005:8000 ehazlett/shipyard`
+`docker run -p 8005:8000 shipyard/shipyard`
 
 Username: admin
 Password: shipyard
@@ -85,7 +85,7 @@ will change in the future.
 # API
 Shipyard also has a RESTful JSON based API.
 
-See https://github.com/ehazlett/shipyard/wiki/API for API details.
+See https://github.com/shipyard/shipyard/wiki/API for API details.
 
 # Applications
 Applications are groups of containers that are accessible by a domain name.  The easiest
@@ -97,7 +97,7 @@ way to test this is to add some local `/etc/hosts` entries for fake domains poin
 
 Then you can create a new application with the domain `foo.local`.  Attach one or more containers and then access http://foo.local in your browser and it should hit Hipache and be routed to the containers.
 
-For more info on applications, see [here](https://github.com/ehazlett/shipyard/wiki/Applications)
+For more info on applications, see [here](https://github.com/shipyard/shipyard/wiki/Applications)
 
 
 
