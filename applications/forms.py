@@ -55,8 +55,7 @@ class ApplicationForm(forms.ModelForm):
         data = super(ApplicationForm, self).clean()
 
         if len(data.get('containers', [])) == 0:
-            msg = _(u'Select the containers you want this application to use.')
-            self._errors['containers'] = self.error_class([msg])
+            return data
 
         port = data.get('backend_port')
         interface = data.get('host_interface') or '0.0.0.0'
