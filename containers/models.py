@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from distutils.version import LooseVersion
 from django.db import models
 from django.contrib.auth.models import User
 from docker import client
@@ -39,6 +40,12 @@ class Host(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @property
+    def version(self):
+        c = self._get_client()
+        data = c.version()
+        return LooseVersion(data['Version'])
 
     def _get_client(self):
         url = self.hostname
@@ -142,10 +149,32 @@ class Host(models.Model):
     def create_container(self, image=None, command=None, ports=[],
         environment=[], memory=0, description='', volumes=None, volumes_from='',
         privileged=False, binds=None, owner=None, hostname=None):
+
+        if self.version < '0.6.5':
+            port_exposes = ports
+            port_bindings = None
+        else:
+            port_exposes = {}
+            port_bindings = {}
+            for port_str in ports:
+                port_parts = port_str.split(':')
+                if len(port_parts) == 3:
+                    interface, port, mapping = port_parts
+                elif len(port_parts) == 2:
+                    interface = ''
+                    port, mapping = port_parts
+                else:
+                    interface, mapping = ('','')
+                    port = port_str
+                if port.find('/') < 0:
+                    port = "{0}/tcp".format(port)
+                port_exposes[port] = {};
+                port_bindings.setdefault(port, []).append({'HostIp': interface, 'HostPort': mapping})
+
         c = self._get_client()
         try:
             cnt = c.create_container(image=image, command=command, detach=True,
-                ports=ports, mem_limit=memory, tty=True, stdin_open=True,
+                ports=port_exposes, mem_limit=memory, tty=True, stdin_open=True,
                 environment=environment, volumes=volumes,
                 volumes_from=volumes_from, privileged=privileged,
                 hostname=hostname)
@@ -153,7 +182,7 @@ class Host(models.Model):
             import traceback
             traceback.print_exc()
         c_id = cnt.get('Id')
-        c.start(c_id, binds=binds)
+        c.start(c_id, binds=binds, port_bindings=port_bindings)
         status = False
         # create metadata only if container starts successfully
         if c.inspect_container(c_id).get('State', {}).get('Running'):
@@ -303,22 +332,20 @@ class Container(models.Model):
     def get_ports(self):
         meta = self.get_meta()
         network_settings = meta.get('NetworkSettings', {})
-        port_mapping = network_settings.get('PortMapping')
-        if port_mapping:
+        ports = {}
+        if self.host.version < '0.6.5':
             # for verions prior to docker v0.6.5
-            ports = {}
+            port_mapping = network_settings.get('PortMapping')
             for proto in port_mapping:
                 for port, external_port in port_mapping[proto].items():
                     port_proto = "{0}/{1}".format(port, proto)
                     ports[port_proto] = { '0.0.0.0': external_port }
-            return ports
         else:
             # for versions after docker v0.6.5
-            ports = {}
             for port_proto, host_list in network_settings.get('Ports').items():
-                for host in host_list:
+                for host in host_list or []:
                     ports[port_proto] = { host.get('HostIp'): host.get('HostPort') }
-            return ports
+        return ports
 
     def get_memory_limit(self):
         mem = 0
