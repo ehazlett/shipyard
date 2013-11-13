@@ -302,10 +302,23 @@ class Container(models.Model):
 
     def get_ports(self):
         meta = self.get_meta()
-        port_mapping = meta.get('NetworkSettings', {}).get('PortMapping')
+        network_settings = meta.get('NetworkSettings', {})
+        port_mapping = network_settings.get('PortMapping')
         if port_mapping:
-            return port_mapping.get('Tcp', {})
-        return None
+            # for verions prior to docker v0.6.5
+            ports = {}
+            for proto in port_mapping:
+                for port, external_port in port_mapping[proto].items():
+                    port_proto = "{0}/{1}".format(port, proto)
+                    ports[port_proto] = { '0.0.0.0': external_port }
+            return ports
+        else:
+            # for versions after docker v0.6.5
+            ports = {}
+            for port_proto, host_list in network_settings.get('Ports').items():
+                for host in host_list:
+                    ports[port_proto] = { host.get('HostIp'): host.get('HostPort') }
+            return ports
 
     def get_memory_limit(self):
         mem = 0

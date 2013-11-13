@@ -59,7 +59,8 @@ def update_hipache(app_id=None):
             pipe.rpush(domain_key, app.id)
             # add upstreams
             for c in app.containers.all():
-                port = c.get_ports()[app.backend_port]
+                port_proto = "{0}/tcp".format(app.backend_port)
+                port = c.get_ports()[port_proto]['0.0.0.0']
                 upstream = '{0}://{1}:{2}'.format(app.protocol, c.host.hostname,
                     port)
                 pipe.rpush(domain_key, upstream)

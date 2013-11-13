@@ -59,8 +59,9 @@ class ApplicationForm(forms.ModelForm):
 
         port = data.get('backend_port')
         for c in data.get('containers', []):
-            if not port in c.get_ports():
-                msg = _(u'Port %s is not available on the selected containers.' % port)
+            port_proto = "{0}/tcp".format(port)
+            if not port_proto in c.get_ports():
+                msg = _(u'Port %s is not available on the selected containers.' % port_proto)
                 self._errors['backend_port'] = self.error_class([msg])
         return data
 
