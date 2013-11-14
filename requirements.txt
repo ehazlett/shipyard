@@ -10,7 +10,7 @@ django-celery==3.0.23
 django-crispy-forms==1.4.0
 django-redis==3.3
 django-tastypie==0.9.16
-docker-py==0.2.2
+-e git+https://github.com/dotcloud/docker-py@14946ed56bfc6da252496526d650b586f86a29dc#egg=docker_py-dev
 kombu==2.5.14
 mimeparse==0.1.3
 python-dateutil==2.1

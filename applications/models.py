@@ -22,6 +22,8 @@ class Application(models.Model):
     description = models.TextField(null=True, blank=True)
     domain_name = models.CharField(max_length=96, null=True,
         unique=True)
+    host_interface = models.CharField(max_length=128, null=True, blank=True,
+        help_text='Host interface your port is bound to or leave blank for default')
     backend_port = models.CharField(max_length=5, null=True)
     protocol = models.CharField(max_length=6, null=True,
         default='http', choices=PROTOCOL_CHOICES)

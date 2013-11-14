@@ -151,40 +151,35 @@
                     <span class="panel-title">{% trans 'Ports' %}</span>
                 </div>
                 <div class="panel-body">
-                    {% with net=container.get_meta.NetworkSettings %}
-                    {% with tcp=net.PortMapping.Tcp %}
-                    {% with udp=net.PortMapping.Udp %}
-                    {% if tcp or udp %}
+                    {% with ports=container.get_ports %}
+                    {% if ports %}
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>{% trans 'Protocol' %}</th>
                                 <th>{% trans 'Port' %}</th>
+                                <th>{% trans 'Host Interface' %}</th>
                                 <th>{% trans 'Mapping' %}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for k,v in tcp.items %}
+                            {% for port,host_list in ports.items %}
+                            {% for interface,mapping in host_list.items %}
                             <tr>
-                                <td>TCP</td>
-                                <td>{{k}}</td>
-                                <td>{{v|container_port_link:container.host.name|safe}}</td>
+                                <td>{{port}}</td>
+                                <td>{{interface}}</td>
+                                <td>
+                                  <a target="_blank" href="{{interface|container_host_url:container.host.hostname}}:{{mapping}}">
+                                  {{mapping}}
+                                  </a>
+                                </td>
                             </tr>
                             {% endfor %}
-                            {% for k,v in udp.items %}
-                            <tr>
-                                <td>UDP</td>
-                                <td>{{k}}</td>
-                                <td>{{v}}</td>
-                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                     {% else %}
                     <span class="text-muted">{% trans 'No port mappings' %}</span>
                     {% endif %}
-                    {% endwith %}
-                    {% endwith %}
                     {% endwith %}
                 </div>
             </div>
