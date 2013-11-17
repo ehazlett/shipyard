@@ -27,4 +27,4 @@ expose 80
 expose 443
 expose 6379
 expose 8000
-cmd ["/bin/sh", "-e", "/opt/apps/shipyard/.docker/run.sh"]
+entrypoint ["/opt/apps/shipyard/.docker/run.sh"]
