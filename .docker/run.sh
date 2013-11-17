@@ -99,7 +99,7 @@ if [ -z "$APP_COMPONENTS" ] || [ ! -z "`echo $APP_COMPONENTS | grep app`" ] ; th
 priority=10
 directory=/opt/apps/shipyard
 command=/usr/local/bin/uwsgi
-    --http-socket 0.0.0.0:8001
+    --http-socket 0.0.0.0:5000
     -p 4
     -b 32768
     -T
@@ -197,7 +197,7 @@ http {
     access_log $LOG_DIR/nginx_access.log;
 
     location / {
-      proxy_pass http://127.0.0.1:8001;
+      proxy_pass http://127.0.0.1:5000;
       proxy_set_header Host \$http_host;
       proxy_set_header X-Forwarded-Host \$host;
       proxy_set_header X-Real-IP \$remote_addr;
