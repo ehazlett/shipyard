@@ -13,7 +13,7 @@ VE_DIR=/opt/ve/shipyard
 EXTRA_CMD=${EXTRA_CMD:-}
 EXTRA_REQUIREMENTS=${EXTRA_REQUIREMENTS:-}
 CONFIG=$APP_DIR/shipyard/local_settings.py
-SKIP_DEPLOY=${SKIP_DEPLOY:-}
+UPDATE_APP=${UPDATE_APP:-}
 REVISION=${REVISION:-master}
 LOG_DIR=/var/log/shipyard
 HIPACHE_CONFIG=/etc/hipache.config.json
@@ -70,7 +70,7 @@ cat << EOF >> $HIPACHE_CONFIG
 EOF
 
 # deploy
-if [ -z "$SKIP_DEPLOY" ] ; then
+if [ ! -z "$UPDATE_APP" ] ; then
     git fetch
     git reset --hard
     git checkout --force $REVISION
