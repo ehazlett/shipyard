@@ -250,6 +250,11 @@ CELERYBEAT_SCHEDULE = {
     'check-protected-containers': {
         'task': 'shipyard.tasks.check_protected_containers',
         'schedule': timedelta(seconds=RECOVERY_INTERVAL),
+    },
+    'docker-host-info': {
+        'task': 'shipyard.tasks.docker_host_info',
+        # make the schedule slightly lower than the cache ttl
+        'schedule': timedelta(seconds=round(HOST_CACHE_TTL/1.25)),
     }
 }
 

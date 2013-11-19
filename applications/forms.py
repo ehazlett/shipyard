@@ -38,6 +38,7 @@ class ApplicationForm(forms.ModelForm):
                 'name',
                 'description',
                 'domain_name',
+                'host_interface',
                 'backend_port',
                 'protocol',
                 Field('containers', size=container_list_length),
@@ -54,19 +55,25 @@ class ApplicationForm(forms.ModelForm):
         data = super(ApplicationForm, self).clean()
 
         if len(data.get('containers', [])) == 0:
-            msg = _(u'Select the containers you want this application to use.')
-            self._errors['containers'] = self.error_class([msg])
+            return data
 
         port = data.get('backend_port')
+        interface = data.get('host_interface') or '0.0.0.0'
         for c in data.get('containers', []):
-            if not port in c.get_ports():
-                msg = _(u'Port %s is not available on the selected containers.' % port)
+            port_proto = "{0}/tcp".format(port)
+            container_ports = c.get_ports()
+            if not port_proto in container_ports:
+                msg = _(u'Port %s is not available on the selected containers.' % port_proto)
                 self._errors['backend_port'] = self.error_class([msg])
+            if not container_ports.get(port_proto).get(interface):
+                msg = _(u'Port %s is not bound to the interface %s on the selected containers.' % (port_proto, interface))
+                self._errors['host_interface'] = self.error_class([msg])
+
         return data
 
     class Meta:
         model = Application
-        fields = ('name', 'description', 'domain_name', 'backend_port',
+        fields = ('name', 'description', 'domain_name', 'host_interface', 'backend_port',
             'protocol', 'containers')
 
 class EditApplicationForm(forms.Form):
@@ -74,6 +81,7 @@ class EditApplicationForm(forms.Form):
     name = forms.CharField(required=True)
     description = forms.CharField(required=False)
     domain_name = forms.CharField(required=True)
+    host_interface = forms.CharField(required=False)
     backend_port = forms.CharField(required=True)
     protocol = forms.ChoiceField(required=True)
 

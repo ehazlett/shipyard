@@ -46,7 +46,7 @@ class CreateContainerForm(forms.Form):
         help_text='Memory in MB')
     environment = forms.CharField(required=False,
         help_text='key=value space separated pairs')
-    ports = forms.CharField(required=False, help_text='space separated')
+    ports = forms.CharField(required=False, help_text='space separated (i.e. 8000 8001:8001 127.0.0.1:80:80 )')
     volume = forms.CharField(required=False, help_text='container volume (i.e. /mnt/volume)')
     volumes_from = forms.CharField(required=False,
         help_text='mount volumes from specified container')

@@ -1,4 +1,5 @@
 #!/bin/bash
+APP_COMPONENTS="$*"
 APP_DIR=/opt/apps/shipyard
 REDIS_HOST=${REDIS_HOST:-127.0.0.1}
 REDIS_PORT=${REDIS_PORT:-6379}
@@ -12,7 +13,7 @@ VE_DIR=/opt/ve/shipyard
 EXTRA_CMD=${EXTRA_CMD:-}
 EXTRA_REQUIREMENTS=${EXTRA_REQUIREMENTS:-}
 CONFIG=$APP_DIR/shipyard/local_settings.py
-SKIP_DEPLOY=${SKIP_DEPLOY:-}
+UPDATE_APP=${UPDATE_APP:-}
 REVISION=${REVISION:-master}
 LOG_DIR=/var/log/shipyard
 HIPACHE_CONFIG=/etc/hipache.config.json
@@ -24,6 +25,7 @@ HIPACHE_HTTPS_PORT=${HIPACHE_HTTPS_PORT:-443}
 HIPACHE_SSL_CERT=${HIPACHE_SSL_CERT:-}
 HIPACHE_SSL_KEY=${HIPACHE_SSL_KEY:-}
 NGINX_RESOLVER=${NGINX_RESOLVER:-`cat /etc/resolv.conf | grep ^nameserver | head -1 | awk '{ print $2; }'`}
+SUPERVISOR_CONF=/opt/supervisor.conf
 mkdir -p $LOG_DIR
 cd $APP_DIR
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
@@ -68,14 +70,119 @@ cat << EOF >> $HIPACHE_CONFIG
 EOF
 
 # deploy
-if [ -z "$SKIP_DEPLOY" ] ; then
+if [ ! -z "$UPDATE_APP" ] ; then
     git fetch
     git reset --hard
     git checkout --force $REVISION
     git pull --ff-only origin $REVISION
 fi
+# supervisor
+cat << EOF > $SUPERVISOR_CONF
+[supervisord]
+nodaemon=false
+
+[unix_http_server]
+file=/var/run//supervisor.sock
+chmod=0700
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///var/run//supervisor.sock
+
+EOF
+
+if [ -z "$APP_COMPONENTS" ] || [ ! -z "`echo $APP_COMPONENTS | grep app`" ] ; then
+    cat << EOF >> $SUPERVISOR_CONF
+[program:app]
+priority=10
+directory=/opt/apps/shipyard
+command=/usr/local/bin/uwsgi
+    --http-socket 0.0.0.0:5000
+    -p 4
+    -b 32768
+    -T
+    --master
+    --max-requests 5000
+    -H /opt/ve/shipyard
+    --static-map /static=/opt/apps/shipyard/static
+    --static-map /static=/opt/ve/shipyard/lib/python2.7/site-packages/django/contrib/admin/static
+    --module wsgi:application
+user=root
+autostart=true
+autorestart=true
+stopsignal=QUIT
+stdout_logfile=/var/log/shipyard/app.log
+stderr_logfile=/var/log/shipyard/app.err
+
+EOF
+fi
+
+if [ -z "$APP_COMPONENTS" ] ; then
+    cat << EOF >> $SUPERVISOR_CONF
+[program:redis]
+priority=10
+directory=/var/lib/redis
+command=redis-server
+user=root
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/shipyard/redis.log
+stderr_logfile=/var/log/shipyard/redis.err
+
+EOF
+fi
+
+if [ -z "$APP_COMPONENTS" ] || [ ! -z "`echo $APP_COMPONENTS | grep worker`" ] ; then
+    cat << EOF >> $SUPERVISOR_CONF
+[program:worker]
+priority=99
+directory=/opt/apps/shipyard
+command=/opt/ve/shipyard/bin/python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E -c 4
+user=root
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/shipyard/worker.log
+stderr_logfile=/var/log/shipyard/worker.err
+
+EOF
+fi
+
+if [ -z "$APP_COMPONENTS" ] ; then
+    cat << EOF >> $SUPERVISOR_CONF
+[program:nginx]
+priority=20
+directory=/usr/local/openresty/nginx
+command=/usr/local/openresty/nginx/sbin/nginx
+    -p /usr/local/openresty/nginx/ 
+    -c /opt/apps/shipyard/.docker/nginx.conf
+user=root
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/shipyard/nginx.log
+stderr_logfile=/var/log/shipyard/nginx.err
+
+EOF
+fi
+
+if [ -z "$APP_COMPONENTS" ] || [ ! -z "`echo $APP_COMPONENTS | grep router`" ] ; then
+    cat << EOF >> $SUPERVISOR_CONF
+[program:hipache]
+priority=40
+directory=/tmp
+command=hipache -c /etc/hipache.config.json
+user=root
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/shipyard/hipache.log
+stderr_logfile=/var/log/shipyard/hipache.err
+
+EOF
+fi
+
 # nginx resolver
-cat << EOF >> $APP_DIR/.docker/nginx.conf
+cat << EOF > $APP_DIR/.docker/nginx.conf
 daemon off;
 worker_processes  1;
 error_log $LOG_DIR/nginx_error.log;
@@ -90,7 +197,7 @@ http {
     access_log $LOG_DIR/nginx_access.log;
 
     location / {
-      proxy_pass http://127.0.0.1:8001;
+      proxy_pass http://127.0.0.1:5000;
       proxy_set_header Host \$http_host;
       proxy_set_header X-Forwarded-Host \$host;
       proxy_set_header X-Real-IP \$remote_addr;
@@ -163,4 +270,4 @@ fi
 $VE_DIR/bin/python manage.py syncdb --noinput
 $VE_DIR/bin/python manage.py migrate --noinput
 $VE_DIR/bin/python manage.py create_api_keys
-supervisord -c /opt/apps/shipyard/.docker/supervisor.conf -n
+supervisord -c $SUPERVISOR_CONF -n

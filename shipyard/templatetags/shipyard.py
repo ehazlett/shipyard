@@ -58,6 +58,25 @@ def container_port_link(port, host):
     return ret
 
 @register.filter
+def container_host_url(interface, hostname):
+    """
+    Returns exposed interface URL, replacing default 0.0.0.0
+    with container hostname as url
+
+    :param interface: Port interface
+    :param hostname: Container host name
+
+    """
+    if interface == '0.0.0.0':
+        if 'unix' in hostname:
+            host_url = '127.0.0.1'
+        else:
+            host_url = hostname
+    else:
+        host_url = interface
+    return 'http://{0}'.format(host_url)
+
+@register.filter
 @stringfilter
 def container_memory_to_mb(value):
     """
