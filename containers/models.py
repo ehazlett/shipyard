@@ -148,7 +148,7 @@ class Host(models.Model):
 
     def create_container(self, image=None, command=None, ports=[],
         environment=[], memory=0, description='', volumes=None, volumes_from='',
-        privileged=False, binds=None, owner=None, hostname=None):
+        privileged=False, binds=None, links=None, name=None, owner=None, hostname=None):
 
         if self.version < '0.6.5':
             port_exposes = ports
@@ -176,13 +176,13 @@ class Host(models.Model):
             cnt = c.create_container(image=image, command=command, detach=True,
                 ports=port_exposes, mem_limit=memory, tty=True, stdin_open=True,
                 environment=environment, volumes=volumes,
-                volumes_from=volumes_from, privileged=privileged,
+                volumes_from=volumes_from, privileged=privileged, name=name,
                 hostname=hostname)
         except:
             import traceback
             traceback.print_exc()
         c_id = cnt.get('Id')
-        c.start(c_id, binds=binds, port_bindings=port_bindings)
+        c.start(c_id, binds=binds, port_bindings=port_bindings, links=links)
         status = False
         # create metadata only if container starts successfully
         if c.inspect_container(c_id).get('State', {}).get('Running'):

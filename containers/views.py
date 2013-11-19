@@ -73,9 +73,11 @@ def create_container(request):
         form = CreateContainerForm(request.POST)
         if form.is_valid():
             image = form.data.get('image')
+            name = form.data.get('name')
             environment = form.data.get('environment')
             command = form.data.get('command')
             memory = form.data.get('memory', 0)
+            links = form.data.get('links', None)
             volume = form.data.get('volume')
             volumes_from = form.data.get('volumes_from')
             if command.strip() == '':
@@ -97,6 +99,12 @@ def create_container(request):
                     binds = { mnt: vol }
                 else:
                     volume = { volume: {}}
+            # build links
+            c_links = {}
+            for link in links.split():
+                l,n = link.split(':')
+                c_links[l] = n
+            links = c_links
             # convert memory from MB to bytes
             if memory:
                 memory = int(memory) * 1048576
@@ -117,7 +125,7 @@ def create_container(request):
                     environment=environment, memory=memory,
                     description=form.data.get('description'), volumes=volume,
                     volumes_from=volumes_from, privileged=privileged,
-                    binds=binds, owner=user)
+                    binds=binds, links=links, name=name, owner=user)
             if hosts:
                 if status:
                     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
