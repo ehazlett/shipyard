@@ -1,6 +1,7 @@
 #!/bin/bash
 APP_COMPONENTS="$*"
 APP_DIR=/opt/apps/shipyard
+ADMIN_PASS=${ADMIN_PASS:-}
 REDIS_HOST=${REDIS_HOST:-127.0.0.1}
 REDIS_PORT=${REDIS_PORT:-6379}
 DB_TYPE=${DB_TYPE:-sqlite3}
@@ -270,4 +271,7 @@ fi
 $VE_DIR/bin/python manage.py syncdb --noinput
 $VE_DIR/bin/python manage.py migrate --noinput
 $VE_DIR/bin/python manage.py create_api_keys
+if [ ! -z "$ADMIN_PASS" ] ; then
+    $VE_DIR/bin/python manage.py update_admin_user --username=admin --password=$ADMIN_PASS
+fi
 supervisord -c $SUPERVISOR_CONF -n
