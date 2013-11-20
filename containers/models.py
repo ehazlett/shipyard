@@ -329,6 +329,18 @@ class Container(models.Model):
         from applications.models import Application
         return Application.objects.filter(containers__in=[self])
 
+    def restart(self):
+        return self.host.restart_container(container_id=self.container_id)
+
+    def stop(self):
+        return self.host.stop_container(container_id=self.container_id)
+
+    def logs(self):
+        return self.host.get_container_logs(container_id=self.container_id)
+
+    def destroy(self):
+        return self.host.destroy_container(container_id=self.container_id)
+
     def get_ports(self):
         meta = self.get_meta()
         network_settings = meta.get('NetworkSettings', {})

@@ -1,6 +1,7 @@
 from tastypie.test import ResourceTestCase
 from django.contrib.auth.models import User
 from containers.models import Container, Host
+import os
 
 class ContainerResourceTest(ResourceTestCase):
 
@@ -14,7 +15,7 @@ class ContainerResourceTest(ResourceTestCase):
         self.api_key = self.user.api_key.key
         host = Host()
         host.name = 'local'
-        host.hostname = '127.0.0.1'
+        host.hostname = os.getenv('DOCKER_TEST_HOST', '127.0.0.1')
         host.save()
         self.host = host
         self.data = {
@@ -75,6 +76,33 @@ class ContainerResourceTest(ResourceTestCase):
     def test_delete_container(self):
         url = '{}1/'.format(self.api_list_url)
         resp = self.api_client.delete(url, format='json',
+            authentication=self.get_credentials())
+        self.assertHttpAccepted(resp)
+
+    def test_restart_container(self):
+        """
+        Test container restart
+        """
+        url = '{}1/restart/'.format(self.api_list_url)
+        resp = self.api_client.get(url, format='json',
+            authentication=self.get_credentials())
+        self.assertHttpAccepted(resp)
+
+    def test_stop_container(self):
+        """
+        Test container stop
+        """
+        url = '{}1/stop/'.format(self.api_list_url)
+        resp = self.api_client.get(url, format='json',
+            authentication=self.get_credentials())
+        self.assertHttpAccepted(resp)
+
+    def test_destroy_container(self):
+        """
+        Test container destroy
+        """
+        url = '{}1/destroy/'.format(self.api_list_url)
+        resp = self.api_client.get(url, format='json',
             authentication=self.get_credentials())
         self.assertHttpAccepted(resp)
 
