@@ -135,12 +135,27 @@ stderr_logfile=/var/log/shipyard/redis.err
 EOF
 fi
 
-if [ -z "$APP_COMPONENTS" ] || [ ! -z "`echo $APP_COMPONENTS | grep worker`" ] ; then
+if [ -z "$APP_COMPONENTS" ] || [ ! -z "`echo $APP_COMPONENTS | grep master-worker`" ] ; then
+    cat << EOF >> $SUPERVISOR_CONF
+[program:master-worker]
+priority=99
+directory=/opt/apps/shipyard
+command=/opt/ve/shipyard/bin/python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E -c 4
+user=root
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/shipyard/master-worker.log
+stderr_logfile=/var/log/shipyard/master-worker.err
+
+EOF
+fi
+
+if [ ! -z "`echo $APP_COMPONENTS | grep "^worker"`" ] ; then
     cat << EOF >> $SUPERVISOR_CONF
 [program:worker]
 priority=99
 directory=/opt/apps/shipyard
-command=/opt/ve/shipyard/bin/python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E -c 4
+command=/opt/ve/shipyard/bin/python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler -E -c 4
 user=root
 autostart=true
 autorestart=true
