@@ -11,12 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from django.http import Http404, HttpResponse
 from tastypie import fields
 from tastypie.resources import Resource
 from tastypie.bundle import Bundle
 from tastypie.authorization import Authorization
 from tastypie.authentication import (ApiKeyAuthentication,
     SessionAuthentication, MultiAuthentication)
+from django.conf.urls import url
+from tastypie.utils import trailing_slash
 from containers.models import Container, Host
 from hosts.api import HostResource
 from django.contrib.auth.models import User
@@ -41,6 +44,62 @@ class ContainerResource(Resource):
             ApiKeyAuthentication(), SessionAuthentication())
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'delete']
+
+    def prepend_urls(self):
+        return [
+            url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)/restart%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('restart'), name="api_restart"),
+            url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)/stop%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('stop'), name="api_stop"),
+            url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)/destroy%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('destroy'), name="api_destroy"),
+        ]
+    
+    def _container_action(self, action, request, **kwargs):
+        """
+        Container actions
+
+        :param action: Action to perform (restart, stop, destroy)
+        :param request: Request object
+
+        """
+        self.method_check(request, allowed=['get'])
+        self.is_authenticated(request)
+        self.throttle_check(request)
+
+        c_id = kwargs.get('pk')
+        if not c_id:
+            return HttpResponse(status=404)
+        try:
+            container = Container.objects.get(id=c_id)
+        except Container.DoesNotExist:
+            return HttpResponse(status=404)
+        actions = {
+            'restart': container.restart,
+            'stop': container.stop,
+            'destroy': container.destroy,
+            }
+        actions[action]()
+        self.log_throttled_access(request)
+        return HttpResponse(status=204)
+        
+    def restart(self, request, **kwargs):
+        """
+        Custom view for restarting containers
+
+        """
+        return self._container_action('restart', request, **kwargs)
+
+    def stop(self, request, **kwargs):
+        """
+        Custom view for stopping containers
+
+        """
+        return self._container_action('stop', request, **kwargs)
+
+    def destroy(self, request, **kwargs):
+        """
+        Custom view for destroying containers
+
+        """
+        return self._container_action('destroy', request, **kwargs)
 
     def detail_uri_kwargs(self, bundle_or_obj):
         kwargs = {}
