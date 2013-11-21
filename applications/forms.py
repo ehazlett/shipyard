@@ -65,7 +65,7 @@ class ApplicationForm(forms.ModelForm):
             if not port_proto in container_ports:
                 msg = _(u'Port %s is not available on the selected containers.' % port_proto)
                 self._errors['backend_port'] = self.error_class([msg])
-            if not container_ports.get(port_proto).get(interface):
+            if not container_ports.get(port_proto, {}).get(interface):
                 msg = _(u'Port %s is not bound to the interface %s on the selected containers.' % (port_proto, interface))
                 self._errors['host_interface'] = self.error_class([msg])
 
