@@ -61,7 +61,10 @@ def update_hipache(app_id=None):
             for c in app.containers.all():
                 port_proto = "{0}/tcp".format(app.backend_port)
                 host_interface = app.host_interface or '0.0.0.0'
-                hostname = c.host.hostname if host_interface == '0.0.0.0' else host_interface
+                hostname = c.host.public_hostname or \
+                        c.host.hostname if host_interface == '0.0.0.0' else \
+                        host_interface
+                # check for unix socket
                 port = c.get_ports()[port_proto][host_interface]
                 upstream = '{0}://{1}:{2}'.format(app.protocol, hostname, port)
                 pipe.rpush(domain_key, upstream)

@@ -28,6 +28,7 @@ class HostForm(forms.ModelForm):
                 None,
                 'name',
                 'hostname',
+                'public_hostname',
                 'port',
             ),
             FormActions(
@@ -46,5 +47,5 @@ class HostForm(forms.ModelForm):
 
     class Meta:
         model = Host
-        fields = ('name', 'hostname', 'port')
+        fields = ('name', 'hostname', 'public_hostname', 'port')
 
