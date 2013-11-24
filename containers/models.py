@@ -35,7 +35,7 @@ class Host(models.Model):
         unique=True)
     hostname = models.CharField(max_length=128, null=True,
             unique=True, help_text=_('Host/IP/Socket to connect to Docker'))
-    public_hostname = models.CharField(max_length=128, null=True,
+    public_hostname = models.CharField(max_length=128, null=True, blank=True,
             help_text=_('Hostname/IP used for applications (if different from hostname)'))
     port = models.SmallIntegerField(null=True, default=4243)
     enabled = models.NullBooleanField(null=True, default=True)
