@@ -57,8 +57,8 @@ class Application(models.Model):
         utils.update_hipache(self.id)
 
 def update_application_config(sender, **kwargs):
+    # signal used for updating the manytomany containers field
     app = kwargs.get('instance')
-    action = kwargs.get('action', '')
     app.save()
     utils.update_hipache(app.id)
 
