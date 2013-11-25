@@ -40,13 +40,15 @@ def get_image_choices():
 
 class CreateContainerForm(forms.Form):
     image = forms.ChoiceField(required=True)
+    name = forms.CharField(required=False, help_text=_('container name (used in links)'))
     description = forms.CharField(required=False)
     command = forms.CharField(required=False)
     memory = forms.CharField(required=False, max_length=8,
         help_text='Memory in MB')
     environment = forms.CharField(required=False,
         help_text='key=value space separated pairs')
-    ports = forms.CharField(required=False, help_text='space separated (i.e. 8000 8001:8001 127.0.0.1:80:80 )')
+    ports = forms.CharField(required=False, help_text=_('space separated (i.e. 8000 8001:8001 127.0.0.1:80:80 )'))
+    links = forms.CharField(required=False, help_text=_('space separated (i.e. redis:db)'))
     volume = forms.CharField(required=False, help_text='container volume (i.e. /mnt/volume)')
     volumes_from = forms.CharField(required=False,
         help_text='mount volumes from specified container')
@@ -61,11 +63,13 @@ class CreateContainerForm(forms.Form):
             Fieldset(
                 None,
                 'image',
+                'name',
                 'command',
                 'description',
                 'memory',
                 'environment',
                 'ports',
+                'links',
                 'volume',
                 'volumes_from',
                 'hosts',
