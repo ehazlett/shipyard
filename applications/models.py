@@ -56,8 +56,15 @@ class Application(models.Model):
     def update_config(self):
         utils.update_hipache(self.id)
 
+def update_application_config(sender, **kwargs):
+    app = kwargs.get('instance')
+    action = kwargs.get('action', '')
+    app.save()
+    utils.update_hipache(app.id)
+
 def remove_application_config(sender, **kwargs):
     app = kwargs.get('instance')
     utils.remove_hipache_config(app.domain_name)
 
+m2m_changed.connect(update_application_config, sender=Application.containers.through)
 pre_delete.connect(remove_application_config, sender=Application)
