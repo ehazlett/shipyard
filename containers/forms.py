@@ -41,6 +41,7 @@ def get_image_choices():
 class CreateContainerForm(forms.Form):
     image = forms.ChoiceField(required=True)
     name = forms.CharField(required=False, help_text=_('container name (used in links)'))
+    hostname = forms.CharField(required=False)
     description = forms.CharField(required=False)
     command = forms.CharField(required=False)
     memory = forms.CharField(required=False, max_length=8,
@@ -64,6 +65,7 @@ class CreateContainerForm(forms.Form):
                 None,
                 'image',
                 'name',
+                'hostname',
                 'command',
                 'description',
                 'memory',

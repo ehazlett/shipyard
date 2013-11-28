@@ -74,6 +74,7 @@ def create_container(request):
         if form.is_valid():
             image = form.data.get('image')
             name = form.data.get('name')
+            hostname = form.data.get('hostname')
             environment = form.data.get('environment')
             command = form.data.get('command')
             memory = form.data.get('memory', 0)
@@ -125,7 +126,8 @@ def create_container(request):
                     environment=environment, memory=memory,
                     description=form.data.get('description'), volumes=volume,
                     volumes_from=volumes_from, privileged=privileged,
-                    binds=binds, links=links, name=name, owner=user)
+                    binds=binds, links=links, name=name, owner=user,
+                    hostname=hostname)
             if hosts:
                 if status:
                     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
