@@ -27,6 +27,19 @@ HIPACHE_SSL_CERT=${HIPACHE_SSL_CERT:-}
 HIPACHE_SSL_KEY=${HIPACHE_SSL_KEY:-}
 NGINX_RESOLVER=${NGINX_RESOLVER:-`cat /etc/resolv.conf | grep ^nameserver | head -1 | awk '{ print $2; }'`}
 SUPERVISOR_CONF=/opt/supervisor.conf
+
+echo "App Components: ${APP_COMPONENTS}"
+
+# if linked, specify db type
+if [ ! -z "$DB_PORT_5432_TCP_ADDR" ] ; then
+    DB_TYPE=postgresql_psycopg2
+    DB_NAME=${DB_ENV_DB_NAME:-shipyard}
+    DB_USER=${DB_ENV_DB_USER:-shipyard}
+    DB_PASS=${DB_ENV_DB_PASS:-shipyard}
+    DB_HOST=${DB_PORT_5432_TCP_ADDR}
+    DB_PORT=${DB_PORT_5432_TCP_PORT}
+fi
+
 mkdir -p $LOG_DIR
 cd $APP_DIR
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
