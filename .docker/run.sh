@@ -2,6 +2,7 @@
 APP_COMPONENTS="$*"
 APP_DIR=/opt/apps/shipyard
 ADMIN_PASS=${ADMIN_PASS:-}
+CELERY_WORKERS=${CELERY_WORKERS:-4}
 REDIS_HOST=${REDIS_HOST:-127.0.0.1}
 REDIS_PORT=${REDIS_PORT:-6379}
 DB_TYPE=${DB_TYPE:-sqlite3}
@@ -153,7 +154,7 @@ if [ -z "$APP_COMPONENTS" ] || [ ! -z "`echo $APP_COMPONENTS | grep master-worke
 [program:master-worker]
 priority=99
 directory=/opt/apps/shipyard
-command=/opt/ve/shipyard/bin/python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E -c 4
+command=/opt/ve/shipyard/bin/python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E -c ${CELERY_WORKERS}
 user=root
 autostart=true
 autorestart=true
@@ -168,7 +169,7 @@ if [ ! -z "`echo $APP_COMPONENTS | grep "^worker"`" ] ; then
 [program:worker]
 priority=99
 directory=/opt/apps/shipyard
-command=/opt/ve/shipyard/bin/python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler -E -c 4
+command=/opt/ve/shipyard/bin/python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler -E -c ${CELERY_WORKERS}
 user=root
 autostart=true
 autorestart=true
