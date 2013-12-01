@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from fabric.api import sudo, run, cd, env, execute
+from fabric.api import sudo, run, cd, env, execute, put
 import fabric.state
 from fabric.decorators import task, with_settings
 from fabric.context_managers import settings, hide
 from random import Random
+import os
 import string
 import sys
 fabric.state.output['running'] = False
@@ -44,7 +45,7 @@ def install_docker():
         sudo('apt-get install -y linux-image-generic-lts-raring linux-headers-generic-lts-raring')
         sudo('sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"')
         sudo('sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"')
-        print('* You will need to reboot in order to use the new kernel and aufs modules') 
+        print('* You will need to reboot in order to use the new kernel and aufs module') 
         reboot_needed = True
     else:
         sudo('apt-get install -y linux-image-extra-`uname -r`')
@@ -56,6 +57,13 @@ def install_docker():
     # check ufw
     sudo("sed -i 's/^DEFAULT_FORWARD_POLICY.*/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw")
     sudo('service ufw restart')
+    # set to listen on local addr
+    local_ip = run("ifconfig eth0 | grep 'inet addr:' | cut -d':' -f2 | awk '{ print $1; }'")
+    with open('.tmpcfg', 'w') as f:
+        f.write('DOCKER_OPTS="-H unix:///var/run/docker.sock -H tcp://{}:4243"'.format(local_ip))
+    put('.tmpcfg', '/etc/default/docker', use_sudo=True)
+    os.remove('.tmpcfg')
+    sudo('service docker restart')
     if reboot_needed:
         print('Setup complete.  Rebooting...')
         sudo('reboot')
@@ -115,6 +123,7 @@ def setup_load_balancer(redis_host=None, upstreams=''):
             sudo('docker pull shipyard/lb')
             sudo('docker run -i -t -d -p 80:80 -name shipyard_lb -e REDIS_HOST={} -e APP_ROUTER_UPSTREAMS={} shipyard/lb'.format(redis_host, upstreams))
             print('-  Shipyard Load Balancer started')
+            print('-  Update DNS to use {} for your Shipyard Domain'.format(env.host_string))
 
 @task
 def setup_shipyard_db(db_pass=None):
@@ -156,12 +165,10 @@ def setup(lb_host=None, core_host=None):
     print(':: Configuring Redis on {}'.format(env.host_string))
     execute(setup_redis)
     # setup app router
-    env.host_string = core_host
     print(':: Configuring Router on {}'.format(env.host_string))
     ret = execute(setup_app_router, lb_host)
     h, upstream = ret.popitem()
     # setup lb
-    env.host_string = lb_host
     print(':: Configuring Load Balancer on {}'.format(env.host_string))
     execute(setup_load_balancer, lb_host, upstream)
     # setup shipyard
