@@ -57,7 +57,7 @@ def install_docker():
         sudo('sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"')
         sudo('sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"')
     sudo('apt-get update')
-    sudo('apt-get install -y lxc-docker')
+    sudo('apt-get install -y lxc-docker git-core')
     sudo('echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf ; sysctl -p /etc/sysctl.conf')
     # check ufw
     sudo("sed -i 's/^DEFAULT_FORWARD_POLICY.*/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw")
