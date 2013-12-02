@@ -95,7 +95,7 @@ class Host(models.Model):
                     c_ids.append(c.get('Id'))
             # return metadata objects
             containers = Container.objects.filter(container_id__in=c_ids).filter(
-                Q(owner=None) | Q(owner=owner))
+                Q(owner=None) | Q(owner=owner)).order_by('id')
         return containers
 
     def invalidate_cache(self):

@@ -19,6 +19,8 @@ from random import Random
 import os
 import string
 import sys
+import json
+import time
 fabric.state.output['running'] = False
 env.output_prefix = False
 
@@ -33,6 +35,9 @@ def check_valid_os(*args, **kwargs):
         out = run('which apt-get')
         if out == '':
             raise StandardError('Only Debian/Ubuntu are supported.  Sorry.')
+
+def get_local_ip():
+    return run("ifconfig eth0 | grep 'inet addr:' | cut -d':' -f2 | awk '{ print $1; }'")
 
 @task
 def install_docker():
@@ -58,7 +63,7 @@ def install_docker():
     sudo("sed -i 's/^DEFAULT_FORWARD_POLICY.*/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw")
     sudo('service ufw restart')
     # set to listen on local addr
-    local_ip = run("ifconfig eth0 | grep 'inet addr:' | cut -d':' -f2 | awk '{ print $1; }'")
+    local_ip = get_local_ip()
     with open('.tmpcfg', 'w') as f:
         f.write('DOCKER_OPTS="-H unix:///var/run/docker.sock -H tcp://{}:4243"'.format(local_ip))
     put('.tmpcfg', '/etc/default/docker', use_sudo=True)
@@ -156,6 +161,28 @@ def setup_shipyard(redis_host=None, admin_pass=None):
             sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard app master-worker'.format(
                 redis_host, admin_pass))
             print('-  Shipyard started with credentials: admin:{}'.format(admin_pass))
+            while True:
+                with settings(warn_only=True):
+                    out = run('wget -O- --connect-timeout=1 http://{}:5000/'.format(env.host_string))
+                    if out.find('Shipyard Project') != -1:
+                        break
+                    time.sleep(1)
+            hostname = run('hostname')
+            local_ip = get_local_ip()
+            # add current host to api
+            host_data = {
+                'name': hostname,
+                'hostname': local_ip,
+                'public_hostname': env.host_string,
+                'port': 4243,
+                'enabled': True,
+            }
+            host_json = json.dumps(host_data)
+            user_json = run('curl -d "username=admin&password={}" http://{}:5000/api/login'.format(admin_pass, env.host_string))
+            user_data = json.loads(user_json)
+            api_key = user_data.get('api_key')
+            # add host
+            run('curl -H "Authorization: ApiKey admin:{}" -d "{}" -H "Content-type: application/json" http://{}:5000/api/v1/hosts/'.format(admin_pass, host_json, env.host_string))
         print('-  Shipyard available on http://{}:5000'.format(env.host_string))
 
 @task
