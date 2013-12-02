@@ -1,5 +1,5 @@
 # Dec. 1, 2013
-Release: d9d2b452
+Release: [d9d2b452](https://github.com/shipyard/shipyard/commit/d9d2b452)
 
 This release adds various fixes and updates for Docker 0.7 support.
 
