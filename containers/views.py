@@ -75,6 +75,7 @@ def create_container(request):
             image = form.data.get('image')
             name = form.data.get('name')
             hostname = form.data.get('hostname')
+            description = form.data.get('description')
             environment = form.data.get('environment')
             command = form.data.get('command')
             memory = form.data.get('memory', 0)
@@ -124,7 +125,7 @@ def create_container(request):
                     user = request.user
                 c_id, status = host.create_container(image, command, ports,
                     environment=environment, memory=memory,
-                    description=form.data.get('description'), volumes=volume,
+                    description=description, volumes=volume,
                     volumes_from=volumes_from, privileged=privileged,
                     binds=binds, links=links, name=name, owner=user,
                     hostname=hostname)
@@ -226,6 +227,7 @@ def _create_container(request):
             environment=environment, memory=memory,
             description=form.data.get('description'), volumes=volume,
             volumes_from=volumes_from, privileged=privileged, owner=user)
+        print(c_id)
     if hosts:
         if status:
             messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
@@ -270,12 +272,11 @@ def destroy_container(request, host, container_id):
 @login_required
 def attach_container(request, host, container_id):
     h = Host.objects.get(name=host)
-    c_id = utils.get_short_id(container_id)
-    c = Container.objects.get(container_id=c_id)
+    c = Container.objects.get(container_id=container_id)
     session_id = utils.generate_console_session(h, c)
     ctx = {
-        'container_id': c_id,
-        'container_name': c.description or c_id,
+        'container_id': container_id,
+        'container_name': c.description or container_id,
         'ws_url': 'ws://{0}/console/{1}/'.format(request.META['HTTP_HOST'], session_id),
     }
     return render_to_response("containers/attach.html", ctx,

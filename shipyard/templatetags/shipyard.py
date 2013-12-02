@@ -103,3 +103,7 @@ def container_cpu(value):
 @register.filter()
 def split(value, arg):
     return value.split(arg)
+
+@register.filter()
+def get_short_id(value):
+    return value[:12]

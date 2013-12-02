@@ -92,7 +92,7 @@ class Host(models.Model):
             c_ids = []
             for h in hosts:
                 for c in h.get_containers(show_all=show_all):
-                    c_ids.append(utils.get_short_id(c.get('Id')))
+                    c_ids.append(c.get('Id'))
             # return metadata objects
             containers = Container.objects.filter(container_id__in=c_ids).filter(
                 Q(owner=None) | Q(owner=owner))
@@ -114,8 +114,7 @@ class Host(models.Model):
                 containers = []
             # update meta data
             for x in containers:
-                # only get first 12 chars of id (for metatdata)
-                c_id = utils.get_short_id(x.get('Id'))
+                c_id = x.get('Id')
                 # ignore stopped containers
                 self._load_container_data(c_id)
                 container_ids.append(c_id)
@@ -207,19 +206,18 @@ class Host(models.Model):
         self.get_containers()
         # update hipache
         container = Container.objects.get(
-            container_id=utils.get_short_id(container_id))
+            container_id=container_id)
         apps = Application.objects.filter(containers__in=[container])
         for app in apps:
             app.update_config()
 
     def stop_container(self, container_id=None):
-        c_id = utils.get_short_id(container_id)
-        c = Container.objects.get(container_id=c_id)
+        c = Container.objects.get(container_id=container_id)
         if c.protected:
             raise ProtectedContainerError(
                 _('Unable to stop container.  Container is protected.'))
         c = self._get_client()
-        c.stop(c_id)
+        c.stop(container_id)
         self._invalidate_container_cache()
 
     def get_container_logs(self, container_id=None):
@@ -227,20 +225,19 @@ class Host(models.Model):
         return c.logs(container_id)
 
     def destroy_container(self, container_id=None):
-        c_id = utils.get_short_id(container_id)
-        c = Container.objects.get(container_id=c_id)
+        c = Container.objects.get(container_id=container_id)
         if c.protected:
             raise ProtectedContainerError(
                 _('Unable to destroy container.  Container is protected.'))
         c = self._get_client()
         try:
-            c.kill(c_id)
-            c.remove_container(c_id)
+            c.kill(container_id)
+            c.remove_container(container_id)
         except client.APIError:
             # ignore 404s from api if container not found
             pass
         # remove metadata
-        Container.objects.filter(container_id=c_id).delete()
+        Container.objects.filter(container_id=container_id).delete()
         self._invalidate_container_cache()
 
     def import_image(self, repository=None):
@@ -263,8 +260,7 @@ class Host(models.Model):
         self._invalidate_image_cache()
 
     def clone_container(self, container_id=None):
-        c_id = utils.get_short_id(container_id)
-        c = Container.objects.get(container_id=c_id)
+        c = Container.objects.get(container_id=container_id)
         meta = c.get_meta()
         cfg = meta.get('Config')
         image = cfg.get('Image')
@@ -297,7 +293,7 @@ class Container(models.Model):
     protected = models.BooleanField(default=False)
 
     def __unicode__(self):
-        d = self.container_id
+        d = self.get_short_id()
         if d and self.description:
             d += ' ({0})'.format(self.description)
         return d
@@ -310,7 +306,7 @@ class Container(models.Model):
             c_ids = []
             for h in hosts:
                 for c in h.get_containers():
-                    c_ids.append(utils.get_short_id(c.get('Id')))
+                    c_ids.append(c.get('Id'))
             # return metadata objects
             containers = Container.objects.filter(container_id__in=c_ids).filter(
                 Q(owner=None))
@@ -326,6 +322,9 @@ class Container(models.Model):
 
     def get_meta(self):
         return json.loads(self.meta)
+
+    def get_short_id(self):
+        return self.container_id[:12]
 
     def get_applications(self):
         from applications.models import Application
@@ -369,7 +368,7 @@ class Container(models.Model):
         return mem
 
     def get_name(self):
-        d = self.container_id
+        d = self.get_short_id()
         if self.description:
             d = self.description
         return d
