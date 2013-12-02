@@ -52,6 +52,28 @@ def login(request):
     return render_to_response('accounts/login.html',
         context_instance=RequestContext(request))
 
+@require_http_methods(["POST"])
+@csrf_exempt
+def api_login(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+    user = authenticate(username=username, password=password)
+    data = {}
+    status = 200
+    if user is not None:
+        if user.is_active:
+            data['status'] = 'success'
+            data['email'] = user.email
+            data['api_key'] = user.api_key.key
+            data['username'] = username
+        else:
+            data['status'] = 'account is disabled'
+            status = 403
+    else:
+        data['status'] = 'access denied'
+        status = 401
+    return HttpResponse(json.dumps(data), status=status)
+
 def logout(request):
     logout_user(request)
     return redirect(reverse('index'))

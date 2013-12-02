@@ -27,6 +27,7 @@ v1_api.register(HostResource())
 
 urlpatterns = patterns('',
     url(r'^$', 'shipyard.views.index', name='index'),
+    url(r'^api/login', 'accounts.views.api_login', name='api_login'),
     url(r'^api/', include(v1_api.urls)),
     url(r'^accounts/', include('accounts.urls')),
     url(r'^applications/', include('applications.urls')),
