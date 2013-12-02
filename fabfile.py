@@ -182,7 +182,7 @@ def setup_shipyard(redis_host=None, admin_pass=None):
             user_data = json.loads(user_json)
             api_key = user_data.get('api_key')
             # add host
-            run('curl -H "Authorization: ApiKey admin:{}" -d "{}" -H "Content-type: application/json" http://{}:5000/api/v1/hosts/'.format(admin_pass, host_json, env.host_string))
+            run('curl -H "Authorization: ApiKey admin:{}" -d \'{}\' -H "Content-type: application/json" http://{}:5000/api/v1/hosts/'.format(api_key, host_json, env.host_string))
         print('-  Shipyard available on http://{}:5000'.format(env.host_string))
 
 @task
