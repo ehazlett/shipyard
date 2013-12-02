@@ -1,4 +1,6 @@
 # Dec. 1, 2013
+Release: d9d2b452
+
 This release adds various fixes and updates for Docker 0.7 support.
 
 * All container operations now use full container IDs (will still show short IDs in UI)
