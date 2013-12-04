@@ -31,7 +31,7 @@ SUPERVISOR_CONF=/opt/supervisor.conf
 
 echo "App Components: ${APP_COMPONENTS}"
 
-# if linked, specify db type
+# check for db link
 if [ ! -z "$DB_PORT_5432_TCP_ADDR" ] ; then
     DB_TYPE=postgresql_psycopg2
     DB_NAME=${DB_ENV_DB_NAME:-shipyard}
@@ -40,7 +40,11 @@ if [ ! -z "$DB_PORT_5432_TCP_ADDR" ] ; then
     DB_HOST=${DB_PORT_5432_TCP_ADDR}
     DB_PORT=${DB_PORT_5432_TCP_PORT}
 fi
-
+# check for redis link
+if [ ! -z "$REDIS_PORT_6379_TCP_ADDR" ] ; then
+    REDIS_HOST=${REDIS_PORT_6379_TCP_ADDR:-$REDIS_HOST}
+    REDIS_PORT=${REDIS_PORT_6379_TCP_PORT:-$REDIS_PORT}
+fi
 mkdir -p $LOG_DIR
 cd $APP_DIR
 echo "REDIS_HOST=\"$REDIS_HOST\"" > $CONFIG
