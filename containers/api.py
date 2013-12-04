@@ -144,7 +144,7 @@ class ContainerResource(Resource):
             data = bundle.data
             c_id, status = host.create_container(**data)
             bundle.obj = Container.objects.get(
-                container_id=utils.get_short_id(c_id))
+                container_id=c_id)
         bundle = self.full_hydrate(bundle)
         return bundle
 

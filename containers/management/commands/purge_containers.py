@@ -9,7 +9,7 @@ class Command(BaseCommand):
         hosts = Host.objects.filter(enabled=True)
         all_containers = [x.container_id for x in Container.objects.all()]
         for host in hosts:
-            host_containers = [utils.get_short_id(c.get('Id')) \
+            host_containers = [c.get('Id') \
                 for c in host.get_containers(show_all=True)]
             for c in all_containers:
                 if c not in host_containers:
