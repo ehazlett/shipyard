@@ -24,6 +24,8 @@ from containers.models import Container, Host
 from hosts.api import HostResource
 from django.contrib.auth.models import User
 from shipyard import utils
+import time
+import socket
 
 def get_containers():
     valid_container_ids = [x.container_id for x in Host.get_all_containers()]
@@ -134,17 +136,43 @@ class ContainerResource(Resource):
         """
         # HACK: get host id -- this should probably be some type of
         # reverse lookup from tastypie
+        if not bundle.data.has_key('hosts'):
+            raise StandardError('You must specify hosts')
         host_urls = bundle.data.get('hosts')
         # remove 'hosts' from data and pass rest to create_container
         del bundle.data['hosts']
+        containers = []
         # launch on hosts
         for host_url in host_urls:
             host_id = host_url.split('/')[-2]
             host = Host.objects.get(id=host_id)
             data = bundle.data
             c_id, status = host.create_container(**data)
-            bundle.obj = Container.objects.get(
-                container_id=c_id)
+            obj = Container.objects.get(container_id=c_id)
+            bundle.obj = obj
+            containers.append(obj)
+        # wait for containers if port is specified and requested
+        if bundle.request.GET.has_key('wait') == True:
+            # check for timeout override
+            try:
+                timeout = int(bundle.request.GET.get('wait'))
+            except Exception, e:
+                timeout = 60
+            print('Using timeout: {}'.format(timeout))
+            for c in containers:
+                # wait for port to be available
+                count = 0
+                c_id = c.container_id
+                while True:
+                    if count > timeout:
+                        break
+                    # reload meta to get NAT port
+                    c.host._load_container_data(c.container_id)
+                    c = Container.objects.get(container_id=c_id)
+                    if c.is_available():
+                        break
+                    count += 1
+                    time.sleep(1)
         bundle = self.full_hydrate(bundle)
         return bundle
 
