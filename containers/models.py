@@ -24,6 +24,7 @@ from shipyard import utils
 import json
 import hashlib
 import requests
+import socket
 from shipyard.exceptions import ProtectedContainerError
 
 HOST_CACHE_TTL = getattr(settings, 'HOST_CACHE_TTL', 15)
@@ -151,6 +152,8 @@ class Host(models.Model):
         environment=[], memory=0, description='', volumes=None, volumes_from='',
         privileged=False, binds=None, links=None, name=None, owner=None, hostname=None):
 
+        if isinstance(ports, str):
+            ports = ports.split(',')
         if self.version < '0.6.5':
             port_exposes = ports
             port_bindings = None
@@ -259,6 +262,13 @@ class Host(models.Model):
         c.remove_image(image_id)
         self._invalidate_image_cache()
 
+    def get_hostname(self):
+        # returns public_hostname if available otherwise default
+        host = self.hostname
+        if self.public_hostname:
+            host = self.public_hostname
+        return host
+
     def clone_container(self, container_id=None):
         c = Container.objects.get(container_id=container_id)
         meta = c.get_meta()
@@ -321,7 +331,10 @@ class Container(models.Model):
             return False
 
     def get_meta(self):
-        return json.loads(self.meta)
+        meta = {}
+        if self.meta:
+            meta = json.loads(self.meta)
+        return meta
 
     def get_short_id(self):
         return self.container_id[:12]
@@ -329,6 +342,39 @@ class Container(models.Model):
     def get_applications(self):
         from applications.models import Application
         return Application.objects.filter(containers__in=[self])
+
+    def is_available(self):
+        """
+        This will run through all ExposedPorts and attempt a connect.  If
+        successful, returns True.  If there are no ExposedPorts, it is assumed
+        that the container has completed and is available.
+
+        """
+        meta = self.get_meta()
+        exposed_ports = meta.get('Config', {}).get('ExposedPorts', [])
+        available = True
+        port_checks = []
+        host = self.host.get_hostname()
+        # attempt to connect to check availability
+        meta_net = meta.get('NetworkSettings')
+        if meta_net.get('Ports') and len(meta_net.get('Ports')) != 0:
+            for e_port in exposed_ports:
+                ports = meta_net.get('Ports')
+                port_defs = ports[e_port]
+                if port_defs:
+                    port = port_defs[0].get('HostPort')
+                    try:
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        s.settimeout(1)
+                        s.connect((host, int(port)))
+                        port_checks.append(True)
+                        continue
+                    except Exception, e:
+                        port_checks.append(False)
+                        s.close()
+            if port_checks and False in port_checks:
+                available = False
+        return available
 
     def restart(self):
         return self.host.restart_container(container_id=self.container_id)
@@ -355,7 +401,7 @@ class Container(models.Model):
                     ports[port_proto] = { '0.0.0.0': external_port }
         else:
             # for versions after docker v0.6.5
-            for port_proto, host_list in network_settings.get('Ports').items():
+            for port_proto, host_list in network_settings.get('Ports', {}).items():
                 for host in host_list or []:
                     ports[port_proto] = { host.get('HostIp'): host.get('HostPort') }
         return ports
