@@ -123,20 +123,19 @@ def create_container(request):
                 host = Host.objects.get(id=i)
                 if private:
                     user = request.user
-                c_id, status = host.create_container(image, command, ports,
-                    environment=environment, memory=memory,
-                    description=description, volumes=volume,
-                    volumes_from=volumes_from, privileged=privileged,
-                    binds=binds, links=links, name=name, owner=user,
-                    hostname=hostname)
-            if hosts:
-                if status:
+                try:
+                    c_id, status = host.create_container(image, command, ports,
+                        environment=environment, memory=memory,
+                        description=description, volumes=volume,
+                        volumes_from=volumes_from, privileged=privileged,
+                        binds=binds, links=links, name=name, owner=user,
+                        hostname=hostname)
                     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
                         image))
-                else:
-                    messages.add_message(request, messages.ERROR,
-                        _('Container failed to start'))
-            else:
+                except Exception, e:
+                    messages.error(request, e)
+                    status = False
+            if not hosts:
                 messages.add_message(request, messages.ERROR, _('No hosts selected'))
             return redirect(reverse('containers.views.index'))
     ctx = {

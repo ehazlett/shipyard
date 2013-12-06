@@ -150,7 +150,8 @@ class Host(models.Model):
 
     def create_container(self, image=None, command=None, ports=[],
         environment=[], memory=0, description='', volumes=None, volumes_from='',
-        privileged=False, binds=None, links=None, name=None, owner=None, hostname=None):
+        privileged=False, binds=None, links=None, name=None, owner=None,
+        hostname=None, **kwargs):
 
         if isinstance(ports, str):
             ports = ports.split(',')
@@ -181,10 +182,10 @@ class Host(models.Model):
                 ports=port_exposes, mem_limit=memory, tty=True, stdin_open=True,
                 environment=environment, volumes=volumes,
                 volumes_from=volumes_from, privileged=privileged, name=name,
-                hostname=hostname)
-        except:
-            import traceback
-            traceback.print_exc()
+                hostname=hostname, **kwargs)
+        except Exception, e:
+            raise StandardError('There was an error starting the container: {}'.format(
+                e.explanation))
         c_id = cnt.get('Id')
         c.start(c_id, binds=binds, port_bindings=port_bindings, links=links)
         status = False
