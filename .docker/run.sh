@@ -34,15 +34,15 @@ echo "App Components: ${APP_COMPONENTS}"
 # check for db link
 if [ ! -z "$DB_PORT_5432_TCP_ADDR" ] ; then
     DB_TYPE=postgresql_psycopg2
-    DB_NAME=${DB_ENV_DB_NAME:-shipyard}
-    DB_USER=${DB_ENV_DB_USER:-shipyard}
-    DB_PASS=${DB_ENV_DB_PASS:-shipyard}
-    DB_HOST=${DB_PORT_5432_TCP_ADDR}
+    DB_NAME="${DB_ENV_DB_NAME:-shipyard}"
+    DB_USER="${DB_ENV_DB_USER:-shipyard}"
+    DB_PASS="${DB_ENV_DB_PASS:-shipyard}"
+    DB_HOST="${DB_PORT_5432_TCP_ADDR}"
     DB_PORT=${DB_PORT_5432_TCP_PORT}
 fi
 # check for redis link
 if [ ! -z "$REDIS_PORT_6379_TCP_ADDR" ] ; then
-    REDIS_HOST=${REDIS_PORT_6379_TCP_ADDR:-$REDIS_HOST}
+    REDIS_HOST="${REDIS_PORT_6379_TCP_ADDR:-$REDIS_HOST}"
     REDIS_PORT=${REDIS_PORT_6379_TCP_PORT:-$REDIS_PORT}
 fi
 mkdir -p $LOG_DIR
