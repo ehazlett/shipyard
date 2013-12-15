@@ -2,6 +2,7 @@
 APP_COMPONENTS="$*"
 APP_DIR=/opt/apps/shipyard
 ADMIN_PASS=${ADMIN_PASS:-}
+DEBUG=${DEBUG:-True}
 CELERY_WORKERS=${CELERY_WORKERS:-4}
 REDIS_HOST=${REDIS_HOST:-127.0.0.1}
 REDIS_PORT=${REDIS_PORT:-6379}
@@ -60,6 +61,7 @@ DATABASES = {
         'PORT': '${DB_PORT}',
     }
 }
+DEBUG = ${DEBUG}
 EOF
 # hipache config
 cat << EOF > $HIPACHE_CONFIG
