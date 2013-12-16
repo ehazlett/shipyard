@@ -40,6 +40,12 @@ def get_local_ip():
     return run("ifconfig eth0 | grep 'inet addr:' | cut -d':' -f2 | awk '{ print $1; }'")
 
 @task
+def install_core_dependencies():
+    check_valid_os()
+    with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
+        sudo('apt-get install -y curl wget')
+
+@task
 def install_docker():
     check_valid_os()
     print(':: Installing Docker')
@@ -158,7 +164,7 @@ def setup_shipyard(redis_host=None, admin_pass=None):
             build = out.return_code
         if build:
             sudo('docker pull shipyard/shipyard')
-            sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard app master-worker'.format(
+            sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e DEBUG=False -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard app master-worker'.format(
                 redis_host, admin_pass))
             print('-  Shipyard started with credentials: admin:{}'.format(admin_pass))
             while True:
@@ -189,6 +195,8 @@ def setup_shipyard(redis_host=None, admin_pass=None):
 def setup(lb_host=None, core_host=None):
     # setup redis
     env.host_string = lb_host
+    print(':: Installing Dependencies on {}'.format(env.host_string))
+    execute(install_core_dependencies)
     print(':: Configuring Redis on {}'.format(env.host_string))
     execute(setup_redis)
     # setup app router
@@ -200,6 +208,8 @@ def setup(lb_host=None, core_host=None):
     execute(setup_load_balancer, lb_host, upstream)
     # setup shipyard
     env.host_string = core_host
+    print(':: Installing Dependencies on {}'.format(env.host_string))
+    execute(install_core_dependencies)
     # generate db_pass
     db_pass = ''.join(Random().sample(string.letters+string.digits, 8))
     admin_pass = ''.join(Random().sample(string.letters+string.digits, 12))
