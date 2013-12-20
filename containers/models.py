@@ -167,7 +167,7 @@ class Host(models.Model):
                     interface, port, mapping = port_parts
                 elif len(port_parts) == 2:
                     interface = ''
-                    port, mapping = port_parts
+                    mapping, port = port_parts
                 else:
                     interface, mapping = ('','')
                     port = port_str
