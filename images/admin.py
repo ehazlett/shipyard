@@ -11,14 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.db import models
-from hosts.models import Host
+from django.contrib import admin
+from images.models import Image
 
-class Image(models.Model):
-    image_id = models.CharField(max_length=96, null=True, blank=True)
-    repository = models.CharField(max_length=96)
-    host = models.ForeignKey(Host, null=True)
-    meta = models.TextField(blank=True, null=True, default='{}')
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ('image_id', 'host')
+    search_fields = ('image_id', 'host__hostname')
 
-    def __unicode__(self):
-        return "{} ({})".format(self.repository, self.image_id[:12])
+admin.site.register(Image, ImageAdmin)

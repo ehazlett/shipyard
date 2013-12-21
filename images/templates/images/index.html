@@ -51,12 +51,10 @@
     </div>
 </div>
 
-
 <div class="panel panel-default">
     <div class="panel-heading heading-large">
         <span class="panel-title section-title">{% trans 'Images' %}</span>
         <span class="section-toolbar">
-            <a href="{% url 'images.views.refresh' %}"><span class="glyphicon glyphicon-refresh"></span></a>
         </span>
         <span class="pull-right">
             <a href="#dialog-import-image" id="import-image" class="btn btn-success btn-sm" data-toggle="modal">{% trans 'Import' %}</a>
@@ -70,19 +68,16 @@
                 <tr>
                     <th>{% trans 'ID' %}</th>
                     <th>{% trans 'Repository' %}</th>
-                    <th>{% trans 'Tag' %}</th>
                     <th>{% trans 'Host' %}</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                {% for h,host_images in images.items %}
-                {% for i in host_images %}
+                {% for i in images %}
                 <tr>
-                    <td>{{i.Id|slice:":12"}}</td>
-                    <td>{{i.Repository}}</td>
-                    <td>{{i.Tag}}</td>
-                    <td>{{h.name}}</td>
+                    <td>{{i.image_id|slice:":12"}}</td>
+                    <td>{{i.repository}}</td>
+                    <td>{{i.host.name}}</td>
                     <td>
                         <div class="btn-group">
                             <a href="#" data-toggle="dropdown">
@@ -90,12 +85,11 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu right">
-                                <li><a href="#" rel="tooltip" class="remove-image" data-url="{% url 'images.views.remove_image' host_id=h.id image_id=i.Id %}">{% trans 'Remove Image' %}</a></li>
+                                <li><a href="#" rel="tooltip" class="remove-image" data-url="{% url 'images.views.remove_image' host_id=i.host.id image_id=i.image_id %}">{% trans 'Remove Image' %}</a></li>
                             </ul>
                         </div>
                     </td>
                 </tr>
-                {% endfor %}
                 {% endfor %}
             </tbody>
         </table>

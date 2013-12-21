@@ -61,96 +61,6 @@ class Host(models.Model):
                 url = 'http://{0}'.format(url)
         return client.Client(base_url=url)
 
-    def _invalidate_container_cache(self):
-        # invalidate cache
-        key = CONTAINER_KEY.format(self.name)
-        try:
-            cache.delete_pattern('*{0}*'.format(key))
-        except: # ignore cache bust errors
-            pass
-
-    def _invalidate_image_cache(self):
-        # invalidate cache
-        cache.delete(IMAGE_KEY.format(self.name))
-
-    def _generate_container_cache_key(self, seed=None):
-        gen_id = hashlib.sha224(self.name + str(seed)).hexdigest()
-        key = '{0}:{1}'.format(CONTAINER_KEY.format(self.name), gen_id)
-        return key
-
-    def _load_container_data(self, container_id):
-        c = self._get_client()
-        meta = c.inspect_container(container_id)
-        m, created = Container.objects.get_or_create(
-            container_id=container_id, host=self)
-        m.is_running = meta.get('State', {}).get('Running', False)
-        m.meta = json.dumps(meta)
-        m.save()
-
-    @classmethod
-    def get_all_containers(cls, show_all=False, owner=None):
-        hosts = Host.objects.filter(enabled=True)
-        containers = []
-        # load containers
-        if hosts:
-            c_ids = []
-            for h in hosts:
-                for c in h.get_containers(show_all=show_all):
-                    c_ids.append(c.get('Id'))
-            # return metadata objects
-            containers = Container.objects.filter(container_id__in=c_ids).filter(
-                Q(owner=None) | Q(owner=owner)).order_by('id')
-        return containers
-
-    def invalidate_cache(self):
-        self._invalidate_container_cache()
-        self._invalidate_image_cache()
-
-    def get_containers(self, show_all=False):
-        c = self._get_client()
-        key = self._generate_container_cache_key(show_all)
-        containers = cache.get(key)
-        container_ids = []
-        if containers is None:
-            try:
-                containers = c.containers(all=show_all)
-            except requests.ConnectionError:
-                containers = []
-            # update meta data
-            for x in containers:
-                c_id = x.get('Id')
-                # ignore stopped containers
-                self._load_container_data(c_id)
-                container_ids.append(c_id)
-            # set extra containers to not running
-            Container.objects.filter(host=self).exclude(
-                container_id__in=container_ids).update(is_running=False)
-            cache.set(key, containers, HOST_CACHE_TTL)
-        return containers
-
-    def get_containers_for_user(self, user=None, show_all=False):
-        containers = self.get_containers(show_all=show_all)
-        # don't filter staff
-        if user.is_staff:
-            return containers
-        # filter
-        ids = [x.container_id for x in Container.objects.all() \
-            if x.owner == None or x.owner == user]
-        return [x for x in containers if x.get('Id') in ids]
-
-    def get_images(self, show_all=False):
-        c = self._get_client()
-        key = IMAGE_KEY.format(self.name)
-        images = cache.get(key)
-        if images is None:
-            try:
-                # only show images with a repository name
-                images = [x for x in c.images(all=show_all) if x.get('Repository')]
-                cache.set(key, images, HOST_CACHE_TTL)
-            except requests.ConnectionError:
-                images = []
-        return images
-
     def create_container(self, image=None, command=None, ports=[],
         environment=[], memory=0, description='', volumes=None, volumes_from='',
         privileged=False, binds=None, links=None, name=None, owner=None,
@@ -250,7 +160,6 @@ class Host(models.Model):
     def import_image(self, repository=None):
         c = self._get_client()
         c.pull(repository)
-        self._invalidate_image_cache()
 
     def build_image(self, path=None, tag=None):
         c = self._get_client()
@@ -264,7 +173,6 @@ class Host(models.Model):
     def remove_image(self, image_id=None):
         c = self._get_client()
         c.remove_image(image_id)
-        self._invalidate_image_cache()
 
     def get_hostname(self):
         # returns public_hostname if available otherwise default

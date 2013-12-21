@@ -17,16 +17,13 @@ from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 from hosts.models import Host
+from images.models import Image
 from shipyard import tasks
 
 @login_required
 def index(request):
     hosts = Host.objects.filter(enabled=True)
-    images = {}
-    for h in hosts:
-        img = h.get_images()
-        if img:
-            images[h] = img
+    images = Image.objects.filter(host__in=hosts).exclude(repository__contains='<none>').order_by('repository')
     ctx = {
         'images': images
     }
@@ -37,6 +34,7 @@ def index(request):
 def remove_image(request, host_id, image_id):
     h = Host.objects.get(id=host_id)
     h.remove_image(image_id)
+    image = Image.objects.get(image_id=image_id).delete()
     messages.add_message(request, messages.INFO, _('Removed') + ' {}'.format(
         image_id))
     return redirect('images.views.index')

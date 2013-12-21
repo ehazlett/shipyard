@@ -23,12 +23,12 @@ import hashlib
 
 @celery.task
 def check_protected_containers():
+    # TODO: needs refactored for new agent setup
     print('Checking protected containers')
     protected_containers = Container.objects.filter(protected=True)
     for c in protected_containers:
         host = c.host
         # get host containers
-        host.invalidate_cache()
         cnt_ids = [utils.get_short_id(x.get('Id'))
             for x in c.host.get_containers()]
         # check if container is still running

@@ -17,6 +17,7 @@ from django.views.decorators.csrf import csrf_exempt
 from functools import wraps
 from hosts.models import Host
 from containers.models import Container
+from images.models import Image
 import json
 
 def http_401(msg):
@@ -69,8 +70,8 @@ def register(request):
 def containers(request):
     key = get_agent_key(request)
     host = Host.objects.get(agent_key=key)
-    containerData = json.loads(request.body)
-    for d in containerData:
+    container_data = json.loads(request.body)
+    for d in container_data:
         c = d.get('Container')
         meta = d.get('Meta')
         container, created = Container.objects.get_or_create(host=host,
@@ -78,4 +79,24 @@ def containers(request):
         container.meta = json.dumps(meta)
         container.is_running = meta.get('State', {}).get('Running')
         container.save()
+    # cleanup old containers
+    container_ids = [x.get('Container').get('Id') for x in container_data]
+    Container.objects.all().exclude(container_id__in=container_ids).delete()
+    return HttpResponse()
+
+@csrf_exempt
+@agent_key_required
+def images(request):
+    key = get_agent_key(request)
+    host = Host.objects.get(agent_key=key)
+    image_data = json.loads(request.body)
+    for i in image_data:
+        image, created = Image.objects.get_or_create(host=host,
+                image_id=i.get('Id'))
+        image.repository = i.get('RepoTags')[0]
+        image.meta = json.dumps(image_data)
+        image.save()
+    # cleanup old images
+    image_ids = [x.get('Id') for x in image_data]
+    Image.objects.all().exclude(image_id__in=image_ids).delete()
     return HttpResponse()
