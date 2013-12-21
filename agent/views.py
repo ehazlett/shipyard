@@ -14,8 +14,38 @@
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from functools import wraps
 from hosts.models import Host
+from containers.models import Container
 import json
+
+def http_401(msg):
+    return HttpResponse(msg, status=401)
+
+def get_agent_key(request):
+    auth = request.META.get('HTTP_AUTHORIZATION')
+    if not auth:
+        return None
+    key = auth.split(':')[-1]
+    return key
+
+def agent_key_required(func):
+    """
+    Decorator to check for valid agent key
+
+    Expects to have an authorization header in the following format:
+
+        Authorization AgentKey:<key>
+
+    """
+    def f(request, *args, **kwargs):
+        key = get_agent_key(request)
+        try:
+            host = Host.objects.get(agent_key=key)
+        except Host.DoesNotExist:
+            return http_401('unauthorized')
+        return func(request, *args, **kwargs)
+    return f
 
 @require_http_methods(['POST'])
 @csrf_exempt
@@ -34,3 +64,18 @@ def register(request):
     resp = HttpResponse(json.dumps(data), content_type='application/json')
     return resp
 
+@csrf_exempt
+@agent_key_required
+def containers(request):
+    key = get_agent_key(request)
+    host = Host.objects.get(agent_key=key)
+    containerData = json.loads(request.body)
+    for d in containerData:
+        c = d.get('Container')
+        meta = d.get('Meta')
+        container, created = Container.objects.get_or_create(host=host,
+                container_id=c.get('Id'))
+        container.meta = json.dumps(meta)
+        container.is_running = meta.get('State', {}).get('Running')
+        container.save()
+    return HttpResponse()

@@ -15,4 +15,5 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('agent.views',
     url(r'^register/$', 'register', name='agent.register'),
+    url(r'^containers/$', 'containers', name='agent.containers'),
 )
