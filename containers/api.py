@@ -20,7 +20,8 @@ from tastypie.authentication import (ApiKeyAuthentication,
     SessionAuthentication, MultiAuthentication)
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
-from containers.models import Container, Host
+from containers.models import Container
+from hosts.models import Host
 from hosts.api import HostResource
 from django.contrib.auth.models import User
 from shipyard import utils

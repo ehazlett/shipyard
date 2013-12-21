@@ -11,20 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from tastypie import fields
-from tastypie.resources import ModelResource
-from tastypie.authorization import Authorization
-from tastypie.authentication import (ApiKeyAuthentication,
-    SessionAuthentication, MultiAuthentication)
-from tastypie.bundle import Bundle
-from django.conf.urls import url
+from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from hosts.models import Host
+import json
 
-class HostResource(ModelResource):
-    class Meta:
-        queryset = Host.objects.all()
-        resource_name = 'hosts'
-        authorization = Authorization()
-        authentication = MultiAuthentication(
-            ApiKeyAuthentication(), SessionAuthentication())
+@require_http_methods(['POST'])
+@csrf_exempt
+def register(request):
+    form = request.POST
+    name = form.get('name')
+    h, created = Host.objects.get_or_create(name=name)
+    if created:
+        h.name = name
+        h.hostname = request.META['REMOTE_ADDR']
+        h.enabled = None
+        h.save()
+    data = {
+        'key': h.agent_key,
+    }
+    resp = HttpResponse(json.dumps(data), content_type='application/json')
+    return resp
 

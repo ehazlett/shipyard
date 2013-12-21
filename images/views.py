@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from containers.models import Host
+from hosts.models import Host
 from shipyard import tasks
 
 @login_required

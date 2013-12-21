@@ -18,7 +18,7 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from containers.models import Host
+from hosts.models import Host
 from hosts.forms import HostForm
 
 @login_required
@@ -31,18 +31,21 @@ def index(request):
         context_instance=RequestContext(request))
 
 @login_required
-def add_host(request):
-    form = HostForm()
+def edit_host(request, host_id):
+    h = Host.objects.get(id=host_id)
+    form = HostForm(instance=h)
     if request.method == 'POST':
-        form = HostForm(request.POST)
+        form = HostForm(request.POST, instance=h)
         form.owner = request.user
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.INFO, _('Updated') + ' {0}'.format(
+                h.name))
             return redirect(reverse('hosts.views.index'))
     ctx = {
         'form': form
     }
-    return render_to_response('hosts/add_host.html', ctx,
+    return render_to_response('hosts/edit_host.html', ctx,
         context_instance=RequestContext(request))
 
 @login_required

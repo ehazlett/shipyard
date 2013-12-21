@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from django import forms
-from containers.models import Host
+from hosts.models import Host
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Button
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton, FormActions
@@ -29,15 +29,15 @@ class HostForm(forms.ModelForm):
                 'name',
                 'hostname',
                 'public_hostname',
+                'agent_key',
                 'port',
             ),
             FormActions(
-                Submit('save', _('Add'), css_class="btn btn-lg btn-success"),
+                Submit('save', _('Save'), css_class="btn btn-lg btn-success"),
             )
         )
-        self.helper.form_id = 'form-add-host'
+        self.helper.form_id = 'form-edit-host'
         self.helper.form_class = 'form-horizontal'
-        self.helper.form_action = reverse('hosts.views.add_host')
 
     def clean_hostname(self):
         data = self.cleaned_data['hostname']
@@ -47,5 +47,5 @@ class HostForm(forms.ModelForm):
 
     class Meta:
         model = Host
-        fields = ('name', 'hostname', 'public_hostname', 'port')
+        fields = ('name', 'hostname', 'public_hostname', 'agent_key', 'port')
 

@@ -23,7 +23,8 @@ from django.db.models import Q
 from django.utils.html import strip_tags
 from django.core import serializers
 from django.shortcuts import render_to_response
-from containers.models import Host, Container
+from containers.models import Container
+from hosts.models import Host
 from django.template import RequestContext
 from containers.forms import (CreateContainerForm,
     ImportRepositoryForm, ImageBuildForm)

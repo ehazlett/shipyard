@@ -172,6 +172,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'tastypie',
     'shipyard',
+    'agent',
     'accounts',
     'containers',
     'applications',

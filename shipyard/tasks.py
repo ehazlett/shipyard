@@ -15,7 +15,8 @@ import celery
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from containers.models import Container, Host
+from containers.models import Container
+from hosts.models import Host
 from exceptions import RecoveryThresholdError
 import utils
 import hashlib
