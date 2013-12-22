@@ -13,6 +13,7 @@
 # limitations under the License.
 from django import forms
 from hosts.models import Host
+from images.models import Image
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Button
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton, FormActions
@@ -25,17 +26,12 @@ def get_available_hosts():
 def get_image_choices():
     hosts = get_available_hosts()
     choices = []
-    found_images = []
-    for h in hosts:
-        for i in h.get_images():
-            image_name = '{0}:{1}'.format(i.get('Repository'), i.get('Tag'))
-            if image_name not in found_images:
-                found_images.append(image_name)
-                if i.get('Repository'):
-                    d = (image_name, '{0}/{1}'.format(
-                        i.get('Repository'), i.get('Tag')))
-                    choices.append(d)
-    choices.sort()
+    images = Image.objects.filter(host__in=hosts).order_by('repository')
+    for i in images:
+        repo = i.repository
+        if repo.find('<none>') == -1:
+            d = (repo, repo)
+            choices.append(d)
     return choices
 
 class CreateContainerForm(forms.Form):

@@ -22,81 +22,6 @@ import utils
 import hashlib
 
 @celery.task
-def check_protected_containers():
-    # TODO: needs refactored for new agent setup
-    print('Checking protected containers')
-    protected_containers = Container.objects.filter(protected=True)
-    for c in protected_containers:
-        host = c.host
-        # get host containers
-        cnt_ids = [utils.get_short_id(x.get('Id'))
-            for x in c.host.get_containers()]
-        # check if container is still running
-        if c.container_id not in cnt_ids:
-            # reload the latest info
-            host._load_container_data(c.container_id)
-            host = c.host
-            meta = c.get_meta()
-            cfg = meta.get('Config')
-            if not cfg:
-                print('Invalid container config for {} ; skipping'.format(
-                    c.description))
-                c.delete()
-                return
-            image = cfg.get('Image')
-            command = ' '.join(cfg.get('Cmd'))
-            # update port spec to specify the original NAT'd port
-            port_mapping = meta.get('NetworkSettings').get('PortMapping')
-            port_specs = []
-            if port_mapping:
-                for x,y in port_mapping.items():
-                    for k,v in y.items():
-                        port_specs.append('{}:{}/{}'.format(v,k,x.lower()))
-            env = cfg.get('Env')
-            mem = cfg.get('Memory')
-            description = c.description
-            volumes = cfg.get('Volumes')
-            volumes_from = cfg.get('VolumesFrom')
-            privileged = cfg.get('Privileged')
-            owner = c.owner
-            hostname = cfg.get("Hostname")
-            # volume mapping
-            binds = {}
-            for k in meta.get("Volumes"):
-                binds[meta.get("Volumes")[k]] = k
-            # check/update cache for recovery
-            c_hash = hashlib.sha256(
-                str(host.id)+str(image)+''.join(port_specs)).hexdigest()
-            key = 'recover:{}'.format(c_hash)
-            if cache.get(key):
-                val = cache.incr(key)
-                if val > settings.RECOVERY_THRESHOLD:
-                    # mark as not protected to prevent recovery loop
-                    c.protected = False
-                    c.save()
-                    raise RecoveryThresholdError(_('Container') + ' {} '.format(
-                        c.description) + _('has recovered too many times.'))
-            else:
-                cache.set(key, 1, settings.RECOVERY_TIME)
-            print('Recovering: {}'.format(c.description))
-            c_id, status = host.create_container(image, command, port_specs,
-                env, mem, description, volumes, volumes_from, privileged, binds, owner, hostname)
-            # load new container data
-            host._load_container_data(c.container_id)
-            new_c = Container.objects.get(container_id=c_id)
-            # mark new container as protected
-            new_c.protected = True
-            new_c.save()
-            # add new container to any applications that
-            # previous container belonged
-            for app in c.get_applications():
-                app.containers.add(new_c)
-                app.save()
-            # remove old container meta
-            c.delete()
-    return True
-
-@celery.task
 def import_image(repo_name=None):
     if not repo_name:
         raise StandardError('You must specify a repo name')
@@ -138,11 +63,22 @@ def docker_host_info():
     return True
 
 @celery.task
-def get_docker_host_info(host_id):
-    if not host_id:
-        raise StandardError('You must specify a host_id')
-    host = Host.objects.get(id=host_id)
-    print('Getting docker host info: {}'.format(host.name))
-    host.get_containers()
-    host.get_images()
-    return True
+def recover_containers():
+    protected_containers = Container.objects.filter(protected=True).exclude(
+            is_running=True)
+    for c in protected_containers:
+        host = c.host
+        print('Recovering {}'.format(c.get_name()))
+        c_id, status = host.clone_container(c.container_id)
+        # update container info
+        host._load_container_data(c_id)
+        import time
+        time.sleep(5)
+        new_c = Container.objects.get(container_id=c_id)
+        print(new_c.meta)
+        # update app
+        for app in c.get_applications():
+            app.containers.remove(c)
+            app.containers.add(new_c)
+            app.save()
+

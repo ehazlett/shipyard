@@ -79,9 +79,10 @@ def containers(request):
         container.meta = json.dumps(meta)
         container.is_running = meta.get('State', {}).get('Running')
         container.save()
-    # cleanup old containers
     container_ids = [x.get('Container').get('Id') for x in container_data]
-    Container.objects.all().exclude(container_id__in=container_ids).delete()
+    # cleanup old containers
+    Container.objects.all().exclude(protected=True).exclude(
+            container_id__in=container_ids).delete()
     return HttpResponse()
 
 @csrf_exempt

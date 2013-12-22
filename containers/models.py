@@ -13,12 +13,10 @@
 # limitations under the License.
 from django.db import models
 from django.contrib.auth.models import User
-from docker import client
 from django.utils.translation import ugettext as _
 from django.db.models import Q
 from shipyard import utils
 import json
-from shipyard.exceptions import ProtectedContainerError
 
 class Container(models.Model):
     container_id = models.CharField(max_length=96, null=True, blank=True)
@@ -39,17 +37,8 @@ class Container(models.Model):
     def get_running(cls, user=None):
         from hosts.models import Host
         hosts = Host.objects.filter(enabled=True)
-        containers = []
-        if hosts:
-            c_ids = []
-            for h in hosts:
-                for c in h.get_containers():
-                    c_ids.append(c.get('Id'))
-            # return metadata objects
-            containers = Container.objects.filter(container_id__in=c_ids).filter(
-                Q(owner=None))
-            if user:
-                containers = containers.filter(Q(owner=request.user))
+        containers = Container.objects.filter(is_running=True,
+                host__in=hosts)
         return containers
 
     def is_public(self):

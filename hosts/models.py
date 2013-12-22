@@ -18,6 +18,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+from shipyard.exceptions import ProtectedContainerError
 from uuid import uuid4
 from containers.models import Container
 import hashlib
@@ -61,6 +62,15 @@ class Host(models.Model):
                 url = 'http://{0}'.format(url)
         return client.Client(base_url=url)
 
+    def _load_container_data(self, container_id):
+        c = self._get_client()
+        meta = c.inspect_container(container_id)
+        m, created = Container.objects.get_or_create(
+            container_id=container_id, host=self)
+        m.is_running = meta.get('State', {}).get('Running', False)
+        m.meta = json.dumps(meta)
+        m.save()
+
     def create_container(self, image=None, command=None, ports=[],
         environment=[], memory=0, description='', volumes=None, volumes_from='',
         privileged=False, binds=None, links=None, name=None, owner=None,
@@ -88,7 +98,6 @@ class Host(models.Model):
                     port = "{0}/tcp".format(port)
                 port_exposes[port] = {};
                 port_bindings.setdefault(port, []).append({'HostIp': interface, 'HostPort': mapping})
-
         c = self._get_client()
         try:
             cnt = c.create_container(image=image, command=command, detach=True,
@@ -110,15 +119,12 @@ class Host(models.Model):
             c.owner = owner
             c.save()
             status = True
-        # clear host cache
-        self._invalidate_container_cache()
         return c_id, status
 
     def restart_container(self, container_id=None):
         from applications.models import Application
         c = self._get_client()
         c.restart(container_id)
-        self._invalidate_container_cache()
         # reload containers to get proper port
         self.get_containers()
         # update hipache
@@ -135,7 +141,6 @@ class Host(models.Model):
                 _('Unable to stop container.  Container is protected.'))
         c = self._get_client()
         c.stop(container_id)
-        self._invalidate_container_cache()
 
     def get_container_logs(self, container_id=None):
         c = self._get_client()
@@ -155,7 +160,6 @@ class Host(models.Model):
             pass
         # remove metadata
         Container.objects.filter(container_id=container_id).delete()
-        self._invalidate_container_cache()
 
     def import_image(self, repository=None):
         c = self._get_client()
@@ -188,20 +192,25 @@ class Host(models.Model):
         image = cfg.get('Image')
         command = ' '.join(cfg.get('Cmd'))
         # update port spec to specify the original NAT'd port
-        port_mapping = meta.get('NetworkSettings').get('PortMapping')
-        port_specs = []
-        if port_mapping:
-            for x,y in port_mapping.items():
-                for k,v in y.items():
-                    port_specs.append('{}/{}'.format(k,x.lower()))
+        port_specs = cfg.get('ExposedPorts', {}).keys()
+        ports = []
+        for p in port_specs:
+            ports.append(p.split('/')[0])
         env = cfg.get('Env')
         mem = cfg.get('Memory')
+        hostname = cfg.get('Hostname')
         description = c.description
         volumes = cfg.get('Volumes')
         volumes_from = cfg.get('VolumesFrom')
         privileged = cfg.get('Privileged')
         owner = c.owner
-        c_id, status = self.create_container(image, command, port_specs,
-            env, mem, description, volumes, volumes_from, privileged, owner)
+        c_id, status = self.create_container(image, command, ports,
+            env, mem, description, volumes, volumes_from, privileged, 
+            owner=owner, hostname=hostname)
+        # mark as protected if needed
+        if c.protected:
+            container = Container.objects.get(container_id=c_id)
+            container.protected = True
+            container.save()
         return c_id, status
 

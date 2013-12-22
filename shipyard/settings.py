@@ -215,9 +215,9 @@ MESSAGE_TAGS = {
 }
 
 # amount of time in seconds to check protected containers
-RECOVERY_INTERVAL = 15
+RECOVERY_INTERVAL = int(os.getenv('RECOVERY_INTERVAL', 15))
 # number of times to restart a container before aborting
-RECOVERY_THRESHOLD = 3
+RECOVERY_THRESHOLD = int(os.getenv('RECOVERY_THRESHOLD', 3))
 # amount of time in seconds to allow for recovery.  if the container
 # goes past the number in RECOVERY_THRESHOLD in this time span
 # the container an exception will be raised and it won't be attempted
@@ -251,14 +251,9 @@ BROKER_URL += '{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB)
 
 # celery scheduled tasks
 CELERYBEAT_SCHEDULE = {
-    'check-protected-containers': {
-        'task': 'shipyard.tasks.check_protected_containers',
+    'recover_containers': {
+        'task': 'shipyard.tasks.recover_containers',
         'schedule': timedelta(seconds=RECOVERY_INTERVAL),
-    },
-    'docker-host-info': {
-        'task': 'shipyard.tasks.docker_host_info',
-        # make the schedule slightly lower than the cache ttl
-        'schedule': timedelta(seconds=round(HOST_CACHE_TTL/1.25)),
     }
 }
 
