@@ -53,11 +53,13 @@ def agent_key_required(func):
 def register(request):
     form = request.POST
     name = form.get('name')
+    port = form.get('port')
     h, created = Host.objects.get_or_create(name=name)
     if created:
         h.name = name
         h.hostname = request.META['REMOTE_ADDR']
         h.enabled = None
+        h.port = int(port)
         h.save()
     data = {
         'key': h.agent_key,

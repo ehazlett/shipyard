@@ -59,7 +59,6 @@ def index(request):
 @login_required
 def container_details(request, container_id=None):
     c = Container.objects.get(container_id=container_id)
-    print(c.get_meta())
     ctx = {
         'container': c,
     }
