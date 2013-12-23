@@ -107,7 +107,7 @@ class Host(models.Model):
                 hostname=hostname, **kwargs)
         except Exception, e:
             raise StandardError('There was an error starting the container: {}'.format(
-                e.explanation))
+                e))
         c_id = cnt.get('Id')
         c.start(c_id, binds=binds, port_bindings=port_bindings, links=links)
         status = False

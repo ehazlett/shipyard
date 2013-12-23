@@ -187,9 +187,15 @@ command=/usr/local/bin/shipyard-agent
         sudo('supervisorctl update')
 
 @task
-def setup_shipyard(redis_host=None, admin_pass=None, tag='latest'):
+def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
+        debug=False):
     check_valid_os()
     check_docker()
+    # convert bool to string from fabric (fabric sends string)
+    if debug == True:
+        debug = 'true'
+    elif debug == False:
+        debug = 'false'
     print(':: Setting up Shipyard on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
         build = True
@@ -198,8 +204,8 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest'):
             build = out.return_code
         if build:
             sudo('docker pull shipyard/shipyard')
-            sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e DEBUG=False -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format(
-                redis_host, admin_pass, tag))
+            sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e DEBUG={} -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format(
+                debug.capitalize(), redis_host, admin_pass, tag))
             print('-  Shipyard started with credentials: admin:{}'.format(admin_pass))
             while True:
                 with settings(warn_only=True):
@@ -226,7 +232,7 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest'):
         print('-  Shipyard available on http://{}:5000'.format(env.host_string))
 
 @task
-def setup(lb_host=None, core_host=None, tag='latest'):
+def setup(lb_host=None, core_host=None, tag='latest', debug='false'):
     env.hosts = [lb_host, core_host]
     env.parallel = True
     # setup redis
@@ -249,7 +255,7 @@ def setup(lb_host=None, core_host=None, tag='latest'):
     # shipyard db
     execute(setup_shipyard_db, db_pass)
     # shipyard
-    execute(setup_shipyard, lb_host, admin_pass, tag)
+    execute(setup_shipyard, lb_host, admin_pass, tag, debug)
     # install agent
     execute(setup_shipyard_agent, 'http://{}:5000'.format(env.host_string))
 
