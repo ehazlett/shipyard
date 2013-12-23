@@ -21,7 +21,7 @@ add .docker/known_hosts /root/.ssh/known_hosts
 run (find $SHIPYARD_APP_DIR -name "*.db" -delete)
 run (cd $SHIPYARD_APP_DIR && git remote rm origin)
 run (cd $SHIPYARD_APP_DIR && git remote add origin https://github.com/shipyard/shipyard.git)
-run $SHIPYARD_VE_DIR/bin/pip install -r $SHIPYARD_APP_DIR/requirements.txt
+run $SHIPYARD_VE_DIR/bin/pip install --upgrade -r $SHIPYARD_APP_DIR/requirements.txt
 run (cd $SHIPYARD_APP_DIR && $SHIPYARD_VE_DIR/bin/python manage.py syncdb --noinput)
 run (cd $SHIPYARD_APP_DIR && $SHIPYARD_VE_DIR/bin/python manage.py migrate)
 run (cd $SHIPYARD_APP_DIR && $SHIPYARD_VE_DIR/bin/python manage.py update_admin_user --username=admin --password=shipyard)
