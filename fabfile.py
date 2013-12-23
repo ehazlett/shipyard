@@ -159,7 +159,7 @@ def setup_shipyard_db(db_pass=None):
             print('-  Shipyard DB started')
 
 @task
-def setup_shipyard_agent(shipyard_url, agent_key):
+def setup_shipyard_agent(shipyard_url):
     check_valid_os()
     check_docker()
     print(':: Setting up Shipyard Agent on {}'.format(env.host_string))
@@ -170,8 +170,9 @@ def setup_shipyard_agent(shipyard_url, agent_key):
         sudo('wget --no-check-certificate {} -O /usr/local/bin/shipyard-agent'.format(url))
         sudo('chmod +x /usr/local/bin/shipyard-agent')
         # register
-        sudo('/usr/local/bin/shipyard-agent -url {} -register'.format(
+        out = sudo('/usr/local/bin/shipyard-agent -url {} -register'.format(
             shipyard_url))
+        agent_key = out.split('\n')[-1].split(':')[-1].strip()
         # configure supervisor
         conf = '''
 [program:shipyard-agent]
@@ -186,7 +187,7 @@ command=/usr/local/bin/shipyard-agent
         sudo('supervisorctl update')
 
 @task
-def setup_shipyard(redis_host=None, admin_pass=None, agent_key='', tag='latest'):
+def setup_shipyard(redis_host=None, admin_pass=None, tag='latest'):
     check_valid_os()
     check_docker()
     print(':: Setting up Shipyard on {}'.format(env.host_string))
@@ -206,18 +207,17 @@ def setup_shipyard(redis_host=None, admin_pass=None, agent_key='', tag='latest')
                     if out.find('Shipyard Project') != -1:
                         break
                     time.sleep(1)
+            hostname = run('hostname -s')
             user_json = run('curl -d "username=admin&password={}" http://{}:5000/api/login'.format(admin_pass, env.host_string))
-            print(user_json)
             user_data = json.loads(user_json)
             api_key = user_data.get('api_key')
-            print(api_key)
             # get list of hosts to activate
             host_json = run('curl -H "Authorization: ApiKey admin:{}" -H "Content-type: application/json" http://{}:5000/api/v1/hosts/'.format(api_key, env.host_string))
             host_data = json.loads(host_json)
             hosts = host_data.get('objects')
             # activate
             for host in hosts:
-                if host.get('agent_key') == agent_key:
+                if host.get('name') == hostname:
                     host_data = {
                         'enabled': True,
                     }
@@ -227,7 +227,6 @@ def setup_shipyard(redis_host=None, admin_pass=None, agent_key='', tag='latest')
 
 @task
 def setup(lb_host=None, core_host=None, tag='latest'):
-    agent_key = str(uuid4()).replace('-', '')
     env.hosts = [lb_host, core_host]
     env.parallel = True
     # setup redis
@@ -250,11 +249,9 @@ def setup(lb_host=None, core_host=None, tag='latest'):
     # shipyard db
     execute(setup_shipyard_db, db_pass)
     # shipyard
-    execute(setup_shipyard, lb_host, admin_pass, agent_key, tag)
+    execute(setup_shipyard, lb_host, admin_pass, tag)
     # install agent
-    execute(setup_shipyard_agent, 'http://{}:5000'.format(env.host_string),
-            agent_key)
-    print(':: Setup finished')
+    execute(setup_shipyard_agent, 'http://{}:5000'.format(env.host_string))
 
 @task
 def teardown(lb_host=None, core_host=None):
