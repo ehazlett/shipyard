@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
 
 
         # Changing field 'Container.host'
-        db.alter_column(u'containers_container', 'host_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['hosts.Host'], null=True))
+        #db.alter_column(u'containers_container', 'host_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['hosts.Host'], null=True))
 
     def backwards(self, orm):
         # Adding model 'Host'

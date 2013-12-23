@@ -21,6 +21,8 @@ import string
 import sys
 import json
 import time
+import tempfile
+from uuid import uuid4
 fabric.state.output['running'] = False
 env.output_prefix = False
 
@@ -42,13 +44,16 @@ def get_local_ip():
 @task
 def install_core_dependencies():
     check_valid_os()
+    print(':: Installing Core Dependencies on {}'.format(env.host_string))
     with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
-        sudo('apt-get install -y curl wget')
+        sudo('apt-get update')
+        sudo('apt-get -y upgrade')
+        sudo('apt-get install -y curl wget supervisor')
 
 @task
 def install_docker():
     check_valid_os()
-    print(':: Installing Docker')
+    print(':: Installing Docker on {}'.format(env.host_string))
     ver = run('cat /etc/lsb-release  | grep DISTRIB_RELEASE | cut -d \'=\' -f2')
     reboot_needed = False
     sudo('apt-get update')
@@ -71,7 +76,7 @@ def install_docker():
     # set to listen on local addr
     local_ip = get_local_ip()
     with open('.tmpcfg', 'w') as f:
-        f.write('DOCKER_OPTS="-H unix:///var/run/docker.sock -H tcp://{}:4243"'.format(local_ip))
+        f.write('DOCKER_OPTS="-H unix:///var/run/docker.sock -H tcp://127.0.0.1:4243"')
     put('.tmpcfg', '/etc/default/docker', use_sudo=True)
     os.remove('.tmpcfg')
     sudo('service docker restart')
@@ -83,7 +88,7 @@ def install_docker():
 def setup_redis():
     check_valid_os()
     check_docker()
-    print(':: Setting up Shipyard Redis')
+    print(':: Setting up Shipyard Redis on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
         build = True
         with settings(warn_only=True):
@@ -100,7 +105,7 @@ def setup_app_router(redis_host=None):
         sys.exit(1)
     check_valid_os()
     check_docker()
-    print(':: Setting up Shipyard Router')
+    print(':: Setting up Shipyard Router on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
         build = True
         with settings(warn_only=True):
@@ -124,7 +129,7 @@ def setup_load_balancer(redis_host=None, upstreams=''):
     check_valid_os()
     check_docker()
     # setup upstreams
-    print(':: Setting up Shipyard Load Balancer')
+    print(':: Setting up Shipyard Load Balancer on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
         build = True
         with settings(warn_only=True):
@@ -140,7 +145,7 @@ def setup_load_balancer(redis_host=None, upstreams=''):
 def setup_shipyard_db(db_pass=None):
     check_valid_os()
     check_docker()
-    print(':: Setting up Shipyard DB')
+    print(':: Setting up Shipyard DB on {}'.format(env.host_string))
     if not db_pass:
         db_pass = ''.join(Random().sample(string.letters+string.digits, 8))
     with hide('stdout', 'warnings'):
@@ -154,9 +159,37 @@ def setup_shipyard_db(db_pass=None):
             print('-  Shipyard DB started')
 
 @task
-def setup_shipyard(redis_host=None, admin_pass=None):
+def setup_shipyard_agent(shipyard_url, agent_key):
     check_valid_os()
     check_docker()
+    print(':: Setting up Shipyard Agent on {}'.format(env.host_string))
+    with hide('stdout', 'warnings'):
+        with settings(warn_only=True):
+            sudo('supervisorctl stop shipyard-agent')
+        url = 'https://github.com/shipyard/shipyard-agent/releases/download/v0.0.1/shipyard-agent'
+        sudo('wget --no-check-certificate {} -O /usr/local/bin/shipyard-agent'.format(url))
+        sudo('chmod +x /usr/local/bin/shipyard-agent')
+        # register
+        sudo('/usr/local/bin/shipyard-agent -url {} -register'.format(
+            shipyard_url))
+        # configure supervisor
+        conf = '''
+[program:shipyard-agent]
+directory=/tmp
+user=root
+command=/usr/local/bin/shipyard-agent
+    -url {}
+    -key {}
+'''.format(shipyard_url, agent_key)
+        sudo('echo "{}" > /etc/supervisor/conf.d/shipyard-agent.conf'.format(
+            conf))
+        sudo('supervisorctl update')
+
+@task
+def setup_shipyard(redis_host=None, admin_pass=None, agent_key='', tag='latest'):
+    check_valid_os()
+    check_docker()
+    print(':: Setting up Shipyard on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
         build = True
         with settings(warn_only=True):
@@ -164,8 +197,8 @@ def setup_shipyard(redis_host=None, admin_pass=None):
             build = out.return_code
         if build:
             sudo('docker pull shipyard/shipyard')
-            sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e DEBUG=False -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard app master-worker'.format(
-                redis_host, admin_pass))
+            sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e DEBUG=False -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format(
+                redis_host, admin_pass, tag))
             print('-  Shipyard started with credentials: admin:{}'.format(admin_pass))
             while True:
                 with settings(warn_only=True):
@@ -173,50 +206,55 @@ def setup_shipyard(redis_host=None, admin_pass=None):
                     if out.find('Shipyard Project') != -1:
                         break
                     time.sleep(1)
-            hostname = run('hostname')
-            local_ip = get_local_ip()
-            # add current host to api
-            host_data = {
-                'name': hostname,
-                'hostname': local_ip,
-                'public_hostname': env.host_string,
-                'port': 4243,
-                'enabled': True,
-            }
-            host_json = json.dumps(host_data)
             user_json = run('curl -d "username=admin&password={}" http://{}:5000/api/login'.format(admin_pass, env.host_string))
+            print(user_json)
             user_data = json.loads(user_json)
             api_key = user_data.get('api_key')
-            # add host
-            run('curl -H "Authorization: ApiKey admin:{}" -d \'{}\' -H "Content-type: application/json" http://{}:5000/api/v1/hosts/'.format(api_key, host_json, env.host_string))
+            print(api_key)
+            # get list of hosts to activate
+            host_json = run('curl -H "Authorization: ApiKey admin:{}" -H "Content-type: application/json" http://{}:5000/api/v1/hosts/'.format(api_key, env.host_string))
+            host_data = json.loads(host_json)
+            hosts = host_data.get('objects')
+            # activate
+            for host in hosts:
+                if host.get('agent_key') == agent_key:
+                    host_data = {
+                        'enabled': True,
+                    }
+                    # authorize host
+                    run('curl -H "Authorization: ApiKey admin:{}" -X PUT -d \'{}\' -H "Content-type: application/json" http://{}:5000/api/v1/hosts/{}/'.format(api_key, json.dumps(host_data), env.host_string, host.get('id')))
         print('-  Shipyard available on http://{}:5000'.format(env.host_string))
 
 @task
-def setup(lb_host=None, core_host=None):
+def setup(lb_host=None, core_host=None, tag='latest'):
+    agent_key = str(uuid4()).replace('-', '')
+    env.hosts = [lb_host, core_host]
+    env.parallel = True
     # setup redis
-    env.host_string = lb_host
-    print(':: Installing Dependencies on {}'.format(env.host_string))
     execute(install_core_dependencies)
-    print(':: Configuring Redis on {}'.format(env.host_string))
+    # host setup
+    env.hosts = []
+    env.host_string = lb_host
+    # redis
     execute(setup_redis)
     # setup app router
-    print(':: Configuring Router on {}'.format(env.host_string))
     ret = execute(setup_app_router, lb_host)
     h, upstream = ret.popitem()
     # setup lb
-    print(':: Configuring Load Balancer on {}'.format(env.host_string))
     execute(setup_load_balancer, lb_host, upstream)
     # setup shipyard
     env.host_string = core_host
-    print(':: Installing Dependencies on {}'.format(env.host_string))
-    execute(install_core_dependencies)
     # generate db_pass
     db_pass = ''.join(Random().sample(string.letters+string.digits, 8))
     admin_pass = ''.join(Random().sample(string.letters+string.digits, 12))
-    print(':: Configuring Shipyard DB on {}'.format(env.host_string))
+    # shipyard db
     execute(setup_shipyard_db, db_pass)
-    print(':: Configuring Shipyard on {}'.format(env.host_string))
-    execute(setup_shipyard, lb_host, admin_pass)
+    # shipyard
+    execute(setup_shipyard, lb_host, admin_pass, agent_key, tag)
+    # install agent
+    execute(setup_shipyard_agent, 'http://{}:5000'.format(env.host_string),
+            agent_key)
+    print(':: Setup finished')
 
 @task
 def teardown(lb_host=None, core_host=None):

@@ -174,10 +174,10 @@ INSTALLED_APPS = (
     'shipyard',
     'agent',
     'accounts',
+    'hosts',
     'containers',
     'applications',
     'images',
-    'hosts',
 )
 
 # A sample logging configuration. The only tangible logging
