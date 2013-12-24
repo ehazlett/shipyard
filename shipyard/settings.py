@@ -234,7 +234,7 @@ except ImportError:
 CACHES = {
     "default": {
         "BACKEND": "redis_cache.cache.RedisCache",
-        "LOCATION": "{}:{}:{}".format(REDIS_HOST, REDIS_PORT, REDIS_DB),
+        "LOCATION": "%s:%s:%s" % (REDIS_HOST, REDIS_PORT, REDIS_DB),
         "OPTIONS": {
             "CLIENT_CLASS": "redis_cache.client.DefaultClient",
         }
@@ -245,8 +245,8 @@ HIPACHE_REDIS_HOST = REDIS_HOST
 HIPACHE_REDIS_PORT = REDIS_PORT
 BROKER_URL = 'redis://'
 if REDIS_PASSWORD:
-    BROKER_URL += ':{}@'.format(REDIS_PASSWORD)
-BROKER_URL += '{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB)
+    BROKER_URL += ':%s@' % (REDIS_PASSWORD)
+BROKER_URL += '%s:%s/%s' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
 
 # celery scheduled tasks
 CELERYBEAT_SCHEDULE = {
