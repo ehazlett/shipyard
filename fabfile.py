@@ -76,7 +76,7 @@ def install_docker():
     # set to listen on local addr
     local_ip = get_local_ip()
     with open('.tmpcfg', 'w') as f:
-        f.write('DOCKER_OPTS="-H unix:///var/run/docker.sock -H tcp://127.0.0.1:4243"')
+        f.write('DOCKER_OPTS="-H unix:///var/run/docker.sock -H tcp://127.0.0.1:4243 -dns 8.8.8.8"')
     put('.tmpcfg', '/etc/default/docker', use_sudo=True)
     os.remove('.tmpcfg')
     sudo('service docker restart')
