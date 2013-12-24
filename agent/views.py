@@ -83,7 +83,7 @@ def containers(request):
         container.save()
     container_ids = [x.get('Container').get('Id') for x in container_data]
     # cleanup old containers
-    Container.objects.all().exclude(protected=True).exclude(
+    Container.objects.filter(host=host).exclude(protected=True).exclude(
             container_id__in=container_ids).delete()
     return HttpResponse()
 
@@ -101,5 +101,5 @@ def images(request):
         image.save()
     # cleanup old images
     image_ids = [x.get('Id') for x in image_data]
-    Image.objects.all().exclude(image_id__in=image_ids).delete()
+    Image.objects.filter(host=host).exclude(image_id__in=image_ids).delete()
     return HttpResponse()
