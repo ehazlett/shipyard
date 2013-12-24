@@ -72,6 +72,8 @@ def register(request):
 def containers(request):
     key = get_agent_key(request)
     host = Host.objects.get(agent_key=key)
+    if not host.enabled:
+        return HttpResponse(status=403)
     container_data = json.loads(request.body)
     for d in container_data:
         c = d.get('Container')
@@ -92,6 +94,8 @@ def containers(request):
 def images(request):
     key = get_agent_key(request)
     host = Host.objects.get(agent_key=key)
+    if not host.enabled:
+        return HttpResponse(status=403)
     image_data = json.loads(request.body)
     for i in image_data:
         image, created = Image.objects.get_or_create(host=host,
