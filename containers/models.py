@@ -181,13 +181,14 @@ class Host(models.Model):
             cnt = c.create_container(image=image, command=command, detach=True,
                 ports=port_exposes, mem_limit=memory, tty=True, stdin_open=True,
                 environment=environment, volumes=volumes,
-                volumes_from=volumes_from, privileged=privileged, name=name,
+                volumes_from=volumes_from, name=name,
                 hostname=hostname, **kwargs)
         except Exception, e:
             raise StandardError('There was an error starting the container: {}'.format(
-                e.explanation))
+                e))
         c_id = cnt.get('Id')
-        c.start(c_id, binds=binds, port_bindings=port_bindings, links=links)
+        c.start(c_id, binds=binds, port_bindings=port_bindings, links=links,
+                privileged=privileged)
         status = False
         # create metadata only if container starts successfully
         if c.inspect_container(c_id).get('State', {}).get('Running'):
