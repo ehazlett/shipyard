@@ -26,9 +26,10 @@ def get_available_hosts():
 def get_image_choices():
     hosts = get_available_hosts()
     choices = []
-    images = Image.objects.filter(host__in=hosts).order_by('repository')
+    images = Image.objects.filter(host__in=hosts).order_by('repository').values_list(
+            'repository', flat=True).order_by('repository').distinct()
     for i in images:
-        repo = i.repository
+        repo = i
         if repo.find('<none>') == -1:
             d = (repo, repo)
             choices.append(d)
