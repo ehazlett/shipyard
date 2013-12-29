@@ -14,7 +14,7 @@
                 <form id="form-import-image" role="form" action="{% url 'images.views.import_image' %}" method="post">
                     {% csrf_token %}
                     <div class="form-group">
-                          <input class="form-control" name="repo_name" type="text" placeholder="{% trans 'i.e. ehazlett/shipyard' %}" autofocus="true">
+                          <input class="form-control" name="repo_name" type="text" placeholder="{% trans 'i.e. shipyard/shipyard' %}" autofocus="true">
                     </div>
                 </form>
             </div>
