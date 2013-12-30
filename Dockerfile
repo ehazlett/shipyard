@@ -5,7 +5,7 @@ run apt-get update
 run apt-get install -y python-dev python-setuptools libxml2-dev libxslt-dev libmysqlclient-dev supervisor redis-server git-core wget make g++ libreadline-dev libncurses5-dev libpcre3-dev  libpq-dev libmysqlclient-dev
 run wget http://nodejs.org/dist/v0.8.26/node-v0.8.26.tar.gz -O /tmp/node.tar.gz
 run (cd /tmp && tar zxf node.tar.gz && cd node-* && ./configure ; make install)
-run npm install git+http://github.com/shipyard/hipache.git -g
+run npm install -g hipache
 run wget http://openresty.org/download/ngx_openresty-1.4.2.9.tar.gz -O /tmp/nginx.tar.gz
 run (cd /tmp && tar zxf nginx.tar.gz && cd ngx_* && ./configure --with-luajit && make && make install)
 env SHIPYARD_APP_DIR /opt/apps/shipyard
