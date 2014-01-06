@@ -159,14 +159,14 @@ def setup_shipyard_db(db_pass=None):
             print('-  Shipyard DB started')
 
 @task
-def setup_shipyard_agent(shipyard_url):
+def setup_shipyard_agent(shipyard_url, version='v0.0.4'):
     check_valid_os()
     check_docker()
     print(':: Setting up Shipyard Agent on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
         with settings(warn_only=True):
             sudo('supervisorctl stop shipyard-agent')
-        url = 'https://github.com/shipyard/shipyard-agent/releases/download/v0.0.1/shipyard-agent'
+        url = 'https://github.com/shipyard/shipyard-agent/releases/download/{}/shipyard-agent'.format(version)
         sudo('wget --no-check-certificate {} -O /usr/local/bin/shipyard-agent'.format(url))
         sudo('chmod +x /usr/local/bin/shipyard-agent')
         # register

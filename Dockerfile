@@ -10,7 +10,7 @@ run wget http://openresty.org/download/ngx_openresty-1.4.2.9.tar.gz -O /tmp/ngin
 run (cd /tmp && tar zxf nginx.tar.gz && cd ngx_* && ./configure --with-luajit && make && make install)
 env SHIPYARD_APP_DIR /opt/apps/shipyard
 env SHIPYARD_VE_DIR /opt/ve/shipyard
-run easy_install pip
+run easy_install pip==1.4
 run pip install virtualenv
 run pip install uwsgi
 run virtualenv --no-site-packages $SHIPYARD_VE_DIR
