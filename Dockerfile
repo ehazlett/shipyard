@@ -11,6 +11,7 @@ run (cd /tmp && tar zxf nginx.tar.gz && cd ngx_* && ./configure --with-luajit &&
 env SHIPYARD_APP_DIR /opt/apps/shipyard
 env SHIPYARD_VE_DIR /opt/ve/shipyard
 run easy_install pip
+run pip install setuptools --no-use-wheel --upgrade
 run pip install virtualenv
 run pip install uwsgi
 run virtualenv --no-site-packages $SHIPYARD_VE_DIR
