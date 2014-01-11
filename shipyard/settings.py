@@ -257,5 +257,11 @@ CELERYBEAT_SCHEDULE = {
     }
 }
 
+# ssl
+if os.getenv('FORCE_SSL'):
+    SESSION_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    CSRF_COOKIE_SECURE = True
+
 import djcelery
 djcelery.setup_loader()
