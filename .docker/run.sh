@@ -137,6 +137,18 @@ stopsignal=QUIT
 stdout_logfile=/var/log/shipyard/app.log
 stderr_logfile=/var/log/shipyard/app.err
 
+[program:nginx]
+priority=20
+directory=/usr/local/openresty/nginx
+command=/usr/local/openresty/nginx/sbin/nginx
+    -p /usr/local/openresty/nginx/ 
+    -c /opt/apps/shipyard/.docker/nginx.conf
+user=root
+autostart=true
+autorestart=true
+stdout_logfile=/var/log/shipyard/nginx.log
+stderr_logfile=/var/log/shipyard/nginx.err
+
 EOF
 fi
 
@@ -181,23 +193,6 @@ autostart=true
 autorestart=true
 stdout_logfile=/var/log/shipyard/worker.log
 stderr_logfile=/var/log/shipyard/worker.err
-
-EOF
-fi
-
-if [ -z "$APP_COMPONENTS" ] ; then
-    cat << EOF >> $SUPERVISOR_CONF
-[program:nginx]
-priority=20
-directory=/usr/local/openresty/nginx
-command=/usr/local/openresty/nginx/sbin/nginx
-    -p /usr/local/openresty/nginx/ 
-    -c /opt/apps/shipyard/.docker/nginx.conf
-user=root
-autostart=true
-autorestart=true
-stdout_logfile=/var/log/shipyard/nginx.log
-stderr_logfile=/var/log/shipyard/nginx.err
 
 EOF
 fi
