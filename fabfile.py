@@ -101,8 +101,7 @@ def setup_redis():
 @task
 def setup_app_router(redis_host=None):
     if not redis_host:
-        print('You must specify the hostname/IP from the shipyard/redis container host')
-        sys.exit(1)
+        redis_host = env.host_string
     check_valid_os()
     check_docker()
     print(':: Setting up Shipyard Router on {}'.format(env.host_string))
@@ -113,7 +112,7 @@ def setup_app_router(redis_host=None):
             build = out.return_code
         if build:
             sudo('docker pull shipyard/router')
-            c_id = sudo('docker run -i -t -d -p 80 -e REDIS_HOST={} shipyard/router'.format(redis_host))
+            c_id = sudo('docker run -i -t -name shipyard_router -d -p 80 -e REDIS_HOST={} shipyard/router'.format(redis_host))
         else:
             c_id = sudo("docker ps | grep shipyard/router | tail -1 | awk '{ print $1; }'")
         port_map = sudo('docker port {} 80'.format(c_id))
@@ -123,11 +122,14 @@ def setup_app_router(redis_host=None):
 
 @task
 def setup_load_balancer(redis_host=None, upstreams=''):
-    if not redis_host or not upstreams:
-        print('You must specify a redis_host from the shipyard/redis container and at least one upstream from the shipyard/router container')
-        sys.exit(1)
     check_valid_os()
     check_docker()
+    if not redis_host or not upstreams:
+        # setup on this host
+        execute(setup_redis)
+        ret = execute(setup_app_router, env.host_string)
+        h, upstream = ret.popitem()
+        upstreams = upstream
     # setup upstreams
     print(':: Setting up Shipyard Load Balancer on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
@@ -191,6 +193,8 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
         debug=False):
     check_valid_os()
     check_docker()
+    if not redis_host:
+        redis_host = env.host_string
     # convert bool to string from fabric (fabric sends string)
     if debug == True:
         debug = 'true'
@@ -232,48 +236,40 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
         print('-  Shipyard available on http://{}:5000'.format(env.host_string))
 
 @task
-def setup(lb_host=None, core_host=None, tag='latest', debug='false'):
-    env.hosts = [lb_host, core_host]
-    env.parallel = True
+def setup(tag='latest', debug='false'):
     # setup redis
     execute(install_core_dependencies)
-    # host setup
-    env.hosts = []
-    env.host_string = lb_host
     # redis
     execute(setup_redis)
     # setup app router
-    ret = execute(setup_app_router, lb_host)
+    ret = execute(setup_app_router, env.host_string)
     h, upstream = ret.popitem()
     # setup lb
-    execute(setup_load_balancer, lb_host, upstream)
+    execute(setup_load_balancer)
     # setup shipyard
-    env.host_string = core_host
     # generate db_pass
     db_pass = ''.join(Random().sample(string.letters+string.digits, 8))
     admin_pass = ''.join(Random().sample(string.letters+string.digits, 12))
     # shipyard db
     execute(setup_shipyard_db, db_pass)
     # shipyard
-    execute(setup_shipyard, lb_host, admin_pass, tag, debug)
+    execute(setup_shipyard, admin_pass=admin_pass, tag=tag, debug=debug)
     # install agent
     execute(setup_shipyard_agent, 'http://{}:5000'.format(env.host_string))
 
 @task
-def teardown(lb_host=None, core_host=None):
+def teardown():
     env.warn_only = True
     with hide('stdout', 'warnings'):
-        env.host_string = lb_host
         print(':: Tearing down Shipyard Redis')
         sudo('docker kill shipyard_redis')
         sudo('docker rm shipyard_redis')
         print(':: Tearing down Shipyard Load Balancer')
         sudo('docker kill shipyard_lb')
         sudo('docker rm shipyard_lb')
-        env.host_string = core_host
         print(':: Tearing down Shipyard Router')
-        sudo("docker ps -a | grep shipyard/router | awk '{ print $1; }' | xargs sudo docker kill")
-        sudo("docker ps -a | grep shipyard/router | awk '{ print $1; }' | xargs sudo docker rm")
+        sudo('docker kill shipyard_router')
+        sudo('docker rm shipyard_router')
         print(':: Tearing down Shipyard DB')
         sudo('docker kill shipyard_db')
         sudo('docker rm shipyard_db')
@@ -294,15 +290,13 @@ def check_env(lb_host=None, core_host=None):
         sudo('docker ps | grep shipyard/shipyard')
 
 @task
-def clean(lb_host=None, core_host=None):
+def clean():
     env.warn_only = True
-    execute(teardown, lb_host, core_host)
+    execute(teardown)
     with hide('stdout', 'warnings'):
-        env.host_string = lb_host
         print(':: Removing images')
         sudo('docker rmi shipyard/redis')
         sudo('docker rmi shipyard/lb')
-        env.host_string = core_host
         sudo('docker rmi shipyard/router')
         sudo('docker rmi shipyard/db')
         sudo('docker rmi shipyard/shipyard')
