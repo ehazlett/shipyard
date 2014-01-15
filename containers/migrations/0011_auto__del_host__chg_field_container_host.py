@@ -8,6 +8,8 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # unset host for all containers ; these will be reset when the agent runs
+
         # Deleting model 'Host'
         db.delete_table(u'containers_host')
 
