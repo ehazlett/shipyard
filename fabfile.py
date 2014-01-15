@@ -208,21 +208,21 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
             build = out.return_code
         if build:
             sudo('docker pull shipyard/shipyard')
-            sudo('docker run -i -t -d -p 5000:5000 -link shipyard_db:db -e DEBUG={} -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format(
+            sudo('docker run -i -t -d -p 8000:8000 -link shipyard_db:db -e DEBUG={} -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format(
                 debug.capitalize(), redis_host, admin_pass, tag))
             print('-  Shipyard started with credentials: admin:{}'.format(admin_pass))
             while True:
                 with settings(warn_only=True):
-                    out = run('wget -O- --connect-timeout=1 http://{}:5000/'.format(env.host_string))
+                    out = run('wget -O- --connect-timeout=1 http://{}:8000/'.format(env.host_string))
                     if out.find('Shipyard Project') != -1:
                         break
                     time.sleep(1)
             hostname = run('hostname -s')
-            user_json = run('curl -d "username=admin&password={}" http://{}:5000/api/login'.format(admin_pass, env.host_string))
+            user_json = run('curl -d "username=admin&password={}" http://{}:8000/api/login'.format(admin_pass, env.host_string))
             user_data = json.loads(user_json)
             api_key = user_data.get('api_key')
             # get list of hosts to activate
-            host_json = run('curl -H "Authorization: ApiKey admin:{}" -H "Content-type: application/json" http://{}:5000/api/v1/hosts/'.format(api_key, env.host_string))
+            host_json = run('curl -H "Authorization: ApiKey admin:{}" -H "Content-type: application/json" http://{}:8000/api/v1/hosts/'.format(api_key, env.host_string))
             host_data = json.loads(host_json)
             hosts = host_data.get('objects')
             # activate
@@ -232,8 +232,8 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
                         'enabled': True,
                     }
                     # authorize host
-                    run('curl -H "Authorization: ApiKey admin:{}" -X PUT -d \'{}\' -H "Content-type: application/json" http://{}:5000/api/v1/hosts/{}/'.format(api_key, json.dumps(host_data), env.host_string, host.get('id')))
-        print('-  Shipyard available on http://{}:5000'.format(env.host_string))
+                    run('curl -H "Authorization: ApiKey admin:{}" -X PUT -d \'{}\' -H "Content-type: application/json" http://{}:8000/api/v1/hosts/{}/'.format(api_key, json.dumps(host_data), env.host_string, host.get('id')))
+        print('-  Shipyard available on http://{}:8000'.format(env.host_string))
 
 @task
 def setup(tag='latest', debug='false'):
@@ -255,7 +255,7 @@ def setup(tag='latest', debug='false'):
     # shipyard
     execute(setup_shipyard, admin_pass=admin_pass, tag=tag, debug=debug)
     # install agent
-    execute(setup_shipyard_agent, 'http://{}:5000'.format(env.host_string))
+    execute(setup_shipyard_agent, 'http://{}:8000'.format(env.host_string))
 
 @task
 def teardown():
