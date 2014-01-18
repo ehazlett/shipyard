@@ -126,8 +126,6 @@ class Host(models.Model):
         from applications.models import Application
         c = self._get_client()
         c.restart(container_id)
-        # reload containers to get proper port
-        self.get_containers()
         # update hipache
         container = Container.objects.get(
             container_id=container_id)

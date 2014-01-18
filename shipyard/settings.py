@@ -16,11 +16,13 @@ import os
 import subprocess
 from datetime import timedelta
 from django.contrib.messages import constants as messages
+import sys
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '../')
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 APP_NAME = 'shipyard'
+TESTING = sys.argv[1:2] == ['test']
 # app rev
 try:
     p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
@@ -224,7 +226,7 @@ RECOVERY_THRESHOLD = int(os.getenv('RECOVERY_THRESHOLD', 3))
 # to be recovered
 RECOVERY_TIME = 60
 
-HIPACHE_ENABLED = True
+HIPACHE_ENABLED = not TESTING
 CELERY_TIMEZONE = 'UTC'
 
 try:

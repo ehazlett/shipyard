@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ "$1" != "-s" ]; then
     VE_DIR=./.ve
     if [ -e "/etc/lsb-release" ]; then

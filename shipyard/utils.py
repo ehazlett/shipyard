@@ -39,7 +39,7 @@ def generate_console_session(host, container):
     
     key = 'console:{0}'.format(session_id)
     docker_host = '{0}:{1}'.format(host.hostname, host.port)
-    attach_path = '/v1.3/containers/{0}/attach/ws'.format(container.container_id)
+    attach_path = '/v1.8/containers/{0}/attach/ws'.format(container.container_id)
 
     rds.hmset(key, { 'host': docker_host, 'path': attach_path })
     rds.expire(key, 120)
@@ -65,6 +65,7 @@ def update_hipache(app_id=None):
                         c.host.hostname if host_interface == '0.0.0.0' else \
                         host_interface
                 # check for unix socket
+                print('update_hipache.get_ports: {}'.format(c.get_ports()))
                 port = c.get_ports()[port_proto][host_interface]
                 upstream = '{0}://{1}:{2}'.format(app.protocol, hostname, port)
                 pipe.rpush(domain_key, upstream)
