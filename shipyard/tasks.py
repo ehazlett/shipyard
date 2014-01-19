@@ -75,7 +75,6 @@ def recover_containers():
         import time
         time.sleep(5)
         new_c = Container.objects.get(container_id=c_id)
-        print(new_c.meta)
         # update app
         for app in c.get_applications():
             app.containers.remove(c)
