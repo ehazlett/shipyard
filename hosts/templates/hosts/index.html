@@ -31,7 +31,7 @@
                     <td>{{h.hostname}}</td>
                     <td>{{h.port}}</td>
                     {% with status=h.enabled %}
-                    <td><span class="label label-{% if status %}success{% else  %}{% if status == None %}default{% else %}danger{% endif %} {% endif %}">{% if status %}{{status}}{% else %}{% trans 'Pending' %}{% endif %}</span></td>
+                    <td><span class="label label-{% if status %}success{% else  %}{% if status == None %}default{% else %}danger{% endif %} {% endif %}">{% if status %}{{status}}{% else %}{% trans 'Disabled' %}{% endif %}</span></td>
                     {% endwith %}
                     <td>{{h.last_updated}}</td>
                     <td>
