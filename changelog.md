@@ -1,4 +1,5 @@
 # Jan. 20, 2014
+Release [fca0891c](https://github.com/shipyard/shipyard/commit/fca0891c)
 
 This is a major release.  This adds the new [Shipyard Agent](https://github.com/shipyard/shipyard-agent) support.
 
