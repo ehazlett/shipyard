@@ -11,12 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from django.conf.urls import patterns, url
+from django.contrib import admin
+from images.models import Image
 
-urlpatterns = patterns('hosts.views',
-    url(r'^$', 'index'),
-    url(r'^edit/(?P<host_id>.*)/$', 'edit_host'),
-    url(r'^enable/(?P<host_id>.*)/$', 'enable_host'),
-    url(r'^disable/(?P<host_id>.*)/$', 'disable_host'),
-    url(r'^remove/(?P<host_id>.*)/$', 'remove_host'),
-)
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ('image_id', 'host')
+    search_fields = ('image_id', 'host__hostname')
+
+admin.site.register(Image, ImageAdmin)

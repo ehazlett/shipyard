@@ -11,20 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from tastypie import fields
-from tastypie.resources import ModelResource
-from tastypie.authorization import Authorization
-from tastypie.authentication import (ApiKeyAuthentication,
-    SessionAuthentication, MultiAuthentication)
-from tastypie.bundle import Bundle
-from django.conf.urls import url
+from django.contrib import admin
 from hosts.models import Host
 
-class HostResource(ModelResource):
-    class Meta:
-        queryset = Host.objects.all()
-        resource_name = 'hosts'
-        authorization = Authorization()
-        authentication = MultiAuthentication(
-            ApiKeyAuthentication(), SessionAuthentication())
+class HostAdmin(admin.ModelAdmin):
+    list_display = ('name', 'hostname', 'port', 'enabled')
+    search_fields = ('name', 'hostname', 'port')
+    list_filter = ('enabled',)
 
+admin.site.register(Host, HostAdmin)

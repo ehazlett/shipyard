@@ -10,4 +10,5 @@ newrelic.ini
 .vagrant*
 *.gz
 *.db
+*.ve
 static_root/*

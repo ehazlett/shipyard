@@ -15,6 +15,7 @@ from django import forms
 from django.utils.translation import ugettext as _
 from applications.models import Application
 from containers.models import Container
+from hosts.models import Host
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, Field
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton, FormActions

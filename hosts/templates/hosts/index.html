@@ -9,7 +9,6 @@
         <span class="section-toolbar">
         </span>
         <span class="pull-right">
-            <a href="{% url 'hosts.views.add_host' %}" class="btn btn-success btn-sm">{% trans 'Add' %}</a>
         </span>
     </div>
     <div class="panel-body">
@@ -21,16 +20,20 @@
                     <th>{% trans 'Hostname' %}</th>
                     <th>{% trans 'Port' %}</th>
                     <th>{% trans 'Enabled' %}</th>
+                    <th>{% trans 'Last Update' %}</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for h in hosts %}
                 <tr>
-                    <td>{{h.name}}</td>
+                    <td><a href="{% url 'hosts.views.edit_host' host_id=h.id %}">{{h.name}}</a></td>
                     <td>{{h.hostname}}</td>
                     <td>{{h.port}}</td>
-                    <td><span class="label label-{% if h.enabled %}success{% else %}danger{% endif %}">{{h.enabled}}</span></td>
+                    {% with status=h.enabled %}
+                    <td><span class="label label-{% if status %}success{% else  %}{% if status == None %}default{% else %}danger{% endif %} {% endif %}">{% if status %}{{status}}{% else %}{% trans 'Disabled' %}{% endif %}</span></td>
+                    {% endwith %}
+                    <td>{{h.last_updated}}</td>
                     <td>
                         <div class="btn-group">
                             <a href="#" data-toggle="dropdown">
@@ -38,12 +41,17 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu right">
+                                {% if h.enabled != None %}
                                 {% if h.enabled %}
                                 <li><a href="#" class="disable-host" data-url="{% url 'hosts.views.disable_host' host_id=h.id %}">{% trans 'Disable Host' %}</a></li>
                                 {% else %}
                                 <li><a href="#" class="enable-host" data-url="{% url 'hosts.views.enable_host' host_id=h.id %}">{% trans 'Enable Host' %}</a></li>
                                 {% endif %}
                                 <li><a href="#" class="remove-host" data-url="{% url 'hosts.views.remove_host' host_id=h.id %}">{% trans 'Remove Host' %}</a></li>
+                                {% else %}
+                                <li><a href="#" class="enable-host" data-url="{% url 'hosts.views.enable_host' host_id=h.id %}">{% trans 'Authorize Host' %}</a></li>
+                                <li><a href="#" class="remove-host" data-url="{% url 'hosts.views.remove_host' host_id=h.id %}">{% trans 'Deny Host' %}</a></li>
+                                {% endif %}
                             </ul>
                         </div>
                     </td>
@@ -52,7 +60,7 @@
             </tbody>
         </table>
         {% else %}
-        <div class="text-muted">{% trans 'No hosts' %}</div>
+        <div class="text-muted">{% trans 'Please register a Docker host using the' %} <a href="https://github.com/shipyard/shipyard-agent">Shipyard Agent</a></div>
         {% endif %}
     </div>
 </div>

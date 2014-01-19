@@ -29,7 +29,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading heading-large">
-        <span class="panel-title section-title">{{container.get_name}} {% if container.privileged %}<span class="label label-success">{% trans 'Privileged' %}</span>{% endif %}</span>
+        <span class="panel-title section-title">{{container.get_name}}</span>
         <span class="section-toolbar">
             <a href="#" class="container-info" data-container-id="{{container.container_id}}"><span class="glyphicon glyphicon-edit"></span></a>
         </span>
@@ -46,16 +46,16 @@
         <div class="row">
             <div class="col-md-6">
                 <dl class="dl-horizontal">
+                    <dt>{% trans 'Name' %}</dt>
+                    <dd>{{container.get_meta.Name}}</dd>
+                </dl>
+                <dl class="dl-horizontal">
                     <dt>{% trans 'Container ID' %}</dt>
                     <dd>{{container.get_short_id}}</dd>
                 </dl>
                 <dl class="dl-horizontal">
                     <dt>{% trans 'Image' %}</dt>
                     <dd>{{container.get_meta.Config.Image}}</dd>
-                </dl>
-                <dl class="dl-horizontal">
-                    <dt>{% trans 'Command' %}</dt>
-                    <dd>{{container.get_meta.Config.Cmd|join:" "}}</dd>
                 </dl>
                 <dl class="dl-horizontal">
                     <dt>{% trans 'CPU' %}</dt>
@@ -86,10 +86,8 @@
                     <dd>{{container.host.name}}</dd>
                 </dl>
                 <dl class="dl-horizontal">
-                    <dt>{% trans 'Privileged' %}</dt>
-                    {% with priv=container.get_meta.Config.Privileged %}
-                    <dd><span class="label label-{% if priv %}success{% else %}default{% endif %}">{{priv}}</span></dd>
-                    {% endwith %}
+                    <dt>{% trans 'Command' %}</dt>
+                    <dd>{{container.get_meta.Config.Cmd|join:" "}}</dd>
                 </dl>
                 <dl class="dl-horizontal">
                     <dt>{% trans 'IP' %}</dt>
@@ -111,76 +109,111 @@
                 </dl>
             </div>
         </div>
-
-        <div class="col-md-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <span class="panel-title">{% trans 'Environment' %}</span>
-                </div>
-                <div class="panel-body">
-                    {% with env=container.get_meta.Config.Env %}
-                    {% if env %}
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>{% trans 'Key' %}</th>
-                                <th>{% trans 'Value' %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for k in env %}
-                            {% with v=k|split:"=" %}
-                            <tr>
-                                <td>{{v.0}}</td>
-                                <td>{{v.1}}</td>
-                            </tr>
-                            {% endwith %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    {% else %}
-                    <span class="text-muted">{% trans 'No environment variables' %}</span>
-                    {% endif %}
-                    {% endwith %}
-                </div>
+    
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title section-title">{% trans 'Config' %}</span>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <span class="panel-title">{% trans 'Ports' %}</span>
-                </div>
-                <div class="panel-body">
-                    {% with ports=container.get_ports %}
-                    {% if ports %}
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>{% trans 'Port' %}</th>
-                                <th>{% trans 'Host Interface' %}</th>
-                                <th>{% trans 'Mapping' %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for port,host_list in ports.items %}
-                            {% for interface,mapping in host_list.items %}
-                            <tr>
-                                <td>{{port}}</td>
-                                <td>{{interface}}</td>
-                                <td>
-                                  <a target="_blank" href="{{interface|container_host_url:container.host.hostname}}:{{mapping}}">
-                                  {{mapping}}
-                                  </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    {% else %}
-                    <span class="text-muted">{% trans 'No port mappings' %}</span>
-                    {% endif %}
-                    {% endwith %}
+            <div class="panel-body">
+                <div id="config" class="row">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab-ports" data-toggle="tab">{% trans 'Ports' %}</a></li>
+                        <li><a href="#tab-environment" data-toggle="tab">{% trans 'Environment' %}</a></li>
+                        <li><a href="#tab-volumes" data-toggle="tab">{% trans 'Volumes' %}</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab-ports">
+                            {% with ports=container.get_ports %}
+                            {% if ports %}
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Port' %}</th>
+                                        <th>{% trans 'Host Interface' %}</th>
+                                        <th>{% trans 'Mapping' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for port,host_list in ports.items %}
+                                    {% for interface,mapping in host_list.items %}
+                                    <tr>
+                                        <td>{{port}}</td>
+                                        <td>{{interface}}</td>
+                                        <td>
+                                          <a target="_blank" href="{{interface|container_host_url:container.host.hostname}}:{{mapping}}">
+                                          {{mapping}}
+                                          </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <div class="section-info">
+                                <span class="text-muted">{% trans 'No port mappings' %}</span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        <div class="tab-pane" id="tab-environment">
+                            {% with env=container.get_meta.Config.Env %}
+                            {% if env %}
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Key' %}</th>
+                                        <th>{% trans 'Value' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for k in env %}
+                                    {% with v=k|split:"=" %}
+                                    <tr>
+                                        <td>{{v.0}}</td>
+                                        <td>{{v.1}}</td>
+                                    </tr>
+                                    {% endwith %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <div class="section-info">
+                                <span class="text-muted">{% trans 'No environment variables' %}</span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        <div class="tab-pane" id="tab-volumes">
+                            {% with vols=container.get_meta.Volumes %}
+                            {% if vols %}
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Volume' %}</th>
+                                        <th>{% trans 'Mount' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for k,v in vols.items %}
+                                    <tr>
+                                        <td>{{k}}</td>
+                                        <td>{{v}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <div class="section-info">
+                                <span class="text-muted">{% trans 'No volumes' %}</span>
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

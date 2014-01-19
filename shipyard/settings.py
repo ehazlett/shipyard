@@ -16,11 +16,13 @@ import os
 import subprocess
 from datetime import timedelta
 from django.contrib.messages import constants as messages
+import sys
 PROJECT_ROOT = os.path.join(os.path.dirname(__file__), '../')
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 APP_NAME = 'shipyard'
+TESTING = sys.argv[1:2] == ['test']
 # app rev
 try:
     p = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE)
@@ -172,11 +174,12 @@ INSTALLED_APPS = (
     'crispy_forms',
     'tastypie',
     'shipyard',
+    'agent',
     'accounts',
+    'hosts',
     'containers',
     'applications',
     'images',
-    'hosts',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -214,16 +217,16 @@ MESSAGE_TAGS = {
 }
 
 # amount of time in seconds to check protected containers
-RECOVERY_INTERVAL = 15
+RECOVERY_INTERVAL = int(os.getenv('RECOVERY_INTERVAL', 15))
 # number of times to restart a container before aborting
-RECOVERY_THRESHOLD = 3
+RECOVERY_THRESHOLD = int(os.getenv('RECOVERY_THRESHOLD', 3))
 # amount of time in seconds to allow for recovery.  if the container
 # goes past the number in RECOVERY_THRESHOLD in this time span
 # the container an exception will be raised and it won't be attempted
 # to be recovered
 RECOVERY_TIME = 60
 
-HIPACHE_ENABLED = True
+HIPACHE_ENABLED = not TESTING
 CELERY_TIMEZONE = 'UTC'
 
 try:
@@ -250,16 +253,17 @@ BROKER_URL += '{}:{}/{}'.format(REDIS_HOST, REDIS_PORT, REDIS_DB)
 
 # celery scheduled tasks
 CELERYBEAT_SCHEDULE = {
-    'check-protected-containers': {
-        'task': 'shipyard.tasks.check_protected_containers',
+    'recover_containers': {
+        'task': 'shipyard.tasks.recover_containers',
         'schedule': timedelta(seconds=RECOVERY_INTERVAL),
-    },
-    'docker-host-info': {
-        'task': 'shipyard.tasks.docker_host_info',
-        # make the schedule slightly lower than the cache ttl
-        'schedule': timedelta(seconds=round(HOST_CACHE_TTL/1.25)),
     }
 }
+
+# ssl
+if os.getenv('FORCE_SSL'):
+    SESSION_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+    CSRF_COOKIE_SECURE = True
 
 import djcelery
 djcelery.setup_loader()

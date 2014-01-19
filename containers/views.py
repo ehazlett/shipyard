@@ -23,7 +23,8 @@ from django.db.models import Q
 from django.utils.html import strip_tags
 from django.core import serializers
 from django.shortcuts import render_to_response
-from containers.models import Host, Container
+from containers.models import Container
+from hosts.models import Host
 from django.template import RequestContext
 from containers.forms import (CreateContainerForm,
     ImportRepositoryForm, ImageBuildForm)
@@ -46,8 +47,8 @@ def handle_upload(f):
 def index(request):
     hosts = Host.objects.filter(enabled=True)
     show_all = True if request.GET.has_key('showall') else False
-    containers = Host.get_all_containers(show_all=show_all,
-        owner=request.user)
+    containers = Container.objects.filter(host__in=hosts, is_running=True).\
+            order_by('description')
     ctx = {
         'hosts': hosts,
         'containers': containers,
@@ -133,6 +134,7 @@ def create_container(request):
                     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
                         image))
                 except Exception, e:
+                    print(e)
                     messages.error(request, e)
                     status = False
             if not hosts:
@@ -182,61 +184,6 @@ def container_logs(request, host, container_id):
     }
     return render_to_response('containers/container_logs.html', ctx,
         context_instance=RequestContext(request))
-
-@require_http_methods(['POST'])
-@login_required
-def _create_container(request):
-    form = CreateContainerForm(request.POST)
-    image = form.data.get('image')
-    environment = form.data.get('environment')
-    command = form.data.get('command')
-    memory = form.data.get('memory', 0)
-    volume = form.data.get('volume')
-    volumes_from = form.data.get('volumes_from')
-    if command.strip() == '':
-        command = None
-    if environment.strip() == '':
-        environment = None
-    else:
-        environment = environment.split()
-    if memory.strip() == '':
-        memory = 0
-    # build volumes
-    if volume == '':
-        volume = None
-    if volume:
-        volume = { volume: {}}
-    # convert memory from MB to bytes
-    if memory:
-        memory = int(memory) * 1048576
-    ports = form.data.get('ports', '').split()
-    hosts = form.data.getlist('hosts')
-    private = form.data.get('private')
-    privileged = form.data.get('privileged')
-    # convert to bool
-    if privileged:
-        privileged = True
-    user = None
-    status = False
-    for i in hosts:
-        host = Host.objects.get(id=i)
-        if private:
-            user = request.user
-        c_id, status = host.create_container(image, command, ports,
-            environment=environment, memory=memory,
-            description=form.data.get('description'), volumes=volume,
-            volumes_from=volumes_from, privileged=privileged, owner=user)
-        print(c_id)
-    if hosts:
-        if status:
-            messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
-                image))
-        else:
-            messages.add_message(request, messages.ERROR,
-                _('Container failed to start'))
-    else:
-        messages.add_message(request, messages.ERROR, _('No hosts selected'))
-    return redirect('containers.views.index')
 
 @login_required
 def restart_container(request, host, container_id):

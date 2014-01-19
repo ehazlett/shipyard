@@ -13,39 +13,36 @@
 # limitations under the License.
 from django.http import Http404, HttpResponse
 from tastypie import fields
-from tastypie.resources import Resource
+from tastypie.resources import ModelResource
+from tastypie.constants import ALL, ALL_WITH_RELATIONS
 from tastypie.bundle import Bundle
 from tastypie.authorization import Authorization
 from tastypie.authentication import (ApiKeyAuthentication,
     SessionAuthentication, MultiAuthentication)
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
-from containers.models import Container, Host
-from hosts.api import HostResource
+from containers.models import Container
+from hosts.models import Host
 from django.contrib.auth.models import User
 from shipyard import utils
 import time
 import socket
 
-def get_containers():
-    valid_container_ids = [x.container_id for x in Host.get_all_containers()]
-    return Container.objects.filter(container_id__in=valid_container_ids)
-
-class ContainerResource(Resource):
-    container_id = fields.CharField(attribute='container_id')
-    description = fields.CharField(attribute='description')
+class ContainerResource(ModelResource):
     meta = fields.DictField(attribute='get_meta')
-    is_running = fields.BooleanField(attribute='is_running')
-    host = fields.ToOneField(HostResource, attribute='host')
-    protected = fields.BooleanField(attribute='protected')
 
     class Meta:
+        queryset = Container.objects.all()
         resource_name = 'containers'
         authorization = Authorization()
         authentication = MultiAuthentication(
             ApiKeyAuthentication(), SessionAuthentication())
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'delete']
+        filtering = {
+            'container_id': ALL,
+            'is_running': ALL,
+        }
 
     def prepend_urls(self):
         return [
@@ -103,31 +100,13 @@ class ContainerResource(Resource):
         """
         return self._container_action('destroy', request, **kwargs)
 
-    def detail_uri_kwargs(self, bundle_or_obj):
+    def detail_uri_kwargs(self, bundle_or_obj, **kwargs):
         kwargs = {}
         if isinstance(bundle_or_obj, Bundle):
             kwargs['pk'] = bundle_or_obj.obj.id
         else:
             kwargs['pk'] = bundle_or_obj.id
         return kwargs
-
-    def get_object_list(self, request):
-        containers = get_containers()
-        return containers
-
-    def obj_get_list(self, request=None, **kwargs):
-        return self.get_object_list(request)
-
-    def obj_get(self, request=None, **kwargs):
-        # TODO: refactor Container to use a Manager to automatically
-        # update container metadata
-        id = kwargs.get('pk')
-        c = Container.objects.get(id=id)
-        # refresh metadata
-        c.host._load_container_data(c.container_id)
-        # re-run query to get new data
-        c = Container.objects.get(id=id)
-        return c
 
     def obj_create(self, bundle, request=None, **kwargs):
         """
@@ -158,7 +137,6 @@ class ContainerResource(Resource):
                 timeout = int(bundle.request.GET.get('wait'))
             except Exception, e:
                 timeout = 60
-            print('Using timeout: {}'.format(timeout))
             for c in containers:
                 # wait for port to be available
                 count = 0

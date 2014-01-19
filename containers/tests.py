@@ -1,6 +1,7 @@
 from tastypie.test import ResourceTestCase
 from django.contrib.auth.models import User
-from containers.models import Container, Host
+from containers.models import Container
+from hosts.models import Host
 import os
 
 class ContainerResourceTest(ResourceTestCase):
@@ -29,8 +30,8 @@ class ContainerResourceTest(ResourceTestCase):
             data=self.data, authentication=self.get_credentials())
 
     def tearDown(self):
-        for c in self.host.get_all_containers():
-            self.host.destroy_container(c.container_id)
+        for c in Container.objects.all():
+            c.destroy()
 
     def get_credentials(self):
         return self.create_apikey(self.username, self.api_key)

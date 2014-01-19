@@ -1,3 +1,11 @@
+# Jan. 20, 2014
+
+This is a major release.  This adds the new [Shipyard Agent](https://github.com/shipyard/shipyard-agent) support.
+
+* merged Agent branch (see the [Agent Migration](https://github.com/shipyard/shipyard/wiki/Agent-Migration) docs for instructions on migrating)
+* UI updates: re-org ; shows volumes ; env vars are in tab (not shown by default)
+* updated for docker 0.7.6
+
 # Dec. 1, 2013
 Release: [d9d2b452](https://github.com/shipyard/shipyard/commit/d9d2b452)
 

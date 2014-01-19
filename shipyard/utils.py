@@ -39,7 +39,7 @@ def generate_console_session(host, container):
     
     key = 'console:{0}'.format(session_id)
     docker_host = '{0}:{1}'.format(host.hostname, host.port)
-    attach_path = '/v1.3/containers/{0}/attach/ws'.format(container.container_id)
+    attach_path = '/v1.8/containers/{0}/attach/ws'.format(container.container_id)
 
     rds.hmset(key, { 'host': docker_host, 'path': attach_path })
     rds.expire(key, 120)

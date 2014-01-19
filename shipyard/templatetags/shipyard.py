@@ -1,7 +1,7 @@
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.translation import ugettext as _
-from containers.models import Host
+from hosts.models import Host
 from datetime import datetime
 
 register = template.Library()

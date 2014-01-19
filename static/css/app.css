@@ -4,7 +4,7 @@ html, body {
   padding-top: 25px;
 }
 div.main-content {
-  padding: 0px;
+  padding: 5px;
   min-height: 500px;
 }
 div#login {
@@ -402,4 +402,10 @@ a span.glyphicon {
 }
 div.info {
   margin-top: 25px;
+}
+div#config {
+  padding: 0px 5px 5px 5px;
+}
+div.section-info {
+  padding: 15px 10px;
 }
