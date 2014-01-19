@@ -43,6 +43,8 @@ class Host(models.Model):
     port = models.SmallIntegerField(null=True, default=4243)
     agent_key = models.CharField(max_length=64, null=True,
             default=generate_agent_key, help_text=_('Agent Key'))
+    last_updated = models.DateTimeField(auto_now=True, null=True,
+            help_text=_('Last time agent reported an update'))
     enabled = models.NullBooleanField(null=True, default=True)
 
     def __unicode__(self):

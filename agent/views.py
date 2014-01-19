@@ -72,6 +72,7 @@ def register(request):
 def containers(request):
     key = get_agent_key(request)
     host = Host.objects.get(agent_key=key)
+    host.save() # update last_updated
     if not host.enabled:
         return HttpResponse(status=403)
     container_data = json.loads(request.body)
@@ -94,6 +95,7 @@ def containers(request):
 def images(request):
     key = get_agent_key(request)
     host = Host.objects.get(agent_key=key)
+    host.save() # update last_updated
     if not host.enabled:
         return HttpResponse(status=403)
     image_data = json.loads(request.body)

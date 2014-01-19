@@ -20,6 +20,7 @@
                     <th>{% trans 'Hostname' %}</th>
                     <th>{% trans 'Port' %}</th>
                     <th>{% trans 'Enabled' %}</th>
+                    <th>{% trans 'Last Update' %}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -32,6 +33,7 @@
                     {% with status=h.enabled %}
                     <td><span class="label label-{% if status %}success{% else  %}{% if status == None %}default{% else %}danger{% endif %} {% endif %}">{% if status %}{{status}}{% else %}{% trans 'Pending' %}{% endif %}</span></td>
                     {% endwith %}
+                    <td>{{h.last_updated}}</td>
                     <td>
                         <div class="btn-group">
                             <a href="#" data-toggle="dropdown">
@@ -58,7 +60,7 @@
             </tbody>
         </table>
         {% else %}
-        <div class="text-muted">{% trans 'Please register a Docker host using the Shipyard Agent' %}</div>
+        <div class="text-muted">{% trans 'Please register a Docker host using the' %} <a href="https://github.com/shipyard/shipyard-agent">Shipyard Agent</a></div>
         {% endif %}
     </div>
 </div>

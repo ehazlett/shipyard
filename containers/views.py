@@ -47,7 +47,8 @@ def handle_upload(f):
 def index(request):
     hosts = Host.objects.filter(enabled=True)
     show_all = True if request.GET.has_key('showall') else False
-    containers = Container.objects.filter(host__in=hosts, is_running=True)
+    containers = Container.objects.filter(host__in=hosts, is_running=True).\
+            order_by('description')
     ctx = {
         'hosts': hosts,
         'containers': containers,
