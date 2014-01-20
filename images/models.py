@@ -21,4 +21,7 @@ class Image(models.Model):
     meta = models.TextField(blank=True, null=True, default='{}')
 
     def __unicode__(self):
-        return "{} ({})".format(self.repository, self.image_id[:12])
+        img_id = 'unknown'
+        if self.image_id:
+            img_id = self.image_id[:12]
+        return "{} ({})".format(self.repository, img_id)
