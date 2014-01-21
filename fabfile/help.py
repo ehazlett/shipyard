@@ -20,18 +20,18 @@ containers you want.
 
 For a fully automated deployment, run:
 
-    fab setup:<lb_hostname>,<core_hostname>
+    fab -H <docker-host> setup
 
 This will install all components on the two instances and return the login
 credentials when finished.
 
 To remove a deployment:
 
-    fab teardown:<lb_hostname>,<core_hostname>
+    fab -H <docker-host> teardown
 
 To clean (removes Docker images):
 
-    fab clean:<lb_hostname>,<core_hostname>
+    fab -H <docker-host> clean
 
 There are several fabric "tasks" that you can use to deploy various components.
 To see available tasks run "fab -l".  You can run a specific task like:
