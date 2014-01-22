@@ -101,7 +101,7 @@ def images(request):
     image_data = json.loads(request.body)
     for i in image_data:
         image, created = Image.objects.get_or_create(host=host,
-                image_id=i.get('ID'))
+                image_id=i.get('Id'))
         image.repository = i.get('RepoTags')[0]
         image.meta = json.dumps(image_data)
         image.save()
