@@ -164,7 +164,7 @@ def setup_shipyard_db(db_pass=None):
             print('-  Shipyard DB started')
 
 @task
-def setup_shipyard_agent(shipyard_url, version='v0.0.6'):
+def setup_shipyard_agent(shipyard_url, version='v0.0.7'):
     check_valid_os()
     check_docker()
     print(':: Setting up Shipyard Agent on {}'.format(env.host_string))
