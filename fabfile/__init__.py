@@ -25,6 +25,7 @@ import tempfile
 from uuid import uuid4
 
 from . import help  # noqa
+from .utils import tobool
 
 fabric.state.output['running'] = False
 env.output_prefix = False
@@ -192,17 +193,12 @@ command=/usr/local/bin/shipyard-agent
         sudo('supervisorctl update')
 
 @task
-def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
-        debug=False):
+def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
     check_valid_os()
     check_docker()
     if not redis_host:
         redis_host = env.host_string
-    # convert bool to string from fabric (fabric sends string)
-    if debug == True:
-        debug = 'true'
-    elif debug == False:
-        debug = 'false'
+
     print(':: Setting up Shipyard on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
         build = True
@@ -211,8 +207,7 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
             build = out.return_code
         if build:
             sudo('docker pull shipyard/shipyard')
-            sudo('docker run -i -t -d -p 8000:8000 -link shipyard_db:db -e DEBUG={} -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format(
-                debug.capitalize(), redis_host, admin_pass, tag))
+            sudo('docker run -i -t -d -p 8000:8000 -link shipyard_db:db -e DEBUG={} -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format("True" if debug else "False", redis_host, admin_pass, tag))
             print('-  Shipyard started with credentials: admin:{}'.format(admin_pass))
             while True:
                 with settings(warn_only=True):
@@ -238,8 +233,19 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest',
                     run('curl -H "Authorization: ApiKey admin:{}" -X PUT -d \'{}\' -H "Content-type: application/json" http://{}:8000/api/v1/hosts/{}/'.format(api_key, json.dumps(host_data), env.host_string, host.get('id')))
         print('-  Shipyard available on http://{}:8000'.format(env.host_string))
 
-@task
-def setup(tag='latest', debug='false'):
+
+@task()
+def setup(tag="latest", debug="no"):
+    """Setup a full prodction deployment
+
+    Options:
+
+        tag   - "latest" or "dev" or any valid git tag.
+        debug - Whether or not to deploy a debug deployment (Default: no)
+    """
+
+    debug = tobool(debug)
+
     # setup redis
     execute(install_core_dependencies)
     # redis
