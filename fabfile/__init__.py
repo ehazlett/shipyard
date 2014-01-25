@@ -274,13 +274,13 @@ def setup(**options):
     """Setup a full prodction deployment
 
     Options:
-        tag     - "latest" or "dev" or any valid git tag.
-        debug   - Whether or not to deploy a debug deployment (Default: no)
-        adminpw - An optional admin password. (Default is to randomly generate one)
+        tag         - "latest" or "dev" or any valid git tag.
+        debug       - Whether or not to deploy a debug deployment (Default: no)
+        password    - An optional admin password. (Default is to randomly generate one)
     """
 
     tag = options.get("tag", "latest")
-    adminpw = options.get("adminpw", None)
+    password = options.get("password", None)
     debug = tobool(options.get("debug", "no"))
 
     # setup redis
@@ -299,7 +299,7 @@ def setup(**options):
     db_pass = ''.join(Random().sample(string.letters+string.digits, 8))
 
     # generate or use provided admin pasword
-    admin_pass = adminpw or ''.join(Random().sample(string.letters+string.digits, 12))
+    admin_pass = password or ''.join(Random().sample(string.letters+string.digits, 12))
 
     # shipyard db
     execute(setup_shipyard_db, db_pass)
