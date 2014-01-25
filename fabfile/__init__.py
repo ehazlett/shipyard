@@ -11,24 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from fabric.api import sudo, run, cd, env, execute, put, reboot
-import fabric.state
-from fabric.decorators import task, with_settings
-from fabric.context_managers import settings, hide
-from random import Random
+
+
+"""ShipYard Fabric Deployment and Development Tasks
+
+For a list of tasks: fab -l
+
+For help on a task: fab help:<task>
+"""
+
+
 import os
-import string
-import sys
 import json
 import time
-import tempfile
-from uuid import uuid4
+import string
+from random import Random
+
+
+import fabric.state
+from fabric.decorators import task
+from fabric.context_managers import settings, hide
+from fabric.api import sudo, run, env, execute, put, reboot
+
 
 from . import help  # noqa
 from .utils import tobool
 
+
 fabric.state.output['running'] = False
 env.output_prefix = False
+
 
 def check_docker(*args, **kwargs):
     with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
@@ -36,14 +48,17 @@ def check_docker(*args, **kwargs):
         if out == '':
             install_docker()
 
+
 def check_valid_os(*args, **kwargs):
     with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
         out = run('which apt-get')
         if out == '':
             raise StandardError('Only Debian/Ubuntu are currently supported.  Sorry.')
 
+
 def get_local_ip():
     return run("ifconfig eth0 | grep 'inet addr:' | cut -d':' -f2 | awk '{ print $1; }'")
+
 
 @task
 def install_core_dependencies():
@@ -53,6 +68,7 @@ def install_core_dependencies():
         sudo('apt-get update')
         sudo('apt-get -y upgrade')
         sudo('apt-get install -y curl wget supervisor')
+
 
 @task
 def install_docker():
@@ -77,7 +93,6 @@ def install_docker():
     sudo("sed -i 's/^DEFAULT_FORWARD_POLICY.*/DEFAULT_FORWARD_POLICY=\"ACCEPT\"/g' /etc/default/ufw")
     sudo('service ufw restart')
     # set to listen on local addr
-    local_ip = get_local_ip()
     with open('.tmpcfg', 'w') as f:
         f.write('DOCKER_OPTS="-H unix:///var/run/docker.sock -H tcp://127.0.0.1:4243"')
     put('.tmpcfg', '/etc/default/docker', use_sudo=True)
@@ -86,6 +101,7 @@ def install_docker():
     if reboot_needed:
         print(':: Setup complete.  Rebooting to apply new kernel...')
         reboot(wait=60)
+
 
 @task
 def setup_redis():
@@ -100,6 +116,7 @@ def setup_redis():
         if build:
             sudo('docker pull shipyard/redis')
             sudo('docker run -i -t -d -p 6379:6379 -name shipyard_redis shipyard/redis')
+
 
 @task
 def setup_app_router(redis_host=None):
@@ -122,6 +139,7 @@ def setup_app_router(redis_host=None):
         port = port_map.split(':')[-1]
         print('-  Shipyard Router started')
     return '{}:{}'.format(env.host_string, port)
+
 
 @task
 def setup_load_balancer(redis_host=None, upstreams=''):
@@ -146,6 +164,7 @@ def setup_load_balancer(redis_host=None, upstreams=''):
             print('-  Shipyard Load Balancer started')
             print('-  Update DNS to use {} for your Shipyard Domain'.format(env.host_string))
 
+
 @task
 def setup_shipyard_db(db_pass=None):
     check_valid_os()
@@ -160,8 +179,9 @@ def setup_shipyard_db(db_pass=None):
             build = out.return_code
         if build:
             sudo('docker pull shipyard/db')
-            ret = sudo('docker run -i -t -d -p 5432 -e DB_PASS={} -name shipyard_db shipyard/db'.format(db_pass))
+            sudo('docker run -i -t -d -p 5432 -e DB_PASS={} -name shipyard_db shipyard/db'.format(db_pass))
             print('-  Shipyard DB started')
+
 
 @task
 def setup_shipyard_agent(shipyard_url, version='v0.0.9'):
@@ -192,6 +212,7 @@ command=/usr/local/bin/shipyard-agent
             conf))
         sudo('supervisorctl update')
 
+
 @task
 def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
     check_valid_os()
@@ -207,7 +228,11 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
             build = out.return_code
         if build:
             sudo('docker pull shipyard/shipyard')
-            sudo('docker run -i -t -d -p 8000:8000 -link shipyard_db:db -e DEBUG={} -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard shipyard/shipyard:{} app master-worker'.format("True" if debug else "False", redis_host, admin_pass, tag))
+            sudo(
+                'docker run -i -t -d \
+                -p 8000:8000 -link shipyard_db:db -e DEBUG={} -e REDIS_HOST={} -e ADMIN_PASS={} -name shipyard \
+                shipyard/shipyard:{} app master-worker'.format("True" if debug else "False", redis_host, admin_pass, tag)
+            )
             print('-  Shipyard started with credentials: admin:{}'.format(admin_pass))
             while True:
                 with settings(warn_only=True):
@@ -220,7 +245,11 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
             user_data = json.loads(user_json)
             api_key = user_data.get('api_key')
             # get list of hosts to activate
-            host_json = run('curl -H "Authorization: ApiKey admin:{}" -H "Content-type: application/json" http://{}:8000/api/v1/hosts/'.format(api_key, env.host_string))
+            host_json = run(
+                'curl -H "Authorization: ApiKey admin:{}" -H "Content-type: application/json" http://{}:8000/api/v1/hosts/'.format(
+                    api_key, env.host_string
+                )
+            )
             host_data = json.loads(host_json)
             hosts = host_data.get('objects')
             # activate
@@ -230,7 +259,11 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
                         'enabled': True,
                     }
                     # authorize host
-                    run('curl -H "Authorization: ApiKey admin:{}" -X PUT -d \'{}\' -H "Content-type: application/json" http://{}:8000/api/v1/hosts/{}/'.format(api_key, json.dumps(host_data), env.host_string, host.get('id')))
+                    run(
+                        'curl -H "Authorization: ApiKey admin:{}" -X PUT -d \'{}\' -H "Content-type: application/json" http://{}:8000/api/v1/hosts/{}/'.format(
+                            api_key, json.dumps(host_data), env.host_string, host.get('id')
+                        )
+                    )
         print('-  Shipyard available on http://{}:8000'.format(env.host_string))
 
 
@@ -266,6 +299,7 @@ def setup(tag="latest", debug="no"):
     # install agent
     execute(setup_shipyard_agent, 'http://{}:8000'.format(env.host_string))
 
+
 @task
 def teardown():
     env.warn_only = True
@@ -286,6 +320,7 @@ def teardown():
         sudo('docker kill shipyard')
         sudo('docker rm shipyard')
 
+
 @task
 def check_env(lb_host=None, core_host=None):
     env.warn_only = True
@@ -297,6 +332,7 @@ def check_env(lb_host=None, core_host=None):
         sudo('docker ps | grep shipyard/router')
         sudo('docker ps | grep shipyard/db')
         sudo('docker ps | grep shipyard/shipyard')
+
 
 @task
 def clean():
