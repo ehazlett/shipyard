@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from fabric.api import sudo, run, cd, env, execute, put
+from fabric.api import sudo, run, cd, env, execute, put, reboot
 import fabric.state
 from fabric.decorators import task, with_settings
 from fabric.context_managers import settings, hide
@@ -40,7 +40,7 @@ def check_valid_os(*args, **kwargs):
     with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
         out = run('which apt-get')
         if out == '':
-            raise StandardError('Only Debian/Ubuntu are supported.  Sorry.')
+            raise StandardError('Only Debian/Ubuntu are currently supported.  Sorry.')
 
 def get_local_ip():
     return run("ifconfig eth0 | grep 'inet addr:' | cut -d':' -f2 | awk '{ print $1; }'")
@@ -61,17 +61,17 @@ def install_docker():
     ver = run('cat /etc/lsb-release  | grep DISTRIB_RELEASE | cut -d \'=\' -f2')
     reboot_needed = False
     sudo('apt-get update')
+    sudo('sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"')
+    sudo('sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"')
+    # extras
     if ver == '12.04':
         sudo('apt-get install -y linux-image-generic-lts-raring linux-headers-generic-lts-raring')
-        sudo('sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"')
-        sudo('sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"')
         print('* You will need to reboot in order to use the new kernel and aufs module') 
         reboot_needed = True
     else:
         sudo('apt-get install -y linux-image-extra-`uname -r`')
-        sudo('sudo sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"')
-        sudo('sh -c "echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list"')
     sudo('apt-get update')
+    # docker
     sudo('apt-get install -y lxc-docker git-core')
     sudo('echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf ; sysctl -p /etc/sysctl.conf')
     # check ufw
@@ -86,7 +86,7 @@ def install_docker():
     sudo('service docker restart')
     if reboot_needed:
         print('Setup complete.  Rebooting...')
-        sudo('reboot')
+        reboot(wait=60)
 
 @task
 def setup_redis():
