@@ -66,7 +66,6 @@ def install_docker():
     # extras
     if ver == '12.04':
         sudo('apt-get install -y linux-image-generic-lts-raring linux-headers-generic-lts-raring')
-        print('* You will need to reboot in order to use the new kernel and aufs module') 
         reboot_needed = True
     else:
         sudo('apt-get install -y linux-image-extra-`uname -r`')
@@ -85,7 +84,7 @@ def install_docker():
     os.remove('.tmpcfg')
     sudo('service docker restart')
     if reboot_needed:
-        print('Setup complete.  Rebooting...')
+        print(':: Setup complete.  Rebooting to apply new kernel...')
         reboot(wait=60)
 
 @task
@@ -165,11 +164,12 @@ def setup_shipyard_db(db_pass=None):
             print('-  Shipyard DB started')
 
 @task
-def setup_shipyard_agent(shipyard_url, version='v0.0.7'):
+def setup_shipyard_agent(shipyard_url, version='v0.0.9'):
     check_valid_os()
     check_docker()
     print(':: Setting up Shipyard Agent on {}'.format(env.host_string))
     with hide('stdout', 'warnings'):
+        sudo('apt-get install -y supervisor')
         with settings(warn_only=True):
             sudo('supervisorctl stop shipyard-agent')
         url = 'https://github.com/shipyard/shipyard-agent/releases/download/{}/shipyard-agent'.format(version)
