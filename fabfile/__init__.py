@@ -270,16 +270,18 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
 
 
 @task()
-def setup(tag="latest", debug="no"):
+def setup(**options):
     """Setup a full prodction deployment
 
     Options:
-
-        tag   - "latest" or "dev" or any valid git tag.
-        debug - Whether or not to deploy a debug deployment (Default: no)
+        tag     - "latest" or "dev" or any valid git tag.
+        debug   - Whether or not to deploy a debug deployment (Default: no)
+        adminpw - An optional admin password. (Default is to randomly generate one)
     """
 
-    debug = tobool(debug)
+    tag = options.get("tag", "latest")
+    adminpw = options.get("adminpw", None)
+    debug = tobool(options.get("debug", "no"))
 
     # setup redis
     execute(install_core_dependencies)
@@ -290,10 +292,15 @@ def setup(tag="latest", debug="no"):
     h, upstream = ret.popitem()
     # setup lb
     execute(setup_load_balancer)
+
     # setup shipyard
+
     # generate db_pass
     db_pass = ''.join(Random().sample(string.letters+string.digits, 8))
-    admin_pass = ''.join(Random().sample(string.letters+string.digits, 12))
+
+    # generate or use provided admin pasword
+    admin_pass = adminpw or ''.join(Random().sample(string.letters+string.digits, 12))
+
     # shipyard db
     execute(setup_shipyard_db, db_pass)
     # shipyard
