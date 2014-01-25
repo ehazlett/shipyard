@@ -1,6 +1,6 @@
 #!/bin/bash
 
-requirements="fabric"
+requirements="fabric py"
 
 if [[ "$VIRTUAL_ENV" == "" ]]; then
     curl -o - https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O - | python
