@@ -54,10 +54,11 @@ def register(request):
     form = request.POST
     name = form.get('name')
     port = form.get('port')
+    hostname = form.get('hostname')
     h, created = Host.objects.get_or_create(name=name)
     if created:
         h.name = name
-        h.hostname = request.META['REMOTE_ADDR']
+        h.hostname = hostname
         h.enabled = None
         h.port = int(port)
         h.save()
