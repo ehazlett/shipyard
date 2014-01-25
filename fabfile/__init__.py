@@ -28,8 +28,11 @@ import string
 from random import Random
 
 
+from py.path import local as localpath
+
 import fabric.state
 from fabric.decorators import task
+from fabric.contrib.files import upload_template
 from fabric.context_managers import settings, hide
 from fabric.api import sudo, run, env, execute, put, reboot
 
@@ -40,6 +43,9 @@ from .utils import tobool
 
 fabric.state.output['running'] = False
 env.output_prefix = False
+
+
+TEMPLATES = localpath(__file__).new(basename="templates")
 
 
 def check_docker(*args, **kwargs):
@@ -199,19 +205,14 @@ def setup_shipyard_agent(shipyard_url, version='v0.0.9'):
         out = sudo('/usr/local/bin/shipyard-agent -url {} -register'.format(
             shipyard_url))
         agent_key = out.split('\n')[-1].split(':')[-1].strip()
+
         # configure supervisor
-        conf = '''
-[program:shipyard-agent]
-directory=/tmp
-user=root
-command=/usr/local/bin/shipyard-agent
-    -url {}
-    -key {}
-autostart=true
-autorestart=true
-'''.format(shipyard_url, agent_key)
-        sudo('echo "{}" > /etc/supervisor/conf.d/shipyard-agent.conf'.format(
-            conf))
+        upload_template(
+            str(TEMPLATES.join("shipyard-agent.conf")),
+            "/etc/supervisor/conf.d/shipyard-agent.conf",
+            context={"url": shipyard_url, "key": agent_key},
+            use_sudo=True,
+        )
         sudo('supervisorctl update')
 
 
@@ -242,7 +243,7 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
                     if out.find('Shipyard Project') != -1:
                         break
                     time.sleep(1)
-            hostname = run('hostname -s')
+            run('hostname -s')
             user_json = run('curl -d "username=admin&password={}" http://{}:8000/api/login'.format(admin_pass, env.host_string))
             user_data = json.loads(user_json)
             api_key = user_data.get('api_key')
@@ -256,7 +257,6 @@ def setup_shipyard(redis_host=None, admin_pass=None, tag='latest', debug=False):
             hosts = host_data.get('objects')
             # activate
             for host in hosts:
-                if host.get('name') == hostname:
                     host_data = {
                         'enabled': True,
                     }
