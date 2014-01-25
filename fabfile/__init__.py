@@ -1,4 +1,4 @@
-# Copyright 2013 Evan Hazlett and contributors.
+# Copyright 2014 Evan Hazlett and contributors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-"""ShipYard Fabric Deployment and Development Tasks
+"""Shipyard Fabric Deployment and Development Tasks
 
 For a list of tasks: fab -l
 
@@ -100,7 +100,7 @@ def install_docker():
     sudo('service docker restart')
     if reboot_needed:
         print(':: Setup complete.  Rebooting to apply new kernel...')
-        reboot(wait=60)
+        reboot(wait=120)
 
 
 @task
@@ -207,6 +207,8 @@ user=root
 command=/usr/local/bin/shipyard-agent
     -url {}
     -key {}
+autostart=true
+autorestart=true
 '''.format(shipyard_url, agent_key)
         sudo('echo "{}" > /etc/supervisor/conf.d/shipyard-agent.conf'.format(
             conf))
