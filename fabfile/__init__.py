@@ -69,6 +69,94 @@ def install_core_dependencies():
         sudo('apt-get -y upgrade')
         sudo('apt-get install -y curl wget supervisor')
 
+@task
+def install_openvswitch():
+    check_valid_os()
+    print(':: Installing Open vSwitch on {}'.format(env.host_string))
+    with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
+        sudo('add-apt-repository universe')
+        sudo('add-apt-repository multiverse')
+        sudo('apt-get update')
+        ver = run('cat /etc/lsb-release  | grep DISTRIB_RELEASE | cut -d \'=\' -f2')
+        sudo('echo "BRCOMPAT=yes" >> /etc/default/openvswitch-switch')
+        if ver == '12.04':
+            sudo('apt-get install -y openvswitch-controller openvswitch-brcompat \
+                    openvswitch-switch openvswitch-datapath-source')
+            sudo('module-assistant auto-install openvswitch-datapath -q')
+        else:
+            sudo('apt-get install -y openvswitch-switch openvswitch-controller openvswitch-brcompat')
+        sudo('service openvswitch-controller restart')
+        sudo('service openvswitch-switch restart')
+        sudo('wget -O /usr/local/bin/pipework https://s3.amazonaws.com/arcus-docker/support/pipework')
+        sudo('chmod +x /usr/local/bin/pipework')
+
+@task
+def setup_openvswitch(bridge_name='ovsbr0', internal_bridge_name='ovsbr-int',
+        tep_network='172.24.1.0'):
+    check_valid_os()
+    print(':: Configuring Open vSwitch on {}'.format(env.host_string))
+    with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
+        out = run('which ovs-vsctl')
+        if out == '':
+            execute(install_openvswitch)
+        sudo('ovs-vsctl add-br {}'.format(bridge_name))
+        sudo('ovs-vsctl add-br {}'.format(internal_bridge_name))
+        hostname = run('hostname -s | md5sum | head -c 8')
+        host_ip = run("ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'")
+        tep_name = 'tep-{}'.format(hostname)
+        tep_ip = '{}.{}'.format('.'.join(tep_network.split('.')[0:2]),
+                host_ip.split('.')[-1])
+        gre_name = 'gre-{}'.format(hostname)
+        sudo('ovs-vsctl add-port {0} {1} -- set interface {1} type=internal'.format(
+            bridge_name, tep_name))
+        sudo('ifconfig {} {} netmask 255.255.255.0'.format(
+            tep_name, tep_ip))
+        tep_ips = []
+        host_ips = []
+        current_host = env.host_string
+        # loop through hosts to get tep_ips
+        # i'm sure this isn't efficient but this is the best way i could get
+        # with the way fabric handles hosts
+        for host in env.hosts:
+            env.host_string = host
+            host_ip = run("ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'")
+            host_ips.append(host_ip)
+            tep_ip = '{}.{}'.format('.'.join(tep_network.split('.')[0:-1]),
+                    host_ip.split('.')[-1])
+            tep_ips.append(tep_ip)
+        env.host_string = current_host
+    # loop through all hosts and setup the GRE tunnels
+    current_host = env.host_string
+    for host in env.hosts:
+        env.host_string = host
+        with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
+            hostname = run('hostname -s | md5sum | head -c 8')
+            host_ip = run("ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'")
+            gre_name = 'gre-{}'.format(hostname)
+            tep_ip = '{}.{}'.format('.'.join(tep_network.split('.')[0:-1]),
+                    host_ip.split('.')[-1])
+            for ip in host_ips:
+                if ip != host_ip:
+                    with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
+                        sudo('ovs-vsctl add-port {0} {1} -- set interface {1} type=gre \
+                                options:remote_ip={2}'.format(
+                                    internal_bridge_name, gre_name, ip))
+    env.host_string = current_host
+
+@task
+def clean_openvswitch(bridge_name='ovsbr0', internal_bridge_name='ovsbr-int'):
+    check_valid_os()
+    print(':: Cleaning Open vSwitch on {}'.format(env.host_string))
+    with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
+        hostname = run('hostname -s | md5sum | head -c 8')
+        tep_name = 'tep-{}'.format(hostname)
+        gre_name = 'gre-{}'.format(hostname)
+        sudo('ovs-vsctl del-port {} {}'.format(bridge_name, tep_name))
+        sudo('ovs-vsctl del-port {} {}'.format(bridge_name, gre_name))
+    with settings(warn_only=True), hide('stdout', 'running', 'warnings'):
+        sudo('ovs-vsctl del-br {}'.format(bridge_name))
+        sudo('ovs-vsctl del-br {}'.format(internal_bridge_name))
+    
 
 @task
 def install_docker():
