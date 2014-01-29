@@ -104,7 +104,7 @@ def images(request):
         image, created = Image.objects.get_or_create(host=host,
                 image_id=i.get('Id'))
         image.repository = i.get('RepoTags')[0]
-        image.meta = json.dumps(image_data)
+        image.history = json.dumps(image_data)
         image.save()
     # cleanup old images
     image_ids = [x.get('Id') for x in image_data]

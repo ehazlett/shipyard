@@ -145,7 +145,6 @@ class ContainerResource(ModelResource):
                     if count > timeout:
                         break
                     # reload meta to get NAT port
-                    c.host._load_container_data(c.container_id)
                     c = Container.objects.get(container_id=c_id)
                     if c.is_available():
                         break
