@@ -13,17 +13,23 @@
 # limitations under the License.
 from tastypie import fields
 from tastypie.resources import ModelResource
+from tastypie.bundle import Bundle
 from tastypie.authorization import Authorization
 from tastypie.authentication import (ApiKeyAuthentication,
     SessionAuthentication, MultiAuthentication)
-from tastypie.bundle import Bundle
 from django.conf.urls import url
-from hosts.models import Host
+from images.models import Image
+from hosts.api import HostResource
 
-class HostResource(ModelResource):
+class ImageResource(ModelResource):
+    host = fields.ToOneField(HostResource, 'host')
+    history = fields.ListField(attribute='get_history')
+
     class Meta:
-        queryset = Host.objects.all()
-        resource_name = 'hosts'
+        queryset = Image.objects.exclude(repository__contains='none')
+        resource_name = 'images'
+        list_allowed_methods = ['get']
+        detail_allowed_methods = ['get']
         authorization = Authorization()
         authentication = MultiAuthentication(
             ApiKeyAuthentication(), SessionAuthentication())

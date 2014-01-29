@@ -1,4 +1,4 @@
-# Copyright 2013 Evan Hazlett and contributors.
+# Copyright Evan Hazlett and contributors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -145,7 +145,6 @@ class ContainerResource(ModelResource):
                     if count > timeout:
                         break
                     # reload meta to get NAT port
-                    c.host._load_container_data(c.container_id)
                     c = Container.objects.get(container_id=c_id)
                     if c.is_available():
                         break

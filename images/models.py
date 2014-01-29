@@ -1,4 +1,4 @@
-# Copyright 2013 Evan Hazlett and contributors.
+# Copyright Evan Hazlett and contributors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,15 +13,23 @@
 # limitations under the License.
 from django.db import models
 from hosts.models import Host
+import json
 
 class Image(models.Model):
     image_id = models.CharField(max_length=96, null=True, blank=True)
     repository = models.CharField(max_length=96)
     host = models.ForeignKey(Host, null=True)
-    meta = models.TextField(blank=True, null=True, default='{}')
+    history = models.TextField(blank=True, null=True, default='{}')
 
     def __unicode__(self):
         img_id = 'unknown'
         if self.image_id:
             img_id = self.image_id[:12]
         return "{} ({})".format(self.repository, img_id)
+
+    def get_history(self):
+        history = {}
+        if self.history:
+            history = json.loads(self.history)
+        return history
+
