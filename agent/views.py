@@ -82,6 +82,8 @@ def containers(request):
         meta = d.get('Meta')
         container, created = Container.objects.get_or_create(host=host,
                 container_id=c.get('Id'))
+        if container.description == '' and c.get('Names'):
+            container.description = c.get('Names')[0][1:]
         container.meta = json.dumps(meta)
         container.is_running = meta.get('State', {}).get('Running')
         container.save()
