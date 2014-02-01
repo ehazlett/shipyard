@@ -17,4 +17,5 @@ urlpatterns = patterns('agent.views',
     url(r'^register/$', 'register', name='agent.register'),
     url(r'^containers/$', 'containers', name='agent.containers'),
     url(r'^images/$', 'images', name='agent.images'),
+    url(r'^metrics/$', 'metrics', name='agent.metrics'),
 )
