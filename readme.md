@@ -14,6 +14,10 @@ To deploy a local Shipyard stack:
 
 `docker run -i -t -v /var/run/docker.sock:/docker.sock shipyard/deploy setup`
 
+You should be able to login to http://localhost:8000.  You will need to setup
+the [Shipyard Agent](https://github.com/shipyard/shipyard-agent) to see containers,
+ images, etc.
+
 Username: admin
 Password: shipyard
 
