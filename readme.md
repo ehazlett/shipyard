@@ -10,13 +10,9 @@ To report issues please use [Github](https://github.com/shipyard/shipyard/issues
 
 There is also an IRC channel setup on Freenode:  `irc.freenode.net` `#shipyard`
 
-To run the latest version on port 8000:
+To deploy a local Shipyard stack:
 
-`docker run -p 8000:8000 shipyard/shipyard`
-
-Or to run on a custom port (leave the `-p` option off to get random port):
-
-`docker run -p 8005:8000 shipyard/shipyard`
+`docker run -i -t -v /var/run/docker.sock:/docker.sock shipyard/deploy setup`
 
 Username: admin
 Password: shipyard
@@ -33,18 +29,6 @@ is running on localhost.
 * `python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E` (in another terminal)
 * Open browser to http://localhost:8000
 * Add a host (i.e. 127.0.0.1 for local docker)
-
-Alternate dev setup using vagrant (this will install all dependencies including
-docker itself for a self-contained dev environment):
-
-* `vagrant up`
-* `vagrant ssh`
-* `python manage.py syncdb --noinput`
-* `python manage.py migrate`
-* `python manage.py createsuperuser`
-* `./manage.py runserver 0.0.0.0:8000`
-* `./manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E` (in separate ssh session)
-* Open browser to http://localhost:8000
 
 # Features
 
