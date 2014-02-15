@@ -34,7 +34,6 @@ def index(request):
 def remove_image(request, host_id, image_id):
     h = Host.objects.get(id=host_id)
     h.remove_image(image_id)
-    image = Image.objects.get(image_id=image_id).delete()
     messages.add_message(request, messages.INFO, _('Removed') + ' {}'.format(
         image_id))
     return redirect('images.views.index')
