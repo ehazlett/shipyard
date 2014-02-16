@@ -24,3 +24,6 @@ class Metric(models.Model):
     def __unicode__(self):
         return '{}: {} {} {}'.format(self.metric_type, self.counter, self.value,
                 self.unit)
+
+    def unix_timestamp(self):
+        return int(self.timestamp.strftime('%s'))

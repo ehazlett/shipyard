@@ -109,7 +109,7 @@
                 </dl>
             </div>
         </div>
-    
+
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span class="panel-title section-title">{% trans 'Config' %}</span>
@@ -117,13 +117,23 @@
             <div class="panel-body">
                 <div id="config" class="row">
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab-ports" data-toggle="tab">{% trans 'Ports' %}</a></li>
+                        <li class="active"><a href="#tab-metrics" data-toggle="tab">{% trans 'Metrics' %}</a></li>
+                        <li><a href="#tab-ports" data-toggle="tab">{% trans 'Ports' %}</a></li>
                         <li><a href="#tab-environment" data-toggle="tab">{% trans 'Environment' %}</a></li>
                         <li><a href="#tab-volumes" data-toggle="tab">{% trans 'Volumes' %}</a></li>
                     </ul>
 
                     <div class="tab-content">
-                        <div class="tab-pane active" id="tab-ports">
+                        <div class="tab-pane active" id="tab-metrics">
+                            <div id="cpu-chart">
+                                <svg style="height: 400px;"></svg>
+                            </div>
+                            <div id="mem-chart">
+                                <svg style="height: 400px;"></svg>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-ports">
                             {% with ports=container.get_ports %}
                             {% if ports %}
                             <table class="table table-hover table-striped">
@@ -221,6 +231,57 @@
 </div>
 {% include "containers/_common.html" %}
 <script type="text/javascript">
+    $(function() {
+        {% if cpu_metrics and mem_metrics %}
+        var cpuMetrics = {{cpu_metrics|safe}};
+        var memMetrics = {{mem_metrics|safe}};
+        var cpuData = buildChartData(cpuMetrics, "CPU");
+        var memData = buildChartData(memMetrics, "Memory");
+        // cpu
+        nv.addGraph(function() {
+            var chart = nv.models.lineChart()
+            .margin({left: 100, right: 30})
+            .useInteractiveGuideline(false)
+            .transitionDuration(350)
+            .showLegend(true)
+            .showYAxis(true)
+            .showXAxis(true);
+             
+            chart.xAxis
+            .tickFormat(function(d) { return d3.time.format('%X')(new Date(d)) });
+            
+            chart.forceY([0, 1]);
+            chart.yAxis
+            .axisLabel('CPU (%)')
+            .tickFormat(d3.format('%'));
+             
+            d3.select('#cpu-chart svg').datum(cpuData).call(chart);
+            nv.utils.windowResize(function() { chart.update() });
+            return chart;
+        });
+        // memory
+        nv.addGraph(function() {
+            var chart = nv.models.lineChart()
+            .margin({left: 100, right: 30})
+            .useInteractiveGuideline(false)
+            .transitionDuration(350)
+            .showLegend(true)
+            .showYAxis(true)
+            .showXAxis(true);
+             
+            chart.xAxis
+            .tickFormat(function(d) { return d3.time.format('%X')(new Date(d)) });
+             
+            chart.yAxis
+            .axisLabel('Memory (KB)')
+            .tickFormat(d3.format('d'));
+             
+            d3.select('#mem-chart svg').datum(memData).call(chart);
+            nv.utils.windowResize(function() { chart.update() });
+            return chart;
+        });
+        {% endif %}
+    });
     $("#switch").on('click', function() {
         $("#switch").bootstrapSwitch('toggleState');
     });
