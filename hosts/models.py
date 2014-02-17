@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 from shipyard.exceptions import ProtectedContainerError
 from uuid import uuid4
 from containers.models import Container
+import shlex
 import hashlib
 import requests
 import socket
@@ -45,7 +46,7 @@ class Host(models.Model):
             default=generate_agent_key, help_text=_('Agent Key'))
     last_updated = models.DateTimeField(auto_now=True, null=True,
             help_text=_('Last time agent reported an update'))
-    enabled = models.NullBooleanField(null=True, default=True)
+    enabled = models.NullBooleanField(null=True, default=False)
 
     def __unicode__(self):
         return self.name
@@ -77,7 +78,34 @@ class Host(models.Model):
         environment=[], memory=0, description='', volumes=None, volumes_from='',
         privileged=False, binds=None, links=None, name=None, owner=None,
         hostname=None, **kwargs):
-
+        if command.strip() == '':
+            command = None
+        if environment.strip() == '':
+            environment = None
+        else:
+            environment = shlex.split(environment)
+        # build volumes
+        binds = None
+        if volumes == '':
+            volumes = None
+        if volumes:
+            if volumes.find(':') > -1:
+                mnt, vol = volumes.split(':')
+                volumes = { vol: {}}
+                binds = { mnt: vol }
+            else:
+                volumes = { volumes: {}}
+        # build links
+        c_links = {}
+        for link in links.split():
+            l,n = link.split(':')
+            c_links[l] = n
+        links = c_links
+        # convert memory from MB to bytes
+        if memory:
+            memory = int(memory) * 1048576
+        if memory.strip() == '':
+            memory = 0
         if isinstance(ports, str):
             ports = ports.split(',')
         if self.version < '0.6.5':
@@ -100,6 +128,9 @@ class Host(models.Model):
                     port = "{0}/tcp".format(port)
                 port_exposes[port] = {};
                 port_bindings.setdefault(port, []).append({'HostIp': interface, 'HostPort': mapping})
+        # convert to bool
+        if privileged:
+            privileged = True
         c = self._get_client()
         try:
             cnt = c.create_container(image=image, command=command, detach=True,
