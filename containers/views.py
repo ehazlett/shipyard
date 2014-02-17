@@ -104,41 +104,10 @@ def create_container(request):
             links = form.data.get('links', None)
             volume = form.data.get('volume')
             volumes_from = form.data.get('volumes_from')
-            if command.strip() == '':
-                command = None
-            if environment.strip() == '':
-                environment = None
-            else:
-                environment = shlex.split(environment)
-            if memory.strip() == '':
-                memory = 0
-            # build volumes
-            binds = None
-            if volume == '':
-                volume = None
-            if volume:
-                if volume.find(':') > -1:
-                    mnt, vol = volume.split(':')
-                    volume = { vol: {}}
-                    binds = { mnt: vol }
-                else:
-                    volume = { volume: {}}
-            # build links
-            c_links = {}
-            for link in links.split():
-                l,n = link.split(':')
-                c_links[l] = n
-            links = c_links
-            # convert memory from MB to bytes
-            if memory:
-                memory = int(memory) * 1048576
             ports = form.data.get('ports', '').split()
             hosts = form.data.getlist('hosts')
             private = form.data.get('private')
             privileged = form.data.get('privileged')
-            # convert to bool
-            if privileged:
-                privileged = True
             user = None
             status = False
             for i in hosts:
@@ -150,7 +119,7 @@ def create_container(request):
                         environment=environment, memory=memory,
                         description=description, volumes=volume,
                         volumes_from=volumes_from, privileged=privileged,
-                        binds=binds, links=links, name=name, owner=user,
+                        links=links, name=name, owner=user,
                         hostname=hostname)
                     messages.add_message(request, messages.INFO, _('Created') + ' {0}'.format(
                         image))

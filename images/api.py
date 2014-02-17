@@ -22,7 +22,7 @@ from images.models import Image
 from hosts.api import HostResource
 
 class ImageResource(ModelResource):
-    host = fields.ToOneField(HostResource, 'host')
+    host = fields.ToOneField(HostResource, 'host', full=True)
     history = fields.ListField(attribute='get_history')
 
     class Meta:

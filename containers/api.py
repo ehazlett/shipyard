@@ -23,12 +23,14 @@ from django.conf.urls import url
 from tastypie.utils import trailing_slash
 from containers.models import Container
 from hosts.models import Host
+from hosts.api import HostResource
 from django.contrib.auth.models import User
 from shipyard import utils
 import time
 import socket
 
 class ContainerResource(ModelResource):
+    host = fields.ToOneField(HostResource, 'host', full=True)
     meta = fields.DictField(attribute='get_meta')
 
     class Meta:
@@ -48,6 +50,7 @@ class ContainerResource(ModelResource):
         return [
             url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)/restart%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('restart'), name="api_restart"),
             url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)/stop%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('stop'), name="api_stop"),
+            url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)/start%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('start'), name="api_start"),
             url(r"^(?P<resource_name>%s)/(?P<pk>\w[\w/-]*)/destroy%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('destroy'), name="api_destroy"),
         ]
     
@@ -66,13 +69,25 @@ class ContainerResource(ModelResource):
         c_id = kwargs.get('pk')
         if not c_id:
             return HttpResponse(status=404)
+        container = None
+        # try to get by model id
         try:
             container = Container.objects.get(id=c_id)
-        except Container.DoesNotExist:
-            return HttpResponse(status=404)
+        except:
+            pass
+        # search if container not specified
+        if container is None:
+            # try to find by container id
+            c = Container.objects.filter(container_id__contains=c_id)
+            if not c:
+                return HttpResponse("Invalid container", status=404)
+            if len(c) > 1:
+                return HttpResponse("Multiple containers found", status=400)
+            container = c[0]
         actions = {
             'restart': container.restart,
             'stop': container.stop,
+            'start': container.restart,
             'destroy': container.destroy,
             }
         actions[action]()
@@ -92,6 +107,14 @@ class ContainerResource(ModelResource):
 
         """
         return self._container_action('stop', request, **kwargs)
+
+    def start(self, request, **kwargs):
+        """
+        Custom view for starting containers
+
+        """
+        return self._container_action('start', request, **kwargs)
+
 
     def destroy(self, request, **kwargs):
         """

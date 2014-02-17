@@ -22,7 +22,7 @@ from applications.models import Application
 from containers.api import ContainerResource
 
 class ApplicationResource(ModelResource):
-    containers = fields.ToManyField(ContainerResource, 'containers', null=True)
+    containers = fields.ToManyField(ContainerResource, 'containers', null=True, full=True)
 
     class Meta:
         queryset = Application.objects.all()
