@@ -273,7 +273,10 @@
              
             chart.yAxis
             .axisLabel('Memory (KB)')
-            .tickFormat(d3.format('d'));
+            .tickFormat(d3.format(',d'));
+             
+            chart.y2Axis
+            .tickFormat(d3.format(',d'));
              
             d3.select('#mem-chart svg').datum(memData).call(chart);
             nv.utils.windowResize(function() { chart.update() });
