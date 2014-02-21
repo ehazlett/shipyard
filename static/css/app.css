@@ -19,6 +19,17 @@ div#login {
   -moz-border-radius: 10px;
   border: 1px solid #bababa;
 }
+div.chart {
+    margin-bottom: 50px;
+}
+div.chart svg {
+    height: 375px;
+}
+.nvd3.nv-noData {
+  font-size: 24px;
+  font-weight: normal;
+  color: #dedede;
+}
 @media (max-width: 768px) {
   div.main-content {
     margin: 5px;

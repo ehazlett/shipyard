@@ -25,6 +25,7 @@ from django.core import serializers
 from django.shortcuts import render_to_response
 from containers.models import Container
 from hosts.models import Host
+from metrics.models import Metric
 from django.template import RequestContext
 from containers.forms import (CreateContainerForm,
     ImportRepositoryForm, ImageBuildForm)
@@ -60,8 +61,28 @@ def index(request):
 @login_required
 def container_details(request, container_id=None):
     c = Container.objects.get(container_id=container_id)
+    metrics = Metric.objects.filter(source=c.container_id).order_by('-timestamp')
+    cpu_metrics = metrics.filter(counter='cpu')[:30]
+    mem_metrics = metrics.filter(counter='memory')[:30]
+    # build custom data to use unix timestamp instead of python datetime
+    cpu_data = []
+    mem_data = []
+    for m in cpu_metrics:
+        cpu_data.append({
+            'counter': m.counter,
+            'value': m.value,
+            'timestamp': m.unix_timestamp(),
+            })
+    for m in mem_metrics:
+        mem_data.append({
+            'counter': m.counter,
+            'value': m.value,
+            'timestamp': m.unix_timestamp(),
+            })
     ctx = {
         'container': c,
+        'cpu_metrics': json.dumps(cpu_data),
+        'mem_metrics': json.dumps(mem_data),
     }
     return render_to_response('containers/container_details.html', ctx,
         context_instance=RequestContext(request))

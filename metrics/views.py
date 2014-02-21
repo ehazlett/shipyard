@@ -10,12 +10,5 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
-from django.conf.urls import patterns, url
+from django.shortcuts import render
 
-urlpatterns = patterns('agent.views',
-    url(r'^register/$', 'register', name='agent.register'),
-    url(r'^containers/$', 'containers', name='agent.containers'),
-    url(r'^images/$', 'images', name='agent.images'),
-    url(r'^metrics/$', 'metrics', name='agent.metrics'),
-)

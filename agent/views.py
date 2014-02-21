@@ -18,6 +18,7 @@ from functools import wraps
 from hosts.models import Host
 from containers.models import Container
 from images.models import Image
+from metrics.models import Metric
 import json
 
 def http_401(msg):
@@ -112,3 +113,25 @@ def images(request):
     image_ids = [x.get('Id') for x in image_data]
     Image.objects.filter(host=host).exclude(image_id__in=image_ids).delete()
     return HttpResponse()
+
+@csrf_exempt
+@agent_key_required
+def metrics(request):
+    key = get_agent_key(request)
+    host = Host.objects.get(agent_key=key)
+    host.save() # update last_updated
+    if not host.enabled:
+        return HttpResponse(status=403)
+    metrics = json.loads(request.body)
+    for metric in metrics:
+        # add counters
+        for counter in metric.get('counters'):
+            m = Metric()
+            m.metric_type = metric.get('type')
+            m.source = metric.get('container_id')
+            m.counter = counter.get('name')
+            m.value = counter.get('value')
+            m.unit = counter.get('unit')
+            m.save()
+    return HttpResponse()
+
