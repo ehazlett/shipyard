@@ -19,5 +19,5 @@ run (cd $SHIPYARD_APP_DIR && python manage.py update_admin_user --username=admin
 
 volume /var/log/shipyard
 expose 8000
-workdir /opt/apps/shipyard
+workdir /app
 entrypoint ["/app/.docker/run.sh"]

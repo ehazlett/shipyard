@@ -78,23 +78,24 @@ class Host(models.Model):
         environment=[], memory=0, description='', volumes=None, volumes_from='',
         privileged=False, binds=None, links=None, name=None, owner=None,
         hostname=None, **kwargs):
-        if command.strip() == '':
+        if isinstance(command, str) and command.strip() == '':
             command = None
         if isinstance(environment, str) and environment.strip() == '':
             environment = None
         elif not isinstance(environment, list):
             environment = shlex.split(environment)
         # build volumes
-        binds = None
-        if volumes == '':
-            volumes = None
-        if volumes:
-            if volumes.find(':') > -1:
-                mnt, vol = volumes.split(':')
-                volumes = { vol: {}}
-                binds = { mnt: vol }
-            else:
-                volumes = { volumes: {}}
+        if not binds:
+            binds = None
+            if volumes == '':
+                volumes = None
+            if volumes:
+                if volumes.find(':') > -1:
+                    mnt, vol = volumes.split(':')
+                    volumes = { vol: {}}
+                    binds = { mnt: vol }
+                else:
+                    volumes = { volumes: {}}
         # build links
         c_links = {}
         if links:
