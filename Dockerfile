@@ -6,7 +6,7 @@ run apt-get install -y python-dev python-setuptools libxml2-dev libxslt-dev libm
 env SHIPYARD_APP_DIR /app
 run easy_install pip
 run pip install setuptools --no-use-wheel --upgrade
-run pip install uwsgi
+run pip install uwsgi==2.0.2
 run pip install MySQL-Python==1.2.3
 run pip install psycopg2
 add . $SHIPYARD_APP_DIR
