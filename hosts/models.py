@@ -80,9 +80,9 @@ class Host(models.Model):
         hostname=None, **kwargs):
         if command.strip() == '':
             command = None
-        if environment.strip() == '':
+        if isinstance(environment, str) and environment.strip() == '':
             environment = None
-        else:
+        elif not isinstance(environment, list):
             environment = shlex.split(environment)
         # build volumes
         binds = None
@@ -97,14 +97,15 @@ class Host(models.Model):
                 volumes = { volumes: {}}
         # build links
         c_links = {}
-        for link in links.split():
-            l,n = link.split(':')
-            c_links[l] = n
-        links = c_links
+        if links:
+            for link in links.split():
+                l,n = link.split(':')
+                c_links[l] = n
+            links = c_links
         # convert memory from MB to bytes
         if memory:
             memory = int(memory) * 1048576
-        if memory.strip() == '':
+        if isinstance(memory, str) and memory.strip() == '':
             memory = 0
         if isinstance(ports, str):
             ports = ports.split(',')

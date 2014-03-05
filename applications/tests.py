@@ -132,7 +132,7 @@ class ApplicationResourceTest(ResourceTestCase):
         self.assertValidJSONResponse(resp)
         data = self.deserialize(resp)
         self.assertTrue(data.get('name') == self.app_data.get('name'))
-        self.assertTrue(container_url in data.get('containers'))
+        self.assertTrue(container_url == data.get('containers')[0].get('resource_uri'))
 
     def test_delete_application(self):
         """
