@@ -23,9 +23,9 @@ echo "App Components: ${APP_COMPONENTS}"
 # check for db link
 if [ ! -z "$DB_PORT_5432_TCP_ADDR" ] ; then
     DB_TYPE=postgresql_psycopg2
-    DB_NAME="${DB_ENV_POSTGRESQL_DB:-shipyard}"
-    DB_USER="${DB_ENV_POSTGRESQL_USER:-shipyard}"
-    DB_PASS="${DB_ENV_POSTGRESQL_PASS:-shipyard}"
+    DB_NAME="${DB_ENV_DB_NAME:-shipyard}"
+    DB_USER="${DB_ENV_DB_USER:-shipyard}"
+    DB_PASS="${DB_ENV_DB_PASS:-shipyard}"
     DB_HOST="${DB_PORT_5432_TCP_ADDR}"
     DB_PORT=${DB_PORT_5432_TCP_PORT}
 fi
