@@ -120,9 +120,10 @@ class Container(models.Model):
                     ports[port_proto] = { '0.0.0.0': external_port }
         else:
             # for versions after docker v0.6.5
-            for port_proto, host_list in network_settings.get('Ports', {}).items():
-                for host in host_list or []:
-                    ports[port_proto] = { host.get('HostIp'): host.get('HostPort') }
+            if network_settings.get('Ports') != None:
+                for port_proto, host_list in network_settings.get('Ports', {}).items():
+                    for host in host_list or []:
+                        ports[port_proto] = { host.get('HostIp'): host.get('HostPort') }
         return ports
 
     def get_memory_limit(self):
