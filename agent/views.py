@@ -87,11 +87,12 @@ def containers(request):
             container.description = c.get('Names')[0][1:]
         container.meta = json.dumps(meta)
         container.is_running = meta.get('State', {}).get('Running')
+        container.synced = True
         container.save()
     container_ids = [x.get('Container').get('Id') for x in container_data]
     # cleanup old containers
     Container.objects.filter(host=host).exclude(protected=True).exclude(
-            container_id__in=container_ids).delete()
+            container_id__in=container_ids).exclude(synced=False).delete()
     return HttpResponse()
 
 @csrf_exempt
@@ -123,15 +124,16 @@ def metrics(request):
     if not host.enabled:
         return HttpResponse(status=403)
     metrics = json.loads(request.body)
-    for metric in metrics:
-        # add counters
-        for counter in metric.get('counters'):
-            m = Metric()
-            m.metric_type = metric.get('type')
-            m.source = metric.get('container_id')
-            m.counter = counter.get('name')
-            m.value = counter.get('value')
-            m.unit = counter.get('unit')
-            m.save()
+    if metrics:
+        for metric in metrics:
+            # add counters
+            for counter in metric.get('counters'):
+                m = Metric()
+                m.metric_type = metric.get('type')
+                m.source = metric.get('container_id')
+                m.counter = counter.get('name')
+                m.value = counter.get('value')
+                m.unit = counter.get('unit')
+                m.save()
     return HttpResponse()
 

@@ -26,6 +26,8 @@ class Container(models.Model):
     host = models.ForeignKey('hosts.Host', null=True, blank=True)
     owner = models.ForeignKey(User, null=True, blank=True)
     protected = models.BooleanField(default=False)
+    synced = models.BooleanField(default=False, blank=True,
+            help_text='Whether the agent has synced the container info')
 
     def __unicode__(self):
         d = self.get_short_id()
