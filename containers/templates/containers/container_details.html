@@ -87,7 +87,12 @@
                 </dl>
                 <dl class="dl-horizontal">
                     <dt>{% trans 'Command' %}</dt>
-                    <dd>{% if container.get_meta.Cmd %}{{container.get_meta.Config.Cmd|join:" "}}{% endif %}</dd>
+                    <dd>{% if container.get_meta.Config.Entrypoint %}{{container.get_meta.Config.Entrypoint|join:" "}}
+                        {% else %}
+                        {% if container.get_meta.Config.Cmd %}{{container.get_meta.Config.Cmd|join:" "}}{% endif %}
+                        {% endif %}
+                    </dd>
+
                 </dl>
                 <dl class="dl-horizontal">
                     <dt>{% trans 'IP' %}</dt>

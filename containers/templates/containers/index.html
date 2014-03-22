@@ -31,7 +31,11 @@
                     <td><a href="{% url 'containers.views.container_details' container_id=c.container_id %}" class="container-info" data-container-id="{{c.container_id}}">{{c.get_short_id}}</a></td>
                     <td>{{c.description}}</td>
                     <td>{{c.get_meta.Config.Image}}</td>
-                    <td>{% if c.get_meta.Config.Cmd %}{{c.get_meta.Config.Cmd|join:" "}}{% endif %}</td>
+                    <td>{% if c.get_meta.Config.Entrypoint %}{{c.get_meta.Config.Entrypoint|join:" "}}
+                        {% else %}
+                        {% if c.get_meta.Config.Cmd %}{{c.get_meta.Config.Cmd|join:" "}}{% endif %}
+                        {% endif %}
+                    </td>
                     <td>{{c.host.name}}</td>
                     <td>
                         <div class="btn-group">
