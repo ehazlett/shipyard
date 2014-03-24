@@ -120,16 +120,16 @@ class Host(models.Model):
                 port_parts = port_str.split(':')
                 if len(port_parts) == 3:
                     interface, mapping, port = port_parts
+		    port_bindings[port] = (interface, mapping)
                 elif len(port_parts) == 2:
-                    interface = ''
                     mapping, port = port_parts
+		    port_bindings[port] = mapping
                 else:
-                    interface, mapping = ('','')
                     port = port_str
+		    port_bindings[port] = None
                 if port.find('/') < 0:
                     port = "{0}/tcp".format(port)
                 port_exposes[port] = {};
-                port_bindings.setdefault(port, []).append({'HostIp': interface, 'HostPort': mapping})
         # convert to bool
         if privileged:
             privileged = True
