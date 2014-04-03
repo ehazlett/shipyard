@@ -28,7 +28,6 @@ from django.contrib.auth.models import User
 from shipyard import utils
 import time
 import socket
-import json
 
 class ContainerResource(ModelResource):
     host = fields.ToOneField(HostResource, 'host', full=True)
