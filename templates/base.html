@@ -55,7 +55,7 @@
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
           <span class="sr-only">{% trans 'Toggle Navigation' %}</span>
         </button>
-        <a class="navbar-brand" href="/"><img src="{{STATIC_URL}}img/app.png" /> {{APP_NAME}}</a>
+        <a class="navbar-brand" href="{% url "shipyard.views.index" %}"><img src="{{STATIC_URL}}img/app.png" /> {{APP_NAME}}</a>
       </div>
       <ul id="nav" class="nav navbar-nav navbar-right">
         {% if request.user.id != None %}
@@ -63,7 +63,7 @@
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{request.user.username}} <b class="caret"></b></a>
           <ul class="dropdown-menu">
             {% if request.user.is_superuser %}
-            <li><a href="/admin/" target="_sh_admin">{% trans 'administration' %}</a></li>
+            <li><a href="{% url "admin:index" %}" target="_sh_admin">{% trans 'administration' %}</a></li>
             <li class="divider"></li>
             {% endif %}
             <li><a href="{% url "accounts.views.logout" %}">{% trans 'logout' %}</a></li>
