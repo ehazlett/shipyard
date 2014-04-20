@@ -22,17 +22,22 @@ Username: admin
 Password: shipyard
 
 # Dev Setup
-Shipyard needs Redis for caching and queueing.  By default, it assumes Redis
-is running on localhost.
+Shipyard uses [Fig](http://orchardup.github.io/fig/) for an easy development environment.  Visit that link first to setup Fig.  Then continue:
 
-* `pip install -r requirements.txt`
-* `python manage.py syncdb --noinput`
-* `python manage.py migrate`
-* `python manage.py createsuperuser`
-* `python manage.py runserver`
-* `python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E` (in another terminal)
-* Open browser to http://localhost:8000
-* Add a host (i.e. 127.0.0.1 for local docker)
+* `fig up -d redis router lb db`
+* `fig run app python manage.py syncdb --noinput`
+* `fig run app python manage.py migrate`
+* `fig run app python manage.py createsuperuser`
+* `fig up app`
+* `fig up worker` (in separate terminal to see output)
+* Open browser to localhost:8000 for Shipyard and localhost for the LB (you must not have anything else running on port 80)
+
+To rebuild the app image (if you make changes to the `Dockerfile`, etc.):
+
+* `fig build app`
+* `fig build worker`
+
+Then restart the app and worker containers as explained above.
 
 # Features
 

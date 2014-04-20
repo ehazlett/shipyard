@@ -1,0 +1,43 @@
+app:
+  build: .
+  command: python manage.py runserver 0.0.0.0:8000
+  volumes:
+    - .:/app
+  ports:
+    - "8000:8000"
+  links:
+    - db
+    - redis
+redis:
+  image: shipyard/redis
+  ports:
+    - "6379"
+router:
+  image: shipyard/router
+  ports:
+    - "80"
+  links:
+    - redis
+lb:
+  image: shipyard/lb
+  ports:
+    - "80:80"
+  links:
+    - redis
+    - router
+db:
+  image: shipyard/db
+  environment:
+    DB_USER: shipyard
+    DB_PASS: shipyard
+    DB_NAME: shipyard
+  ports:
+    - "5432"
+worker:
+  build: .
+  command: python manage.py celery worker -B --scheduler=djcelery.schedulers.DatabaseScheduler -E
+  volumes:
+    - .:/app
+  links:
+    - db
+    - redis

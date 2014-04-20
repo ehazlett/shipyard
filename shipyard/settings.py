@@ -57,6 +57,22 @@ REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 REDIS_DB = os.getenv('REDIS_DB', 0)
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', None)
+# check for fig
+if os.environ.has_key('SHIPYARD_REDIS_1_PORT_6379_TCP_ADDR'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'shipyard',
+            'USER': 'shipyard',
+            'PASSWORD': 'shipyard',
+            'HOST': os.getenv('SHIPYARD_DB_1_PORT_5432_TCP_ADDR'),
+            'PORT': int(os.getenv('SHIPYARD_DB_1_PORT_5432_TCP_PORT')),
+        }
+    }
+    REDIS_HOST = os.getenv('SHIPYARD_REDIS_1_PORT_6379_TCP_ADDR')
+    REDIS_PORT = int(os.getenv('SHIPYARD_REDIS_1_PORT_6379_TCP_PORT'))
+    DEBUG = True
+
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 

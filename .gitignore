@@ -12,3 +12,4 @@ newrelic.ini
 *.db
 *.ve
 static_root/*
+src/*

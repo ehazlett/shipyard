@@ -1,6 +1,5 @@
-from ubuntu:12.04
+from stackbrew/ubuntu:12.04
 maintainer Shipyard Project "http://shipyard-project.com"
-run echo "deb http://us.archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
 run apt-get update
 run apt-get install -y python-dev python-setuptools libxml2-dev libxslt-dev libmysqlclient-dev supervisor wget make g++ libreadline-dev libncurses5-dev libpcre3-dev libpq-dev libmysqlclient-dev git-core
 env SHIPYARD_APP_DIR /app
@@ -20,4 +19,4 @@ run (cd $SHIPYARD_APP_DIR && python manage.py update_admin_user --username=admin
 volume /var/log/shipyard
 expose 8000
 workdir /app
-entrypoint ["/app/.docker/run.sh"]
+cmd ["/app/.docker/run.sh"]
