@@ -16,6 +16,7 @@ from containers.models import Container
 
 class ContainerAdmin(admin.ModelAdmin):
     list_display = ('container_id', 'host', 'owner')
+    list_display_filter = ('is_running',)
     search_fields = ('container_id', 'host__hostname')
 
 admin.site.register(Container, ContainerAdmin)

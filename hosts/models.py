@@ -63,6 +63,7 @@ class Host(models.Model):
             url ='{0}:{1}'.format(self.hostname, self.port)
             if not url.startswith('http'):
                 url = 'http://{0}'.format(url)
+        print(url)
         return client.Client(base_url=url)
 
     def _load_container_data(self, container_id):

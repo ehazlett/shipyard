@@ -31,6 +31,21 @@ def index(request):
         context_instance=RequestContext(request))
 
 @login_required
+def add_host(request):
+    form = HostForm()
+    if request.method == 'POST':
+        form = HostForm(request.POST)
+        form.owner = request.user
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('hosts.views.index'))
+    ctx = {
+        'form': form
+    }
+    return render_to_response('hosts/add_host.html', ctx,
+        context_instance=RequestContext(request))
+
+@login_required
 def edit_host(request, host_id):
     h = Host.objects.get(id=host_id)
     form = HostForm(instance=h)
