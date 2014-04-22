@@ -40,11 +40,11 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu right">
-                                <li><a class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Attach' %}</a></li>
-                                <li><a href="#" class="clone-container" data-url="{% url 'containers.views.clone_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Clone' %}</a></li>
-                                <li><a href="#" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Restart' %}</a></li>
-                                <li><a href="#" class="stop-container" data-url="{% url 'containers.stop_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Stop' %}</a></li>
-                                <li><a href="#" class="destroy-container" data-url="{% url 'containers.destroy_container' host=c.host.name container_id=c.get_meta.ID %}">{% trans 'Destroy' %}</a></li>
+                                <li><a class="attach-container" target="_blank" href="{% url 'containers.attach_container' host=c.host.name container_id=c.container_id %}">{% trans 'Attach' %}</a></li>
+                                <li><a href="#" class="clone-container" data-url="{% url 'containers.views.clone_container' host=c.host.name container_id=c.container_id %}">{% trans 'Clone' %}</a></li>
+                                <li><a href="#" class="restart-container" data-url="{% url 'containers.restart_container' host=c.host.name container_id=c.container_id %}">{% trans 'Restart' %}</a></li>
+                                <li><a href="#" class="stop-container" data-url="{% url 'containers.stop_container' host=c.host.name container_id=c.container_id %}">{% trans 'Stop' %}</a></li>
+                                <li><a href="#" class="destroy-container" data-url="{% url 'containers.destroy_container' host=c.host.name container_id=c.container_id %}">{% trans 'Destroy' %}</a></li>
                             </ul>
                         </div>
                     </td>
