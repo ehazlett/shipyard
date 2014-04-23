@@ -79,6 +79,8 @@ def containers(request):
         return HttpResponse(status=403)
     container_data = json.loads(request.body)
     for d in container_data:
+        if d.get('HostConfig', {}).get('PortBindings'):
+            print(d)
         c = d.get('Container')
         meta = d.get('Meta')
         running = meta.get('State', {}).get('Running', False)

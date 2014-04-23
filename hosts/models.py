@@ -63,7 +63,6 @@ class Host(models.Model):
             url ='{0}:{1}'.format(self.hostname, self.port)
             if not url.startswith('http'):
                 url = 'http://{0}'.format(url)
-        print(url)
         return client.Client(base_url=url)
 
     def _load_container_data(self, container_id):
@@ -122,6 +121,7 @@ class Host(models.Model):
                 if len(port_parts) == 3:
                     interface, mapping, port = port_parts
 		    port_bindings[port] = (interface, mapping)
+                    port_exposes[port]
                 elif len(port_parts) == 2:
                     mapping, port = port_parts
 		    port_bindings[port] = mapping
@@ -130,14 +130,14 @@ class Host(models.Model):
 		    port_bindings[port] = None
                 if port.find('/') < 0:
                     port = "{0}/tcp".format(port)
-                port_exposes[port] = {};
+                port_exposes[port_str] = {}
         # convert to bool
         if privileged:
             privileged = True
         c = self._get_client()
         try:
             cnt = c.create_container(image=image, command=command, detach=True,
-                ports=port_exposes, mem_limit=memory, tty=True, stdin_open=True,
+                    ports=ports, mem_limit=memory, tty=True, stdin_open=True,
                 environment=environment, volumes=volumes,
                 volumes_from=volumes_from, name=name,
                 hostname=hostname, **kwargs)
