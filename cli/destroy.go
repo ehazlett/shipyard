@@ -12,12 +12,6 @@ var destroyCommand = cli.Command{
 	ShortName: "d",
 	Usage:     "destroy a container",
 	Action:    destroyAction,
-	Flags: []cli.Flag{
-		cli.StringFlag{
-			Name:  "id, i",
-			Usage: "container id",
-		},
-	},
 }
 
 func destroyAction(c *cli.Context) {
@@ -27,12 +21,16 @@ func destroyAction(c *cli.Context) {
 		fmt.Println("error destroying container: %s\n", err)
 		return
 	}
+	img := c.Args()
 	for _, cnt := range containers {
-		if strings.HasPrefix(cnt.ID, c.String("id")) {
-			if err := m.Destroy(cnt); err != nil {
-				logger.Fatalf("error destroying container: %s\n", err)
+		// this can probably be more efficient
+		for _, i := range img {
+			if strings.HasPrefix(cnt.ID, i) {
+				if err := m.Destroy(cnt); err != nil {
+					logger.Fatalf("error destroying container: %s\n", err)
+				}
+				fmt.Printf("destroyed %s\n", cnt.ID[:12])
 			}
-			fmt.Printf("destroyed %s\n", cnt.ID[:12])
 		}
 	}
 }
