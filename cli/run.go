@@ -37,21 +37,28 @@ var runCommand = cli.Command{
 			Usage: "labels",
 			Value: &cli.StringSlice{},
 		},
+		cli.IntFlag{
+			Name:  "count",
+			Usage: "number of instances",
+			Value: 1,
+		},
 	},
 }
 
 func runAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
-	image := &citadel.Image{
-		Name:   c.String("name"),
-		Cpus:   c.Float64("cpus"),
-		Memory: c.Float64("memory"),
-		Labels: c.StringSlice("labels"),
-		Type:   c.String("type"),
+	for i := 0; i < c.Int("count"); i++ {
+		image := &citadel.Image{
+			Name:   c.String("name"),
+			Cpus:   c.Float64("cpus"),
+			Memory: c.Float64("memory"),
+			Labels: c.StringSlice("labels"),
+			Type:   c.String("type"),
+		}
+		container, err := m.Run(image)
+		if err != nil {
+			logger.Fatalf("error running container: %s\n", err)
+		}
+		fmt.Printf("started %s on %s\n", container.ID[:12], container.Engine.Addr)
 	}
-	container, err := m.Run(image)
-	if err != nil {
-		logger.Fatalf("error running container: %s", err)
-	}
-	fmt.Printf("started %s on %s", container.ID[:12], container.Engine.Addr)
 }

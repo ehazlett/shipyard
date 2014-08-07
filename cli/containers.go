@@ -21,7 +21,7 @@ func containersAction(c *cli.Context) {
 	if len(containers) == 0 {
 		return
 	}
-	d := NewDisplay(18, 30, ' ')
+	d := NewDisplay(25, 40, ' ')
 	d.Write(fmt.Sprintf("ID\tName\tHost"))
 	for _, c := range containers {
 		d.Write(fmt.Sprintf("%s\t%s\t%s", c.ID[:12], c.Image.Name, c.Engine.Addr))
