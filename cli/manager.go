@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/citadel/citadel"
+	"github.com/shipyard/shipyard"
 )
 
 type (
@@ -28,7 +29,7 @@ func (m *Manager) buildUrl(path string) string {
 	return fmt.Sprintf("%s%s", m.baseUrl, path)
 }
 
-func (m *Manager) GetContainers() ([]*citadel.Container, error) {
+func (m *Manager) Containers() ([]*citadel.Container, error) {
 	containers := []*citadel.Container{}
 	url := m.buildUrl("/containers")
 	r, err := http.Get(url)
@@ -89,4 +90,17 @@ func (m *Manager) Destroy(container *citadel.Container) error {
 		return errors.New(string(c))
 	}
 	return nil
+}
+
+func (m *Manager) Engines() ([]*shipyard.Engine, error) {
+	engines := []*shipyard.Engine{}
+	url := m.buildUrl("/engines")
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(r.Body).Decode(&engines); err != nil {
+		return nil, err
+	}
+	return engines, nil
 }

@@ -29,6 +29,7 @@ func main() {
 		containersCommand,
 		runCommand,
 		destroyCommand,
+		engineListCommand,
 	}
 	app.Run(os.Args)
 }
