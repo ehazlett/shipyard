@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/codegangsta/cli"
@@ -25,9 +26,15 @@ func containersAction(c *cli.Context) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "ID\tName\tHost")
+	fmt.Fprintln(w, "ID\tName\tHost\tPorts")
 	for _, c := range containers {
-		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\n", c.ID[:12], c.Image.Name, c.Engine.Addr))
+		portDefs := []string{}
+		for _, port := range c.Ports {
+			p := fmt.Sprintf("%s/%d:%d", port.Proto, port.ContainerPort, port.Port)
+			portDefs = append(portDefs, p)
+		}
+		ports := strings.Join(portDefs, ", ")
+		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%s\n", c.ID[:12], c.Image.Name, c.Engine.Addr, ports))
 	}
 	w.Flush()
 }
