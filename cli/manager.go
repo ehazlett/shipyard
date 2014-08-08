@@ -42,13 +42,13 @@ func (m *Manager) Containers() ([]*citadel.Container, error) {
 	return containers, nil
 }
 
-func (m *Manager) Run(image *citadel.Image) (*citadel.Container, error) {
+func (m *Manager) Run(image *citadel.Image, pull bool) (*citadel.Container, error) {
 	b, err := json.Marshal(image)
 	if err != nil {
 		return nil, err
 	}
 	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/run")
+	url := m.buildUrl(fmt.Sprintf("/run?pull=%v", pull))
 	resp, err := http.Post(url, "application/json", buf)
 	if err != nil {
 		return nil, err

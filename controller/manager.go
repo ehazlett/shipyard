@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"time"
 
 	"github.com/citadel/citadel"
@@ -66,14 +67,18 @@ func (m *Manager) init() []*shipyard.Engine {
 	m.engines = engines
 	var engs []*citadel.Engine
 	for _, d := range engines {
-		caCert := []byte(d.CACertificate)
-		sslCert := []byte(d.SSLCertificate)
-		sslKey := []byte(d.SSLKey)
-		c, err := getTLSConfig(caCert, sslCert, sslKey)
-		if err != nil {
-			logger.Errorf("error getting tls config: %s", err)
+		tlsConfig := &tls.Config{}
+		if d.CACertificate != "" && d.SSLCertificate != "" && d.SSLKey != "" {
+			caCert := []byte(d.CACertificate)
+			sslCert := []byte(d.SSLCertificate)
+			sslKey := []byte(d.SSLKey)
+			c, err := getTLSConfig(caCert, sslCert, sslKey)
+			if err != nil {
+				logger.Errorf("error getting tls config: %s", err)
+			}
+			tlsConfig = c
 		}
-		if err := setEngineClient(d.Engine, c); err != nil {
+		if err := setEngineClient(d.Engine, tlsConfig); err != nil {
 			logger.Errorf("error setting tls config for engine: %s", err)
 		}
 		engs = append(engs, d.Engine)

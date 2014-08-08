@@ -32,10 +32,24 @@ var runCommand = cli.Command{
 			Value: "service",
 			Usage: "type (service, batch, etc.)",
 		},
+		cli.StringFlag{
+			Name:  "hostname",
+			Value: "",
+			Usage: "container hostname",
+		},
+		cli.StringFlag{
+			Name:  "domain",
+			Value: "",
+			Usage: "container domain name",
+		},
 		cli.StringSliceFlag{
 			Name:  "label",
 			Usage: "labels",
 			Value: &cli.StringSlice{},
+		},
+		cli.BoolFlag{
+			Name:  "pull",
+			Usage: "pull the image from the repository",
 		},
 		cli.IntFlag{
 			Name:  "count",
@@ -49,13 +63,15 @@ func runAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	for i := 0; i < c.Int("count"); i++ {
 		image := &citadel.Image{
-			Name:   c.String("name"),
-			Cpus:   c.Float64("cpus"),
-			Memory: c.Float64("memory"),
-			Labels: c.StringSlice("label"),
-			Type:   c.String("type"),
+			Name:       c.String("name"),
+			Cpus:       c.Float64("cpus"),
+			Memory:     c.Float64("memory"),
+			Hostname:   c.String("hostname"),
+			Domainname: c.String("domain"),
+			Labels:     c.StringSlice("label"),
+			Type:       c.String("type"),
 		}
-		container, err := m.Run(image)
+		container, err := m.Run(image, c.Bool("pull"))
 		if err != nil {
 			logger.Fatalf("error running container: %s\n", err)
 		}

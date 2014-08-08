@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/citadel/citadel"
 	"github.com/gorilla/mux"
@@ -50,13 +51,21 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 }
 
 func run(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	p := r.FormValue("pull")
+	pull, err := strconv.ParseBool(p)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	var image *citadel.Image
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	container, err := manager.clusterManager.Start(image)
+	container, err := manager.clusterManager.Start(image, pull)
 	if err != nil {
 		logger.Errorf("error running %s: %s", image.Name, err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
