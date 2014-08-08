@@ -110,5 +110,14 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 	if _, err := r.Table(tblNameConfig).Insert(engine).RunWrite(m.session); err != nil {
 		return err
 	}
+	m.init()
+	return nil
+}
+
+func (m *Manager) RemoveEngine(id string) error {
+	if _, err := r.Table(tblNameConfig).Get(id).Delete().RunWrite(m.session); err != nil {
+		return err
+	}
+	m.init()
 	return nil
 }

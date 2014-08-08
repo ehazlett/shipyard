@@ -8,10 +8,10 @@ import (
 )
 
 var destroyCommand = cli.Command{
-	Name:      "destroy",
-	ShortName: "d",
-	Usage:     "destroy a container",
-	Action:    destroyAction,
+	Name:        "destroy",
+	Usage:       "destroy a container",
+	Description: "destroy <id> [<id>]",
+	Action:      destroyAction,
 }
 
 func destroyAction(c *cli.Context) {

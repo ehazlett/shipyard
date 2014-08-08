@@ -106,6 +106,20 @@ func addEngine(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Infof("added engine id=%s addr=%s cpus=%f memory=%f", engine.Engine.ID, engine.Engine.Addr, engine.Engine.Cpus, engine.Engine.Memory)
+	w.WriteHeader(http.StatusCreated)
+}
+
+func removeEngine(w http.ResponseWriter, r *http.Request) {
+	var engine *shipyard.Engine
+	if err := json.NewDecoder(r.Body).Decode(&engine); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := manager.RemoveEngine(engine.ID); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("removed engine", engine.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -122,6 +136,7 @@ func main() {
 	r.HandleFunc("/destroy", destroy).Methods("DELETE")
 	r.HandleFunc("/engines", engines).Methods("GET")
 	r.HandleFunc("/engines/add", addEngine).Methods("POST")
+	r.HandleFunc("/engines/remove", removeEngine).Methods("POST")
 
 	logger.Infof("shipyard controller listening on %s", listenAddr)
 

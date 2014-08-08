@@ -31,6 +31,7 @@ func main() {
 		destroyCommand,
 		engineListCommand,
 		engineAddCommand,
+		engineRemoveCommand,
 	}
 	app.Run(os.Args)
 }

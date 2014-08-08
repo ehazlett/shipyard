@@ -116,6 +116,27 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 	if err != nil {
 		return err
 	}
+	if resp.StatusCode != 201 {
+		c, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(string(c))
+	}
+	return nil
+}
+
+func (m *Manager) RemoveEngine(engine *shipyard.Engine) error {
+	b, err := json.Marshal(engine)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(b)
+	url := m.buildUrl("/engines/remove")
+	resp, err := http.Post(url, "application/json", buf)
+	if err != nil {
+		return err
+	}
 	if resp.StatusCode != 204 {
 		c, err := ioutil.ReadAll(resp.Body)
 		if err != nil {

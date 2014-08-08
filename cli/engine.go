@@ -156,3 +156,31 @@ func engineAddAction(c *cli.Context) {
 		return
 	}
 }
+
+var engineRemoveCommand = cli.Command{
+	Name:        "remove-engine",
+	Usage:       "removes an engine",
+	Description: "remove-engine <id> [<id>]",
+	Action:      engineRemoveAction,
+}
+
+func engineRemoveAction(c *cli.Context) {
+	m := NewManager(c.GlobalString("host"))
+	engines, err := m.Engines()
+	if err != nil {
+		fmt.Printf("error removing engine: %s\n", err)
+		return
+	}
+	removeEngines := c.Args()
+	for _, eng := range engines {
+		// this can probably be more efficient
+		for _, i := range removeEngines {
+			if eng.Engine.ID == i {
+				if err := m.RemoveEngine(eng); err != nil {
+					logger.Fatalf("error removing engine: %s\n", err)
+				}
+				fmt.Printf("removed %s\n", eng.Engine.ID)
+			}
+		}
+	}
+}
