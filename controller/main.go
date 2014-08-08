@@ -72,7 +72,7 @@ func run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Infof("started %s", image.Name)
+	logger.Infof("started %s pull=%v", image.Name, pull)
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
