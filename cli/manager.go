@@ -104,3 +104,24 @@ func (m *Manager) Engines() ([]*shipyard.Engine, error) {
 	}
 	return engines, nil
 }
+
+func (m *Manager) AddEngine(engine *shipyard.Engine) error {
+	b, err := json.Marshal(engine)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(b)
+	url := m.buildUrl("/engines/add")
+	resp, err := http.Post(url, "application/json", buf)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 204 {
+		c, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(string(c))
+	}
+	return nil
+}

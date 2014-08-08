@@ -33,7 +33,7 @@ var runCommand = cli.Command{
 			Usage: "type (service, batch, etc.)",
 		},
 		cli.StringSliceFlag{
-			Name:  "labels",
+			Name:  "label",
 			Usage: "labels",
 			Value: &cli.StringSlice{},
 		},
@@ -52,7 +52,7 @@ func runAction(c *cli.Context) {
 			Name:   c.String("name"),
 			Cpus:   c.Float64("cpus"),
 			Memory: c.Float64("memory"),
-			Labels: c.StringSlice("labels"),
+			Labels: c.StringSlice("label"),
 			Type:   c.String("type"),
 		}
 		container, err := m.Run(image)
