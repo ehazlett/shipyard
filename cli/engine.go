@@ -29,10 +29,10 @@ func engineListAction(c *cli.Context) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "ID\tCpus\tMemory\tAddr\tLabels")
+	fmt.Fprintln(w, "ID\tCpus\tMemory\tHost\tLabels")
 	for _, e := range engines {
 		labels := strings.Join(e.Engine.Labels, ",")
-		fmt.Fprintf(w, "%s\t%f\t%f\t%s\t%s\n", e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.Addr, labels)
+		fmt.Fprintf(w, "%s\t%.2f\t%.2f\t%s\t%s\n", e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.ID, labels)
 	}
 	w.Flush()
 }

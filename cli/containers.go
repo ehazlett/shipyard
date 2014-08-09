@@ -35,7 +35,7 @@ func containersAction(c *cli.Context) {
 			portDefs = append(portDefs, p)
 		}
 		ports := strings.Join(portDefs, ", ")
-		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%s\n", c.ID[:12], c.Image.Name, c.Engine.Addr, ports))
+		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%s\n", c.ID[:12], c.Image.Name, c.Engine.ID, ports))
 	}
 	w.Flush()
 }
