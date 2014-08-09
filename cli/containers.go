@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -37,4 +38,25 @@ func containersAction(c *cli.Context) {
 		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%s\n", c.ID[:12], c.Image.Name, c.Engine.Addr, ports))
 	}
 	w.Flush()
+}
+
+var containerInspectCommand = cli.Command{
+	Name:   "inspect",
+	Usage:  "inspect container",
+	Action: containerInspectAction,
+}
+
+func containerInspectAction(c *cli.Context) {
+	m := NewManager(c.GlobalString("host"))
+	args := c.Args()
+	if len(args) == 0 {
+		logger.Fatalf("you must specify a container id")
+	}
+	containerId := args[0]
+	container, err := m.GetContainer(containerId)
+	if err != nil {
+		logger.Fatalf("error getting container info: %s", err)
+	}
+	b, err := json.MarshalIndent(container, "", "    ")
+	fmt.Println(string(b))
 }

@@ -18,13 +18,16 @@ func destroyAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	containers, err := m.Containers()
 	if err != nil {
-		fmt.Println("error destroying container: %s\n", err)
+		fmt.Println("error getting container info: %s\n", err)
 		return
 	}
-	img := c.Args()
+	ids := c.Args()
+	if len(ids) == 0 {
+		logger.Fatalf("you must specify at least one id")
+	}
 	for _, cnt := range containers {
 		// this can probably be more efficient
-		for _, i := range img {
+		for _, i := range ids {
 			if strings.HasPrefix(cnt.ID, i) {
 				if err := m.Destroy(cnt); err != nil {
 					logger.Fatalf("error destroying container: %s\n", err)

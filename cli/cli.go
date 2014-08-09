@@ -27,6 +27,7 @@ func main() {
 	}
 	app.Commands = []cli.Command{
 		containersCommand,
+		containerInspectCommand,
 		runCommand,
 		destroyCommand,
 		engineListCommand,

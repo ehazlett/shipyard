@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/citadel/citadel"
 	"github.com/shipyard/shipyard"
@@ -145,4 +146,17 @@ func (m *Manager) RemoveEngine(engine *shipyard.Engine) error {
 		return errors.New(string(c))
 	}
 	return nil
+}
+
+func (m *Manager) GetContainer(id string) (*citadel.Container, error) {
+	containers, err := m.Containers()
+	if err != nil {
+		return nil, err
+	}
+	for _, cnt := range containers {
+		if strings.HasPrefix(cnt.ID, id) {
+			return cnt, nil
+		}
+	}
+	return nil, nil
 }

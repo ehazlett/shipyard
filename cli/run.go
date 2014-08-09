@@ -43,6 +43,11 @@ var runCommand = cli.Command{
 			Usage: "container domain name",
 		},
 		cli.StringSliceFlag{
+			Name:  "env",
+			Usage: "environment variables (key=value pairs)",
+			Value: &cli.StringSlice{},
+		},
+		cli.StringSliceFlag{
 			Name:  "label",
 			Usage: "labels",
 			Value: &cli.StringSlice{},
@@ -61,15 +66,17 @@ var runCommand = cli.Command{
 
 func runAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
+	env := parseEnvironmentVariables(c.StringSlice("env"))
 	for i := 0; i < c.Int("count"); i++ {
 		image := &citadel.Image{
-			Name:       c.String("name"),
-			Cpus:       c.Float64("cpus"),
-			Memory:     c.Float64("memory"),
-			Hostname:   c.String("hostname"),
-			Domainname: c.String("domain"),
-			Labels:     c.StringSlice("label"),
-			Type:       c.String("type"),
+			Name:        c.String("name"),
+			Cpus:        c.Float64("cpus"),
+			Memory:      c.Float64("memory"),
+			Hostname:    c.String("hostname"),
+			Domainname:  c.String("domain"),
+			Labels:      c.StringSlice("label"),
+			Environment: env,
+			Type:        c.String("type"),
 		}
 		container, err := m.Run(image, c.Bool("pull"))
 		if err != nil {
