@@ -41,9 +41,10 @@ func containersAction(c *cli.Context) {
 }
 
 var containerInspectCommand = cli.Command{
-	Name:   "inspect",
-	Usage:  "inspect container",
-	Action: containerInspectAction,
+	Name:      "inspect",
+	ShortName: "i",
+	Usage:     "inspect container",
+	Action:    containerInspectAction,
 }
 
 func containerInspectAction(c *cli.Context) {
