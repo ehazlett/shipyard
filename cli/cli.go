@@ -17,7 +17,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "shipyard"
 	app.Usage = "manage a shipyard cluster"
-	app.Version = "0.0.1"
+	app.Version = "1.0.0"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "host",

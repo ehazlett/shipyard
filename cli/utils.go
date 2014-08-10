@@ -1,7 +1,10 @@
 package main
 
 import (
+	"strconv"
 	"strings"
+
+	"github.com/citadel/citadel"
 )
 
 func parseEnvironmentVariables(pairs []string) map[string]string {
@@ -17,4 +20,50 @@ func parseEnvironmentVariables(pairs []string) map[string]string {
 		env[k] = v
 	}
 	return env
+}
+
+func parsePorts(pairs []string) []*citadel.Port {
+	ports := []*citadel.Port{}
+	for _, p := range pairs {
+		parts := strings.Split(p, "/")
+		if len(parts) != 2 {
+			logger.Error("port definitions must be in <proto>/<host-port>:<container-port> pairs")
+			return nil
+		}
+		proto := parts[0]
+		portDef := parts[1]
+		// parse ports
+		portParts := strings.Split(portDef, ":")
+		if len(portParts) != 2 {
+			logger.Error("port definitions must be in <proto>/<host-port>:<container-port> pairs")
+			return nil
+		}
+		hostPortDef := portParts[0]
+		containerPortDef := portParts[1]
+		hostPort := 0
+		containerPort := 0
+		if hostPortDef != "" {
+			i, err := strconv.Atoi(hostPortDef)
+			if err != nil {
+				logger.Error("unable to parse port: %s", err)
+				return nil
+			}
+			hostPort = i
+		}
+		if containerPortDef != "" {
+			i, err := strconv.Atoi(containerPortDef)
+			if err != nil {
+				logger.Error("unable to parse port: %s", err)
+				return nil
+			}
+			containerPort = i
+		}
+		port := &citadel.Port{
+			Proto:         proto,
+			Port:          hostPort,
+			ContainerPort: containerPort,
+		}
+		ports = append(ports, port)
+	}
+	return ports
 }

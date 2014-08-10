@@ -52,6 +52,11 @@ var runCommand = cli.Command{
 			Usage: "labels",
 			Value: &cli.StringSlice{},
 		},
+		cli.StringSliceFlag{
+			Name:  "port",
+			Usage: "expose container ports. usage: --port <proto>/<host-port>:<container-port> i.e. --port tcp/:8080 --port tcp/80:8080",
+			Value: &cli.StringSlice{},
+		},
 		cli.BoolFlag{
 			Name:  "pull",
 			Usage: "pull the image from the repository",
@@ -67,6 +72,7 @@ var runCommand = cli.Command{
 func runAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	env := parseEnvironmentVariables(c.StringSlice("env"))
+	ports := parsePorts(c.StringSlice("port"))
 	for i := 0; i < c.Int("count"); i++ {
 		image := &citadel.Image{
 			Name:        c.String("name"),
@@ -76,6 +82,7 @@ func runAction(c *cli.Context) {
 			Domainname:  c.String("domain"),
 			Labels:      c.StringSlice("label"),
 			Environment: env,
+			BindPorts:   ports,
 			Type:        c.String("type"),
 		}
 		container, err := m.Run(image, c.Bool("pull"))
