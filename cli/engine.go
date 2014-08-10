@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -183,4 +184,25 @@ func engineRemoveAction(c *cli.Context) {
 			}
 		}
 	}
+}
+
+var engineInspectCommand = cli.Command{
+	Name:        "inspect-engine",
+	Usage:       "inspect an engine",
+	Description: "inspect-engine <id>",
+	Action:      engineInspectAction,
+}
+
+func engineInspectAction(c *cli.Context) {
+	m := NewManager(c.GlobalString("host"))
+	if len(c.Args()) == 0 {
+		logger.Fatal("you must specify an id")
+	}
+	id := c.Args()[0]
+	eng, err := m.GetEngine(id)
+	if err != nil {
+		logger.Fatalf("error inspecting engine: %s", err)
+	}
+	b, err := json.MarshalIndent(eng, "", "    ")
+	fmt.Println(string(b))
 }

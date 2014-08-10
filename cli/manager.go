@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"github.com/citadel/citadel"
 	"github.com/shipyard/shipyard"
@@ -149,14 +148,27 @@ func (m *Manager) RemoveEngine(engine *shipyard.Engine) error {
 }
 
 func (m *Manager) GetContainer(id string) (*citadel.Container, error) {
-	containers, err := m.Containers()
+	var container *citadel.Container
+	url := m.buildUrl(fmt.Sprintf("/api/containers/%s", id))
+	r, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	for _, cnt := range containers {
-		if strings.HasPrefix(cnt.ID, id) {
-			return cnt, nil
-		}
+	if err := json.NewDecoder(r.Body).Decode(&container); err != nil {
+		return nil, err
 	}
-	return nil, nil
+	return container, nil
+}
+
+func (m *Manager) GetEngine(id string) (*shipyard.Engine, error) {
+	var engine *shipyard.Engine
+	url := m.buildUrl(fmt.Sprintf("/api/engines/%s", id))
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(r.Body).Decode(&engine); err != nil {
+		return nil, err
+	}
+	return engine, nil
 }

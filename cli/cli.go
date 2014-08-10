@@ -33,6 +33,7 @@ func main() {
 		engineListCommand,
 		engineAddCommand,
 		engineRemoveCommand,
+		engineInspectCommand,
 	}
 	app.Run(os.Args)
 }
