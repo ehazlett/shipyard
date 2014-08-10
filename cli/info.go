@@ -21,7 +21,10 @@ func infoAction(c *cli.Context) {
 		logger.Fatalf("error getting cluster info: %s", err)
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "Cpus\tMemory\tContainers\tImages\tEngines")
-	fmt.Fprintf(w, "%.2f\t%.2f\t%d\t%d\t%d\n", info.Cpus, info.Memory, info.ContainerCount, info.ImageCount, info.EngineCount)
+	fmt.Fprintf(w, "Cpus: %.2f\n", info.Cpus)
+	fmt.Fprintf(w, "Memory: %.2f\n", info.Memory)
+	fmt.Fprintf(w, "Containers: %d\n", info.ContainerCount)
+	fmt.Fprintf(w, "Images: %d\n", info.ImageCount)
+	fmt.Fprintf(w, "Engines: %d\n", info.EngineCount)
 	w.Flush()
 }
