@@ -149,3 +149,11 @@ func (m *Manager) GetContainer(id string) (*citadel.Container, error) {
 	}
 	return nil, nil
 }
+
+func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
+	info, err := m.clusterManager.ClusterInfo()
+	if err != nil {
+		return nil, err
+	}
+	return info, nil
+}

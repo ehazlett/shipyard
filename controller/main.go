@@ -158,6 +158,19 @@ func removeEngine(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func clusterInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	info, err := manager.ClusterInfo()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(info); err != nil {
+		logger.Error(err)
+	}
+}
+
 func main() {
 	var (
 		mErr      error
@@ -169,6 +182,7 @@ func main() {
 	}
 
 	apiRouter := mux.NewRouter()
+	apiRouter.HandleFunc("/api/cluster/info", clusterInfo).Methods("GET")
 	apiRouter.HandleFunc("/api/containers", containers).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/run", run).Methods("POST")

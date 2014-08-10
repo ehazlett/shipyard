@@ -172,3 +172,16 @@ func (m *Manager) GetEngine(id string) (*shipyard.Engine, error) {
 	}
 	return engine, nil
 }
+
+func (m *Manager) Info() (*citadel.ClusterInfo, error) {
+	var info *citadel.ClusterInfo
+	url := m.buildUrl("/api/cluster/info")
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(r.Body).Decode(&info); err != nil {
+		return nil, err
+	}
+	return info, nil
+}

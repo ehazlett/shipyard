@@ -34,6 +34,7 @@ func main() {
 		engineAddCommand,
 		engineRemoveCommand,
 		engineInspectCommand,
+		infoCommand,
 	}
 	app.Run(os.Args)
 }
