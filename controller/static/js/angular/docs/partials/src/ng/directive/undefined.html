@@ -1,0 +1,83 @@
+
+
+<div>
+  <a ng-click="openPlunkr('examples/example-example44')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a>
+  <div class="runnable-example"
+      path="examples/example-example44"
+      module="ngAnimate"
+      deps="angular-animate.js"
+      animations="true">
+
+   
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>Click me: &lt;input type=&quot;checkbox&quot; ng-model=&quot;checked&quot;&gt;&lt;br/&gt;&#10;&lt;div&gt;&#10;  Show:&#10;  &lt;div class=&quot;check-element animate-hide&quot; ng-show=&quot;checked&quot;&gt;&#10;    &lt;span class=&quot;glyphicon glyphicon-thumbs-up&quot;&gt;&lt;/span&gt; I show up when your checkbox is checked.&#10;  &lt;/div&gt;&#10;&lt;/div&gt;&#10;&lt;div&gt;&#10;  Hide:&#10;  &lt;div class=&quot;check-element animate-hide&quot; ng-hide=&quot;checked&quot;&gt;&#10;    &lt;span class=&quot;glyphicon glyphicon-thumbs-down&quot;&gt;&lt;/span&gt; I hide when your checkbox is checked.&#10;  &lt;/div&gt;&#10;&lt;/div&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="glyphicons.css"
+      language="css"
+      type="css">
+      <pre><code>@import url(//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css);</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="animations.css"
+      language="css"
+      type="css">
+      <pre><code>.animate-hide {&#10;  -webkit-transition:all linear 0.5s;&#10;  transition:all linear 0.5s;&#10;  line-height:20px;&#10;  opacity:1;&#10;  padding:10px;&#10;  border:1px solid black;&#10;  background:white;&#10;}&#10;&#10;.animate-hide.ng-hide {&#10;  line-height:0;&#10;  opacity:0;&#10;  padding:0 10px;&#10;}&#10;&#10;.check-element {&#10;  padding:10px;&#10;  border:1px solid black;&#10;  background:white;&#10;}</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="protractor.js"
+      type="protractor"
+      language="js">
+      <pre><code>var thumbsUp = element(by.css(&#39;span.glyphicon-thumbs-up&#39;));&#10;var thumbsDown = element(by.css(&#39;span.glyphicon-thumbs-down&#39;));&#10;&#10;it(&#39;should check ng-show / ng-hide&#39;, function() {&#10;  expect(thumbsUp.isDisplayed()).toBeFalsy();&#10;  expect(thumbsDown.isDisplayed()).toBeTruthy();&#10;&#10;  element(by.model(&#39;checked&#39;)).click();&#10;&#10;  expect(thumbsUp.isDisplayed()).toBeTruthy();&#10;  expect(thumbsDown.isDisplayed()).toBeFalsy();&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-example44/index.html" name="example-example44"></iframe>
+  </div>
+</div>
+
+
+ng(&#39;{selected_color:myColor}&#39;)).getText()).toMatch(&#39;red&#39;);&#10;  element.all(by.model(&#39;myColor&#39;)).first().click();&#10;  element.all(by.css(&#39;select[ng-model=&quot;myColor&quot;] option&#39;)).first().click();&#10;  expect(element(by.binding(&#39;{selected_color:myColor}&#39;)).getText()).toMatch(&#39;black&#39;);&#10;  element(by.css(&#39;.nullable select[ng-model=&quot;myColor&quot;]&#39;)).click();&#10;  element.all(by.css(&#39;.nullable select[ng-model=&quot;myColor&quot;] option&#39;)).first().click();&#10;  expect(element(by.binding(&#39;{selected_color:myColor}&#39;)).getText()).toMatch(&#39;null&#39;);&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-example49/index.html" name="example-example49"></iframe>
+  </div>
+</div>
+
+
+lateSelect.all(by.css(&#39;option&#39;)).get(2).click();&#10;  expect(includeElem.getText()).toMatch(/Content of template2.html/);&#10;});&#10;&#10;it(&#39;should change to blank&#39;, function() {&#10;  if (browser.params.browser == &#39;firefox&#39;) {&#10;    // Firefox can&#39;t handle using selects&#10;    return;&#10;  }&#10;  templateSelect.click();&#10;  templateSelect.all(by.css(&#39;option&#39;)).get(0).click();&#10;  expect(includeElem.isPresent()).toBe(false);&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-example38/index.html" name="example-example38"></iframe>
+  </div>
+</div>
+
+
+ person1.clear();&#10;  person1.sendKeys(&#39;Di&#39;);&#10;  person2.clear();&#10;  person2.sendKeys(&#39;Vojta&#39;);&#10;  expect(withOffset.getText()).toEqual(&#39;Di, Vojta and 2 other people are viewing.&#39;);&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-example41/index.html" name="example-example41"></iframe>
+  </div>
+</div>
+
+
+ger than max length&#39;, function() {&#10;  userLastInput.clear();&#10;  userLastInput.sendKeys(&#39;some ridiculously long name&#39;);&#10;&#10;  expect(user.getText()).toContain(&#39;{&quot;name&quot;:&quot;guest&quot;}&#39;);&#10;  expect(lastNameValid.getText()).toContain(&#39;false&#39;);&#10;  expect(lastNameError.getText()).toContain(&#39;maxlength&#39;);&#10;  expect(formValid.getText()).toContain(&#39;false&#39;);&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-input-directive/index.html" name="example-input-directive"></iframe>
+  </div>
+</div>
+
+

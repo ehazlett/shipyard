@@ -1,0 +1,55 @@
+
+
+<div>
+  <a ng-click="openPlunkr('examples/example-$route-service')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a>
+  <div class="runnable-example"
+      path="examples/example-$route-service"
+      name="$route-service"
+      module="ngRouteExample"
+      deps="angular-route.js"
+      fixBase="true">
+
+   
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;div ng-controller=&quot;MainController&quot;&gt;&#10;  Choose:&#10;  &lt;a href=&quot;Book/Moby&quot;&gt;Moby&lt;/a&gt; |&#10;  &lt;a href=&quot;Book/Moby/ch/1&quot;&gt;Moby: Ch1&lt;/a&gt; |&#10;  &lt;a href=&quot;Book/Gatsby&quot;&gt;Gatsby&lt;/a&gt; |&#10;  &lt;a href=&quot;Book/Gatsby/ch/4?key=value&quot;&gt;Gatsby: Ch4&lt;/a&gt; |&#10;  &lt;a href=&quot;Book/Scarlet&quot;&gt;Scarlet Letter&lt;/a&gt;&lt;br/&gt;&#10;&#10;  &lt;div ng-view&gt;&lt;/div&gt;&#10;&#10;  &lt;hr /&gt;&#10;&#10;  &lt;pre&gt;$location.path() = {{$location.path()}}&lt;/pre&gt;&#10;  &lt;pre&gt;$route.current.templateUrl = {{$route.current.templateUrl}}&lt;/pre&gt;&#10;  &lt;pre&gt;$route.current.params = {{$route.current.params}}&lt;/pre&gt;&#10;  &lt;pre&gt;$route.current.scope.name = {{$route.current.scope.name}}&lt;/pre&gt;&#10;  &lt;pre&gt;$routeParams = {{$routeParams}}&lt;/pre&gt;&#10;&lt;/div&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="book.html"
+      language="html"
+      type="html">
+      <pre><code>controller: {{name}}&lt;br /&gt;&#10;Book Id: {{params.bookId}}&lt;br /&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="chapter.html"
+      language="html"
+      type="html">
+      <pre><code>controller: {{name}}&lt;br /&gt;&#10;Book Id: {{params.bookId}}&lt;br /&gt;&#10;Chapter Id: {{params.chapterId}}</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="script.js"
+      language="js"
+      type="js">
+      <pre><code>angular.module(&#39;ngRouteExample&#39;, [&#39;ngRoute&#39;])&#10;&#10; .controller(&#39;MainController&#39;, function($scope, $route, $routeParams, $location) {&#10;     $scope.$route = $route;&#10;     $scope.$location = $location;&#10;     $scope.$routeParams = $routeParams;&#10; })&#10;&#10; .controller(&#39;BookController&#39;, function($scope, $routeParams) {&#10;     $scope.name = &quot;BookController&quot;;&#10;     $scope.params = $routeParams;&#10; })&#10;&#10; .controller(&#39;ChapterController&#39;, function($scope, $routeParams) {&#10;     $scope.name = &quot;ChapterController&quot;;&#10;     $scope.params = $routeParams;&#10; })&#10;&#10;.config(function($routeProvider, $locationProvider) {&#10;  $routeProvider&#10;   .when(&#39;/Book/:bookId&#39;, {&#10;    templateUrl: &#39;book.html&#39;,&#10;    controller: &#39;BookController&#39;,&#10;    resolve: {&#10;      // I will cause a 1 second delay&#10;      delay: function($q, $timeout) {&#10;        var delay = $q.defer();&#10;        $timeout(delay.resolve, 1000);&#10;        return delay.promise;&#10;      }&#10;    }&#10;  })&#10;  .when(&#39;/Book/:bookId/ch/:chapterId&#39;, {&#10;    templateUrl: &#39;chapter.html&#39;,&#10;    controller: &#39;ChapterController&#39;&#10;  });&#10;&#10;  // configure html5 to get links working on jsfiddle&#10;  $locationProvider.html5Mode(true);&#10;});</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="protractor.js"
+      type="protractor"
+      language="js">
+      <pre><code>it(&#39;should load and compile correct template&#39;, function() {&#10;  element(by.linkText(&#39;Moby: Ch1&#39;)).click();&#10;  var content = element(by.css(&#39;[ng-view]&#39;)).getText();&#10;  expect(content).toMatch(/controller\: ChapterController/);&#10;  expect(content).toMatch(/Book Id\: Moby/);&#10;  expect(content).toMatch(/Chapter Id\: 1/);&#10;&#10;  element(by.partialLinkText(&#39;Scarlet&#39;)).click();&#10;&#10;  content = element(by.css(&#39;[ng-view]&#39;)).getText();&#10;  expect(content).toMatch(/controller\: BookController/);&#10;  expect(content).toMatch(/Book Id\: Scarlet/);&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-$route-service/index.html" name="example-$route-service"></iframe>
+  </div>
+</div>
+
+

@@ -1,0 +1,9 @@
+{
+  "name": "example-example90",
+  "files": [
+    "index-production.html",
+    "script.js",
+    "my-tabs.html",
+    "my-pane.html"
+  ]
+}

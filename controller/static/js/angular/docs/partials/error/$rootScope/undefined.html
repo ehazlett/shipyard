@@ -1,0 +1,32 @@
+
+
+<div>
+  <a ng-click="openPlunkr('examples/example-error-$rootScope-inprog')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a>
+  <div class="runnable-example"
+      path="examples/example-error-$rootScope-inprog"
+      name="error-$rootScope-inprog"
+      module="app">
+
+   
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;button ng-click=&quot;focusInput = true&quot;&gt;Focus&lt;/button&gt;&#10;&lt;input ng-focus=&quot;count = count + 1&quot; set-focus-if=&quot;focusInput&quot; /&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="app.js"
+      language="js"
+      type="js">
+      <pre><code>angular.module(&#39;app&#39;, []).directive(&#39;setFocusIf&#39;, function() {&#10;  return function link($scope, $element, $attr) {&#10;    $scope.$watch($attr.setFocusIf, function(value) {&#10;      if ( value ) { $element[0].focus(); }&#10;    });&#10;  };&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-error-$rootScope-inprog/index.html" name="example-error-$rootScope-inprog"></iframe>
+  </div>
+</div>
+
+

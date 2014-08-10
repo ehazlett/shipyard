@@ -1,0 +1,8 @@
+{
+  "name": "example-example78",
+  "files": [
+    "index-production.html",
+    "script.js",
+    "protractorTest.js"
+  ]
+}

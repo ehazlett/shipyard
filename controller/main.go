@@ -133,23 +133,29 @@ func removeEngine(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var mErr error
+	var (
+		mErr      error
+		globalMux = http.NewServeMux()
+	)
 	manager, mErr = NewManager(rethinkdbAddr, rethinkdbDatabase)
 	if mErr != nil {
 		logger.Fatal(mErr)
 	}
 
-	r := mux.NewRouter()
-	r.HandleFunc("/containers", containers).Methods("GET")
-	r.HandleFunc("/run", run).Methods("POST")
-	r.HandleFunc("/destroy", destroy).Methods("DELETE")
-	r.HandleFunc("/engines", engines).Methods("GET")
-	r.HandleFunc("/engines/add", addEngine).Methods("POST")
-	r.HandleFunc("/engines/remove", removeEngine).Methods("POST")
+	apiRouter := mux.NewRouter()
+	apiRouter.HandleFunc("/api/containers", containers).Methods("GET")
+	apiRouter.HandleFunc("/api/run", run).Methods("POST")
+	apiRouter.HandleFunc("/api/destroy", destroy).Methods("DELETE")
+	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
+	apiRouter.HandleFunc("/api/engines/add", addEngine).Methods("POST")
+	apiRouter.HandleFunc("/api/engines/remove", removeEngine).Methods("POST")
+	globalMux.Handle("/api/", apiRouter)
+
+	globalMux.Handle("/", http.FileServer(http.Dir("static")))
 
 	logger.Infof("shipyard controller listening on %s", listenAddr)
 
-	if err := http.ListenAndServe(listenAddr, r); err != nil {
+	if err := http.ListenAndServe(listenAddr, globalMux); err != nil {
 		logger.Fatal(err)
 	}
 }

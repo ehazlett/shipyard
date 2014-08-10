@@ -32,7 +32,7 @@ func (m *Manager) buildUrl(path string) string {
 
 func (m *Manager) Containers() ([]*citadel.Container, error) {
 	containers := []*citadel.Container{}
-	url := m.buildUrl("/containers")
+	url := m.buildUrl("/api/containers")
 	r, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (m *Manager) Run(image *citadel.Image, pull bool) (*citadel.Container, erro
 		return nil, err
 	}
 	buf := bytes.NewBuffer(b)
-	url := m.buildUrl(fmt.Sprintf("/run?pull=%v", pull))
+	url := m.buildUrl(fmt.Sprintf("/api/run?pull=%v", pull))
 	resp, err := http.Post(url, "application/json", buf)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (m *Manager) Destroy(container *citadel.Container) error {
 		return err
 	}
 	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/destroy")
+	url := m.buildUrl("/api/destroy")
 	req, err := http.NewRequest("DELETE", url, buf)
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (m *Manager) Destroy(container *citadel.Container) error {
 
 func (m *Manager) Engines() ([]*shipyard.Engine, error) {
 	engines := []*shipyard.Engine{}
-	url := m.buildUrl("/engines")
+	url := m.buildUrl("/api/engines")
 	r, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 		return err
 	}
 	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/engines/add")
+	url := m.buildUrl("/api/engines/add")
 	resp, err := http.Post(url, "application/json", buf)
 	if err != nil {
 		return err
@@ -133,7 +133,7 @@ func (m *Manager) RemoveEngine(engine *shipyard.Engine) error {
 		return err
 	}
 	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/engines/remove")
+	url := m.buildUrl("/api/engines/remove")
 	resp, err := http.Post(url, "application/json", buf)
 	if err != nil {
 		return err

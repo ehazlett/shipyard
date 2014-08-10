@@ -1,0 +1,9 @@
+{
+  "name": "example-example64",
+  "files": [
+    "index-production.html",
+    "script.js",
+    "test_data.json",
+    "protractor.js"
+  ]
+}

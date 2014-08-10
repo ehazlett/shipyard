@@ -1,0 +1,32 @@
+
+
+<div>
+  <a ng-click="openPlunkr('examples/example-example66')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a>
+  <div class="runnable-example"
+      path="examples/example-example66"
+      module="linkyExample"
+      deps="angular-sanitize.js">
+
+   
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;script&gt;&#10;  angular.module(&#39;linkyExample&#39;, [&#39;ngSanitize&#39;])&#10;    .controller(&#39;ExampleController&#39;, [&#39;$scope&#39;, function($scope) {&#10;      $scope.snippet =&#10;        &#39;Pretty text with some links:\n&#39;+&#10;        &#39;http://angularjs.org/,\n&#39;+&#10;        &#39;mailto:us@somewhere.org,\n&#39;+&#10;        &#39;another@somewhere.org,\n&#39;+&#10;        &#39;and one more: ftp://127.0.0.1/.&#39;;&#10;      $scope.snippetWithTarget = &#39;http://angularjs.org/&#39;;&#10;    }]);&#10;&lt;/script&gt;&#10;&lt;div ng-controller=&quot;ExampleController&quot;&gt;&#10;Snippet: &lt;textarea ng-model=&quot;snippet&quot; cols=&quot;60&quot; rows=&quot;3&quot;&gt;&lt;/textarea&gt;&#10;&lt;table&gt;&#10;  &lt;tr&gt;&#10;    &lt;td&gt;Filter&lt;/td&gt;&#10;    &lt;td&gt;Source&lt;/td&gt;&#10;    &lt;td&gt;Rendered&lt;/td&gt;&#10;  &lt;/tr&gt;&#10;  &lt;tr id=&quot;linky-filter&quot;&gt;&#10;    &lt;td&gt;linky filter&lt;/td&gt;&#10;    &lt;td&gt;&#10;      &lt;pre&gt;&amp;lt;div ng-bind-html=&quot;snippet | linky&quot;&amp;gt;&lt;br&gt;&amp;lt;/div&amp;gt;&lt;/pre&gt;&#10;    &lt;/td&gt;&#10;    &lt;td&gt;&#10;      &lt;div ng-bind-html=&quot;snippet | linky&quot;&gt;&lt;/div&gt;&#10;    &lt;/td&gt;&#10;  &lt;/tr&gt;&#10;  &lt;tr id=&quot;linky-target&quot;&gt;&#10;   &lt;td&gt;linky target&lt;/td&gt;&#10;   &lt;td&gt;&#10;     &lt;pre&gt;&amp;lt;div ng-bind-html=&quot;snippetWithTarget | linky:&#39;_blank&#39;&quot;&amp;gt;&lt;br&gt;&amp;lt;/div&amp;gt;&lt;/pre&gt;&#10;   &lt;/td&gt;&#10;   &lt;td&gt;&#10;     &lt;div ng-bind-html=&quot;snippetWithTarget | linky:&#39;_blank&#39;&quot;&gt;&lt;/div&gt;&#10;   &lt;/td&gt;&#10;  &lt;/tr&gt;&#10;  &lt;tr id=&quot;escaped-html&quot;&gt;&#10;    &lt;td&gt;no filter&lt;/td&gt;&#10;    &lt;td&gt;&lt;pre&gt;&amp;lt;div ng-bind=&quot;snippet&quot;&amp;gt;&lt;br&gt;&amp;lt;/div&amp;gt;&lt;/pre&gt;&lt;/td&gt;&#10;    &lt;td&gt;&lt;div ng-bind=&quot;snippet&quot;&gt;&lt;/div&gt;&lt;/td&gt;&#10;  &lt;/tr&gt;&#10;&lt;/table&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="protractor.js"
+      type="protractor"
+      language="js">
+      <pre><code>it(&#39;should linkify the snippet with urls&#39;, function() {&#10;  expect(element(by.id(&#39;linky-filter&#39;)).element(by.binding(&#39;snippet | linky&#39;)).getText()).&#10;      toBe(&#39;Pretty text with some links: http://angularjs.org/, us@somewhere.org, &#39; +&#10;           &#39;another@somewhere.org, and one more: ftp://127.0.0.1/.&#39;);&#10;  expect(element.all(by.css(&#39;#linky-filter a&#39;)).count()).toEqual(4);&#10;});&#10;&#10;it(&#39;should not linkify snippet without the linky filter&#39;, function() {&#10;  expect(element(by.id(&#39;escaped-html&#39;)).element(by.binding(&#39;snippet&#39;)).getText()).&#10;      toBe(&#39;Pretty text with some links: http://angularjs.org/, mailto:us@somewhere.org, &#39; +&#10;           &#39;another@somewhere.org, and one more: ftp://127.0.0.1/.&#39;);&#10;  expect(element.all(by.css(&#39;#escaped-html a&#39;)).count()).toEqual(0);&#10;});&#10;&#10;it(&#39;should update&#39;, function() {&#10;  element(by.model(&#39;snippet&#39;)).clear();&#10;  element(by.model(&#39;snippet&#39;)).sendKeys(&#39;new http://link.&#39;);&#10;  expect(element(by.id(&#39;linky-filter&#39;)).element(by.binding(&#39;snippet | linky&#39;)).getText()).&#10;      toBe(&#39;new http://link.&#39;);&#10;  expect(element.all(by.css(&#39;#linky-filter a&#39;)).count()).toEqual(1);&#10;  expect(element(by.id(&#39;escaped-html&#39;)).element(by.binding(&#39;snippet&#39;)).getText())&#10;      .toBe(&#39;new http://link.&#39;);&#10;});&#10;&#10;it(&#39;should work with the target property&#39;, function() {&#10; expect(element(by.id(&#39;linky-target&#39;)).&#10;     element(by.binding(&quot;snippetWithTarget | linky:&#39;_blank&#39;&quot;)).getText()).&#10;     toBe(&#39;http://angularjs.org/&#39;);&#10; expect(element(by.css(&#39;#linky-target a&#39;)).getAttribute(&#39;target&#39;)).toEqual(&#39;_blank&#39;);&#10;});</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-example66/index.html" name="example-example66"></iframe>
+  </div>
+</div>
+
+

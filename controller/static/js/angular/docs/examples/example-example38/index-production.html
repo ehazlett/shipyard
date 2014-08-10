@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Example - example-example38-production</title>
+  <link href="animations.css" rel="stylesheet" type="text/css">
+  
+
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.16/angular.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.16/angular-animate.js"></script>
+  <script src="script.js"></script>
+  
+
+  
+</head>
+<body ng-app="includeExample">
+   <div ng-controller="ExampleController">
+   <select ng-model="template" ng-options="t.name for t in templates">
+    <option value="">(blank)</option>
+   </select>
+   url of the template: <tt>{{template.url}}</tt>
+   <hr/>
+   <div class="slide-animate-container">
+     <div class="slide-animate" ng-include="template.url"></div>
+   </div>
+ </div>
+</body>
+</html>

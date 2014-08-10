@@ -1,0 +1,38 @@
+
+
+<div>
+  <a ng-click="openPlunkr('examples/example-example2')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a>
+  <div class="runnable-example"
+      path="examples/example-example2"
+      ng-app-included="true">
+
+   
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;div ng-app=&quot;ngAppStrictDemo&quot; ng-strict-di&gt;&#10;&lt;div ng-controller=&quot;GoodController1&quot;&gt;&#10;    I can add: {{a}} + {{b}} =  {{ a+b }}&#10;&#10;    &lt;p&gt;This renders because the controller does not fail to&#10;       instantiate, by using explicit annotation style (see&#10;       script.js for details)&#10;    &lt;/p&gt;&#10;&lt;/div&gt;&#10;&#10;&lt;div ng-controller=&quot;GoodController2&quot;&gt;&#10;    Name: &lt;input ng-model=&quot;name&quot;&gt;&lt;br /&gt;&#10;    Hello, {{name}}!&#10;&#10;    &lt;p&gt;This renders because the controller does not fail to&#10;       instantiate, by using explicit annotation style&#10;       (see script.js for details)&#10;    &lt;/p&gt;&#10;&lt;/div&gt;&#10;&#10;&lt;div ng-controller=&quot;BadController&quot;&gt;&#10;    I can add: {{a}} + {{b}} =  {{ a+b }}&#10;&#10;    &lt;p&gt;The controller could not be instantiated, due to relying&#10;       on automatic function annotations (which are disabled in&#10;       strict mode). As such, the content of this section is not&#10;       interpolated, and there should be an error in your web console.&#10;    &lt;/p&gt;&#10;&lt;/div&gt;&#10;&lt;/div&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="script.js"
+      language="js"
+      type="js">
+      <pre><code>angular.module(&#39;ngAppStrictDemo&#39;, [])&#10;// BadController will fail to instantiate, due to relying on automatic function annotation,&#10;// rather than an explicit annotation&#10;.controller(&#39;BadController&#39;, function($scope) {&#10;  $scope.a = 1;&#10;  $scope.b = 2;&#10;})&#10;// Unlike BadController, GoodController1 and GoodController2 will not fail to be instantiated,&#10;// due to using explicit annotations using the array style and $inject property, respectively.&#10;.controller(&#39;GoodController1&#39;, [&#39;$scope&#39;, function($scope) {&#10;  $scope.a = 1;&#10;  $scope.b = 2;&#10;}])&#10;.controller(&#39;GoodController2&#39;, GoodController2);&#10;function GoodController2($scope) {&#10;  $scope.name = &quot;World&quot;;&#10;}&#10;GoodController2.$inject = [&#39;$scope&#39;];</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="style.css"
+      language="css"
+      type="css">
+      <pre><code>div[ng-controller] {&#10;margin-bottom: 1em;&#10;-webkit-border-radius: 4px;&#10;border-radius: 4px;&#10;border: 1px solid;&#10;padding: .5em;&#10;}&#10;div[ng-controller^=Good] {&#10;border-color: #d6e9c6;&#10;background-color: #dff0d8;&#10;color: #3c763d;&#10;}&#10;div[ng-controller^=Bad] {&#10;border-color: #ebccd1;&#10;background-color: #f2dede;&#10;color: #a94442;&#10;margin-bottom: 0;&#10;}</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-example2/index.html" name="example-example2"></iframe>
+  </div>
+</div>
+
+

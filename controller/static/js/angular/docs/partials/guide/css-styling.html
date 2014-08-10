@@ -1,0 +1,39 @@
+<a href='http://github.com/angular/angular.js/edit/master/docs/content/guide/css-styling.ngdoc' class='improve-docs btn btn-primary'><i class="glyphicon glyphicon-edit">&nbsp;</i>Improve this doc</a>
+
+
+<p>Angular sets these CSS classes. It is up to your application to provide useful styling.</p>
+<h1 id="css-classes-used-by-angular">CSS classes used by angular</h1>
+<ul>
+<li><p><code>ng-scope</code></p>
+<ul>
+<li><strong>Usage:</strong> angular applies this class to any element for which a new <a href="api/ng.$rootScope.Scope">scope</a>
+is defined. (see <a href="guide/scope">scope</a> guide for more information about scopes)</li>
+</ul>
+</li>
+<li><p><code>ng-binding</code></p>
+<ul>
+<li><strong>Usage:</strong> angular applies this class to any element that is attached to a data binding, via <code>ng-bind</code> or
+<code>{{}}</code> curly braces, for example. (see <a href="guide/databinding">databinding</a> guide)</li>
+</ul>
+</li>
+<li><p><code>ng-invalid</code>, <code>ng-valid</code></p>
+<ul>
+<li><strong>Usage:</strong> angular applies this class to an input widget element if that element&#39;s input does
+not pass validation. (see <a href="api/ng/directive/input">input</a> directive)</li>
+</ul>
+</li>
+<li><p><code>ng-pristine</code>, <code>ng-dirty</code></p>
+<ul>
+<li><strong>Usage:</strong> angular <a href="api/ng/directive/input">input</a> directive applies <code>ng-pristine</code> class
+to a new input widget element which did not have user interaction. Once the user interacts with
+the input widget the class is changed to <code>ng-dirty</code>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="related-topics">Related Topics</h2>
+<ul>
+<li><a href="guide/templates">Angular Templates</a></li>
+<li><a href="guide/forms">Angular Forms</a></li>
+</ul>
+
+
