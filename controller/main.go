@@ -91,6 +91,17 @@ func engines(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func inspectEngine(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+	engine := manager.GetEngine(id)
+	if err := json.NewEncoder(w).Encode(engine); err != nil {
+		logger.Error(err)
+	}
+}
+
 func containers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -101,6 +112,21 @@ func containers(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := json.NewEncoder(w).Encode(containers); err != nil {
 		log.Println(err)
+	}
+}
+
+func inspectContainer(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+	container, err := manager.GetContainer(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(container); err != nil {
+		logger.Error(err)
 	}
 }
 
@@ -144,9 +170,11 @@ func main() {
 
 	apiRouter := mux.NewRouter()
 	apiRouter.HandleFunc("/api/containers", containers).Methods("GET")
+	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/run", run).Methods("POST")
 	apiRouter.HandleFunc("/api/destroy", destroy).Methods("DELETE")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
+	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/add", addEngine).Methods("POST")
 	apiRouter.HandleFunc("/api/engines/remove", removeEngine).Methods("POST")
 	globalMux.Handle("/api/", apiRouter)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"strings"
 	"time"
 
 	"github.com/citadel/citadel"
@@ -111,6 +112,15 @@ func (m *Manager) Engines() []*shipyard.Engine {
 	return m.engines
 }
 
+func (m *Manager) GetEngine(id string) *shipyard.Engine {
+	for _, e := range m.engines {
+		if e.Engine.ID == id {
+			return e
+		}
+	}
+	return nil
+}
+
 func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 	if _, err := r.Table(tblNameConfig).Insert(engine).RunWrite(m.session); err != nil {
 		return err
@@ -125,4 +135,17 @@ func (m *Manager) RemoveEngine(id string) error {
 	}
 	m.init()
 	return nil
+}
+
+func (m *Manager) GetContainer(id string) (*citadel.Container, error) {
+	containers, err := m.clusterManager.ListContainers()
+	if err != nil {
+		return nil, err
+	}
+	for _, cnt := range containers {
+		if strings.HasPrefix(cnt.ID, id) {
+			return cnt, nil
+		}
+	}
+	return nil, nil
 }
