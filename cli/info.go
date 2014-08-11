@@ -22,7 +22,7 @@ func infoAction(c *cli.Context) {
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
 	fmt.Fprintf(w, "Cpus: %.2f\n", info.Cpus)
-	fmt.Fprintf(w, "Memory: %.2f\n", info.Memory)
+	fmt.Fprintf(w, "Memory: %.2f MB\n", info.Memory)
 	fmt.Fprintf(w, "Containers: %d\n", info.ContainerCount)
 	fmt.Fprintf(w, "Images: %d\n", info.ImageCount)
 	fmt.Fprintf(w, "Engines: %d\n", info.EngineCount)
