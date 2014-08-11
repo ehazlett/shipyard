@@ -1,1 +1,112 @@
-Dashboard
+<div class="ui three column grid">
+    <div class="row">
+        <div id="chart-cpu" class="one wide column">
+        <h3 class="ui header center aligned">CPU</h3>
+                <svg></svg>
+        </div>
+        <div id="chart-memory" class="one wide column">
+        <h3 class="ui header center aligned">Memory</h3>
+                <svg></svg>
+        </div>
+
+        <div class="column">
+            <h3 class="ui header center aligned">Events</h3>
+            <div class="ui feed">
+                <div class="event">
+                    <div class="label">
+                          <i class="circular github alternate icon"></i>
+                    </div>
+                    <div class="content">
+                      <div class="summary">
+                          Project Test: rev <a href="#">abde243f</a> was deployed
+                      </div>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="label">
+                        <i class="circular add icon blue"></i>
+                    </div>
+                    <div class="content">
+                        <div class="summary">
+                            Engine i-ab38fea was added to the cluster
+                        </div>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="label">
+                          <i class="circular checkmark icon green"></i>
+                    </div>
+                    <div class="content">
+                      <div class="summary">
+                          Container org/test-image (ef02ab2) started 
+                      </div>
+                    </div>
+                </div>
+                <div class="event">
+                    <div class="label">
+                          <i class="circular exclamation icon red"></i>
+                    </div>
+                    <div class="content">
+                      <div class="summary">
+                          Container org/test-image (fa56bc2) failed to start
+                      </div>
+                    </div>
+                </div>
+                <div class="ui divider"></div>
+                <div class="ui center aligned">
+                    <a class="fluid ui blue button">all events</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    var cpuData = [
+        {
+            "label": "Used",
+            "value": 1.25
+        },
+        {
+            "label": "Total",
+            "value": 9.0
+        }
+    ]
+    var memoryData = [
+        {
+            "label": "Used",
+            "value": 2048
+        },
+        {
+            "label": "Total",
+            "value": 8192
+        }
+    ]
+    nv.addGraph(function() {
+        var chart = nv.models.pieChart()
+              .x(function(d) { return d.label })
+              .y(function(d) { return d.value })
+              .showLabels(true);
+        
+        d3.select("#chart-cpu svg")
+            .datum(cpuData)
+            .transition().duration(1200)
+            .call(chart);
+        return chart;
+    });
+    nv.addGraph(function() {
+        var chart = nv.models.pieChart()
+              .x(function(d) { return d.label })
+              .y(function(d) { return d.value })
+              .showLabels(true);
+        
+        d3.select("#chart-memory svg")
+            .datum(memoryData)
+            .transition().duration(1200)
+            .call(chart);
+        return chart;
+    });
+});
+</script>

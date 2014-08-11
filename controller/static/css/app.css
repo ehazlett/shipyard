@@ -14,3 +14,9 @@ body {
 div.container {
     margin-top: 10px;
 }
+#chart-cpu svg {
+      height: 400px;
+}
+#chart-memory svg {
+      height: 400px;
+}
