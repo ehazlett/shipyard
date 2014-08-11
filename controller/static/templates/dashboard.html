@@ -88,6 +88,8 @@ $(function(){
         var chart = nv.models.pieChart()
               .x(function(d) { return d.label })
               .y(function(d) { return d.value })
+              .donut(true)
+              .donutRatio(0.4)
               .showLabels(true);
         
         d3.select("#chart-cpu svg")
@@ -100,6 +102,8 @@ $(function(){
         var chart = nv.models.pieChart()
               .x(function(d) { return d.label })
               .y(function(d) { return d.value })
+              .donut(true)
+              .donutRatio(0.4)
               .showLabels(true);
         
         d3.select("#chart-memory svg")
