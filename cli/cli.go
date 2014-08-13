@@ -29,6 +29,8 @@ func main() {
 		containersCommand,
 		containerInspectCommand,
 		runCommand,
+		stopCommand,
+		restartCommand,
 		destroyCommand,
 		engineListCommand,
 		engineAddCommand,

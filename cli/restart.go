@@ -7,14 +7,21 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-var destroyCommand = cli.Command{
-	Name:        "destroy",
-	Usage:       "destroy a container",
-	Description: "destroy <id> [<id>]",
-	Action:      destroyAction,
+var restartCommand = cli.Command{
+	Name:        "restart",
+	Usage:       "restart a container",
+	Description: "restart <id> [<id>]",
+	Action:      restartAction,
+	Flags: []cli.Flag{
+		cli.IntFlag{
+			Name:  "timeout",
+			Usage: "time to wait for restart",
+			Value: 10,
+		},
+	},
 }
 
-func destroyAction(c *cli.Context) {
+func restartAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	containers, err := m.Containers(true)
 	if err != nil {
@@ -29,10 +36,10 @@ func destroyAction(c *cli.Context) {
 		// this can probably be more efficient
 		for _, i := range ids {
 			if strings.HasPrefix(cnt.ID, i) {
-				if err := m.Destroy(cnt); err != nil {
-					logger.Fatalf("error destroying container: %s\n", err)
+				if err := m.Restart(cnt, c.Int("timeout")); err != nil {
+					logger.Fatalf("error restarting container: %s\n", err)
 				}
-				fmt.Printf("destroyed %s\n", cnt.ID[:12])
+				fmt.Printf("restarted %s\n", cnt.ID[:12])
 			}
 		}
 	}

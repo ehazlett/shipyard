@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -53,12 +52,15 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 func run(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	p := r.FormValue("pull")
-	pull, err := strconv.ParseBool(p)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	pull := false
+	if p != "" {
+		pl, err := strconv.ParseBool(p)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		pull = pl
 	}
-
 	var image *citadel.Image
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -80,6 +82,50 @@ func run(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(container); err != nil {
 		logger.Error(err)
 	}
+}
+
+func stop(w http.ResponseWriter, r *http.Request) {
+	var container *citadel.Container
+	if err := json.NewDecoder(r.Body).Decode(&container); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := manager.clusterManager.Stop(container); err != nil {
+		logger.Errorf("error stopping %s: %s", container.ID, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("stopped container %s (%s) on %s", container.ID, container.Image.Name, container.Engine.ID)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func restart(w http.ResponseWriter, r *http.Request) {
+	t := r.FormValue("timeout")
+	timeout := 10
+	if t != "" {
+		tt, err := strconv.Atoi(t)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		timeout = tt
+	}
+	var container *citadel.Container
+	if err := json.NewDecoder(r.Body).Decode(&container); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := manager.clusterManager.Restart(container, timeout); err != nil {
+		logger.Errorf("error restarting %s: %s", container.ID, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("restarted container %s (%s) on %s", container.ID, container.Image.Name, container.Engine.ID)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func engines(w http.ResponseWriter, r *http.Request) {
@@ -105,13 +151,23 @@ func inspectEngine(w http.ResponseWriter, r *http.Request) {
 func containers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	containers, err := manager.clusterManager.ListContainers()
+	all := r.FormValue("all")
+	showAll := false
+	if all != "" {
+		s, err := strconv.ParseBool(all)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		showAll = s
+	}
+	containers, err := manager.clusterManager.ListContainers(showAll)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := json.NewEncoder(w).Encode(containers); err != nil {
-		log.Println(err)
+		logger.Error(err)
 	}
 }
 
@@ -187,6 +243,8 @@ func main() {
 	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/run", run).Methods("POST")
 	apiRouter.HandleFunc("/api/destroy", destroy).Methods("DELETE")
+	apiRouter.HandleFunc("/api/stop", stop).Methods("POST")
+	apiRouter.HandleFunc("/api/restart", restart).Methods("POST")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/add", addEngine).Methods("POST")

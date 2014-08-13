@@ -7,14 +7,14 @@ import (
 	"github.com/codegangsta/cli"
 )
 
-var destroyCommand = cli.Command{
-	Name:        "destroy",
-	Usage:       "destroy a container",
-	Description: "destroy <id> [<id>]",
-	Action:      destroyAction,
+var stopCommand = cli.Command{
+	Name:        "stop",
+	Usage:       "stop a container",
+	Description: "stop <id> [<id>]",
+	Action:      stopAction,
 }
 
-func destroyAction(c *cli.Context) {
+func stopAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	containers, err := m.Containers(true)
 	if err != nil {
@@ -29,10 +29,10 @@ func destroyAction(c *cli.Context) {
 		// this can probably be more efficient
 		for _, i := range ids {
 			if strings.HasPrefix(cnt.ID, i) {
-				if err := m.Destroy(cnt); err != nil {
-					logger.Fatalf("error destroying container: %s\n", err)
+				if err := m.Stop(cnt); err != nil {
+					logger.Fatalf("error stopping container: %s\n", err)
 				}
-				fmt.Printf("destroyed %s\n", cnt.ID[:12])
+				fmt.Printf("stopped %s\n", cnt.ID[:12])
 			}
 		}
 	}
