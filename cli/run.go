@@ -89,6 +89,6 @@ func runAction(c *cli.Context) {
 		if err != nil {
 			logger.Fatalf("error running container: %s\n", err)
 		}
-		fmt.Printf("started %s on %s\n", container.ID[:12], container.Engine.Addr)
+		fmt.Printf("started %s on %s\n", container.ID[:12], container.Engine.ID)
 	}
 }

@@ -154,7 +154,7 @@ func removeEngine(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	logger.Infof("removed engine", engine.ID)
+	logger.Infof("removed engine id=%s", engine.Engine.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
 
