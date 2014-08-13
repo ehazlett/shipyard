@@ -24,6 +24,7 @@ type (
 
 const (
 	tblNameConfig = "config"
+	tblNameEvents = "events"
 )
 
 func NewManager(addr string, database string) (*Manager, error) {
@@ -48,10 +49,13 @@ func NewManager(addr string, database string) (*Manager, error) {
 
 func (m *Manager) initdb() {
 	// create tables if needed
-	_, err := r.Table(tblNameConfig).Run(m.session)
-	if err != nil {
-		if _, err := r.Db(m.database).TableCreate(tblNameConfig).Run(m.session); err != nil {
-			logger.Fatalf("error creating table: %s", err)
+	tables := []string{tblNameConfig, tblNameEvents}
+	for _, tbl := range tables {
+		_, err := r.Table(tbl).Run(m.session)
+		if err != nil {
+			if _, err := r.Db(m.database).TableCreate(tbl).Run(m.session); err != nil {
+				logger.Fatalf("error creating table: %s", err)
+			}
 		}
 	}
 }
@@ -88,6 +92,9 @@ func (m *Manager) init() []*shipyard.Engine {
 	clusterManager, err := cluster.New(scheduler.NewResourceManager(), engs...)
 	if err != nil {
 		logger.Fatal(err)
+	}
+	if err := clusterManager.Events(&EventHandler{Manager: m}); err != nil {
+		logger.Fatalf("unable to register event handler: %s", err)
 	}
 	var (
 		labelScheduler  = &scheduler.LabelScheduler{}
@@ -156,4 +163,11 @@ func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
 		return nil, err
 	}
 	return info, nil
+}
+
+func (m *Manager) SaveEvent(event *shipyard.Event) error {
+	if _, err := r.Table(tblNameEvents).Insert(event).RunWrite(m.session); err != nil {
+		return err
+	}
+	return nil
 }
