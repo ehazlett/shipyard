@@ -96,7 +96,7 @@ func inspectEngine(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]
-	engine := manager.GetEngine(id)
+	engine := manager.Engine(id)
 	if err := json.NewEncoder(w).Encode(engine); err != nil {
 		logger.Error(err)
 	}
@@ -120,7 +120,7 @@ func inspectContainer(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]
-	container, err := manager.GetContainer(id)
+	container, err := manager.Container(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -171,6 +171,19 @@ func clusterInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func events(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	events, err := manager.Events()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(events); err != nil {
+		logger.Error(err)
+	}
+}
+
 func main() {
 	var (
 		mErr      error
@@ -188,6 +201,7 @@ func main() {
 	apiRouter.HandleFunc("/api/run", run).Methods("POST")
 	apiRouter.HandleFunc("/api/destroy", destroy).Methods("DELETE")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
+	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/add", addEngine).Methods("POST")
 	apiRouter.HandleFunc("/api/engines/remove", removeEngine).Methods("POST")

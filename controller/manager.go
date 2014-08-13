@@ -119,7 +119,7 @@ func (m *Manager) Engines() []*shipyard.Engine {
 	return m.engines
 }
 
-func (m *Manager) GetEngine(id string) *shipyard.Engine {
+func (m *Manager) Engine(id string) *shipyard.Engine {
 	for _, e := range m.engines {
 		if e.Engine.ID == id {
 			return e
@@ -144,7 +144,7 @@ func (m *Manager) RemoveEngine(id string) error {
 	return nil
 }
 
-func (m *Manager) GetContainer(id string) (*citadel.Container, error) {
+func (m *Manager) Container(id string) (*citadel.Container, error) {
 	containers, err := m.clusterManager.ListContainers()
 	if err != nil {
 		return nil, err
@@ -170,4 +170,16 @@ func (m *Manager) SaveEvent(event *shipyard.Event) error {
 		return err
 	}
 	return nil
+}
+
+func (m *Manager) Events() ([]*shipyard.Event, error) {
+	res, err := r.Table(tblNameEvents).OrderBy(r.Desc("Time")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	var events []*shipyard.Event
+	if err := res.All(&events); err != nil {
+		return nil, err
+	}
+	return events, nil
 }
