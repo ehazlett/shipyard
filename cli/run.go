@@ -48,6 +48,11 @@ var runCommand = cli.Command{
 			Value: &cli.StringSlice{},
 		},
 		cli.StringSliceFlag{
+			Name:  "arg",
+			Usage: "run arguments",
+			Value: &cli.StringSlice{},
+		},
+		cli.StringSliceFlag{
 			Name:  "label",
 			Usage: "labels",
 			Value: &cli.StringSlice{},
@@ -81,6 +86,7 @@ func runAction(c *cli.Context) {
 			Hostname:    c.String("hostname"),
 			Domainname:  c.String("domain"),
 			Labels:      c.StringSlice("label"),
+			Args:        c.StringSlice("arg"),
 			Environment: env,
 			BindPorts:   ports,
 			Type:        c.String("type"),
