@@ -15,18 +15,11 @@ var containersCommand = cli.Command{
 	ShortName: "c",
 	Usage:     "list containers",
 	Action:    containersAction,
-	Flags: []cli.Flag{
-		cli.BoolFlag{
-			Name:  "all",
-			Usage: "show all containers",
-		},
-	},
 }
 
 func containersAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
-	all := c.Bool("all")
-	containers, err := m.Containers(all)
+	containers, err := m.Containers()
 	if err != nil {
 		logger.Fatalf("error getting containers: %s", err)
 	}

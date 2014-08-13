@@ -16,7 +16,7 @@ var destroyCommand = cli.Command{
 
 func destroyAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
-	containers, err := m.Containers(true)
+	containers, err := m.Containers()
 	if err != nil {
 		fmt.Println("error getting container info: %s\n", err)
 		return

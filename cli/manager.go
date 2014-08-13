@@ -29,12 +29,9 @@ func (m *Manager) buildUrl(path string) string {
 	return fmt.Sprintf("%s%s", m.baseUrl, path)
 }
 
-func (m *Manager) Containers(all bool) ([]*citadel.Container, error) {
+func (m *Manager) Containers() ([]*citadel.Container, error) {
 	containers := []*citadel.Container{}
 	url := m.buildUrl("/api/containers")
-	if all {
-		url += "?all=true"
-	}
 	r, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -51,10 +48,7 @@ func (m *Manager) Run(image *citadel.Image, pull bool) (*citadel.Container, erro
 		return nil, err
 	}
 	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/api/run")
-	if pull {
-		url += "?pull=true"
-	}
+	url := m.buildUrl(fmt.Sprintf("/api/run?pull=%v", pull))
 	resp, err := http.Post(url, "application/json", buf)
 	if err != nil {
 		return nil, err
@@ -85,48 +79,6 @@ func (m *Manager) Destroy(container *citadel.Container) error {
 		return err
 	}
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != 204 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		return errors.New(string(c))
-	}
-	return nil
-}
-
-func (m *Manager) Stop(container *citadel.Container) error {
-	b, err := json.Marshal(container)
-	if err != nil {
-		return err
-	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/api/stop")
-	resp, err := http.Post(url, "application/json", buf)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != 204 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		return errors.New(string(c))
-	}
-	return nil
-}
-
-func (m *Manager) Restart(container *citadel.Container, timeout int) error {
-	b, err := json.Marshal(container)
-	if err != nil {
-		return err
-	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl(fmt.Sprintf("/api/restart?timeout=%d", timeout))
-	resp, err := http.Post(url, "application/json", buf)
 	if err != nil {
 		return err
 	}
