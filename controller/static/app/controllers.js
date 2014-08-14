@@ -27,5 +27,11 @@ angular.module('shipyard.controllers', [])
             Engines.query(function(data){
                 $scope.engines = data;
             });
-        });
+        })
+        .controller('EventsController', function($scope, Events) {
+            $scope.template = 'templates/events.html';
+            Events.query(function(data){
+                $scope.events = data;
+            });
+        })
 

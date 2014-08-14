@@ -15,6 +15,10 @@ angular.module('shipyard', ['ngRoute', 'shipyard.filters', 'shipyard.services', 
                 templateUrl: 'templates/engines.html',
                 controller: 'EnginesController'
             });
+            $routeProvider.when('/events', {
+                templateUrl: 'templates/events.html',
+                controller: 'EventsController'
+            });
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
             });

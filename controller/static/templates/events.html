@@ -1,0 +1,20 @@
+<table class="ui table segment">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Container</th>
+            <th>Engine</th>
+            <th>Type</th>
+            <th>Tags</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="e in events">
+            <td>{{e.time}}</td>
+            <td>{{e.container.id|truncate}}</td>
+            <td>{{e.engine.id}}</td>
+            <td>{{e.type}}</td>
+            <td>{{e.tags.join(', ')}}</td>
+        </tr>
+    </tbody>
+</table>

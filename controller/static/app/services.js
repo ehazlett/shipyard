@@ -6,4 +6,7 @@ angular.module('shipyard.services', ['ngResource'])
     })
     .factory('Engines', function($resource) {
         return $resource('/api/engines');
+    })
+    .factory('Events', function($resource) {
+        return $resource('/api/events');
     });
