@@ -185,3 +185,16 @@ func (m *Manager) Info() (*citadel.ClusterInfo, error) {
 	}
 	return info, nil
 }
+
+func (m *Manager) Events() ([]*shipyard.Event, error) {
+	events := []*shipyard.Event{}
+	url := m.buildUrl("/api/events")
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(r.Body).Decode(&events); err != nil {
+		return nil, err
+	}
+	return events, nil
+}

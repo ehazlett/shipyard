@@ -172,8 +172,8 @@ func (m *Manager) SaveEvent(event *shipyard.Event) error {
 	return nil
 }
 
-func (m *Manager) Events() ([]*shipyard.Event, error) {
-	res, err := r.Table(tblNameEvents).OrderBy(r.Desc("Time")).Run(m.session)
+func (m *Manager) Events(limit int) ([]*shipyard.Event, error) {
+	res, err := r.Table(tblNameEvents).OrderBy(r.Desc("Time")).Limit(limit).Run(m.session)
 	if err != nil {
 		return nil, err
 	}

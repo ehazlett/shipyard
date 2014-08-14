@@ -174,7 +174,17 @@ func clusterInfo(w http.ResponseWriter, r *http.Request) {
 func events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	events, err := manager.Events()
+	limit := 25
+	l := r.FormValue("limit")
+	if l != "" {
+		lt, err := strconv.Atoi(l)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		limit = lt
+	}
+	events, err := manager.Events(limit)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
