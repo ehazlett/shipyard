@@ -26,5 +26,7 @@ func infoAction(c *cli.Context) {
 	fmt.Fprintf(w, "Containers: %d\n", info.ContainerCount)
 	fmt.Fprintf(w, "Images: %d\n", info.ImageCount)
 	fmt.Fprintf(w, "Engines: %d\n", info.EngineCount)
+	fmt.Fprintf(w, "Reserved Cpus: %.2f\n", info.ReservedCpus)
+	fmt.Fprintf(w, "Reserved Memory: %.2f\n", info.ReservedMemory)
 	w.Flush()
 }
