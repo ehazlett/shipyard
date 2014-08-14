@@ -13,8 +13,11 @@ angular.module('shipyard.controllers', [])
                 return false
             }
         })
-        .controller('DashboardController', function($scope) {
+        .controller('DashboardController', function($scope, Events) {
             $scope.template = 'templates/dashboard.html';
+            Events.query(function(data){
+                $scope.events = data;
+            });
         })
         .controller('ContainersController', function($scope, Containers) {
             $scope.template = 'templates/containers.html';
