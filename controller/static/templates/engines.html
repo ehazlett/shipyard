@@ -1,1 +1,22 @@
-Engines
+<table class="ui table segment">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>CPUs</th>
+            <th>Memory</th>
+            <th>Addr</th>
+            <th>Labels</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="e in engines">
+            <td>
+                <a href="/#/engines/{{e.engine.id}}">{{e.id}}</a>
+            </td>
+            <td>{{e.engine.cpus}}</td>
+            <td>{{e.engine.memory}} MB</td>
+            <td>{{e.engine.addr}}</td>
+            <td>{{e.engine.labels.join(', ')}}</td>
+        </tr>
+    </tbody>
+</table>

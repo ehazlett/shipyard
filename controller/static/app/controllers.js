@@ -1,0 +1,31 @@
+'use strict';
+
+angular.module('shipyard.controllers', [])
+        .controller('HeaderController', function($scope) {
+            $scope.template = 'templates/header.html';
+        })
+        .controller('MenuController', function($scope, $location) {
+            $scope.template = 'templates/menu.html';
+            $scope.isActive = function(path){
+                if ($location.path().substr(0, path.length) == path) {
+                    return true
+                }
+                return false
+            }
+        })
+        .controller('DashboardController', function($scope) {
+            $scope.template = 'templates/dashboard.html';
+        })
+        .controller('ContainersController', function($scope, Containers) {
+            $scope.template = 'templates/containers.html';
+            Containers.query(function(data){
+                $scope.containers = data;
+            });
+        })
+        .controller('EnginesController', function($scope, Engines) {
+            $scope.template = 'templates/engines.html';
+            Engines.query(function(data){
+                $scope.engines = data;
+            });
+        });
+

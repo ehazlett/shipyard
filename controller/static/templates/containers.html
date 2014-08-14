@@ -1,1 +1,22 @@
-Containers
+<table class="ui table segment">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>CPUs</th>
+            <th>Memory</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="c in containers">
+            <td>
+                <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
+            </td>
+            <td>{{c.image.name}}</td>
+            <td>{{c.image.cpus}}</td>
+            <td>{{c.image.memory}} MB</td>
+            <td>{{c.image.type}}</td>
+        </tr>
+    </tbody>
+</table>
