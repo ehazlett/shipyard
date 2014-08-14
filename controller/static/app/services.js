@@ -9,4 +9,9 @@ angular.module('shipyard.services', ['ngResource'])
     })
     .factory('Events', function($resource) {
         return $resource('/api/events');
+    })
+    .factory('ClusterInfo', function($resource) {
+        return $resource('/api/cluster/info', [], {
+            query: { isArray: false }
+        });
     });

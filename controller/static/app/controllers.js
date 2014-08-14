@@ -13,10 +13,15 @@ angular.module('shipyard.controllers', [])
                 return false
             }
         })
-        .controller('DashboardController', function($scope, Events) {
+        .controller('DashboardController', function($scope, Events, ClusterInfo) {
             $scope.template = 'templates/dashboard.html';
             Events.query(function(data){
                 $scope.events = data;
+            });;
+            ClusterInfo.query(function(data){
+                $scope.clusterInfo = data;
+                drawDashboardCharts(data.reserved_cpus, data.cpus,
+                    data.reserved_memory, data.memory);
             });
         })
         .controller('ContainersController', function($scope, Containers) {
