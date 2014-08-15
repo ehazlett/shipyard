@@ -25,7 +25,6 @@ func init() {
 	flag.StringVar(&listenAddr, "listen", ":8080", "listen address")
 	flag.StringVar(&rethinkdbAddr, "rethinkdb-addr", "127.0.0.1:28015", "rethinkdb address")
 	flag.StringVar(&rethinkdbDatabase, "rethinkdb-database", "shipyard", "rethinkdb database")
-	flag.Parse()
 }
 
 func destroy(w http.ResponseWriter, r *http.Request) {
@@ -195,6 +194,7 @@ func events(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.Parse()
 	var (
 		mErr      error
 		globalMux = http.NewServeMux()
