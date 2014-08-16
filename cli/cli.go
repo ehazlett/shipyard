@@ -13,7 +13,10 @@ var (
 )
 
 func main() {
-
+	shost := os.Getenv("SHIPYARD_HOST")
+	if shost == "" {
+		shost = "http://127.0.0.1:8080"
+	}
 	app := cli.NewApp()
 	app.Name = "shipyard"
 	app.Usage = "manage a shipyard cluster"
@@ -21,11 +24,14 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "host",
-			Value: os.Getenv("SHIPYARD_HOST"),
+			Value: shost,
 			Usage: "shipyard host",
 		},
 	}
 	app.Commands = []cli.Command{
+		accountsCommand,
+		addAccountCommand,
+		deleteAccountCommand,
 		containersCommand,
 		containerInspectCommand,
 		runCommand,

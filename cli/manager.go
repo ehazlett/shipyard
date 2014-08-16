@@ -198,3 +198,62 @@ func (m *Manager) Events() ([]*shipyard.Event, error) {
 	}
 	return events, nil
 }
+
+func (m *Manager) Accounts() ([]*shipyard.Account, error) {
+	accounts := []*shipyard.Account{}
+	url := m.buildUrl("/api/accounts")
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(r.Body).Decode(&accounts); err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
+func (m *Manager) AddAccount(account *shipyard.Account) error {
+	b, err := json.Marshal(account)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(b)
+	url := m.buildUrl("/api/accounts")
+	resp, err := http.Post(url, "application/json", buf)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 204 {
+		c, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(string(c))
+	}
+	return nil
+}
+
+func (m *Manager) DeleteAccount(account *shipyard.Account) error {
+	b, err := json.Marshal(account)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(b)
+	url := m.buildUrl("/api/accounts")
+	req, err := http.NewRequest("DELETE", url, buf)
+	if err != nil {
+		return err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 204 {
+		c, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		return errors.New(string(c))
+	}
+	return nil
+}

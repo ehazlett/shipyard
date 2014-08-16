@@ -9,8 +9,10 @@ import (
 	"strconv"
 
 	"github.com/citadel/citadel"
+	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/controller/middleware"
 	"github.com/sirupsen/logrus"
 )
 
@@ -190,8 +192,60 @@ func events(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := json.NewEncoder(w).Encode(events); err != nil {
-		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+}
+
+func accounts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	accounts, err := manager.Accounts()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(accounts); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func addAccount(w http.ResponseWriter, r *http.Request) {
+	var account *shipyard.Account
+	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := manager.SaveAccount(account); err != nil {
+		logger.Errorf("error saving account: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("saved account %s", account.Username)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func deleteAccount(w http.ResponseWriter, r *http.Request) {
+	var account *shipyard.Account
+	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := manager.DeleteAccount(account); err != nil {
+		logger.Errorf("error deleting account: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("deleted account %s", account.ID)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	logger.Infof("login")
 }
 
 func main() {
@@ -214,6 +268,9 @@ func main() {
 	}
 
 	apiRouter := mux.NewRouter()
+	apiRouter.HandleFunc("/api/accounts", accounts).Methods("GET")
+	apiRouter.HandleFunc("/api/accounts", addAccount).Methods("POST")
+	apiRouter.HandleFunc("/api/accounts", deleteAccount).Methods("DELETE")
 	apiRouter.HandleFunc("/api/cluster/info", clusterInfo).Methods("GET")
 	apiRouter.HandleFunc("/api/containers", containers).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
@@ -224,9 +281,21 @@ func main() {
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/add", addEngine).Methods("POST")
 	apiRouter.HandleFunc("/api/engines/remove", removeEngine).Methods("POST")
-	globalMux.Handle("/api/", apiRouter)
 
+	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
+
+	// api router ; protected by auth
+	authRouter := negroni.New()
+	authRequired := middleware.NewAuthRequired()
+	authRouter.Use(negroni.HandlerFunc(authRequired.HandlerFuncWithNext))
+	authRouter.UseHandler(apiRouter)
+	globalMux.Handle("/api/", authRouter)
+
+	// login handler; open
+	loginRouter := mux.NewRouter()
+	loginRouter.HandleFunc("/auth/login", login).Methods("POST")
+	globalMux.Handle("/auth/", loginRouter)
 
 	logger.Infof("shipyard controller listening on %s", listenAddr)
 

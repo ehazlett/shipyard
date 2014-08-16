@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
 	"strings"
 	"time"
 
@@ -12,6 +13,11 @@ import (
 	"github.com/shipyard/shipyard"
 )
 
+var (
+	ErrAccountExists       = errors.New("account already exists")
+	ErrAccountDoesNotExist = errors.New("account does not exist")
+)
+
 type (
 	Manager struct {
 		address        string
@@ -19,12 +25,14 @@ type (
 		session        *r.Session
 		clusterManager *cluster.Cluster
 		engines        []*shipyard.Engine
+		authenticator  *shipyard.Authenticator
 	}
 )
 
 const (
-	tblNameConfig = "config"
-	tblNameEvents = "events"
+	tblNameConfig   = "config"
+	tblNameEvents   = "events"
+	tblNameAccounts = "accounts"
 )
 
 func NewManager(addr string, database string) (*Manager, error) {
@@ -38,9 +46,10 @@ func NewManager(addr string, database string) (*Manager, error) {
 		return nil, err
 	}
 	m := &Manager{
-		address:  addr,
-		database: database,
-		session:  session,
+		address:       addr,
+		database:      database,
+		session:       session,
+		authenticator: &shipyard.Authenticator{},
 	}
 	m.initdb()
 	m.init()
@@ -49,7 +58,7 @@ func NewManager(addr string, database string) (*Manager, error) {
 
 func (m *Manager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -182,4 +191,73 @@ func (m *Manager) Events(limit int) ([]*shipyard.Event, error) {
 		return nil, err
 	}
 	return events, nil
+}
+
+func (m *Manager) Accounts() ([]*shipyard.Account, error) {
+	res, err := r.Table(tblNameAccounts).OrderBy(r.Asc("username")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	var accounts []*shipyard.Account
+	if err := res.All(&accounts); err != nil {
+		return nil, err
+	}
+	return accounts, nil
+}
+
+func (m *Manager) Account(username string) (*shipyard.Account, error) {
+	res, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrAccountDoesNotExist
+	}
+	var account *shipyard.Account
+	if err := res.One(&account); err != nil {
+		return nil, err
+	}
+	return account, nil
+}
+
+func (m *Manager) SaveAccount(account *shipyard.Account) error {
+	pass := account.Password
+	hash, err := m.authenticator.Hash(pass)
+	if err != nil {
+		return err
+	}
+	// check if exists; if so, update
+	acct, err := m.Account(account.Username)
+	account.Password = hash
+	if acct != nil {
+		if _, err := r.Table(tblNameAccounts).Update(account).RunWrite(m.session); err != nil {
+			return err
+		}
+		return nil
+	}
+	// insert new account
+	if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) DeleteAccount(account *shipyard.Account) error {
+	res, err := r.Table(tblNameAccounts).Filter(map[string]string{"id": account.ID}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrAccountDoesNotExist
+	}
+	return nil
+}
+
+func (m *Manager) Authenticate(username, password string) bool {
+	acct, err := m.Account(username)
+	if err != nil {
+		return false
+	}
+	return m.authenticator.Authenticate(password, acct.Password)
 }
