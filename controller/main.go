@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/citadel/citadel"
@@ -194,6 +195,14 @@ func events(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	rAddr := os.Getenv("RETHINKDB_ADDR")
+	rDb := os.Getenv("RETHINKDB_DATABASE")
+	if rAddr != "" {
+		rethinkdbAddr = rAddr
+	}
+	if rDb != "" {
+		rethinkdbDatabase = rDb
+	}
 	flag.Parse()
 	var (
 		mErr      error
