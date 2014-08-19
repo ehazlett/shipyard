@@ -21,7 +21,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "host",
-			Value: "http://127.0.0.1:8080",
+			Value: os.Getenv("SHIPYARD_HOST"),
 			Usage: "shipyard host",
 		},
 	}
