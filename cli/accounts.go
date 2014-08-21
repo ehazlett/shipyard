@@ -19,8 +19,7 @@ func accountsAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	accounts, err := m.Accounts()
 	if err != nil {
-		fmt.Println("error getting accounts: %s\n", err)
-		return
+		logger.Fatalf("error getting accounts: %s", err)
 	}
 	if len(accounts) == 0 {
 		return
@@ -51,12 +50,17 @@ var addAccountCommand = cli.Command{
 
 func addAccountAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
+	user := c.String("username")
+	pass := c.String("password")
+	if user == "" || pass == "" {
+		logger.Fatalf("you must specify a username and password")
+	}
 	account := &shipyard.Account{
 		Username: c.String("username"),
 		Password: c.String("password"),
 	}
 	if err := m.AddAccount(account); err != nil {
-		logger.Errorf("error adding account: %s", err)
+		logger.Fatalf("error adding account: %s", err)
 	}
 }
 
@@ -78,6 +82,6 @@ func deleteAccountAction(c *cli.Context) {
 		ID: c.String("id"),
 	}
 	if err := m.DeleteAccount(account); err != nil {
-		logger.Errorf("error deleting account: %s", err)
+		logger.Fatalf("error deleting account: %s", err)
 	}
 }

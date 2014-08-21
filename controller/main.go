@@ -90,6 +90,8 @@ func engines(w http.ResponseWriter, r *http.Request) {
 	engines := manager.Engines()
 	if err := json.NewEncoder(w).Encode(engines); err != nil {
 		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 }
 
@@ -279,8 +281,8 @@ func main() {
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
-	apiRouter.HandleFunc("/api/engines/add", addEngine).Methods("POST")
-	apiRouter.HandleFunc("/api/engines/remove", removeEngine).Methods("POST")
+	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")
+	apiRouter.HandleFunc("/api/engines", removeEngine).Methods("DELETE")
 
 	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))

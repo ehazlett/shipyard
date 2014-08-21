@@ -20,8 +20,7 @@ func eventsAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	events, err := m.Events()
 	if err != nil {
-		fmt.Println("error getting events: %s\n", err)
-		return
+		logger.Fatalf("error getting events: %s", err)
 	}
 	if len(events) == 0 {
 		return

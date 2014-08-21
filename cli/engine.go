@@ -23,7 +23,7 @@ func engineListAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	engines, err := m.Engines()
 	if err != nil {
-		fmt.Println("error getting engines: %s\n", err)
+		logger.Fatalf("error getting engines: %s", err)
 		return
 	}
 	if len(engines) == 0 {
@@ -88,9 +88,14 @@ var engineAddCommand = cli.Command{
 
 func engineAddAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
+	id := c.String("id")
+	addr := c.String("addr")
+	if id == "" || addr == "" {
+		logger.Fatalf("you must specify an id and address")
+	}
 	engine := &citadel.Engine{
-		ID:     c.String("id"),
-		Addr:   c.String("addr"),
+		ID:     id,
+		Addr:   addr,
 		Cpus:   c.Float64("cpus"),
 		Memory: c.Float64("memory"),
 		Labels: c.StringSlice("label"),
@@ -105,45 +110,38 @@ func engineAddAction(c *cli.Context) {
 		sslErr      error
 	)
 	if sslCertPath != "" && sslKeyPath != "" && caCertPath != "" {
-
 		sslCert, err := os.Open(sslCertPath)
 		if err != nil {
-			fmt.Println("unable to open ssl certificate: %s", err)
-			return
+			logger.Fatalf("unable to open ssl certificate: %s", err)
 		}
 		sslKey, err := os.Open(sslKeyPath)
 		if err != nil {
-			fmt.Println("unable to open ssl key: %s", err)
-			return
+			logger.Fatalf("unable to open ssl key: %s", err)
 		}
 		caCert, err := os.Open(caCertPath)
 		if err != nil {
-			fmt.Println("unable to open ca certificate: %s", err)
-			return
+			logger.Fatalf("unable to open ca certificate: %s", err)
 		}
 		if _, err := sslCert.Stat(); err != nil {
-			fmt.Println("ssl cert is not accessible: %s", err)
+			logger.Fatalf("ssl cert is not accessible: %s", err)
 		}
 		if _, err := sslKey.Stat(); err != nil {
-			fmt.Println("ssl key is not accessible: %s", err)
+			logger.Fatalf("ssl key is not accessible: %s", err)
 		}
 		if _, err := caCert.Stat(); err != nil {
-			fmt.Println("ca cert is not accessible: %s", err)
+			logger.Fatalf("ca cert is not accessible: %s", err)
 		}
 		sslCertData, sslErr = ioutil.ReadAll(sslCert)
 		if sslErr != nil {
-			fmt.Println("unable to read ssl certificate: %s", sslErr)
-			return
+			logger.Fatalf("unable to read ssl certificate: %s", sslErr)
 		}
 		sslKeyData, sslErr = ioutil.ReadAll(sslKey)
 		if sslErr != nil {
-			fmt.Println("unable to read ssl key: %s", sslErr)
-			return
+			logger.Fatalf("unable to read ssl key: %s", sslErr)
 		}
 		caCertData, sslErr = ioutil.ReadAll(caCert)
 		if sslErr != nil {
-			fmt.Println("unable to read ca certificate: %s", sslErr)
-			return
+			logger.Fatalf("unable to read ca certificate: %s", sslErr)
 		}
 	}
 	shipyardEngine := &shipyard.Engine{
@@ -153,8 +151,7 @@ func engineAddAction(c *cli.Context) {
 		Engine:         engine,
 	}
 	if err := m.AddEngine(shipyardEngine); err != nil {
-		fmt.Printf("error adding engine: %s\n", err)
-		return
+		logger.Fatalf("error adding engine: %s", err)
 	}
 }
 
@@ -169,8 +166,7 @@ func engineRemoveAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	engines, err := m.Engines()
 	if err != nil {
-		fmt.Printf("error removing engine: %s\n", err)
-		return
+		logger.Fatalf("error removing engine: %s\n", err)
 	}
 	removeEngines := c.Args()
 	for _, eng := range engines {
@@ -178,7 +174,7 @@ func engineRemoveAction(c *cli.Context) {
 		for _, i := range removeEngines {
 			if eng.Engine.ID == i {
 				if err := m.RemoveEngine(eng); err != nil {
-					logger.Fatalf("error removing engine: %s\n", err)
+					logger.Fatalf("error removing engine: %s", err)
 				}
 				fmt.Printf("removed %s\n", eng.Engine.ID)
 			}

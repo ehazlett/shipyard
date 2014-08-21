@@ -29,14 +29,41 @@ func (m *Manager) buildUrl(path string) string {
 	return fmt.Sprintf("%s%s", m.baseUrl, path)
 }
 
-func (m *Manager) Containers() ([]*citadel.Container, error) {
-	containers := []*citadel.Container{}
-	url := m.buildUrl("/api/containers")
-	r, err := http.Get(url)
+func (m *Manager) doRequest(path string, method string, expectedStatus int, b []byte) (*http.Response, error) {
+	url := m.buildUrl(path)
+	buf := bytes.NewBuffer(b)
+	req, err := http.NewRequest(method, url, buf)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&containers); err != nil {
+	// TODO: proper auth
+	req.Header.Add("AUTH_TOKEN", "foo")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == 401 {
+		return resp, shipyard.ErrUnauthorized
+	}
+
+	if resp.StatusCode != expectedStatus {
+		c, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		return resp, errors.New(string(c))
+	}
+	return resp, nil
+}
+
+func (m *Manager) Containers() ([]*citadel.Container, error) {
+	containers := []*citadel.Container{}
+	resp, err := m.doRequest("/api/containers", "GET", 200, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&containers); err != nil {
 		return nil, err
 	}
 	return containers, nil
@@ -47,20 +74,11 @@ func (m *Manager) Run(image *citadel.Image, pull bool) (*citadel.Container, erro
 	if err != nil {
 		return nil, err
 	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl(fmt.Sprintf("/api/run?pull=%v", pull))
-	resp, err := http.Post(url, "application/json", buf)
+	var container citadel.Container
+	resp, err := m.doRequest(fmt.Sprintf("/api/run?pull=%v", pull), "POST", 201, b)
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode != 201 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-		return nil, errors.New(string(c))
-	}
-	var container citadel.Container
 	if err := json.NewDecoder(resp.Body).Decode(&container); err != nil {
 		return nil, err
 	}
@@ -72,34 +90,19 @@ func (m *Manager) Destroy(container *citadel.Container) error {
 	if err != nil {
 		return err
 	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/api/destroy")
-	req, err := http.NewRequest("DELETE", url, buf)
-	if err != nil {
+	if _, err := m.doRequest("/api/destroy", "DELETE", 204, b); err != nil {
 		return err
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != 204 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		return errors.New(string(c))
 	}
 	return nil
 }
 
 func (m *Manager) Engines() ([]*shipyard.Engine, error) {
 	engines := []*shipyard.Engine{}
-	url := m.buildUrl("/api/engines")
-	r, err := http.Get(url)
+	resp, err := m.doRequest("/api/engines", "GET", 200, nil)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&engines); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&engines); err != nil {
 		return nil, err
 	}
 	return engines, nil
@@ -110,18 +113,8 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 	if err != nil {
 		return err
 	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/api/engines/add")
-	resp, err := http.Post(url, "application/json", buf)
-	if err != nil {
+	if _, err := m.doRequest("/api/engines", "POST", 201, b); err != nil {
 		return err
-	}
-	if resp.StatusCode != 201 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		return errors.New(string(c))
 	}
 	return nil
 }
@@ -131,30 +124,19 @@ func (m *Manager) RemoveEngine(engine *shipyard.Engine) error {
 	if err != nil {
 		return err
 	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/api/engines/remove")
-	resp, err := http.Post(url, "application/json", buf)
-	if err != nil {
+	if _, err := m.doRequest("/api/engines", "DELETE", 204, b); err != nil {
 		return err
-	}
-	if resp.StatusCode != 204 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		return errors.New(string(c))
 	}
 	return nil
 }
 
 func (m *Manager) GetContainer(id string) (*citadel.Container, error) {
 	var container *citadel.Container
-	url := m.buildUrl(fmt.Sprintf("/api/containers/%s", id))
-	r, err := http.Get(url)
+	resp, err := m.doRequest(fmt.Sprintf("/api/containers/%s", id), "GET", 200, nil)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&container); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&container); err != nil {
 		return nil, err
 	}
 	return container, nil
@@ -162,12 +144,11 @@ func (m *Manager) GetContainer(id string) (*citadel.Container, error) {
 
 func (m *Manager) GetEngine(id string) (*shipyard.Engine, error) {
 	var engine *shipyard.Engine
-	url := m.buildUrl(fmt.Sprintf("/api/engines/%s", id))
-	r, err := http.Get(url)
+	resp, err := m.doRequest(fmt.Sprintf("/api/engines/%s", id), "GET", 200, nil)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&engine); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&engine); err != nil {
 		return nil, err
 	}
 	return engine, nil
@@ -175,12 +156,11 @@ func (m *Manager) GetEngine(id string) (*shipyard.Engine, error) {
 
 func (m *Manager) Info() (*citadel.ClusterInfo, error) {
 	var info *citadel.ClusterInfo
-	url := m.buildUrl("/api/cluster/info")
-	r, err := http.Get(url)
+	resp, err := m.doRequest("/api/cluster/info", "GET", 200, nil)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&info); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		return nil, err
 	}
 	return info, nil
@@ -188,12 +168,11 @@ func (m *Manager) Info() (*citadel.ClusterInfo, error) {
 
 func (m *Manager) Events() ([]*shipyard.Event, error) {
 	events := []*shipyard.Event{}
-	url := m.buildUrl("/api/events")
-	r, err := http.Get(url)
+	resp, err := m.doRequest("/api/events", "GET", 200, nil)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&events); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&events); err != nil {
 		return nil, err
 	}
 	return events, nil
@@ -201,12 +180,11 @@ func (m *Manager) Events() ([]*shipyard.Event, error) {
 
 func (m *Manager) Accounts() ([]*shipyard.Account, error) {
 	accounts := []*shipyard.Account{}
-	url := m.buildUrl("/api/accounts")
-	r, err := http.Get(url)
+	resp, err := m.doRequest("/api/accounts", "GET", 200, nil)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&accounts); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&accounts); err != nil {
 		return nil, err
 	}
 	return accounts, nil
@@ -217,18 +195,8 @@ func (m *Manager) AddAccount(account *shipyard.Account) error {
 	if err != nil {
 		return err
 	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/api/accounts")
-	resp, err := http.Post(url, "application/json", buf)
-	if err != nil {
+	if _, err := m.doRequest("/api/accounts", "POST", 204, b); err != nil {
 		return err
-	}
-	if resp.StatusCode != 204 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		return errors.New(string(c))
 	}
 	return nil
 }
@@ -238,22 +206,8 @@ func (m *Manager) DeleteAccount(account *shipyard.Account) error {
 	if err != nil {
 		return err
 	}
-	buf := bytes.NewBuffer(b)
-	url := m.buildUrl("/api/accounts")
-	req, err := http.NewRequest("DELETE", url, buf)
-	if err != nil {
+	if _, err := m.doRequest("/api/accounts", "DELETE", 204, b); err != nil {
 		return err
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode != 204 {
-		c, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		return errors.New(string(c))
 	}
 	return nil
 }

@@ -18,8 +18,7 @@ func destroyAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
 	containers, err := m.Containers()
 	if err != nil {
-		fmt.Println("error getting container info: %s\n", err)
-		return
+		logger.Fatalf("error getting container info: %s", err)
 	}
 	ids := c.Args()
 	if len(ids) == 0 {

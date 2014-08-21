@@ -1,7 +1,13 @@
 package shipyard
 
 import (
+	"errors"
+
 	"github.com/jameskeane/bcrypt"
+)
+
+var (
+	ErrUnauthorized = errors.New("unauthorized")
 )
 
 type (
