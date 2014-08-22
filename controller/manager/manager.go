@@ -53,6 +53,8 @@ func NewManager(addr string, database string) (*Manager, error) {
 	if err != nil {
 		return nil, err
 	}
+	logger.Info("checking database")
+	r.DbCreate(database).Run(session)
 	m := &Manager{
 		address:       addr,
 		database:      database,
