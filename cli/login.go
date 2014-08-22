@@ -19,11 +19,36 @@ var loginCommand = cli.Command{
 	Action: loginAction,
 }
 
+func saveConfig(cfg *ShipyardConfig) error {
+	usr, err := user.Current()
+	if err != nil {
+		return err
+	}
+	path := filepath.Join(usr.HomeDir, CONFIG_PATH)
+	f, err := os.OpenFile(path, os.O_WRONLY, 0600)
+	if err != nil {
+		if os.IsNotExist(err) {
+			fc, fErr := os.Create(path)
+			if fErr != nil {
+				return err
+			}
+			fc.Chmod(0600)
+			f = fc
+		} else {
+			return err
+		}
+	}
+	defer f.Close()
+	if err := json.NewEncoder(f).Encode(cfg); err != nil {
+		return err
+	}
+	return nil
+}
+
 func loginAction(c *cli.Context) {
-	m := NewManager()
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("Host: ")
-	h, err := reader.ReadString('\n')
+	fmt.Printf("URL: ")
+	ur, err := reader.ReadString('\n')
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -34,38 +59,47 @@ func loginAction(c *cli.Context) {
 	}
 	fmt.Printf("Password: ")
 	p := gopass.GetPasswd()
-	host := strings.TrimSpace(string(h[:]))
+	sUrl := strings.TrimSpace(string(ur[:]))
 	username := strings.TrimSpace(string(u[:]))
 	pass := strings.TrimSpace(string(p[:]))
+
+	cfg := &ShipyardConfig{
+		Url:      sUrl,
+		Username: username,
+	}
+	m := NewManager(cfg)
 	token, err := m.Login(username, pass)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	cfg := &ShipyardConfig{
-		Host:     host,
-		Username: username,
-		Token:    token.Token,
+	cfg.Token = token.Token
+	if err := saveConfig(cfg); err != nil {
+		logger.Fatal(err)
 	}
-	usr, err := user.Current()
+}
+
+var changePasswordCommand = cli.Command{
+	Name:   "change-password",
+	Usage:  "update your password",
+	Action: changePasswordAction,
+}
+
+func changePasswordAction(c *cli.Context) {
+	cfg, err := loadConfig()
 	if err != nil {
 		logger.Fatal(err)
 	}
-	path := filepath.Join(usr.HomeDir, CONFIG_PATH)
-	f, err := os.OpenFile(path, os.O_WRONLY, 0600)
-	if err != nil {
-		if os.IsNotExist(err) {
-			fc, fErr := os.Create(path)
-			if fErr != nil {
-				logger.Fatal(err)
-			}
-			fc.Chmod(0600)
-			f = fc
-		} else {
-			logger.Fatal(err)
-		}
+	m := NewManager(cfg)
+	fmt.Printf("Password: ")
+	p1 := gopass.GetPasswd()
+	fmt.Printf("Confirm: ")
+	p2 := gopass.GetPasswd()
+	pass := strings.TrimSpace(string(p1[:]))
+	pass_confirm := strings.TrimSpace(string(p2[:]))
+	if pass != pass_confirm {
+		logger.Fatal("passwords do not match")
 	}
-	defer f.Close()
-	if err := json.NewEncoder(f).Encode(cfg); err != nil {
-		logger.Fatalf("error writing config: %s", err)
+	if err := m.ChangePassword(pass); err != nil {
+		logger.Fatal(err)
 	}
 }

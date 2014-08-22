@@ -19,11 +19,7 @@ type (
 	}
 )
 
-func NewManager() *Manager {
-	cfg, err := loadConfig()
-	if err != nil {
-		logger.Fatal(err)
-	}
+func NewManager(cfg *ShipyardConfig) *Manager {
 	m := &Manager{
 		config: cfg,
 	}
@@ -31,7 +27,7 @@ func NewManager() *Manager {
 }
 
 func (m *Manager) buildUrl(path string) string {
-	return fmt.Sprintf("%s%s", m.config.Host, path)
+	return fmt.Sprintf("%s%s", m.config.Url, path)
 }
 
 func (m *Manager) doRequest(path string, method string, expectedStatus int, b []byte) (*http.Response, error) {
@@ -233,4 +229,17 @@ func (m *Manager) Login(username, password string) (*shipyard.AuthToken, error) 
 		return nil, err
 	}
 	return token, nil
+}
+
+func (m *Manager) ChangePassword(password string) error {
+	creds := map[string]string{}
+	creds["password"] = password
+	b, err := json.Marshal(creds)
+	if err != nil {
+		return err
+	}
+	if _, err := m.doRequest("/account/changepassword", "POST", 200, b); err != nil {
+		return err
+	}
+	return nil
 }

@@ -16,7 +16,11 @@ var accountsCommand = cli.Command{
 }
 
 func accountsAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	accounts, err := m.Accounts()
 	if err != nil {
 		logger.Fatalf("error getting accounts: %s", err)
@@ -49,7 +53,11 @@ var addAccountCommand = cli.Command{
 }
 
 func addAccountAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	user := c.String("username")
 	pass := c.String("password")
 	if user == "" || pass == "" {
@@ -77,7 +85,11 @@ var deleteAccountCommand = cli.Command{
 }
 
 func deleteAccountAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	id := c.String("id")
 	if id == "" || len(id) < 32 {
 		logger.Fatalf("you must specify an account id")

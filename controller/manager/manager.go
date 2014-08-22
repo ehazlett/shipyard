@@ -10,8 +10,16 @@ import (
 	"github.com/citadel/citadel/cluster"
 	"github.com/citadel/citadel/scheduler"
 	r "github.com/dancannon/gorethink"
+	"github.com/gorilla/sessions"
 	"github.com/shipyard/shipyard"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	tblNameConfig   = "config"
+	tblNameEvents   = "events"
+	tblNameAccounts = "accounts"
+	storeKey        = "shipyard"
 )
 
 var (
@@ -19,6 +27,7 @@ var (
 	ErrAccountDoesNotExist = errors.New("account does not exist")
 	ErrInvalidAuthToken    = errors.New("invalid auth token")
 	logger                 = logrus.New()
+	store                  = sessions.NewCookieStore([]byte(storeKey))
 )
 
 type (
@@ -29,13 +38,9 @@ type (
 		clusterManager *cluster.Cluster
 		engines        []*shipyard.Engine
 		authenticator  *shipyard.Authenticator
+		store          *sessions.CookieStore
+		StoreKey       string
 	}
-)
-
-const (
-	tblNameConfig   = "config"
-	tblNameEvents   = "events"
-	tblNameAccounts = "accounts"
 )
 
 func NewManager(addr string, database string) (*Manager, error) {
@@ -53,6 +58,8 @@ func NewManager(addr string, database string) (*Manager, error) {
 		database:      database,
 		session:       session,
 		authenticator: &shipyard.Authenticator{},
+		store:         store,
+		StoreKey:      storeKey,
 	}
 	m.initdb()
 	m.init()
@@ -61,6 +68,10 @@ func NewManager(addr string, database string) (*Manager, error) {
 
 func (m *Manager) ClusterManager() *cluster.Cluster {
 	return m.clusterManager
+}
+
+func (m *Manager) Store() *sessions.CookieStore {
+	return m.store
 }
 
 func (m *Manager) initdb() {
@@ -290,6 +301,17 @@ func (m *Manager) VerifyAuthToken(username, token string) error {
 	}
 	if token != acct.Token {
 		return ErrInvalidAuthToken
+	}
+	return nil
+}
+
+func (m *Manager) ChangePassword(username, password string) error {
+	hash, err := m.authenticator.Hash(password)
+	if err != nil {
+		return err
+	}
+	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"password": hash}).Run(m.session); err != nil {
+		return err
 	}
 	return nil
 }

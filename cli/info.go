@@ -15,7 +15,11 @@ var infoCommand = cli.Command{
 }
 
 func infoAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	info, err := m.Info()
 	if err != nil {
 		logger.Fatalf("error getting cluster info: %s", err)

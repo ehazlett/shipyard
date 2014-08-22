@@ -20,7 +20,11 @@ var engineListCommand = cli.Command{
 }
 
 func engineListAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	engines, err := m.Engines()
 	if err != nil {
 		logger.Fatalf("error getting engines: %s", err)
@@ -87,7 +91,11 @@ var engineAddCommand = cli.Command{
 }
 
 func engineAddAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	id := c.String("id")
 	addr := c.String("addr")
 	if id == "" || addr == "" {
@@ -163,7 +171,11 @@ var engineRemoveCommand = cli.Command{
 }
 
 func engineRemoveAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	engines, err := m.Engines()
 	if err != nil {
 		logger.Fatalf("error removing engine: %s\n", err)
@@ -190,7 +202,11 @@ var engineInspectCommand = cli.Command{
 }
 
 func engineInspectAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	if len(c.Args()) == 0 {
 		logger.Fatal("you must specify an id")
 	}

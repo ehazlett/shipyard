@@ -46,8 +46,14 @@ func (a *AuthRequired) handleRequest(w http.ResponseWriter, r *http.Request) err
 	parts := strings.Split(authHeader, ":")
 	if len(parts) == 2 {
 		// validate
-		if err := a.manager.VerifyAuthToken(parts[0], parts[1]); err == nil {
+		user := parts[0]
+		token := parts[1]
+		if err := a.manager.VerifyAuthToken(user, token); err == nil {
 			valid = true
+			// set current user
+			session, _ := a.manager.Store().Get(r, a.manager.StoreKey)
+			session.Values["username"] = user
+			session.Save(r, w)
 		}
 	}
 

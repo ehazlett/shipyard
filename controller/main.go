@@ -9,6 +9,7 @@ import (
 
 	"github.com/citadel/citadel"
 	"github.com/codegangsta/negroni"
+	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/manager"
@@ -22,6 +23,10 @@ var (
 	rethinkdbDatabase string
 	controllerManager *manager.Manager
 	logger            = logrus.New()
+)
+
+const (
+	STORE_KEY = "shipyard"
 )
 
 type (
@@ -276,6 +281,24 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func changePassword(w http.ResponseWriter, r *http.Request) {
+	session, _ := controllerManager.Store().Get(r, controllerManager.StoreKey)
+	var creds *Credentials
+	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	username := session.Values["username"].(string)
+	if username == "" {
+		http.Error(w, "unauthorized", http.StatusInternalServerError)
+		return
+	}
+	if err := controllerManager.ChangePassword(username, creds.Password); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func main() {
 	rAddr := os.Getenv("RETHINKDB_ADDR")
 	rDb := os.Getenv("RETHINKDB_DATABASE")
@@ -313,14 +336,23 @@ func main() {
 	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
 
-	// api router ; protected by auth
-	authRouter := negroni.New()
-	authRequired := middleware.NewAuthRequired(controllerManager)
-	authRouter.Use(negroni.HandlerFunc(authRequired.HandlerFuncWithNext))
-	authRouter.UseHandler(apiRouter)
-	globalMux.Handle("/api/", authRouter)
+	// api router; protected by auth
+	apiAuthRouter := negroni.New()
+	apiAuthRequired := middleware.NewAuthRequired(controllerManager)
+	apiAuthRouter.Use(negroni.HandlerFunc(apiAuthRequired.HandlerFuncWithNext))
+	apiAuthRouter.UseHandler(apiRouter)
+	globalMux.Handle("/api/", apiAuthRouter)
 
-	// login handler; open
+	// account router ; protected by auth
+	accountRouter := mux.NewRouter()
+	accountRouter.HandleFunc("/account/changepassword", changePassword).Methods("POST")
+	accountAuthRouter := negroni.New()
+	accountAuthRequired := middleware.NewAuthRequired(controllerManager)
+	accountAuthRouter.Use(negroni.HandlerFunc(accountAuthRequired.HandlerFuncWithNext))
+	accountAuthRouter.UseHandler(accountRouter)
+	globalMux.Handle("/account/", accountAuthRouter)
+
+	// login handler; public
 	loginRouter := mux.NewRouter()
 	loginRouter.HandleFunc("/auth/login", login).Methods("POST")
 	globalMux.Handle("/auth/", loginRouter)
@@ -339,7 +371,7 @@ func main() {
 
 	logger.Infof("shipyard controller listening on %s", listenAddr)
 
-	if err := http.ListenAndServe(listenAddr, globalMux); err != nil {
+	if err := http.ListenAndServe(listenAddr, context.ClearHandler(globalMux)); err != nil {
 		logger.Fatal(err)
 	}
 }

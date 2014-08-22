@@ -15,7 +15,11 @@ var destroyCommand = cli.Command{
 }
 
 func destroyAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	containers, err := m.Containers()
 	if err != nil {
 		logger.Fatalf("error getting container info: %s", err)

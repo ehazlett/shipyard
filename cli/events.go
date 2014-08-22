@@ -17,7 +17,11 @@ var eventsCommand = cli.Command{
 }
 
 func eventsAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	events, err := m.Events()
 	if err != nil {
 		logger.Fatalf("error getting events: %s", err)

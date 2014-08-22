@@ -75,7 +75,11 @@ var runCommand = cli.Command{
 }
 
 func runAction(c *cli.Context) {
-	m := NewManager()
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
+	m := NewManager(cfg)
 	env := parseEnvironmentVariables(c.StringSlice("env"))
 	ports := parsePorts(c.StringSlice("port"))
 	for i := 0; i < c.Int("count"); i++ {

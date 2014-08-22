@@ -20,9 +20,9 @@ func main() {
 		}
 	}
 	if cfg != nil {
-		shost := os.Getenv("SHIPYARD_HOST")
-		if shost == "" {
-			cfg.Host = shost
+		sUrl := os.Getenv("SHIPYARD_URL")
+		if sUrl == "" {
+			cfg.Url = sUrl
 		}
 	}
 	app := cli.NewApp()
@@ -32,6 +32,7 @@ func main() {
 	app.Flags = []cli.Flag{}
 	app.Commands = []cli.Command{
 		loginCommand,
+		changePasswordCommand,
 		accountsCommand,
 		addAccountCommand,
 		deleteAccountCommand,
