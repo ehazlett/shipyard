@@ -18,7 +18,7 @@ var containersCommand = cli.Command{
 }
 
 func containersAction(c *cli.Context) {
-	m := NewManager(c.GlobalString("host"))
+	m := NewManager()
 	containers, err := m.Containers()
 	if err != nil {
 		logger.Fatalf("error getting containers: %s", err)
@@ -48,7 +48,7 @@ var containerInspectCommand = cli.Command{
 }
 
 func containerInspectAction(c *cli.Context) {
-	m := NewManager(c.GlobalString("host"))
+	m := NewManager()
 	args := c.Args()
 	if len(args) == 0 {
 		logger.Fatalf("you must specify a container id")

@@ -325,6 +325,18 @@ func main() {
 	loginRouter.HandleFunc("/auth/login", login).Methods("POST")
 	globalMux.Handle("/auth/", loginRouter)
 
+	// check for admin user
+	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
+		acct := &shipyard.Account{
+			Username: "admin",
+			Password: "shipyard",
+		}
+		if err := controllerManager.SaveAccount(acct); err != nil {
+			logger.Fatal(err)
+		}
+		logger.Infof("created admin user: username: admin password: shipyard")
+	}
+
 	logger.Infof("shipyard controller listening on %s", listenAddr)
 
 	if err := http.ListenAndServe(listenAddr, globalMux); err != nil {

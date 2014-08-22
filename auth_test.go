@@ -9,7 +9,7 @@ const (
 )
 
 var (
-	auth = &Authenticator{}
+	auth = &Authenticator{salt: nil}
 )
 
 func TestHash(t *testing.T) {

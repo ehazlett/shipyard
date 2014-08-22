@@ -15,7 +15,7 @@ var infoCommand = cli.Command{
 }
 
 func infoAction(c *cli.Context) {
-	m := NewManager(c.GlobalString("host"))
+	m := NewManager()
 	info, err := m.Info()
 	if err != nil {
 		logger.Fatalf("error getting cluster info: %s", err)

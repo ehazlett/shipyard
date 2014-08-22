@@ -13,22 +13,25 @@ var (
 )
 
 func main() {
-	shost := os.Getenv("SHIPYARD_HOST")
-	if shost == "" {
-		shost = "http://127.0.0.1:8080"
+	cfg, err := loadConfig()
+	if err != nil {
+		if err != ErrConfigDoesNotExist {
+			logger.Fatal(err)
+		}
+	}
+	if cfg != nil {
+		shost := os.Getenv("SHIPYARD_HOST")
+		if shost == "" {
+			cfg.Host = shost
+		}
 	}
 	app := cli.NewApp()
 	app.Name = "shipyard"
 	app.Usage = "manage a shipyard cluster"
 	app.Version = "1.0.0"
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:  "host",
-			Value: shost,
-			Usage: "shipyard host",
-		},
-	}
+	app.Flags = []cli.Flag{}
 	app.Commands = []cli.Command{
+		loginCommand,
 		accountsCommand,
 		addAccountCommand,
 		deleteAccountCommand,

@@ -1,6 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
+	"os/user"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -66,4 +70,26 @@ func parsePorts(pairs []string) []*citadel.Port {
 		ports = append(ports, port)
 	}
 	return ports
+}
+
+func loadConfig() (*ShipyardConfig, error) {
+	usr, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+	path := filepath.Join(usr.HomeDir, CONFIG_PATH)
+	f, err := os.OpenFile(path, os.O_RDONLY, 0600)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, ErrConfigDoesNotExist
+		} else {
+			return nil, err
+		}
+	}
+	defer f.Close()
+	var cfg *ShipyardConfig
+	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
+		return nil, ErrInvalidConfig
+	}
+	return cfg, nil
 }

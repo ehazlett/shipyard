@@ -13,10 +13,13 @@ var (
 
 type (
 	Account struct {
-		ID        string `json:"id,omitempty" gorethink:"id,omitempty"`
-		Username  string `json:"username,omitempty" gorethink:"username"`
-		Password  string `json:"password,omitempty" gorethink:"password"`
-		AuthToken string `json:"-" gorethink:"auth_token"`
+		ID       string `json:"id,omitempty" gorethink:"id,omitempty"`
+		Username string `json:"username,omitempty" gorethink:"username"`
+		Password string `json:"password,omitempty" gorethink:"password"`
+		Token    string `json:"-" gorethink:"token"`
+	}
+	AuthToken struct {
+		Token string `json:"auth_token,omitempty"`
 	}
 	Authenticator struct {
 		salt []byte

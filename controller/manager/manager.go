@@ -30,9 +30,6 @@ type (
 		engines        []*shipyard.Engine
 		authenticator  *shipyard.Authenticator
 	}
-	Token struct {
-		AuthToken string `json:"auth_token,omitempty"`
-	}
 )
 
 const (
@@ -274,15 +271,15 @@ func (m *Manager) Authenticate(username, password string) bool {
 	return m.authenticator.Authenticate(password, acct.Password)
 }
 
-func (m *Manager) NewAuthToken(username string) (*Token, error) {
+func (m *Manager) NewAuthToken(username string) (*shipyard.AuthToken, error) {
 	token, err := m.authenticator.GenerateToken()
 	if err != nil {
 		return nil, err
 	}
-	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"auth_token": token}).Run(m.session); err != nil {
+	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"token": token}).Run(m.session); err != nil {
 		return nil, err
 	}
-	tk := &Token{AuthToken: token}
+	tk := &shipyard.AuthToken{Token: token}
 	return tk, nil
 }
 
@@ -291,7 +288,7 @@ func (m *Manager) VerifyAuthToken(username, token string) error {
 	if err != nil {
 		return err
 	}
-	if token != acct.AuthToken {
+	if token != acct.Token {
 		return ErrInvalidAuthToken
 	}
 	return nil

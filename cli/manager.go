@@ -15,18 +15,23 @@ import (
 type (
 	Manager struct {
 		baseUrl string
+		config  *ShipyardConfig
 	}
 )
 
-func NewManager(baseUrl string) *Manager {
+func NewManager() *Manager {
+	cfg, err := loadConfig()
+	if err != nil {
+		logger.Fatal(err)
+	}
 	m := &Manager{
-		baseUrl: baseUrl,
+		config: cfg,
 	}
 	return m
 }
 
 func (m *Manager) buildUrl(path string) string {
-	return fmt.Sprintf("%s%s", m.baseUrl, path)
+	return fmt.Sprintf("%s%s", m.config.Host, path)
 }
 
 func (m *Manager) doRequest(path string, method string, expectedStatus int, b []byte) (*http.Response, error) {
@@ -36,8 +41,7 @@ func (m *Manager) doRequest(path string, method string, expectedStatus int, b []
 	if err != nil {
 		return nil, err
 	}
-	// TODO: proper auth
-	req.Header.Add("AUTH_TOKEN", "foo")
+	req.Header.Add("TOKEN", fmt.Sprintf("%s:%s", m.config.Username, m.config.Token))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -210,4 +214,23 @@ func (m *Manager) DeleteAccount(account *shipyard.Account) error {
 		return err
 	}
 	return nil
+}
+
+func (m *Manager) Login(username, password string) (*shipyard.AuthToken, error) {
+	creds := map[string]string{}
+	creds["username"] = username
+	creds["password"] = password
+	b, err := json.Marshal(creds)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.doRequest("/auth/login", "POST", 200, b)
+	if err != nil {
+		return nil, err
+	}
+	var token *shipyard.AuthToken
+	if err := json.NewDecoder(resp.Body).Decode(&token); err != nil {
+		return nil, err
+	}
+	return token, nil
 }
