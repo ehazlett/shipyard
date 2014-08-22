@@ -47,9 +47,9 @@ class CreateContainerForm(forms.Form):
         help_text='key=value space separated pairs')
     ports = forms.CharField(required=False, help_text=_('space separated (i.e. 8000 8001:8001 127.0.0.1:80:80 )'))
     links = forms.CharField(required=False, help_text=_('space separated (i.e. redis:db)'))
-    volume = forms.CharField(required=False, help_text='container volume (i.e. /mnt/volume)')
+    volume = forms.CharField(required=False, help_text='container volume space separated (i.e. /mnt/volume /mnt/volume2)')
     volumes_from = forms.CharField(required=False,
-        help_text='mount volumes from specified container')
+        help_text='mount volumes from specified container space separated (ie. /var/logs /var/data')
     hosts = forms.MultipleChoiceField(required=True)
     private = forms.BooleanField(required=False)
     privileged = forms.BooleanField(required=False)
