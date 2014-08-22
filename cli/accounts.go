@@ -56,8 +56,8 @@ func addAccountAction(c *cli.Context) {
 		logger.Fatalf("you must specify a username and password")
 	}
 	account := &shipyard.Account{
-		Username: c.String("username"),
-		Password: c.String("password"),
+		Username: user,
+		Password: pass,
 	}
 	if err := m.AddAccount(account); err != nil {
 		logger.Fatalf("error adding account: %s", err)
@@ -78,6 +78,10 @@ var deleteAccountCommand = cli.Command{
 
 func deleteAccountAction(c *cli.Context) {
 	m := NewManager(c.GlobalString("host"))
+	id := c.String("id")
+	if id == "" || len(id) < 32 {
+		logger.Fatalf("you must specify an account id")
+	}
 	account := &shipyard.Account{
 		ID: c.String("id"),
 	}

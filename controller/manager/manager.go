@@ -1,4 +1,4 @@
-package main
+package manager
 
 import (
 	"crypto/tls"
@@ -11,11 +11,14 @@ import (
 	"github.com/citadel/citadel/scheduler"
 	r "github.com/dancannon/gorethink"
 	"github.com/shipyard/shipyard"
+	"github.com/sirupsen/logrus"
 )
 
 var (
 	ErrAccountExists       = errors.New("account already exists")
 	ErrAccountDoesNotExist = errors.New("account does not exist")
+	ErrInvalidAuthToken    = errors.New("invalid auth token")
+	logger                 = logrus.New()
 )
 
 type (
@@ -26,6 +29,9 @@ type (
 		clusterManager *cluster.Cluster
 		engines        []*shipyard.Engine
 		authenticator  *shipyard.Authenticator
+	}
+	Token struct {
+		AuthToken string `json:"auth_token,omitempty"`
 	}
 )
 
@@ -54,6 +60,10 @@ func NewManager(addr string, database string) (*Manager, error) {
 	m.initdb()
 	m.init()
 	return m, nil
+}
+
+func (m *Manager) ClusterManager() *cluster.Cluster {
+	return m.clusterManager
 }
 
 func (m *Manager) initdb() {
@@ -229,6 +239,9 @@ func (m *Manager) SaveAccount(account *shipyard.Account) error {
 	}
 	// check if exists; if so, update
 	acct, err := m.Account(account.Username)
+	if err != nil && err != ErrAccountDoesNotExist {
+		return err
+	}
 	account.Password = hash
 	if acct != nil {
 		if _, err := r.Table(tblNameAccounts).Update(account).RunWrite(m.session); err != nil {
@@ -236,7 +249,6 @@ func (m *Manager) SaveAccount(account *shipyard.Account) error {
 		}
 		return nil
 	}
-	// insert new account
 	if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
 		return err
 	}
@@ -260,4 +272,27 @@ func (m *Manager) Authenticate(username, password string) bool {
 		return false
 	}
 	return m.authenticator.Authenticate(password, acct.Password)
+}
+
+func (m *Manager) NewAuthToken(username string) (*Token, error) {
+	token, err := m.authenticator.GenerateToken()
+	if err != nil {
+		return nil, err
+	}
+	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"auth_token": token}).Run(m.session); err != nil {
+		return nil, err
+	}
+	tk := &Token{AuthToken: token}
+	return tk, nil
+}
+
+func (m *Manager) VerifyAuthToken(username, token string) error {
+	acct, err := m.Account(username)
+	if err != nil {
+		return err
+	}
+	if token != acct.AuthToken {
+		return ErrInvalidAuthToken
+	}
+	return nil
 }

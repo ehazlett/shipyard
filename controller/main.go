@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware"
 	"github.com/sirupsen/logrus"
 )
@@ -20,8 +20,15 @@ var (
 	listenAddr        string
 	rethinkdbAddr     string
 	rethinkdbDatabase string
-	manager           *Manager
+	controllerManager *manager.Manager
 	logger            = logrus.New()
+)
+
+type (
+	Credentials struct {
+		Username string `json:"username,omitempty"`
+		Password string `json:"password,omitempty"`
+	}
 )
 
 func init() {
@@ -37,13 +44,13 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := manager.clusterManager.Kill(container, 9); err != nil {
+	if err := controllerManager.ClusterManager().Kill(container, 9); err != nil {
 		logger.Errorf("error destroying %s: %s", container.ID, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := manager.clusterManager.Remove(container); err != nil {
+	if err := controllerManager.ClusterManager().Remove(container); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -67,7 +74,7 @@ func run(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	container, err := manager.clusterManager.Start(image, pull)
+	container, err := controllerManager.ClusterManager().Start(image, pull)
 	if err != nil {
 		logger.Errorf("error running %s: %s", image.Name, err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -87,7 +94,7 @@ func run(w http.ResponseWriter, r *http.Request) {
 func engines(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	engines := manager.Engines()
+	engines := controllerManager.Engines()
 	if err := json.NewEncoder(w).Encode(engines); err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -100,7 +107,7 @@ func inspectEngine(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]
-	engine := manager.Engine(id)
+	engine := controllerManager.Engine(id)
 	if err := json.NewEncoder(w).Encode(engine); err != nil {
 		logger.Error(err)
 	}
@@ -109,13 +116,13 @@ func inspectEngine(w http.ResponseWriter, r *http.Request) {
 func containers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	containers, err := manager.clusterManager.ListContainers()
+	containers, err := controllerManager.ClusterManager().ListContainers()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := json.NewEncoder(w).Encode(containers); err != nil {
-		log.Println(err)
+		logger.Error(err)
 	}
 }
 
@@ -124,7 +131,7 @@ func inspectContainer(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	id := vars["id"]
-	container, err := manager.Container(id)
+	container, err := controllerManager.Container(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -140,7 +147,7 @@ func addEngine(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := manager.AddEngine(engine); err != nil {
+	if err := controllerManager.AddEngine(engine); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -154,7 +161,7 @@ func removeEngine(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := manager.RemoveEngine(engine.ID); err != nil {
+	if err := controllerManager.RemoveEngine(engine.ID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -165,7 +172,7 @@ func removeEngine(w http.ResponseWriter, r *http.Request) {
 func clusterInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	info, err := manager.ClusterInfo()
+	info, err := controllerManager.ClusterInfo()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -188,7 +195,7 @@ func events(w http.ResponseWriter, r *http.Request) {
 		}
 		limit = lt
 	}
-	events, err := manager.Events(limit)
+	events, err := controllerManager.Events(limit)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -202,7 +209,7 @@ func events(w http.ResponseWriter, r *http.Request) {
 func accounts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	accounts, err := manager.Accounts()
+	accounts, err := controllerManager.Accounts()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -220,7 +227,7 @@ func addAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := manager.SaveAccount(account); err != nil {
+	if err := controllerManager.SaveAccount(account); err != nil {
 		logger.Errorf("error saving account: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -236,7 +243,7 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := manager.DeleteAccount(account); err != nil {
+	if err := controllerManager.DeleteAccount(account); err != nil {
 		logger.Errorf("error deleting account: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -247,7 +254,26 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	logger.Infof("login")
+	var creds *Credentials
+	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if !controllerManager.Authenticate(creds.Username, creds.Password) {
+		logger.Errorf("invalid login for %s from %s", creds.Username, r.RemoteAddr)
+		http.Error(w, "invalid username/password", http.StatusForbidden)
+		return
+	}
+	// return token
+	token, err := controllerManager.NewAuthToken(creds.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(token); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func main() {
@@ -264,7 +290,7 @@ func main() {
 		mErr      error
 		globalMux = http.NewServeMux()
 	)
-	manager, mErr = NewManager(rethinkdbAddr, rethinkdbDatabase)
+	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase)
 	if mErr != nil {
 		logger.Fatal(mErr)
 	}
@@ -289,7 +315,7 @@ func main() {
 
 	// api router ; protected by auth
 	authRouter := negroni.New()
-	authRequired := middleware.NewAuthRequired()
+	authRequired := middleware.NewAuthRequired(controllerManager)
 	authRouter.Use(negroni.HandlerFunc(authRequired.HandlerFuncWithNext))
 	authRouter.UseHandler(apiRouter)
 	globalMux.Handle("/api/", authRouter)

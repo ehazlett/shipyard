@@ -8,8 +8,11 @@ const (
 	TEST_PASS = "FOOPASS.+&^"
 )
 
+var (
+	auth = &Authenticator{}
+)
+
 func TestHash(t *testing.T) {
-	auth := &Authenticator{}
 	h, err := auth.Hash(TEST_PASS)
 	if err != nil {
 		t.Error(err)
@@ -19,12 +22,24 @@ func TestHash(t *testing.T) {
 	}
 }
 func TestAuthenticate(t *testing.T) {
-	auth := &Authenticator{}
-	h, _ := auth.Hash(TEST_PASS)
+	h, err := auth.Hash(TEST_PASS)
+	if err != nil {
+		t.Error(err)
+	}
 	if !auth.Authenticate(TEST_PASS, h) {
 		t.Error("expected password FOO")
 	}
 	if auth.Authenticate("BADpass", h) {
 		t.Error("expected passwords to not match")
+	}
+}
+
+func TestAuthenticateFailIfNoPass(t *testing.T) {
+	h, err := auth.Hash(TEST_PASS)
+	if err != nil {
+		t.Error(err)
+	}
+	if auth.Authenticate("", h) {
+		t.Error("empty password should not match")
 	}
 }

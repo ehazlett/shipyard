@@ -2,8 +2,9 @@ package shipyard
 
 import (
 	"errors"
+	"time"
 
-	"github.com/jameskeane/bcrypt"
+	"code.google.com/p/go.crypto/bcrypt"
 )
 
 var (
@@ -12,21 +13,34 @@ var (
 
 type (
 	Account struct {
-		ID       string `json:"id,omitempty" gorethink:"id,omitempty"`
-		Username string `json:"username,omitempty" gorethink:"username"`
-		Password string `json:"-" gorethink:"password"`
+		ID        string `json:"id,omitempty" gorethink:"id,omitempty"`
+		Username  string `json:"username,omitempty" gorethink:"username"`
+		Password  string `json:"password,omitempty" gorethink:"password"`
+		AuthToken string `json:"-" gorethink:"auth_token"`
 	}
-	Authenticator struct{}
+	Authenticator struct {
+		salt []byte
+	}
 )
 
 func NewAuthenticator(salt string) *Authenticator {
-	return &Authenticator{}
+	return &Authenticator{
+		salt: []byte(salt),
+	}
 }
 
 func (a *Authenticator) Hash(password string) (string, error) {
-	return bcrypt.Hash(password)
+	h, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(h[:]), err
 }
 
 func (a *Authenticator) Authenticate(password, hash string) bool {
-	return bcrypt.Match(password, hash)
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err == nil {
+		return true
+	}
+	return false
+}
+
+func (a *Authenticator) GenerateToken() (string, error) {
+	return a.Hash(time.Now().String())
 }

@@ -3,7 +3,9 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,11 +19,13 @@ func defaultDeniedHostHandler(w http.ResponseWriter, r *http.Request) {
 
 type AuthRequired struct {
 	deniedHostHandler http.Handler
+	manager           *manager.Manager
 }
 
-func NewAuthRequired() *AuthRequired {
+func NewAuthRequired(m *manager.Manager) *AuthRequired {
 	return &AuthRequired{
 		deniedHostHandler: http.HandlerFunc(defaultDeniedHostHandler),
+		manager:           m,
 	}
 }
 
@@ -37,11 +41,14 @@ func (a *AuthRequired) Handler(h http.Handler) http.Handler {
 }
 
 func (a *AuthRequired) handleRequest(w http.ResponseWriter, r *http.Request) error {
-	authHeader := r.Header.Get("AUTH_TOKEN")
 	valid := false
-	// TODO: validate
-	if authHeader != "" {
-		valid = true
+	authHeader := r.Header.Get("AUTH_TOKEN")
+	parts := strings.Split(authHeader, ":")
+	if len(parts) == 2 {
+		// validate
+		if err := a.manager.VerifyAuthToken(parts[0], parts[1]); err == nil {
+			valid = true
+		}
 	}
 
 	if !valid {
