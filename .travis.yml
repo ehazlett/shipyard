@@ -10,3 +10,6 @@ install:
     - cd controller && go get -d ./... && cd ..
 script:
     - bash test.sh
+branches:
+    only:
+        reload
