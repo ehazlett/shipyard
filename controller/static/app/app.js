@@ -30,7 +30,7 @@ angular.module('shipyard', ['ngRoute', 'ngCookies', 'shipyard.filters', 'shipyar
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
             });
-            $provide.factory('httpInterceptor', function ($q, $location, AuthToken) {
+            $provide.factory('httpInterceptor', function ($q, $window, AuthToken) {
                 return {
                     request: function (config) {
                         return config || $q.when(config);
