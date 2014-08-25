@@ -1,6 +1,12 @@
 'use strict';
 
 angular.module('shipyard.services', ['ngResource'])
+    .factory('Login', function($resource) {
+        return $resource('/auth/login', [], {
+            query: { isArray: false },
+            'login': { method: 'POST', isArray: false }
+        });
+    })
     .factory('Containers', function($resource) {
         return $resource('/api/containers');
     })

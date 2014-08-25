@@ -1,10 +1,11 @@
 'use strict';
 
-angular.module('shipyard.controllers', [])
-        .controller('HeaderController', function($scope) {
+angular.module('shipyard.controllers', ['ngCookies'])
+        .controller('HeaderController', function($http, $scope, AuthToken) {
             $scope.template = 'templates/header.html';
+            $scope.username = AuthToken.getUsername();
         })
-        .controller('MenuController', function($scope, $location) {
+        .controller('MenuController', function($scope, $location, $cookieStore, AuthToken) {
             $scope.template = 'templates/menu.html';
             $scope.isActive = function(path){
                 if ($location.path().substr(0, path.length) == path) {
@@ -12,8 +13,25 @@ angular.module('shipyard.controllers', [])
                 }
                 return false
             }
+            $scope.isLoggedIn = AuthToken.isLoggedIn();
         })
-        .controller('DashboardController', function($scope, Events, ClusterInfo) {
+        .controller('LoginController', function($scope, $cookieStore, $window, Login, AuthToken) {
+            $scope.template = 'templates/login.html';
+            $scope.login = function() {
+                Login.login({username: $scope.username, password: $scope.password}, function(data){
+                    AuthToken.save($scope.username, data.auth_token);
+                    $window.location.href = '/#/dashboard';
+                    $window.location.reload();
+                });
+            }
+        })
+        .controller('LogoutController', function($scope, $window, AuthToken) {
+            AuthToken.delete();
+            $window.location.href = '/#/login';
+            $window.location.reload();
+        })
+        .controller('DashboardController', function($http, $scope, Events, ClusterInfo, AuthToken) {
+            $http.defaults.headers.common['X-Access-Token'] = AuthToken.get();
             $scope.template = 'templates/dashboard.html';
             Events.query(function(data){
                 $scope.events = data;

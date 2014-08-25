@@ -42,7 +42,7 @@ func (a *AuthRequired) Handler(h http.Handler) http.Handler {
 
 func (a *AuthRequired) handleRequest(w http.ResponseWriter, r *http.Request) error {
 	valid := false
-	authHeader := r.Header.Get("TOKEN")
+	authHeader := r.Header.Get("X-Access-Token")
 	parts := strings.Split(authHeader, ":")
 	if len(parts) == 2 {
 		// validate

@@ -1,0 +1,55 @@
+<div class="ui">
+    <div class="row">
+        <div class="ui grid">
+            <div class="ui form segment six column wide" ng-submit="login()">
+              <div class="field">
+                   <label>Username</label>
+                   <div class="ui left labeled icon input">
+                       <input name="username" placeholder="username" type="text" ng-model="username">
+                       <i class="user icon"></i>
+                       <div class="ui corner label">
+                           <i class="icon asterisk"></i>
+                       </div>
+                   </div>
+                  </div>
+                  <div class="field">
+                      <label>Password</label>
+                      <div class="ui left labeled icon input">
+                          <input name="password" placeholder="password" type="password" ng-model="password">
+                          <i class="lock icon"></i>
+                          <div class="ui corner label">
+                              <i class="icon asterisk"></i>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="ui error message">
+                  </div>
+                  <div class="ui blue submit button">Login</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('.ui.form')
+            .form({
+                username: {
+                    identifier : 'username',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'Please enter a username'
+                        }
+                    ]
+                },
+                password: {
+                    identifier : 'password',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'Please enter a password'
+                        }
+                    ]
+                }
+          });
+        });
