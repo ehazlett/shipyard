@@ -37,7 +37,7 @@
             <div class="ui feed" ng-repeat="event in events | limitTo: 5">
                 <div class="event">
                     <div class="label">
-                          <i class="circular checkmark green icon"></i>
+                        <i class="circular icon" ng-class="event.type|eventCssClass"></i>
                     </div>
                     <div class="content">
                       <div class="summary">
