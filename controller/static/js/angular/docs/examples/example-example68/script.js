@@ -1,1 +1,0 @@
-  angular.module('ngClickExample', ['ngTouch']);

@@ -1,32 +1,30 @@
-<div class="ui">
+<div class="ui three column grid">
     <div class="row">
-        <div class="ui grid">
-            <div class="ui form segment six column wide" ng-submit="login()">
-              <div class="field">
-                   <label>Username</label>
-                   <div class="ui left labeled icon input">
-                       <input name="username" placeholder="username" type="text" ng-model="username">
-                       <i class="user icon"></i>
-                       <div class="ui corner label">
-                           <i class="icon asterisk"></i>
-                       </div>
-                   </div>
-                  </div>
-                  <div class="field">
-                      <label>Password</label>
-                      <div class="ui left labeled icon input">
-                          <input name="password" placeholder="password" type="password" ng-model="password">
-                          <i class="lock icon"></i>
-                          <div class="ui corner label">
-                              <i class="icon asterisk"></i>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="ui error message">
-                  </div>
-                  <div class="ui blue submit button">Login</div>
+        <div class="column"></div>
+        <div class="ui form column segment" ng-submit="login()">
+            <div class="field">
+                <div class="ui left labeled icon input">
+                    <input name="username" placeholder="username" type="text" ng-model="username">
+                    <i class="user icon"></i>
+                    <div class="ui corner label">
+                        <i class="icon asterisk"></i>
+                    </div>
+                </div>
             </div>
+            <div class="field">
+                <div class="ui left labeled icon input">
+                    <input name="password" placeholder="password" type="password" ng-model="password">
+                    <i class="lock icon"></i>
+                    <div class="ui corner label">
+                        <i class="icon asterisk"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="ui error message">
+            </div>
+            <div class="ui blue submit button">Login</div>
         </div>
+        <div class="column"></div>
     </div>
 </div>
 <script type="text/javascript">
