@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+AWS_REGION = ENV['AWS_REGION'] || "us-east-1"
+AWS_AMI    = ENV['AWS_AMI']    || "ami-d0f89fb9"
+AWS_INSTANCE_TYPE = ENV['AWS_INSTANCE_TYPE'] || "m1.small"
+AWS_SECURITY_GROUPS = ["shipyard"]
+
+#     aws.ami = "ami-7747d01e"
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "dummy"
+  config.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+  config.vm.synced_folder ".", "/opt/apps/shipyard"
+  config.vm.provision :shell, :path => "provision-aws.sh"
+
+  config.vm.provider :aws do |aws, override|
+    aws.access_key_id = ENV["AWS_ACCESS_KEY_ID"]
+    aws.secret_access_key = ENV["AWS_SECRET_ACCESS_KEY"]
+    aws.keypair_name = ENV["AWS_KEYPAIR_NAME"]
+    aws.security_groups = AWS_SECURITY_GROUPS
+    aws.region = AWS_REGION
+    aws.ami    = AWS_AMI
+    aws.instance_type = AWS_INSTANCE_TYPE
+
+    override.ssh.private_key_path = ENV["AWS_SSH_PRIVKEY"]
+    override.ssh.username = "ubuntu"
+  end
+end
+
