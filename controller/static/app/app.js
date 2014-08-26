@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('shipyard', ['ngRoute', 'ngCookies', 'shipyard.filters', 'shipyard.services', 'shipyard.controllers', 'shipyard.utils'])
+angular.module('shipyard', ['ngRoute', 'ngCookies', 'nvd3ChartDirectives', 'shipyard.filters', 'shipyard.services', 'shipyard.controllers', 'shipyard.utils'])
     .config(['$routeProvider', '$httpProvider', '$provide',
         function ($routeProvider, $httpProvider, $provide) {
             $routeProvider.when('/login', {

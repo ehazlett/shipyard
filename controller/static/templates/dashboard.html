@@ -2,12 +2,34 @@
     <div class="row">
         <div id="chart-cpu" class="one wide column">
             <h3 class="ui header center aligned">CPU</h3>
-            <svg></svg>
+            <nvd3-pie-chart
+                id="clusterCpuChart"
+                data="clusterCpuData"
+                width="450"
+                height="450"
+                showLabels="true"
+                x="showX()"
+                y="showY()"
+                labelType="percent"
+                >
+                <svg></svg>
+            </nvd3-pie-chart>
         </div>
 
         <div id="chart-memory" class="one wide column">
             <h3 class="ui header center aligned">Memory</h3>
-            <svg></svg>
+            <nvd3-pie-chart
+                id="clusterMemoryChart"
+                data="clusterMemoryData"
+                width="450"
+                height="450"
+                showLabels="true"
+                x="showX()"
+                y="showY()"
+                labelType="percent"
+                >
+                <svg></svg>
+            </nvd3-pie-chart>
         </div>
 
         <div class="column">

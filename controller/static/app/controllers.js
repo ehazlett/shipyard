@@ -35,11 +35,27 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.template = 'templates/dashboard.html';
             Events.query(function(data){
                 $scope.events = data;
-            });;
+            });
+            $scope.showX = function(){
+                return function(d){
+                    return d.key;
+                };
+            };
+            $scope.showY = function(){
+                return function(d){
+                    return d.y;
+                };
+            };
             ClusterInfo.query(function(data){
                 $scope.clusterInfo = data;
-                drawDashboardCharts(data.reserved_cpus, data.cpus,
-                    data.reserved_memory, data.memory);
+                $scope.clusterCpuData = [
+                    { key: "Total", y: data.cpus },
+                    { key: "Reserved", y: data.reserved_cpus }
+                ];
+                $scope.clusterMemoryData = [
+                    { key: "Total", y: data.memory },
+                    { key: "Reserved", y: data.reserved_memory }
+                ];
             });
         })
         .controller('ContainersController', function($scope, Containers) {
