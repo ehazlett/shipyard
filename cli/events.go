@@ -30,11 +30,15 @@ func eventsAction(c *cli.Context) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "Time\tContainer\tEngine\tType\tTags")
+	fmt.Fprintln(w, "Time\tMessage\tEngine\tType\tTags")
 	for _, e := range events {
 		tags := strings.Join(e.Tags, ",")
-		cntId := e.Container.ID[:12]
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", e.Time.Format(time.RubyDate), cntId, e.Container.Engine.ID, e.Type, tags)
+		message := ""
+		if e.Container != nil {
+			cntId := e.Container.ID[:12]
+			message += fmt.Sprintf("container:%s", cntId)
+		}
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", e.Time.Format(time.RubyDate), message, e.Engine.ID, e.Type, tags)
 	}
 	w.Flush()
 }

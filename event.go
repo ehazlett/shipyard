@@ -11,6 +11,6 @@ type Event struct {
 	Container *citadel.Container `json:"container,omitempty"`
 	Engine    *citadel.Engine    `json:"engine,omitempty"`
 	Time      time.Time          `json:"time,omitempty"`
-	Info      string             `json:"info,omitempty"`
+	Message   string             `json:"message,omitempty"`
 	Tags      []string           `json:"tags,omitempty"`
 }
