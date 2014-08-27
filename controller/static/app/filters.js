@@ -1,12 +1,32 @@
 'use strict';
+function truncate(t) {
+   if (t.length < 12) {
+       return t;
+   }
+   return t.substring(0, 12);
+}
 
 angular.module('shipyard.filters', [])
     .filter('truncate', function () {
         return function (t) {
-            if (t.length < 12) {
-                return t;
+            if (t == undefined) {
+                return "";
             }
-            return t.substring(0, 12);
+            return truncate(t);
+        };
+    })
+    .filter('formatEvent', function () {
+        return function (e) {
+            var evt = "";
+            evt += e.type + " ";
+            if (e.container != undefined) {
+                evt += truncate(e.container.id) + " " + e.container.image.name + " ";
+            } else if (e.engine != undefined) {
+                evt += e.engine.id + " (" + e.engine.addr + ") ";
+            } else {
+                evt += e.info + " ";
+            }
+            return evt;
         };
     })
     .filter('eventCssClass', function () {
@@ -25,6 +45,14 @@ angular.module('shipyard.filters', [])
                 case 'restart':
                     cls = "refresh blue";
                     break;
+                case 'add-engine':
+                    cls = "cloud upload green";
+                    break;
+                case 'remove-engine':
+                    cls = "remove";
+                    break;
+                default:
+                    cls = "text file"
             }
             return cls;
         };

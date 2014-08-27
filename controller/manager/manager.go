@@ -162,10 +162,39 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 		return err
 	}
 	m.init()
+	evt := &shipyard.Event{
+		Type:   "add-engine",
+		Time:   time.Now(),
+		Engine: engine.Engine,
+		Tags:   []string{"cluster"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (m *Manager) RemoveEngine(id string) error {
+	var engine *shipyard.Engine
+	res, err := r.Table(tblNameConfig).Get(id).Run(m.session)
+	if err != nil {
+		return err
+	}
+	if err := res.One(&engine); err != nil {
+		if err == r.ErrEmptyResult {
+			return nil
+		}
+		return err
+	}
+	evt := &shipyard.Event{
+		Type:   "remove-engine",
+		Time:   time.Now(),
+		Engine: engine.Engine,
+		Tags:   []string{"cluster"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
 	if _, err := r.Table(tblNameConfig).Get(id).Delete().RunWrite(m.session); err != nil {
 		return err
 	}
