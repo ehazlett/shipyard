@@ -15,7 +15,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             }
             $scope.isLoggedIn = AuthToken.isLoggedIn();
         })
-        .controller('LoginController', function($scope, $cookieStore, $window, Login, AuthToken) {
+        .controller('LoginController', function($scope, $cookieStore, $window, flash, Login, AuthToken) {
             $scope.template = 'templates/login.html';
             $scope.login = function() {
                 Login.login({username: $scope.username, password: $scope.password}, function(data){

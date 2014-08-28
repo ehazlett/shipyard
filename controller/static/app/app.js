@@ -1,8 +1,18 @@
 'use strict';
 
-angular.module('shipyard', ['ngRoute', 'ngCookies', 'nvd3ChartDirectives', 'shipyard.filters', 'shipyard.services', 'shipyard.controllers', 'shipyard.utils'])
-    .config(['$routeProvider', '$httpProvider', '$provide',
-        function ($routeProvider, $httpProvider, $provide) {
+angular.module('shipyard', [
+        'ngRoute',
+        'ngCookies',
+        'shipyard.filters',
+        'shipyard.services',
+        'shipyard.controllers',
+        'shipyard.utils',
+        'nvd3ChartDirectives',
+        'angular-flash.service',
+        'angular-flash.flash-alert-directive'
+    ])
+    .config(['$routeProvider', '$httpProvider', '$provide', 'flashProvider',
+        function ($routeProvider, $httpProvider, $provide, flashProvider) {
             $routeProvider.when('/login', {
                 templateUrl: 'templates/login.html',
                 controller: 'LoginController'
@@ -30,7 +40,7 @@ angular.module('shipyard', ['ngRoute', 'ngCookies', 'nvd3ChartDirectives', 'ship
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
             });
-            $provide.factory('httpInterceptor', function ($q, $window, AuthToken) {
+            $provide.factory('httpInterceptor', function ($q, $window, flash, AuthToken) {
                 return {
                     request: function (config) {
                         return config || $q.when(config);
@@ -42,16 +52,27 @@ angular.module('shipyard', ['ngRoute', 'ngCookies', 'nvd3ChartDirectives', 'ship
                         return response || $q.when(response);
                     },
                     responseError: function (rejection) {
-                        if (rejection.status == 401) {
-                            AuthToken.delete();
-                            $window.location.href = '/#/login';
-                            $window.location.reload();
-                            return $q.reject(rejection);
+                        switch (rejection.status) {
+                            case 401:
+                                AuthToken.delete();
+                                $window.location.href = '/#/login';
+                                $window.location.reload();
+                                return $q.reject(rejection);
+                                break;
+                            case 403:
+                                flash.error = 'Invalid username/password';
+                                break;
                         }
                         return $q.reject(rejection);
                     }
                 };
             });
             $httpProvider.interceptors.push('httpInterceptor');
+            // messages
+            flashProvider.errorClassnames.push('red');
+            flashProvider.warnClassnames.push('yellow');
+            flashProvider.infoClassnames.push('blue');
+            flashProvider.successClassnames.push('green');
+
         }]);
 

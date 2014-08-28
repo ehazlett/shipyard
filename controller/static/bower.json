@@ -29,6 +29,7 @@
     "angular-resource": "~1.2.23",
     "angular-loader": "~1.2.23",
     "angular-cookies": "~1.2.23",
-    "angularjs-nvd3-directives": "~0.0.7"
+    "angularjs-nvd3-directives": "~0.0.7",
+    "angular-flash": "~0.1.13"
   }
 }
