@@ -20,6 +20,9 @@
                     </div>
                 </div>
             </div>
+            <div class="ui small message red" flash-alert="error" ng-show="flash.message" duration="0">
+                {{flash.message}}
+            </div>
             <div class="ui error message">
             </div>
             <div class="ui blue submit button">Login</div>
@@ -50,4 +53,5 @@
                     ]
                 }
           });
-        });
+    });
+</script>

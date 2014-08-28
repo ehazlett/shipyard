@@ -1,17 +1,3 @@
-<div class="ui message green" flash-alert="success">
-    <i class="close icon"></i>
-    <div class="header">
-        {{flash.message}}
-    </div>
-</div>
-
-<div class="ui message red" flash-alert="error">
-    <i class="close icon"></i>
-    <div class="header">
-        {{flash.message}}
-    </div>
-</div>
-
 <div class="ui two column relaxed grid">
     <section class="column">
         <div class="ui header">Shipyard</div>
@@ -27,7 +13,4 @@
 </div>
 <script type="text/javascript">
     $('.ui.dropdown').dropdown('action', 'nothing');
-    $('.message .close').on('click', function() {
-        $(this).closest('.message').fadeOut();
-    });
 </script>

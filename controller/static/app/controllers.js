@@ -18,10 +18,12 @@ angular.module('shipyard.controllers', ['ngCookies'])
         .controller('LoginController', function($scope, $cookieStore, $window, flash, Login, AuthToken) {
             $scope.template = 'templates/login.html';
             $scope.login = function() {
-                Login.login({username: $scope.username, password: $scope.password}, function(data){
+                Login.login({username: $scope.username, password: $scope.password}).$promise.then(function(data){
                     AuthToken.save($scope.username, data.auth_token);
                     $window.location.href = '/#/dashboard';
                     $window.location.reload();
+                }, function() {
+                    flash.error = 'invalid username/password';
                 });
             }
         })
