@@ -51,11 +51,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
             ClusterInfo.query(function(data){
                 $scope.clusterInfo = data;
                 $scope.clusterCpuData = [
-                    { key: "Total", y: data.cpus },
+                    { key: "Free", y: data.cpus - data.reserved_cpus },
                     { key: "Reserved", y: data.reserved_cpus }
                 ];
                 $scope.clusterMemoryData = [
-                    { key: "Total", y: data.memory },
+                    { key: "Free", y: data.memory - data.reserved_memory },
                     { key: "Reserved", y: data.reserved_memory }
                 ];
             });

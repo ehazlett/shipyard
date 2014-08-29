@@ -33,7 +33,10 @@ angular.module('shipyard.filters', [])
         return function (t) {
             var cls = "";
             switch(t) {
-                case 'die', 'kill':
+                case 'die':
+                    cls = "off red";
+                    break;
+                case 'kill':
                     cls = "off red";
                     break;
                 case 'start':
