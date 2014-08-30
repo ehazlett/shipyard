@@ -7,6 +7,7 @@ angular.module('shipyard', [
         'shipyard.services',
         'shipyard.controllers',
         'shipyard.utils',
+        'shipyard.directives',
         'nvd3ChartDirectives',
         'angular-flash.service',
         'angular-flash.flash-alert-directive'
@@ -28,6 +29,10 @@ angular.module('shipyard', [
             $routeProvider.when('/containers', {
                 templateUrl: 'templates/containers.html',
                 controller: 'ContainersController'
+            });
+            $routeProvider.when('/containers/:id', {
+                templateUrl: 'templates/container_details.html',
+                controller: 'ContainerDetailsController'
             });
             $routeProvider.when('/engines', {
                 templateUrl: 'templates/engines.html',
@@ -73,6 +78,5 @@ angular.module('shipyard', [
             flashProvider.warnClassnames.push('yellow');
             flashProvider.infoClassnames.push('blue');
             flashProvider.successClassnames.push('green');
-
         }]);
 

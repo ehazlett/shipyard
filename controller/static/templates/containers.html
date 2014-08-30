@@ -11,7 +11,7 @@
     <tbody>
         <tr ng-repeat="c in containers">
             <td>
-                <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
+                <a href="/#/containers/{{c.id}}" rel="_self">{{c.id|truncate}}</a>
             </td>
             <td>{{c.image.name}}</td>
             <td>{{c.image.cpus}}</td>

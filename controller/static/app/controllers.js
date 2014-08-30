@@ -4,6 +4,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
         .controller('HeaderController', function($http, $scope, AuthToken) {
             $scope.template = 'templates/header.html';
             $scope.username = AuthToken.getUsername();
+            $http.defaults.headers.common['X-Access-Token'] = AuthToken.get();
         })
         .controller('MenuController', function($scope, $location, $cookieStore, AuthToken) {
             $scope.template = 'templates/menu.html';
@@ -33,7 +34,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $window.location.reload();
         })
         .controller('DashboardController', function($http, $scope, Events, ClusterInfo, AuthToken) {
-            $http.defaults.headers.common['X-Access-Token'] = AuthToken.get();
             $scope.template = 'templates/dashboard.html';
             Events.query(function(data){
                 $scope.events = data;
@@ -64,6 +64,49 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.template = 'templates/containers.html';
             Containers.query(function(data){
                 $scope.containers = data;
+            });
+        })
+        .controller('ContainerDetailsController', function($scope, $routeParams, Container) {
+            $scope.template = 'templates/container_details.html';
+            $scope.showX = function(){
+                return function(d){
+                    return d.key;
+                };
+            };
+            var portLinks = [];
+            Container.query({id: $routeParams.id}, function(data){
+                $scope.container = data;
+                // build port links
+                $scope.tooltipFunction = function(){
+                    return function(key, x, y, e, graph) {
+                            return "<div class='ui block small header'>Reserved</div>" + '<p>' + y + '</p>';
+                    }
+                };
+                angular.forEach(data.ports, function(p) {
+                    var h = document.createElement('a');
+                    h.href = data.engine.addr;
+                    var l = {};
+                    l.protocol = p.proto;
+                    l.container_port = p.container_port;
+                    l.link = h.protocol + '//' + h.hostname + ':' + p.port;
+                    this.push(l);
+                }, portLinks);
+                $scope.portLinks = portLinks;
+                $scope.predicate = 'container_port';
+                $scope.cpuMax = data.engine.cpus;
+                $scope.memoryMax = data.engine.memory;
+                $scope.containerCpuData = [
+                    {
+                        "key": "CPU",
+                        "values": [ [$scope.container.image.cpus, $scope.container.image.cpus] ]
+                    }
+                ];
+                $scope.containerMemoryData = [
+                    {
+                        "key": "Memory",
+                        "values": [ [$scope.container.image.memory, $scope.container.image.memory] ]
+                    }
+                ];
             });
         })
         .controller('EnginesController', function($scope, Engines) {
