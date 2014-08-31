@@ -1,0 +1,156 @@
+<div class="ui two column grid">
+    <div class="ui column">
+        <div class="ui form segment" ng-form="deployForm" novalidate>
+            <div class="ui small message red" ng-show="error">
+                <div class="header">Error</div>
+                <p>{{error}}</p>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Image</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="name" placeholder="ehazlett/go-demo" ng-model="name">
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Hostname</label>
+                    <div class="ui left labeled input">
+                        <input type="text" placeholder="foo.example.com" ng-model="hostname">
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Environment</label>
+                <div class="ui left labeled input">
+                    <input type="text" placeholder="key=value (space separated)" ng-model="environment">
+                </div>
+            </div>
+            <div class="field">
+                <label>Arguments</label>
+                <div class="ui left labeled input">
+                    <input type="text" placeholder="(space separated)" ng-model="args">
+                </div>
+            </div>
+            <div class="three fields">
+                <div class="field">
+                    <label>CPUs</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="cpus" ng-model="cpus">
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Memory (MB)</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="memory" ng-model="memory">
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Count</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="count" ng-model="count">
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>Label</label>
+                    <div class="ui left labeled selection dropdown">
+                        <input type="hidden" name="label" ng-model="label" value="{{selectedLabel}}">
+                        <div class="default text">Label</div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div class="item" ng-repeat="label in labels" data-value="{{label}}" data-ng-init="init()" ng-click="selectLabel(label)">{{label}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Type</label>
+                    <div class="ui left labeled selection dropdown">
+                        <input type="hidden" name="type" ng-model="type" value="{{selectedType}}">
+                        <div class="default text">Type</div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu" data-ng-init="init()">
+                            <div class="item" ng-repeat="t in types" data-value="{{t}}" ng-click="selectType(t)">{{t}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui blue button" ng-click="deploy()">Deploy</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('.ui.form')
+            .form({
+                name: {
+                    identifier : 'name',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter a Docker image name'
+                        }
+                    ]
+                },
+                cpus: {
+                    identifier : 'cpus',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter the number of CPU shares'
+                        }
+                    ]
+                },
+                memory: {
+                    identifier : 'memory',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter the amount of memory'
+                        }
+                    ]
+                },
+                count: {
+                    identifier : 'count',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter the number of instances'
+                        }
+                    ]
+                },
+                label: {
+                    identifier : 'label',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'select a label for deployment'
+                        }
+                    ]
+                },
+                type: {
+                    identifier : 'type',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'select a container type'
+                        }
+                    ]
+                }
+            }, {
+                inline: 'true'
+            });
+    });
+</script>

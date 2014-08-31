@@ -12,6 +12,7 @@ angular.module('shipyard.services', ['ngResource', 'ngRoute'])
     })
     .factory('Container', function($resource) {
         return $resource('/api/containers/:id', {id: '@id'}, {
+            destroy: { method: 'DELETE' },
             query: { isArray: false }
         });
     })

@@ -30,6 +30,10 @@ angular.module('shipyard', [
                 templateUrl: 'templates/containers.html',
                 controller: 'ContainersController'
             });
+            $routeProvider.when('/containers/deploy', {
+                templateUrl: 'templates/deploy.html',
+                controller: 'DeployController'
+            });
             $routeProvider.when('/containers/:id', {
                 templateUrl: 'templates/container_details.html',
                 controller: 'ContainerDetailsController'

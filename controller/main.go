@@ -43,8 +43,10 @@ func init() {
 }
 
 func destroy(w http.ResponseWriter, r *http.Request) {
-	var container *citadel.Container
-	if err := json.NewDecoder(r.Body).Decode(&container); err != nil {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	container, err := controllerManager.Container(id)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -67,17 +69,22 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 func run(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	p := r.FormValue("pull")
-	pull, err := strconv.ParseBool(p)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	pull := false
+	if p != "" {
+		pv, err := strconv.ParseBool(p)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		pull = pv
 	}
-
 	var image *citadel.Image
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	logger.Info(image)
 
 	container, err := controllerManager.ClusterManager().Start(image, pull)
 	if err != nil {
@@ -324,9 +331,9 @@ func main() {
 	apiRouter.HandleFunc("/api/accounts", deleteAccount).Methods("DELETE")
 	apiRouter.HandleFunc("/api/cluster/info", clusterInfo).Methods("GET")
 	apiRouter.HandleFunc("/api/containers", containers).Methods("GET")
+	apiRouter.HandleFunc("/api/containers", run).Methods("POST")
 	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
-	apiRouter.HandleFunc("/api/run", run).Methods("POST")
-	apiRouter.HandleFunc("/api/destroy", destroy).Methods("DELETE")
+	apiRouter.HandleFunc("/api/containers/{id}", destroy).Methods("DELETE")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")

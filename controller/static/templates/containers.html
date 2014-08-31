@@ -1,3 +1,10 @@
+<div class="ui icon buttons toolbar">
+    <a href="/#/containers/deploy" class="ui button mini green">
+        <i class="add icon"></i>
+        Deploy
+    </a>
+</div>
+
 <table class="ui table">
     <thead>
         <tr>
@@ -11,7 +18,7 @@
     <tbody>
         <tr ng-repeat="c in containers">
             <td>
-                <a href="/#/containers/{{c.id}}" rel="_self">{{c.id|truncate}}</a>
+                <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
             </td>
             <td>{{c.image.name}}</td>
             <td>{{c.image.cpus}}</td>

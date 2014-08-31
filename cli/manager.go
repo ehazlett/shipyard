@@ -75,7 +75,7 @@ func (m *Manager) Run(image *citadel.Image, pull bool) (*citadel.Container, erro
 		return nil, err
 	}
 	var container citadel.Container
-	resp, err := m.doRequest(fmt.Sprintf("/api/run?pull=%v", pull), "POST", 201, b)
+	resp, err := m.doRequest(fmt.Sprintf("/api/containers?pull=%v", pull), "POST", 201, b)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (m *Manager) Destroy(container *citadel.Container) error {
 	if err != nil {
 		return err
 	}
-	if _, err := m.doRequest("/api/destroy", "DELETE", 204, b); err != nil {
+	if _, err := m.doRequest(fmt.Sprintf("/api/containers/%s", container.ID), "DELETE", 204, b); err != nil {
 		return err
 	}
 	return nil

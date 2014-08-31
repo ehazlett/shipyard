@@ -1,3 +1,27 @@
+<div class="ui basic small modal">
+    <div class="header">
+        Destroy Container
+    </div>
+    <div class="content">
+        Destroy {{container.image.name}} ({{container.id|truncate}})?
+    </div>
+    <div class="actions">
+        <div class="ui button small">Cancel</div>
+        <a ng-click="destroyContainer()" class="ui button small blue">Ok</a>
+    </div>
+</div>
+
+<div class="ui icon buttons toolbar">
+    <a ng-click="showRemoveContainerDialog()" class="ui button mini red">
+        <i class="remove sign icon"></i>
+        Destroy
+    </a>
+</div>
+
+<div class="ui small message red" flash-alert="error" ng-show="flash.message" duration="0">
+    <i class="close icon"></i>
+    {{flash.message}}
+</div>
 <div class="ui stackable grid four column">
     <div class="ui column">
         <div>

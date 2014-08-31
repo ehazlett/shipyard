@@ -66,12 +66,93 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.containers = data;
             });
         })
-        .controller('ContainerDetailsController', function($scope, $routeParams, Container) {
+        .controller('DeployController', function($scope, $location, Engines, Container) {
+            var labels = [];
+            var types = [
+                "service",
+                "host",
+                "unique"
+            ];
+            $scope.cpus = 0.1;
+            $scope.memory = 256;
+            $scope.environment = "";
+            $scope.hostname = "";
+            $scope.count = 1;
+            $scope.args = "";
+            $scope.types = types;
+            $scope.selectLabel = function(label) {
+                $scope.selectedLabel = label;
+            };
+            $scope.selectType = function(type) {
+                $scope.selectedType = type;
+            };
+            $scope.init = function() {
+                $('.ui.dropdown').dropdown();
+            };
+            Engines.query(function(engines){
+                angular.forEach(engines, function(e) {
+                    angular.forEach(e.engine.labels, function(l){
+                        if (labels.indexOf(l) == -1) {
+                            this.push(l);
+                        }
+                    }, labels);
+                });
+                $scope.labels = labels;
+            });
+            $scope.deploy = function() {
+                var valid = $(".ui.form").form('validate form');
+                if (!valid) {
+                    return false;
+                }
+                // format environment
+                var envParts = $scope.environment.split(" ");
+                var environment = {};
+                var args = $scope.args.split(" ");
+                var labels = [$scope.selectedLabel];
+                for (var i=0; i<envParts.length; i++) {
+                    var env = envParts[i].split("=");
+                    environment[env[0]] = env[1];
+                }
+                var params = {
+                    name: $scope.name,
+                    cpus: parseFloat($scope.cpus),
+                    memory: parseFloat($scope.memory),
+                    environment: environment,
+                    hostname: $scope.hostname,
+                    type: $scope.selectedType,
+                    args: args,
+                    labels: labels,
+                    publish: true
+                };
+                Container.save(params).$promise.then(function(c){
+                    $location.path("/containers");
+                }, function(err){
+                    console.log('err');
+                    $scope.error = err.data;
+                    return false;
+                });
+            }
+        })
+        .controller('ContainerDetailsController', function($scope, $location, $routeParams, flash, Container) {
             $scope.template = 'templates/container_details.html';
             $scope.showX = function(){
                 return function(d){
                     return d.key;
                 };
+            };
+            $scope.showRemoveContainerDialog = function() {
+                $('.basic.modal')
+                    .modal('show');
+            };
+            $scope.destroyContainer = function() {
+                Container.destroy({id: $routeParams.id}).$promise.then(function() {
+                    // we must remove the modal or it will come back
+                    // the next time the modal is shown
+                    $('.basic.modal').remove();
+                    $location.path("/containers");
+                }, function(err) {
+                    flash.error = 'error destroying container: ' + err.data;
+                });
             };
             var portLinks = [];
             Container.query({id: $routeParams.id}, function(data){
@@ -79,7 +160,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 // build port links
                 $scope.tooltipFunction = function(){
                     return function(key, x, y, e, graph) {
-                            return "<div class='ui block small header'>Reserved</div>" + '<p>' + y + '</p>';
+                        return "<div class='ui block small header'>Reserved</div>" + '<p>' + y + '</p>';
                     }
                 };
                 angular.forEach(data.ports, function(p) {
@@ -122,3 +203,9 @@ angular.module('shipyard.controllers', ['ngCookies'])
             });
         })
 
+
+$(function(){
+    $('.message .close').on('click', function() {
+          $(this).closest('.message').fadeOut();
+    });
+});
