@@ -69,6 +69,8 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 func run(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	p := r.FormValue("pull")
+	c := r.FormValue("count")
+	count := 1
 	pull := false
 	if p != "" {
 		pv, err := strconv.ParseBool(p)
@@ -78,27 +80,37 @@ func run(w http.ResponseWriter, r *http.Request) {
 		}
 		pull = pv
 	}
+	if c != "" {
+		cc, err := strconv.Atoi(c)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		count = cc
+	}
 	var image *citadel.Image
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	logger.Info(image)
+	launched := []*citadel.Container{}
 
-	container, err := controllerManager.ClusterManager().Start(image, pull)
-	if err != nil {
-		logger.Errorf("error running %s: %s", image.Name, err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	for i := 0; i < count; i++ {
+		container, err := controllerManager.ClusterManager().Start(image, pull)
+		if err != nil {
+			logger.Errorf("error running %s: %s", image.Name, err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		logger.Infof("started %s pull=%v", image.Name, pull)
+		launched = append(launched, container)
 	}
-
-	logger.Infof("started %s pull=%v", image.Name, pull)
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
-	if err := json.NewEncoder(w).Encode(container); err != nil {
+	if err := json.NewEncoder(w).Encode(launched); err != nil {
 		logger.Error(err)
 	}
 }

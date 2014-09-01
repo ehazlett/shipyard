@@ -82,23 +82,23 @@ func runAction(c *cli.Context) {
 	m := NewManager(cfg)
 	env := parseEnvironmentVariables(c.StringSlice("env"))
 	ports := parsePorts(c.StringSlice("port"))
-	for i := 0; i < c.Int("count"); i++ {
-		image := &citadel.Image{
-			Name:        c.String("name"),
-			Cpus:        c.Float64("cpus"),
-			Memory:      c.Float64("memory"),
-			Hostname:    c.String("hostname"),
-			Domainname:  c.String("domain"),
-			Labels:      c.StringSlice("label"),
-			Args:        c.StringSlice("arg"),
-			Environment: env,
-			BindPorts:   ports,
-			Type:        c.String("type"),
-		}
-		container, err := m.Run(image, c.Bool("pull"))
-		if err != nil {
-			logger.Fatalf("error running container: %s\n", err)
-		}
-		fmt.Printf("started %s on %s\n", container.ID[:12], container.Engine.ID)
+	image := &citadel.Image{
+		Name:        c.String("name"),
+		Cpus:        c.Float64("cpus"),
+		Memory:      c.Float64("memory"),
+		Hostname:    c.String("hostname"),
+		Domainname:  c.String("domain"),
+		Labels:      c.StringSlice("label"),
+		Args:        c.StringSlice("arg"),
+		Environment: env,
+		BindPorts:   ports,
+		Type:        c.String("type"),
+	}
+	containers, err := m.Run(image, c.Int("count"), c.Bool("pull"))
+	if err != nil {
+		logger.Fatalf("error running container: %s\n", err)
+	}
+	for _, c := range containers {
+		fmt.Printf("started %s on %s\n", c.ID[:12], c.Engine.ID)
 	}
 }

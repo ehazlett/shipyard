@@ -15,6 +15,20 @@ angular.module('shipyard.filters', [])
             return truncate(t);
         };
     })
+    .filter('parseUrl', function () {
+        return function (u) {
+            if (u == undefined) {
+                return "";
+            }
+            var h = document.createElement('a');
+            h.href = u;
+            var l = {};
+            l.protocol = h.proto;
+            l.port = h.port;
+            l.hostname = h.hostname;
+            return l
+        };
+    })
     .filter('formatEvent', function () {
         return function (e) {
             var evt = "";

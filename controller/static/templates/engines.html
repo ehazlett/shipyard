@@ -1,4 +1,14 @@
-<table class="ui table segment">
+<div class="ui icon message" ng-hide="engines">
+    <i class="info icon"></i>
+    <div class="content">
+        <div class="header">
+            Engines
+        </div>
+        <p>There are no engines in the cluster.</p>
+    </div>
+</div>
+
+<table class="ui table segment" ng-show="engines">
     <thead>
         <tr>
             <th>ID</th>

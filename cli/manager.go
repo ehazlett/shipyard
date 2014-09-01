@@ -69,20 +69,20 @@ func (m *Manager) Containers() ([]*citadel.Container, error) {
 	return containers, nil
 }
 
-func (m *Manager) Run(image *citadel.Image, pull bool) (*citadel.Container, error) {
+func (m *Manager) Run(image *citadel.Image, count int, pull bool) ([]*citadel.Container, error) {
 	b, err := json.Marshal(image)
 	if err != nil {
 		return nil, err
 	}
-	var container citadel.Container
-	resp, err := m.doRequest(fmt.Sprintf("/api/containers?pull=%v", pull), "POST", 201, b)
+	var containers []*citadel.Container
+	resp, err := m.doRequest(fmt.Sprintf("/api/containers?count=%d&pull=%v", count, pull), "POST", 201, b)
 	if err != nil {
 		return nil, err
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&container); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&containers); err != nil {
 		return nil, err
 	}
-	return &container, nil
+	return containers, nil
 }
 
 func (m *Manager) Destroy(container *citadel.Container) error {

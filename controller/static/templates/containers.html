@@ -5,7 +5,17 @@
     </a>
 </div>
 
-<table class="ui table">
+<div class="ui icon message" ng-hide="containers">
+    <i class="info icon"></i>
+    <div class="content">
+        <div class="header">
+            Containers
+        </div>
+        <p>There are no containers running.</p>
+    </div>
+</div>
+
+<table class="ui table" ng-show="containers">
     <thead>
         <tr>
             <th>ID</th>

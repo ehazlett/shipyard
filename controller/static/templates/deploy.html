@@ -1,6 +1,7 @@
 <div class="ui two column grid">
     <div class="ui column">
         <div class="ui form segment" ng-form="deployForm" novalidate>
+            <div class="ui active"><div class="ui large text loader disabled">Launching... Please wait...</div></div>
             <div class="ui small message red" ng-show="error">
                 <div class="header">Error</div>
                 <p>{{error}}</p>
@@ -87,6 +88,11 @@
                     </div>
                 </div>
             </div>
+            <!--
+            <div class="field">
+                <checkbox checked="false" ng-model="pull">Pull the latest image (you must pull if the image does not exist on the host)</checkbox>
+            </div>
+            -->
             <div class="ui blue button" ng-click="deploy()">Deploy</div>
         </div>
     </div>

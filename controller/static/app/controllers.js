@@ -78,7 +78,8 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.environment = "";
             $scope.hostname = "";
             $scope.count = 1;
-            $scope.args = "";
+            $scope.args = null;
+            $scope.pull = true;
             $scope.types = types;
             $scope.selectLabel = function(label) {
                 $scope.selectedLabel = label;
@@ -99,15 +100,27 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 });
                 $scope.labels = labels;
             });
+            $scope.showLoader = function() {
+                $(".ui.loader").removeClass("disabled");
+                $(".ui.active").addClass("dimmer");
+            };
+            $scope.hideLoader = function() {
+                $(".ui.loader").addClass("disabled");
+                $(".ui.active").removeClass("dimmer");
+            };
             $scope.deploy = function() {
+                $scope.showLoader();
                 var valid = $(".ui.form").form('validate form');
                 if (!valid) {
+                    $scope.hideLoader();
                     return false;
                 }
                 // format environment
                 var envParts = $scope.environment.split(" ");
                 var environment = {};
-                var args = $scope.args.split(" ");
+                if ($scope.args != null) {
+                    var args = $scope.args.split(" ");
+                }
                 var labels = [$scope.selectedLabel];
                 for (var i=0; i<envParts.length; i++) {
                     var env = envParts[i].split("=");
@@ -124,10 +137,10 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     labels: labels,
                     publish: true
                 };
-                Container.save(params).$promise.then(function(c){
+                Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
                     $location.path("/containers");
                 }, function(err){
-                    console.log('err');
+                    $scope.hideLoader();
                     $scope.error = err.data;
                     return false;
                 });
@@ -167,7 +180,9 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     var h = document.createElement('a');
                     h.href = data.engine.addr;
                     var l = {};
+                    l.hostname = h.hostname;
                     l.protocol = p.proto;
+                    l.port = p.port;
                     l.container_port = p.container_port;
                     l.link = h.protocol + '//' + h.hostname + ':' + p.port;
                     this.push(l);
