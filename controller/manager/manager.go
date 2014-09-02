@@ -232,9 +232,10 @@ func (m *Manager) SaveServiceKey(key *shipyard.ServiceKey) error {
 	}
 	m.init()
 	evt := &shipyard.Event{
-		Type: "add-service-key",
-		Time: time.Now(),
-		Tags: []string{"cluster", "security"},
+		Type:    "add-service-key",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("description=%s", key.Description),
+		Tags:    []string{"cluster", "security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
@@ -250,7 +251,7 @@ func (m *Manager) RemoveServiceKey(key string) error {
 	evt := &shipyard.Event{
 		Type:    "remove-service-key",
 		Time:    time.Now(),
-		Message: fmt.Sprintf("removed key %s", k.Key),
+		Message: fmt.Sprintf("description=%s", k.Description),
 		Tags:    []string{"cluster", "security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {

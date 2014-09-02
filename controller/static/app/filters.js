@@ -33,12 +33,14 @@ angular.module('shipyard.filters', [])
         return function (e) {
             var evt = "";
             evt += e.type + " ";
-            if (e.container != undefined) {
+            if (e.container !== undefined) {
                 evt += truncate(e.container.id) + " " + e.container.image.name + " ";
-            } else if (e.engine != undefined) {
+            } else if (e.engine !== undefined) {
                 evt += e.engine.id + " (" + e.engine.addr + ") ";
             } else {
-                evt += e.info + " ";
+                if (e.message !== undefined) {
+                    evt += e.message + " ";
+                }
             }
             return evt;
         };
@@ -67,6 +69,12 @@ angular.module('shipyard.filters', [])
                     break;
                 case 'remove-engine':
                     cls = "remove";
+                    break;
+                case 'add-service-key':
+                    cls = "lock green";
+                    break;
+                case 'remove-service-key':
+                    cls = "remove red";
                     break;
                 default:
                     cls = "text file"
