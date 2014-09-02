@@ -206,6 +206,53 @@ func clusterInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func addServiceKey(w http.ResponseWriter, r *http.Request) {
+	var k *shipyard.ServiceKey
+	if err := json.NewDecoder(r.Body).Decode(&k); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	key, err := controllerManager.NewServiceKey(k.Description)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("created service key key=%s description=%s", key.Key, key.Description)
+	if err := json.NewEncoder(w).Encode(key); err != nil {
+		logger.Error(err)
+	}
+}
+
+func serviceKeys(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	keys, err := controllerManager.ServiceKeys()
+	if err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(keys); err != nil {
+		logger.Error(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+}
+
+func removeServiceKey(w http.ResponseWriter, r *http.Request) {
+	var key *shipyard.ServiceKey
+	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := controllerManager.RemoveServiceKey(key.Key); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("removed service key %s", key.Key)
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -346,11 +393,14 @@ func main() {
 	apiRouter.HandleFunc("/api/containers", run).Methods("POST")
 	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}", destroy).Methods("DELETE")
-	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
+	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")
 	apiRouter.HandleFunc("/api/engines", removeEngine).Methods("DELETE")
+	apiRouter.HandleFunc("/api/servicekeys", serviceKeys).Methods("GET")
+	apiRouter.HandleFunc("/api/servicekeys", addServiceKey).Methods("POST")
+	apiRouter.HandleFunc("/api/servicekeys", removeServiceKey).Methods("DELETE")
 
 	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))

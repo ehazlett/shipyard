@@ -24,6 +24,10 @@ type (
 	Authenticator struct {
 		salt []byte
 	}
+	ServiceKey struct {
+		Key         string `json:"key,omitempty" gorethink:"key,omitempty"`
+		Description string `json:"description,omitempty" gorethink:"description,omitempty"`
+	}
 )
 
 func NewAuthenticator(salt string) *Authenticator {

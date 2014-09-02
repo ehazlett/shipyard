@@ -42,18 +42,26 @@ func (a *AuthRequired) Handler(h http.Handler) http.Handler {
 
 func (a *AuthRequired) handleRequest(w http.ResponseWriter, r *http.Request) error {
 	valid := false
-	authHeader := r.Header.Get("X-Access-Token")
-	parts := strings.Split(authHeader, ":")
-	if len(parts) == 2 {
-		// validate
-		user := parts[0]
-		token := parts[1]
-		if err := a.manager.VerifyAuthToken(user, token); err == nil {
+	// service key takes priority
+	serviceKey := r.Header.Get("X-Service-Key")
+	if serviceKey != "" {
+		if err := a.manager.VerifyServiceKey(serviceKey); err == nil {
 			valid = true
-			// set current user
-			session, _ := a.manager.Store().Get(r, a.manager.StoreKey)
-			session.Values["username"] = user
-			session.Save(r, w)
+		}
+	} else { // check for authHeader
+		authHeader := r.Header.Get("X-Access-Token")
+		parts := strings.Split(authHeader, ":")
+		if len(parts) == 2 {
+			// validate
+			user := parts[0]
+			token := parts[1]
+			if err := a.manager.VerifyAuthToken(user, token); err == nil {
+				valid = true
+				// set current user
+				session, _ := a.manager.Store().Get(r, a.manager.StoreKey)
+				session.Values["username"] = user
+				session.Save(r, w)
+			}
 		}
 	}
 

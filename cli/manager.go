@@ -243,3 +243,45 @@ func (m *Manager) ChangePassword(password string) error {
 	}
 	return nil
 }
+
+func (m *Manager) ServiceKeys() ([]*shipyard.ServiceKey, error) {
+	keys := []*shipyard.ServiceKey{}
+	resp, err := m.doRequest("/api/servicekeys", "GET", 200, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&keys); err != nil {
+		return nil, err
+	}
+	return keys, nil
+}
+
+func (m *Manager) NewServiceKey(description string) (*shipyard.ServiceKey, error) {
+	k := &shipyard.ServiceKey{
+		Description: description,
+	}
+	b, err := json.Marshal(k)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.doRequest("/api/servicekeys", "POST", 200, b)
+	if err != nil {
+		return nil, err
+	}
+	var key *shipyard.ServiceKey
+	if err := json.NewDecoder(resp.Body).Decode(&key); err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+func (m *Manager) RemoveServiceKey(key *shipyard.ServiceKey) error {
+	b, err := json.Marshal(key)
+	if err != nil {
+		return err
+	}
+	if _, err := m.doRequest("/api/servicekeys", "DELETE", 204, b); err != nil {
+		return err
+	}
+	return nil
+}

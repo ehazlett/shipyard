@@ -44,6 +44,9 @@ func main() {
 		engineAddCommand,
 		engineRemoveCommand,
 		engineInspectCommand,
+		serviceKeysListCommand,
+		serviceKeyCreateCommand,
+		serviceKeyRemoveCommand,
 		infoCommand,
 		eventsCommand,
 	}

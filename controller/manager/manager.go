@@ -3,6 +3,7 @@ package manager
 import (
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -16,18 +17,20 @@ import (
 )
 
 const (
-	tblNameConfig   = "config"
-	tblNameEvents   = "events"
-	tblNameAccounts = "accounts"
-	storeKey        = "shipyard"
+	tblNameConfig      = "config"
+	tblNameEvents      = "events"
+	tblNameAccounts    = "accounts"
+	tblNameServiceKeys = "service_keys"
+	storeKey           = "shipyard"
 )
 
 var (
-	ErrAccountExists       = errors.New("account already exists")
-	ErrAccountDoesNotExist = errors.New("account does not exist")
-	ErrInvalidAuthToken    = errors.New("invalid auth token")
-	logger                 = logrus.New()
-	store                  = sessions.NewCookieStore([]byte(storeKey))
+	ErrAccountExists          = errors.New("account already exists")
+	ErrAccountDoesNotExist    = errors.New("account does not exist")
+	ErrServiceKeyDoesNotExist = errors.New("service key does not exist")
+	ErrInvalidAuthToken       = errors.New("invalid auth token")
+	logger                    = logrus.New()
+	store                     = sessions.NewCookieStore([]byte(storeKey))
 )
 
 type (
@@ -78,7 +81,7 @@ func (m *Manager) Store() *sessions.CookieStore {
 
 func (m *Manager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameServiceKeys}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -223,6 +226,42 @@ func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
 	return info, nil
 }
 
+func (m *Manager) SaveServiceKey(key *shipyard.ServiceKey) error {
+	if _, err := r.Table(tblNameServiceKeys).Insert(key).RunWrite(m.session); err != nil {
+		return err
+	}
+	m.init()
+	evt := &shipyard.Event{
+		Type: "add-service-key",
+		Time: time.Now(),
+		Tags: []string{"cluster", "security"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) RemoveServiceKey(key string) error {
+	k, err := m.ServiceKey(key)
+	if err != nil {
+		return err
+	}
+	evt := &shipyard.Event{
+		Type:    "remove-service-key",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("removed key %s", k.Key),
+		Tags:    []string{"cluster", "security"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	if _, err := r.Table(tblNameServiceKeys).Filter(map[string]string{"key": key}).Delete().RunWrite(m.session); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *Manager) SaveEvent(event *shipyard.Event) error {
 	if _, err := r.Table(tblNameEvents).Insert(event).RunWrite(m.session); err != nil {
 		return err
@@ -240,6 +279,34 @@ func (m *Manager) Events(limit int) ([]*shipyard.Event, error) {
 		return nil, err
 	}
 	return events, nil
+}
+
+func (m *Manager) ServiceKey(key string) (*shipyard.ServiceKey, error) {
+	res, err := r.Table(tblNameServiceKeys).Filter(map[string]string{"key": key}).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrServiceKeyDoesNotExist
+	}
+	var k *shipyard.ServiceKey
+	if err := res.One(&k); err != nil {
+		return nil, err
+	}
+	return k, nil
+}
+
+func (m *Manager) ServiceKeys() ([]*shipyard.ServiceKey, error) {
+	res, err := r.Table(tblNameServiceKeys).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	keys := []*shipyard.ServiceKey{}
+	if err := res.All(&keys); err != nil {
+		return nil, err
+	}
+	return keys, nil
 }
 
 func (m *Manager) Accounts() ([]*shipyard.Account, error) {
@@ -334,6 +401,28 @@ func (m *Manager) VerifyAuthToken(username, token string) error {
 		return ErrInvalidAuthToken
 	}
 	return nil
+}
+
+func (m *Manager) VerifyServiceKey(key string) error {
+	if _, err := m.ServiceKey(key); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) NewServiceKey(description string) (*shipyard.ServiceKey, error) {
+	k, err := m.authenticator.GenerateToken()
+	if err != nil {
+		return nil, err
+	}
+	key := &shipyard.ServiceKey{
+		Key:         k[24:],
+		Description: description,
+	}
+	if err := m.SaveServiceKey(key); err != nil {
+		return nil, err
+	}
+	return key, nil
 }
 
 func (m *Manager) ChangePassword(username, password string) error {
