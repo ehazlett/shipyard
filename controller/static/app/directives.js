@@ -62,7 +62,6 @@ angular.module('shipyard.directives', [])
                     scope.type = 'standard';
                     scope.checkbox_class = 'ui checkbox';
                 }
-    
                 if (scope.size == 'large'){
                     scope.checkbox_class = scope.checkbox_class + ' large';
                 } else if (scope.size == 'huge') {

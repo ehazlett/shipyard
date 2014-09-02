@@ -64,29 +64,20 @@
                     </div>
                 </div>
             </div>
-            <div class="two fields">
-                <div class="field">
-                    <label>Label</label>
-                    <div class="ui left labeled selection dropdown">
-                        <input type="hidden" name="label" ng-model="label" value="{{selectedLabel}}">
-                        <div class="default text">Label</div>
-                        <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <div class="item" ng-repeat="label in labels" data-value="{{label}}" data-ng-init="init()" ng-click="selectLabel(label)">{{label}}</div>
-                        </div>
+            <div class="field">
+                <label>Type</label>
+                <div class="ui left labeled selection dropdown">
+                    <input type="hidden" name="type" ng-model="type" value="{{selectedType}}">
+                    <div class="default text">{{selectedType || 'Type'}}</div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="item" ng-repeat="t in types" data-value="{{t}}" ng-click="selectType(t)">{{t}}</div>
                     </div>
                 </div>
-                <div class="field">
-                    <label>Type</label>
-                    <div class="ui left labeled selection dropdown">
-                        <input type="hidden" name="type" ng-model="type" value="{{selectedType}}">
-                        <div class="default text">Type</div>
-                        <i class="dropdown icon"></i>
-                        <div class="menu" data-ng-init="init()">
-                            <div class="item" ng-repeat="t in types" data-value="{{t}}" ng-click="selectType(t)">{{t}}</div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div class="field">
+                <label>Labels</label>
+                <checkbox checked="false" name="labels" value="{{label}}" ng-model="selectedLabels" ng-repeat="label in labels">{{label}}</checkbox>
             </div>
             <!--
             <div class="field">
@@ -159,4 +150,5 @@
                 inline: 'true'
             });
     });
+    $('.ui.dropdown').dropdown();
 </script>

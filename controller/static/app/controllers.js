@@ -67,7 +67,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
             });
         })
         .controller('DeployController', function($scope, $location, Engines, Container) {
-            var labels = [];
             var types = [
                 "service",
                 "host",
@@ -81,15 +80,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.args = null;
             $scope.pull = true;
             $scope.types = types;
-            $scope.selectLabel = function(label) {
-                $scope.selectedLabel = label;
-            };
             $scope.selectType = function(type) {
                 $scope.selectedType = type;
+                $(".ui.dropdown").dropdown('hide');
             };
-            $scope.init = function() {
-                $('.ui.dropdown').dropdown();
-            };
+            var labels = [];
             Engines.query(function(engines){
                 angular.forEach(engines, function(e) {
                     angular.forEach(e.engine.labels, function(l){
@@ -115,13 +110,17 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     $scope.hideLoader();
                     return false;
                 }
+                var selectedLabels = [];
+                $(".ui.checkbox").children(":checked").each(function(i, sel){
+                    // HACK: use the label text to set the value
+                    selectedLabels.push($(sel).next().text());
+                });
                 // format environment
                 var envParts = $scope.environment.split(" ");
                 var environment = {};
                 if ($scope.args != null) {
                     var args = $scope.args.split(" ");
                 }
-                var labels = [$scope.selectedLabel];
                 for (var i=0; i<envParts.length; i++) {
                     var env = envParts[i].split("=");
                     environment[env[0]] = env[1];
@@ -134,7 +133,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     hostname: $scope.hostname,
                     type: $scope.selectedType,
                     args: args,
-                    labels: labels,
+                    labels: selectedLabels,
                     publish: true
                 };
                 Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){

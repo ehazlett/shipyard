@@ -22,3 +22,9 @@ div.container {
 .toolbar {
     margin-bottom: 5px;
 }
+.checkbox {
+    padding-right: 10px;
+}
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
