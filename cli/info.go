@@ -34,6 +34,6 @@ func infoAction(c *cli.Context) {
 	fmt.Fprintf(w, "Images: %d\n", info.ImageCount)
 	fmt.Fprintf(w, "Engines: %d\n", info.EngineCount)
 	fmt.Fprintf(w, "Reserved Cpus: %.2f%% (%.2f)\n", cpuPercentage, info.ReservedCpus)
-	fmt.Fprintf(w, "Reserved Memory: %.2f%% (%.2f) MB\n", memPercentage, info.ReservedMemory)
+	fmt.Fprintf(w, "Reserved Memory: %.2f%% (%.2f MB)\n", memPercentage, info.ReservedMemory)
 	w.Flush()
 }
