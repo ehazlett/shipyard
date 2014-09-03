@@ -24,13 +24,16 @@ func infoAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatalf("error getting cluster info: %s", err)
 	}
+	cpuPercentage := (info.ReservedCpus / info.Cpus) * 100
+	memPercentage := (info.ReservedMemory / info.Memory) * 100
+
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
 	fmt.Fprintf(w, "Cpus: %.2f\n", info.Cpus)
 	fmt.Fprintf(w, "Memory: %.2f MB\n", info.Memory)
 	fmt.Fprintf(w, "Containers: %d\n", info.ContainerCount)
 	fmt.Fprintf(w, "Images: %d\n", info.ImageCount)
 	fmt.Fprintf(w, "Engines: %d\n", info.EngineCount)
-	fmt.Fprintf(w, "Reserved Cpus: %.2f\n", info.ReservedCpus)
-	fmt.Fprintf(w, "Reserved Memory: %.2f\n", info.ReservedMemory)
+	fmt.Fprintf(w, "Reserved Cpus: %.2f%% (%.2f)\n", cpuPercentage, info.ReservedCpus)
+	fmt.Fprintf(w, "Reserved Memory: %.2f%% (%.2f) MB\n", memPercentage, info.ReservedMemory)
 	w.Flush()
 }
