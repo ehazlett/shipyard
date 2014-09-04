@@ -17,6 +17,11 @@ type (
 		Username string `json:"username,omitempty" gorethink:"username"`
 		Password string `json:"password,omitempty" gorethink:"password"`
 		Token    string `json:"-" gorethink:"token"`
+		Role     *Role  `json:"role,omitempty" gorethink:"role,omitempty"`
+	}
+	Role struct {
+		ID   string `json:"id,omitempty" gorethink:"id,omitempty"`
+		Name string `json:"name,omitempty" gorethink:"name,omitempty"`
 	}
 	AuthToken struct {
 		Token string `json:"auth_token,omitempty"`

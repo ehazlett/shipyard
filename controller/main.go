@@ -13,7 +13,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/manager"
-	"github.com/shipyard/shipyard/controller/middleware"
+	"github.com/shipyard/shipyard/controller/middleware/access"
+	"github.com/shipyard/shipyard/controller/middleware/auth"
 	"github.com/sirupsen/logrus"
 )
 
@@ -309,8 +310,14 @@ func addAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteAccount(w http.ResponseWriter, r *http.Request) {
-	var account *shipyard.Account
-	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
+	var acct *shipyard.Account
+	if err := json.NewDecoder(r.Body).Decode(&acct); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	account, err := controllerManager.Account(acct.Username)
+	if err != nil {
+		logger.Errorf("error deleting account: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -320,8 +327,68 @@ func deleteAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Infof("deleted account %s", account.ID)
+	logger.Infof("deleted account %s (%s)", account.Username, account.ID)
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func roles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	roles, err := controllerManager.Roles()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(roles); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func role(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	name := vars["name"]
+	role, err := controllerManager.Role(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(role); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func addRole(w http.ResponseWriter, r *http.Request) {
+	var role *shipyard.Role
+	if err := json.NewDecoder(r.Body).Decode(&role); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := controllerManager.SaveRole(role); err != nil {
+		logger.Errorf("error saving role: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("saved role %s", role.Name)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func deleteRole(w http.ResponseWriter, r *http.Request) {
+	var role *shipyard.Role
+	if err := json.NewDecoder(r.Body).Decode(&role); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := controllerManager.DeleteRole(role); err != nil {
+		logger.Errorf("error deleting role: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -388,6 +455,10 @@ func main() {
 	apiRouter.HandleFunc("/api/accounts", accounts).Methods("GET")
 	apiRouter.HandleFunc("/api/accounts", addAccount).Methods("POST")
 	apiRouter.HandleFunc("/api/accounts", deleteAccount).Methods("DELETE")
+	apiRouter.HandleFunc("/api/roles", roles).Methods("GET")
+	apiRouter.HandleFunc("/api/roles/{name}", role).Methods("GET")
+	apiRouter.HandleFunc("/api/roles", addRole).Methods("POST")
+	apiRouter.HandleFunc("/api/roles", deleteRole).Methods("DELETE")
 	apiRouter.HandleFunc("/api/cluster/info", clusterInfo).Methods("GET")
 	apiRouter.HandleFunc("/api/containers", containers).Methods("GET")
 	apiRouter.HandleFunc("/api/containers", run).Methods("POST")
@@ -407,8 +478,10 @@ func main() {
 
 	// api router; protected by auth
 	apiAuthRouter := negroni.New()
-	apiAuthRequired := middleware.NewAuthRequired(controllerManager)
+	apiAuthRequired := auth.NewAuthRequired(controllerManager)
+	apiAccessRequired := access.NewAccessRequired(controllerManager)
 	apiAuthRouter.Use(negroni.HandlerFunc(apiAuthRequired.HandlerFuncWithNext))
+	apiAuthRouter.Use(negroni.HandlerFunc(apiAccessRequired.HandlerFuncWithNext))
 	apiAuthRouter.UseHandler(apiRouter)
 	globalMux.Handle("/api/", apiAuthRouter)
 
@@ -416,7 +489,7 @@ func main() {
 	accountRouter := mux.NewRouter()
 	accountRouter.HandleFunc("/account/changepassword", changePassword).Methods("POST")
 	accountAuthRouter := negroni.New()
-	accountAuthRequired := middleware.NewAuthRequired(controllerManager)
+	accountAuthRequired := auth.NewAuthRequired(controllerManager)
 	accountAuthRouter.Use(negroni.HandlerFunc(accountAuthRequired.HandlerFuncWithNext))
 	accountAuthRouter.UseHandler(accountRouter)
 	globalMux.Handle("/account/", accountAuthRouter)
@@ -428,9 +501,27 @@ func main() {
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
+		// create roles
+		r := &shipyard.Role{
+			Name: "admin",
+		}
+		ru := &shipyard.Role{
+			Name: "user",
+		}
+		if err := controllerManager.SaveRole(r); err != nil {
+			logger.Fatal(err)
+		}
+		if err := controllerManager.SaveRole(ru); err != nil {
+			logger.Fatal(err)
+		}
+		role, err := controllerManager.Role(r.Name)
+		if err != nil {
+			logger.Fatal(err)
+		}
 		acct := &shipyard.Account{
 			Username: "admin",
 			Password: "shipyard",
+			Role:     role,
 		}
 		if err := controllerManager.SaveAccount(acct); err != nil {
 			logger.Fatal(err)

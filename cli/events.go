@@ -33,12 +33,16 @@ func eventsAction(c *cli.Context) {
 	fmt.Fprintln(w, "Time\tMessage\tEngine\tType\tTags")
 	for _, e := range events {
 		tags := strings.Join(e.Tags, ",")
-		message := ""
+		message := e.Message
+		engine := ""
 		if e.Container != nil {
 			cntId := e.Container.ID[:12]
-			message += fmt.Sprintf("container:%s", cntId)
+			message = fmt.Sprintf("container:%s %s", cntId, e.Message)
 		}
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", e.Time.Format(time.RubyDate), message, e.Engine.ID, e.Type, tags)
+		if e.Engine != nil {
+			engine = e.Engine.ID
+		}
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", e.Time.Format(time.RubyDate), message, engine, e.Type, tags)
 	}
 	w.Flush()
 }

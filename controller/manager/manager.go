@@ -20,6 +20,7 @@ const (
 	tblNameConfig      = "config"
 	tblNameEvents      = "events"
 	tblNameAccounts    = "accounts"
+	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
 	storeKey           = "shipyard"
 )
@@ -27,6 +28,7 @@ const (
 var (
 	ErrAccountExists          = errors.New("account already exists")
 	ErrAccountDoesNotExist    = errors.New("account does not exist")
+	ErrRoleDoesNotExist       = errors.New("role does not exist")
 	ErrServiceKeyDoesNotExist = errors.New("service key does not exist")
 	ErrInvalidAuthToken       = errors.New("invalid auth token")
 	logger                    = logrus.New()
@@ -81,7 +83,7 @@ func (m *Manager) Store() *sessions.CookieStore {
 
 func (m *Manager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameServiceKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -369,6 +371,61 @@ func (m *Manager) DeleteAccount(account *shipyard.Account) error {
 	}
 	if res.IsNil() {
 		return ErrAccountDoesNotExist
+	}
+	return nil
+}
+
+func (m *Manager) Roles() ([]*shipyard.Role, error) {
+	res, err := r.Table(tblNameRoles).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	var roles []*shipyard.Role
+	if err := res.All(&roles); err != nil {
+		return nil, err
+	}
+	return roles, nil
+}
+
+func (m *Manager) Role(name string) (*shipyard.Role, error) {
+	res, err := r.Table(tblNameRoles).Filter(map[string]string{"name": name}).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrRoleDoesNotExist
+	}
+	var role *shipyard.Role
+	if err := res.One(&role); err != nil {
+		return nil, err
+	}
+	return role, nil
+}
+
+func (m *Manager) SaveRole(role *shipyard.Role) error {
+	if _, err := r.Table(tblNameRoles).Insert(role).RunWrite(m.session); err != nil {
+		return err
+	}
+	evt := &shipyard.Event{
+		Type:    "add-role",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s", role.Name),
+		Tags:    []string{"cluster", "security"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) DeleteRole(role *shipyard.Role) error {
+	res, err := r.Table(tblNameRoles).Get(role.ID).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrRoleDoesNotExist
 	}
 	return nil
 }

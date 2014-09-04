@@ -190,6 +190,30 @@ func (m *Manager) Accounts() ([]*shipyard.Account, error) {
 	return accounts, nil
 }
 
+func (m *Manager) Roles() ([]*shipyard.Role, error) {
+	roles := []*shipyard.Role{}
+	resp, err := m.doRequest("/api/roles", "GET", 200, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&roles); err != nil {
+		return nil, err
+	}
+	return roles, nil
+}
+
+func (m *Manager) Role(name string) (*shipyard.Role, error) {
+	role := &shipyard.Role{}
+	resp, err := m.doRequest(fmt.Sprintf("/api/roles/%s", name), "GET", 200, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&role); err != nil {
+		return nil, err
+	}
+	return role, nil
+}
+
 func (m *Manager) AddAccount(account *shipyard.Account) error {
 	b, err := json.Marshal(account)
 	if err != nil {
