@@ -1,4 +1,6 @@
 FROM debian:jessie
+RUN apt-get update && apt-get install -y ca-certificates
 ADD cli /usr/local/bin/shipyard-cli
-ENTRYPOINT ["/usr/local/bin/shipyard-cli"]
-CMD ["-h"]
+ADD run.sh /usr/local/bin/run
+ENTRYPOINT ["/usr/local/bin/run"]
+CMD []

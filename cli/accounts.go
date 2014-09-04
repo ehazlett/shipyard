@@ -29,9 +29,9 @@ func accountsAction(c *cli.Context) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "Username\tID\tRole")
+	fmt.Fprintln(w, "Username\tRole")
 	for _, u := range accounts {
-		fmt.Fprintf(w, "%s\t%s\t%s\n", u.Username, u.ID, u.Role.Name)
+		fmt.Fprintf(w, "%s\t%s\n", u.Username, u.Role.Name)
 	}
 	w.Flush()
 }
