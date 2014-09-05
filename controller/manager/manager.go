@@ -353,7 +353,7 @@ func (m *Manager) SaveAccount(account *shipyard.Account) error {
 	}
 	account.Password = hash
 	if acct != nil {
-		if _, err := r.Table(tblNameAccounts).Update(account).RunWrite(m.session); err != nil {
+		if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": account.Username}).Update(map[string]string{"password": hash, "token": ""}).RunWrite(m.session); err != nil {
 			return err
 		}
 		return nil

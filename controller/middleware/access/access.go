@@ -12,7 +12,6 @@ import (
 
 var (
 	logger = logrus.New()
-	ACL    = make(map[string][]string)
 )
 
 func defaultDeniedHandler(w http.ResponseWriter, r *http.Request) {
@@ -22,24 +21,29 @@ func defaultDeniedHandler(w http.ResponseWriter, r *http.Request) {
 type AccessRequired struct {
 	deniedHandler http.Handler
 	manager       *manager.Manager
+	acl           map[string][]string
 }
 
-func setBasicAccessLevels() {
-	ACL["admin"] = []string{"*"}
-	ACL["user"] = []string{
+func defaultAccessLevels() map[string][]string {
+	acl := make(map[string][]string)
+	acl["admin"] = []string{"*"}
+	acl["user"] = []string{
 		"/api/containers",
 		"/api/cluster/info",
 		"/api/events",
 		"/api/engines",
 	}
+	return acl
 }
 
 func NewAccessRequired(m *manager.Manager) *AccessRequired {
-	setBasicAccessLevels()
-	return &AccessRequired{
+	acl := defaultAccessLevels()
+	a := &AccessRequired{
 		deniedHandler: http.HandlerFunc(defaultDeniedHandler),
 		manager:       m,
+		acl:           acl,
 	}
+	return a
 }
 
 func (a *AccessRequired) Handler(h http.Handler) http.Handler {
@@ -84,7 +88,7 @@ func (a *AccessRequired) handleRequest(w http.ResponseWriter, r *http.Request) e
 
 func (a *AccessRequired) checkAccess(path string, role *shipyard.Role) bool {
 	valid := false
-	for _, v := range ACL[role.Name] {
+	for _, v := range a.acl[role.Name] {
 		if v == "*" || strings.HasPrefix(path, v) {
 			valid = true
 			break
