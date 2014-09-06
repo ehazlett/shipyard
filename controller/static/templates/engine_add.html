@@ -1,0 +1,130 @@
+<div class="ui two column grid">
+    <div class="ui column">
+        <div class="ui form segment" ng-form="addEngineForm" novalidate>
+            <div class="ui small message red" ng-show="error">
+                <div class="header">Error</div>
+                <p>{{error}}</p>
+            </div>
+            <div class="field">
+                <label>Name</label>
+                <div class="ui left labeled input">
+                    <input type="text" name="id" placeholder="docker-host" ng-model="id">
+                    <div class="ui corner label">
+                        <i class="icon asterisk"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Labels</label>
+                <div class="ui left labeled input">
+                    <input type="text" name="labels" placeholder="space separated" ng-model="labels">
+                    <div class="ui corner label">
+                        <i class="icon asterisk"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="ui two fields">
+                <div class="field">
+                    <label>CPUs</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="cpus" placeholder="1.0" ng-model="cpus">
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Memory</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="memory" placeholder="1024" ng-model="memory">
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>Address</label>
+                <div class="ui left labeled input">
+                    <input type="text" name="addr" placeholder="http://10.1.2.3:2375" ng-model="addr">
+                    <div class="ui corner label">
+                        <i class="icon asterisk"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label>SSL Certificate</label>
+                <div class="ui left labeled input">
+                    <textarea name="ssl_cert" ng-model="ssl_cert"></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <label>SSL Key</label>
+                <div class="ui left labeled input">
+                    <textarea name="ssl_key" ng-model="ssl_key"></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <label>CA Certificate</label>
+                <div class="ui left labeled input">
+                    <textarea name="ca_cert" ng-model="ca_cert"></textarea>
+                </div>
+            </div>
+            <div class="ui blue button" ng-click="addEngine()">Add</div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function(){
+        $('.ui.form')
+            .form({
+                id: {
+                    identifier : 'id',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter a name'
+                        }
+                    ]
+                },
+                cpus: {
+                    identifier : 'cpus',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter the number of CPU shares'
+                        }
+                    ]
+                },
+                memory: {
+                    identifier : 'memory',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter the amount of memory'
+                        }
+                    ]
+                },
+                addr: {
+                    identifier : 'addr',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter the address of the host'
+                        }
+                    ]
+                },
+                labels: {
+                    identifier : 'labels',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter at least one label'
+                        }
+                    ]
+                }
+            }, {
+                inline: 'true'
+            });
+    });
+</script>

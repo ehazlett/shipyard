@@ -120,11 +120,7 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 }
 
 func (m *Manager) RemoveEngine(engine *shipyard.Engine) error {
-	b, err := json.Marshal(engine)
-	if err != nil {
-		return err
-	}
-	if _, err := m.doRequest("/api/engines", "DELETE", 204, b); err != nil {
+	if _, err := m.doRequest(fmt.Sprintf("/api/engines/%s", engine.Engine.ID), "DELETE", 204, nil); err != nil {
 		return err
 	}
 	return nil

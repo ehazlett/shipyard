@@ -42,6 +42,14 @@ angular.module('shipyard', [
                 templateUrl: 'templates/engines.html',
                 controller: 'EnginesController'
             });
+            $routeProvider.when('/engines/add', {
+                templateUrl: 'templates/engine_add.html',
+                controller: 'EngineAddController'
+            });
+            $routeProvider.when('/engines/:id', {
+                templateUrl: 'templates/engine_details.html',
+                controller: 'EngineDetailsController'
+            });
             $routeProvider.when('/events', {
                 templateUrl: 'templates/events.html',
                 controller: 'EventsController'

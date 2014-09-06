@@ -181,11 +181,9 @@ func addEngine(w http.ResponseWriter, r *http.Request) {
 }
 
 func removeEngine(w http.ResponseWriter, r *http.Request) {
-	var engine *shipyard.Engine
-	if err := json.NewDecoder(r.Body).Decode(&engine); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	vars := mux.Vars(r)
+	id := vars["id"]
+	engine := controllerManager.Engine(id)
 	if err := controllerManager.RemoveEngine(engine.ID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -466,9 +464,9 @@ func main() {
 	apiRouter.HandleFunc("/api/containers/{id}", destroy).Methods("DELETE")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
-	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")
-	apiRouter.HandleFunc("/api/engines", removeEngine).Methods("DELETE")
+	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
+	apiRouter.HandleFunc("/api/engines/{id}", removeEngine).Methods("DELETE")
 	apiRouter.HandleFunc("/api/servicekeys", serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", removeServiceKey).Methods("DELETE")

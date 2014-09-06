@@ -1,3 +1,10 @@
+<div class="ui icon buttons toolbar">
+    <a href="/#/engines/add" class="ui button mini green">
+        <i class="add icon"></i>
+        Add
+    </a>
+</div>
+
 <div class="ui icon message" ng-show="engines.length === 0">
     <i class="info icon"></i>
     <div class="content">
@@ -21,7 +28,7 @@
     <tbody>
         <tr ng-repeat="e in engines">
             <td>
-                <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
+                <a href="/#/engines/{{e.engine.id}}">{{e.engine.id}}</a>
             </td>
             <td>{{e.engine.cpus}}</td>
             <td>{{e.engine.memory}} MB</td>
