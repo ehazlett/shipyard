@@ -76,6 +76,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.memory = 256;
             $scope.environment = "";
             $scope.hostname = "";
+            $scope.domain = "";
             $scope.count = 1;
             $scope.args = null;
             $scope.pull = true;
@@ -131,6 +132,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     memory: parseFloat($scope.memory),
                     environment: environment,
                     hostname: $scope.hostname,
+                    domain: $scope.domain,
                     type: $scope.selectedType,
                     args: args,
                     labels: selectedLabels,
