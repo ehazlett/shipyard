@@ -51,13 +51,25 @@ angular.module('shipyard.controllers', ['ngCookies'])
             ClusterInfo.query(function(data){
                 $scope.clusterInfo = data;
                 $scope.clusterCpuData = [
-                    { key: "Free", y: data.cpus - data.reserved_cpus },
-                    { key: "Reserved", y: data.reserved_cpus }
+                    { key: "Free", y: data.cpus },
+                    { key: "Reserved", y: 0 }
                 ];
+                if (data.cpus != undefined && data.reserved_cpus != undefined) {
+                    $scope.clusterCpuData = [
+                        { key: "Free", y: data.cpus - data.reserved_cpus },
+                        { key: "Reserved", y: data.reserved_cpus }
+                    ];
+                }
                 $scope.clusterMemoryData = [
-                    { key: "Free", y: data.memory - data.reserved_memory },
-                    { key: "Reserved", y: data.reserved_memory }
+                    { key: "Free", y: data.memory },
+                    { key: "Reserved", y: 0 }
                 ];
+                if (data.memory != undefined && data.reserved_memory != undefined) {
+                    $scope.clusterMemoryData = [
+                        { key: "Free", y: data.memory - data.reserved_memory },
+                        { key: "Reserved", y: data.reserved_memory }
+                    ];
+                }
             });
         })
         .controller('ContainersController', function($scope, Containers) {
@@ -117,7 +129,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     selectedLabels.push($(sel).next().text());
                 });
                 // format environment
-                var envParts = $scope.environment.split(" ");
+                var envParts = $scope.environment.match(/(?:['"].+?['"])|\S+/g);
                 var environment = {};
                 if ($scope.args != null) {
                     var args = $scope.args.split(" ");
