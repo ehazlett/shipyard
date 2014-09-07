@@ -8,10 +8,9 @@ import (
 )
 
 var runCommand = cli.Command{
-	Name:      "run",
-	ShortName: "r",
-	Usage:     "run a container",
-	Action:    runAction,
+	Name:   "run",
+	Usage:  "run a container",
+	Action: runAction,
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "name",
