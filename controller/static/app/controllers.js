@@ -4,6 +4,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
         .controller('HeaderController', function($http, $scope, AuthToken) {
             $scope.template = 'templates/header.html';
             $scope.username = AuthToken.getUsername();
+            $scope.isLoggedIn = AuthToken.isLoggedIn();
             $http.defaults.headers.common['X-Access-Token'] = AuthToken.get();
         })
         .controller('MenuController', function($scope, $location, $cookieStore, AuthToken) {
