@@ -15,11 +15,10 @@ body {
     font-family: 'Poiret One', cursive;
     text-rendering: optimizeLegibility;
     font-size: 32px;
-    color: #15345F;
 }
 .logo a, .logo a:visited {
     text-decoration: none;
-    color: #15345F;
+    color: #818181;
 }
 div.ui.logo {
     text-align: center;
