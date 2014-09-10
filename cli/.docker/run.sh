@@ -7,7 +7,7 @@ fi
 function run() {
     echo -ne "${blue}shipyard$NAME> ${reset}"
     read CMD
-    shipyard-cli $CMD
+    shipyard $CMD
 }
 
 function kill() {

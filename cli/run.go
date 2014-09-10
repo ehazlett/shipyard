@@ -79,6 +79,9 @@ func runAction(c *cli.Context) {
 		logger.Fatal(err)
 	}
 	m := NewManager(cfg)
+	if c.String("name") == "" {
+		logger.Fatal("you must specify an image name")
+	}
 	env := parseEnvironmentVariables(c.StringSlice("env"))
 	ports := parsePorts(c.StringSlice("port"))
 	image := &citadel.Image{
