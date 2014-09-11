@@ -91,6 +91,7 @@ func run(w http.ResponseWriter, r *http.Request) {
 	}
 	var image *citadel.Image
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
+		logger.Warnf("error running container: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
