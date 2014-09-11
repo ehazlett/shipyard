@@ -142,7 +142,7 @@ func inspectEngine(w http.ResponseWriter, r *http.Request) {
 func containers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	containers, err := controllerManager.ClusterManager().ListContainers()
+	containers, err := controllerManager.ClusterManager().ListContainers(false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
