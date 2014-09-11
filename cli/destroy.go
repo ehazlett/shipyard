@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/shipyard/shipyard/client"
 )
 
 var destroyCommand = cli.Command{
@@ -19,7 +20,7 @@ func destroyAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	containers, err := m.Containers()
 	if err != nil {
 		logger.Fatalf("error getting container info: %s", err)

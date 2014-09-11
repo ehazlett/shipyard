@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/citadel/citadel"
+	"github.com/shipyard/shipyard/client"
 )
 
 func parseEnvironmentVariables(pairs []string) map[string]string {
@@ -72,7 +73,7 @@ func parsePorts(pairs []string) []*citadel.Port {
 	return ports
 }
 
-func loadConfig() (*ShipyardConfig, error) {
+func loadConfig() (*client.ShipyardConfig, error) {
 	usr, err := user.Current()
 	if err != nil {
 		return nil, err
@@ -87,7 +88,7 @@ func loadConfig() (*ShipyardConfig, error) {
 		}
 	}
 	defer f.Close()
-	var cfg *ShipyardConfig
+	var cfg *client.ShipyardConfig
 	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
 		return nil, ErrInvalidConfig
 	}

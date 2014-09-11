@@ -5,6 +5,7 @@ import (
 
 	"github.com/citadel/citadel"
 	"github.com/codegangsta/cli"
+	"github.com/shipyard/shipyard/client"
 )
 
 var runCommand = cli.Command{
@@ -78,7 +79,7 @@ func runAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	if c.String("name") == "" {
 		logger.Fatal("you must specify an image name")
 	}

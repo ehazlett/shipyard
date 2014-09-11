@@ -7,6 +7,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/client"
 )
 
 var serviceKeysListCommand = cli.Command{
@@ -20,7 +21,7 @@ func serviceKeysListAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	keys, err := m.ServiceKeys()
 	if err != nil {
 		logger.Fatalf("error getting service keys: %s", err)
@@ -55,7 +56,7 @@ func serviceKeyCreateAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	key, err := m.NewServiceKey(c.String("description"))
 	if err != nil {
 		logger.Fatalf("error generating service key: %s\n", err)
@@ -75,7 +76,7 @@ func serviceKeyRemoveAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	removeKeys := c.Args()
 	for _, key := range removeKeys {
 		k := &shipyard.ServiceKey{

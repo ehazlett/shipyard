@@ -7,6 +7,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/client"
 )
 
 var accountsCommand = cli.Command{
@@ -20,7 +21,7 @@ func accountsAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	accounts, err := m.Accounts()
 	if err != nil {
 		logger.Fatalf("error getting accounts: %s", err)
@@ -61,7 +62,7 @@ func addAccountAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	user := c.String("username")
 	pass := c.String("password")
 	if user == "" || pass == "" {
@@ -93,7 +94,7 @@ func deleteAccountAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	accounts := c.Args()
 	if len(accounts) == 0 {
 		return

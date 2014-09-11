@@ -11,6 +11,7 @@ import (
 	"github.com/citadel/citadel"
 	"github.com/codegangsta/cli"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/client"
 )
 
 var engineListCommand = cli.Command{
@@ -24,7 +25,7 @@ func engineListAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	engines, err := m.Engines()
 	if err != nil {
 		logger.Fatalf("error getting engines: %s", err)
@@ -95,7 +96,7 @@ func engineAddAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	id := c.String("id")
 	addr := c.String("addr")
 	if id == "" || addr == "" {
@@ -175,7 +176,7 @@ func engineRemoveAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	engines, err := m.Engines()
 	if err != nil {
 		logger.Fatalf("error removing engine: %s\n", err)
@@ -206,7 +207,7 @@ func engineInspectAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	if len(c.Args()) == 0 {
 		logger.Fatal("you must specify an id")
 	}

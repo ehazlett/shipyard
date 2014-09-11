@@ -11,6 +11,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/howeyc/gopass"
+	"github.com/shipyard/shipyard/client"
 )
 
 var loginCommand = cli.Command{
@@ -19,7 +20,7 @@ var loginCommand = cli.Command{
 	Action: loginAction,
 }
 
-func saveConfig(cfg *ShipyardConfig) error {
+func saveConfig(cfg *client.ShipyardConfig) error {
 	usr, err := user.Current()
 	if err != nil {
 		return err
@@ -63,11 +64,11 @@ func loginAction(c *cli.Context) {
 	username := strings.TrimSpace(string(u[:]))
 	pass := strings.TrimSpace(string(p[:]))
 
-	cfg := &ShipyardConfig{
+	cfg := &client.ShipyardConfig{
 		Url:      sUrl,
 		Username: username,
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	token, err := m.Login(username, pass)
 	if err != nil {
 		logger.Fatal(err)
@@ -89,7 +90,7 @@ func changePasswordAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	fmt.Printf("Password: ")
 	p1 := gopass.GetPasswd()
 	fmt.Printf("Confirm: ")

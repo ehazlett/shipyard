@@ -8,6 +8,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/codegangsta/cli"
+	"github.com/shipyard/shipyard/client"
 )
 
 var containersCommand = cli.Command{
@@ -21,7 +22,7 @@ func containersAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	containers, err := m.Containers()
 	if err != nil {
 		logger.Fatalf("error getting containers: %s", err)
@@ -54,7 +55,7 @@ func containerInspectAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	m := NewManager(cfg)
+	m := client.NewManager(cfg)
 	args := c.Args()
 	if len(args) == 0 {
 		logger.Fatalf("you must specify a container id")
