@@ -1,0 +1,99 @@
+<div class="ui basic small modal">
+    <div class="header">
+        Destroy Container
+    </div>
+    <div class="content">
+        Destroy {{container.image.name}} ({{container.id|truncate}})?
+    </div>
+    <div class="actions">
+        <div class="ui button small">Cancel</div>
+        <a ng-click="destroyContainer()" class="ui button small blue">Ok</a>
+    </div>
+</div>
+
+<div class="ui icon buttons toolbar">
+    <a ng-click="showRemoveContainerDialog()" class="ui button mini red">
+        <i class="remove sign icon"></i>
+        Destroy
+    </a>
+</div>
+
+<div class="ui small message red" flash-alert="error" ng-show="flash.message" duration="0">
+    <i class="close icon"></i>
+    {{flash.message}}
+</div>
+<div class="ui stackable grid four column">
+    <div class="ui column">
+        <div>
+            <h3 class="ui header">Image</h3>
+            <div>{{container.image.name}}</div>
+        </div>
+        <div class="ui divider"></div>
+        <div>
+            <h3 class="ui header">Type</h3>
+            <div>{{container.image.type}}</div>
+        </div>
+        <div class="ui divider"></div>
+        <h4 class="ui top attached block header">Environment</h4>
+        <div class="ui segment attached" ng-hide="container.image.environment">No environment variables</div>
+        <div class="ui segment attached" ng-repeat="(k,v) in container.image.environment">
+            <strong>{{k}}</strong> <div class="ui mini button right floated" envvar="">Show</div>
+            <div class="ui hide">{{v}}</div>
+        </div>
+    </div>
+    <div class="ui column">
+        <div class="ui section">
+            <h3 class="ui header">Hostname</h3>
+            <div>{{container.image.hostname}}</div>
+        </div>
+        <div class="ui divider"></div>
+        <div class="ui section">
+            <h3 class="ui header">Engine</h3>
+            <div>{{container.engine.id}}</div>
+        </div>
+        <div class="ui divider"></div>
+        <h4 class="ui top attached block header">Ports</h4>
+        <div class="ui segment attached">
+            <div ng-hide="container.ports">No exposed ports</div>
+            <div ng-repeat="l in portLinks | orderBy:predicate">
+                <a href="{{l.link}}">{{l.protocol}}/{{l.container_port}} -> {{l.hostname}}:{{l.port}}</a>
+            </div>
+        </div>
+    </div>
+    <div class="ui column">
+        <h3 class="ui header">CPU</h3>
+        <nvd3-multi-bar-chart
+            data="containerCpuData"
+            id="containerCpuChart"
+            xAxisTickFormat="showX()"
+            width="350"
+            height="350"
+            showXAxis="false"
+            showYAxis="true"
+            forcey="[0, {{cpuMax}}]"
+            reduceXTicks="true"
+            tooltips="true"
+            tooltipcontent="tooltipFunction()"
+            >
+            <svg></svg>
+        </nvd3-multi-bar-chart>
+    </div>
+    <div class="ui column">
+        <h3 class="ui header">Memory</h3>
+        <nvd3-multi-bar-chart
+            data="containerMemoryData"
+            id="containerMemoryChart"
+            xAxisTickFormat="showX()"
+            width="350"
+            height="350"
+            showXAxis="false"
+            showYAxis="true"
+            forcey="[0, {{memoryMax}}]"
+            reduceXTicks="true"
+            tooltips="true"
+            tooltipcontent="tooltipFunction()"
+            >
+            <svg></svg>
+        </nvd3-multi-bar-chart>
+    </div>
+</div>

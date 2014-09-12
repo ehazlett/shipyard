@@ -1,0 +1,30 @@
+<div class="ui icon message" ng-show="events.length === 0">
+    <i class="info icon"></i>
+    <div class="content">
+        <div class="header">
+            Events
+        </div>
+        <p>There are no events recorded.</p>
+    </div>
+</div>
+
+<table class="ui table segment" ng-show="events">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Container</th>
+            <th>Engine</th>
+            <th>Type</th>
+            <th>Tags</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="e in events">
+            <td>{{e.time}}</td>
+            <td>{{e.container.id|truncate}}</td>
+            <td>{{e.engine.id}}</td>
+            <td>{{e.type}}</td>
+            <td>{{e.tags.join(', ')}}</td>
+        </tr>
+    </tbody>
+</table>

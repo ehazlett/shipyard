@@ -1,0 +1,16 @@
+<div class="ui two column relaxed grid" ng-show="isLoggedIn">
+    <section class="column">
+        <div class="ui header"><span class="logo"><a href="/#">shipyard</a></span></div>
+    </section>
+    <section class="right aligned column">
+        <div class="ui dropdown" ng-show="username">
+            {{username}} <i class="dropdown icon"></i>
+            <div class="menu">
+                <a href="/#/logout" target="_self" class="item">Logout</a>
+            </div>
+        </div>
+    </section>
+</div>
+<script type="text/javascript">
+    $('.ui.dropdown').dropdown('action', 'nothing');
+</script>

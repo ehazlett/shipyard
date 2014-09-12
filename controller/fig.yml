@@ -1,0 +1,17 @@
+rethinkdb:
+    image: shipyard/rethinkdb
+    ports:
+        - "8080"
+        - "28015"
+        - "29015"
+
+controller:
+    build: .
+    links:
+        - rethinkdb
+    volumes:
+            - .:/app
+    working_dir: /app
+    command: go get -d ./... && go build . && ./controller
+    expose:
+        - "8080"

@@ -1,0 +1,2 @@
+export PS1='\e[0;34mshipyard cli${NAME:+ ($NAME)}> \e[0;m'
+source $HOME/.autocomplete

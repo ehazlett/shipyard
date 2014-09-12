@@ -1,0 +1,15 @@
+language: go
+go:
+  - 1.0
+  - 1.1
+  - 1.2
+  - 1.3
+install:
+    - go get -d ./...
+    - cd cli && go get -d ./... && cd ..
+    - cd controller && go get -d ./... && cd ..
+script:
+    - bash test.sh
+branches:
+    only:
+        reload

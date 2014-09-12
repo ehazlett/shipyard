@@ -1,15 +1,4 @@
-*.pyc
 *.sw*
 *.un*
-local_settings.py
-*.log
-newrelic.ini
-*.egg-info/*
-*build/*
-*dist/*
-.vagrant*
-*.gz
-*.db
-*.ve
-static_root/*
-src/*
+cli/cli
+controller/controller

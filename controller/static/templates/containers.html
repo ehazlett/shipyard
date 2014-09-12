@@ -1,0 +1,41 @@
+<div class="ui icon buttons toolbar">
+    <a href="/#/containers/deploy" class="ui button mini green">
+        <i class="add icon"></i>
+        Deploy
+    </a>
+</div>
+
+<div class="ui icon message" ng-show="containers.length === 0">
+    <i class="info icon"></i>
+    <div class="content">
+        <div class="header">
+            Containers
+        </div>
+        <p>There are no containers running.</p>
+    </div>
+</div>
+
+<table class="ui table" ng-show="containers">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>CPUs</th>
+            <th>Memory</th>
+            <th>State</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="c in containers">
+            <td>
+                <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
+            </td>
+            <td>{{c.image.name}}</td>
+            <td>{{c.image.cpus}}</td>
+            <td>{{c.image.memory|formatMemory}}</td>
+            <td>{{c.state|formatState}}</td>
+            <td>{{c.image.type}}</td>
+        </tr>
+    </tbody>
+</table>

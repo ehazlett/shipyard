@@ -1,0 +1,16 @@
+<div ng-show="isLoggedIn" class="ui ng-hide" ng-cloak>
+    <div id="menu-main" class="ui tabular menu">
+        <a class="item" ng-class="{ active: isActive('/dashboard') }" href="/">
+            <i class="dashboard icon"></i>Dashboard
+        </a>
+        <a class="item" ng-class="{ active: isActive('/containers') }" href="/#/containers">
+            <i class="tasks icon"></i>Containers
+        </a>
+        <a class="item" ng-class="{ active: isActive('/engines') }" href="/#/engines">
+            <i class="cloud icon"></i>Engines
+        </a>
+        <a class="item" ng-class="{ active: isActive('/events') }" href="/#/events">
+            <i class="browser icon"></i>Events
+        </a>
+    </div>
+</div>

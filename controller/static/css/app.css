@@ -1,0 +1,53 @@
+html,
+body {
+    font-size: 15px;
+}
+body {
+    font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    background: #FFFFFF;
+    margin: 0px;
+    padding: 5px 45px 0px 20px;
+    color: #555555;
+    text-rendering: optimizeLegibility;
+    min-width: 320px;
+}
+.logo {
+    font-family: 'Poiret One', cursive;
+    text-rendering: optimizeLegibility;
+    font-size: 32px;
+}
+.logo a, .logo a:visited {
+    text-decoration: none;
+    color: #818181;
+}
+div.ui.logo {
+    text-align: center;
+}
+div.buttons {
+    text-align: center;
+}
+.ui.blue.button {
+    background-color: #9AAFCB;
+}
+.ui.blue.button:hover {
+    background-color: #6581A7;
+}
+div.container {
+    margin-top: 10px;
+}
+.ui.dropdown .menu {
+    margin-top: 5px;
+}
+.hide {
+    display: none;
+}
+
+.toolbar {
+    margin-bottom: 5px;
+}
+.checkbox {
+    padding-right: 10px;
+}
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
