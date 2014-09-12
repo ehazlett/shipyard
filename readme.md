@@ -10,8 +10,9 @@ Shipyard enables multi-host, Docker cluster management.  It uses the [Citadel](h
 
 You can then use the Shipyard CLI to interact:
 
-* `docker run --rm -it shipyard/shipyard-cli --host http://<shipyard-host>:8080`
-* `docker run --rm -it shipyard/shipyard-cli -h`
+* `docker run --rm -it shipyard/shipyard-cli`
+
+This will drop you into a shell with the Shipyard executable.  Use `shipyard login` to login to the Shipyard instance.  Run `shipyard help` to see full options.
 
 # Components
 There are four components to Shipyard:
