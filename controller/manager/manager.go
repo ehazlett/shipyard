@@ -208,7 +208,7 @@ func (m *Manager) RemoveEngine(id string) error {
 }
 
 func (m *Manager) Container(id string) (*citadel.Container, error) {
-	containers, err := m.clusterManager.ListContainers(false)
+	containers, err := m.clusterManager.ListContainers(true)
 	if err != nil {
 		return nil, err
 	}

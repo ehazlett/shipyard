@@ -37,7 +37,11 @@ func (m *Manager) doRequest(path string, method string, expectedStatus int, b []
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("X-Access-Token", fmt.Sprintf("%s:%s", m.config.Username, m.config.Token))
+	if m.config.ServiceKey != "" {
+		req.Header.Add("X-Service-Key", m.config.ServiceKey)
+	} else {
+		req.Header.Add("X-Access-Token", fmt.Sprintf("%s:%s", m.config.Username, m.config.Token))
+	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

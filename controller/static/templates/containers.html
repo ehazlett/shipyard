@@ -22,6 +22,7 @@
             <th>Name</th>
             <th>CPUs</th>
             <th>Memory</th>
+            <th>State</th>
             <th>Type</th>
         </tr>
     </thead>
@@ -32,7 +33,8 @@
             </td>
             <td>{{c.image.name}}</td>
             <td>{{c.image.cpus}}</td>
-            <td>{{c.image.memory}} MB</td>
+            <td>{{c.image.memory|formatMemory}}</td>
+            <td>{{c.state|formatState}}</td>
             <td>{{c.image.type}}</td>
         </tr>
     </tbody>
