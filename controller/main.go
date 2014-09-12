@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -432,10 +433,11 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	rAddr := os.Getenv("RETHINKDB_ADDR")
+	rHost := os.Getenv("RETHINKDB_PORT_28015_TCP_ADDR")
+	rPort := os.Getenv("RETHINKDB_PORT_28015_TCP_PORT")
 	rDb := os.Getenv("RETHINKDB_DATABASE")
-	if rAddr != "" {
-		rethinkdbAddr = rAddr
+	if rHost != "" && rPort != "" {
+		rethinkdbAddr = fmt.Sprintf("%s:%s", rHost, rPort)
 	}
 	if rDb != "" {
 		rethinkdbDatabase = rDb

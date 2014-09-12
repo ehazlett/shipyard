@@ -4,18 +4,13 @@ Docker Management
 Shipyard enables multi-host, Docker cluster management.  It uses the [Citadel](https://github.com/citadel/citadel) toolkit for cluster resourcing and scheduling.  Shipyard has been dramatically simiplified and only requires access to the Docker Remote API and a RethinkDB instance.
 
 # Quick Start
-Since this is in beta, you need to use the `v2` tag for the Shipyard Docker image.
 
-* `docker run -d -P shipyard/rethinkdb`
-* `docker run -d -p 80:8080 shipyard/shipyard:v2 -rethinkdb-addr <rethinkdb-host>:<rethinkdb:port>`
-
-You can also use an environment variable for configuring RethinkDB:
-
-`docker run -d -p 80:8080 -e RETHINKDB_ADDR=1.2.3.4:28015 shipyard/shipyard:v2`
+* `docker run -d -P --name rethinkdb shipyard/rethinkdb`
+* `docker run -d -p 8080:8080 --link rethinkdb:rethinkdb shipyard/shipyard`
 
 You can then use the Shipyard CLI to interact:
 
-* `docker run --rm -it shipyard/shipyard-cli --host http://<shipyard-host>`
+* `docker run --rm -it shipyard/shipyard-cli --host http://<shipyard-host>:8080`
 * `docker run --rm -it shipyard/shipyard-cli -h`
 
 # Components
