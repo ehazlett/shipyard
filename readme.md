@@ -14,6 +14,9 @@ You can then use the Shipyard CLI to interact:
 
 This will drop you into a shell with the Shipyard executable.  Use `shipyard login` to login to the Shipyard instance.  Run `shipyard help` to see full options.
 
+# Documentation
+Full docs are available at http://shipyard-project.com
+
 # Components
 There are four components to Shipyard:
 
