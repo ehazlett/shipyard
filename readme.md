@@ -28,3 +28,6 @@ The Shipyard CLI is a Docker inspired command line interface to a Shipyard clust
 
 ## UI
 The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyard API for all interaction.  It is an AngularJS app that is served via the Controller.
+
+# License
+Shipyard is licensed under the Apache License, Version 2.0. See LICENSE for full license text.
