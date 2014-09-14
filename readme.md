@@ -12,7 +12,9 @@ You can then use the Shipyard CLI to interact:
 
 * `docker run --rm -it shipyard/shipyard-cli`
 
-This will drop you into a shell with the Shipyard executable.  Use `shipyard login` to login to the Shipyard instance.  Run `shipyard help` to see full options.
+This will drop you into a shell with the Shipyard executable.  Use `shipyard login` to login to the Shipyard instance.  Use `shipyard add-engine` to add an engine and get started.  See the [docs](http://shipyard-project.com/docs/quickstart/) for more information.
+
+Use `shipyard help` to see full options.
 
 # Documentation
 Full docs are available at http://shipyard-project.com
