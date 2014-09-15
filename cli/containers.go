@@ -39,14 +39,7 @@ func containersAction(c *cli.Context) {
 			portDefs = append(portDefs, p)
 		}
 		ports := strings.Join(portDefs, ", ")
-		state := "unknown"
-		switch c.State.Running {
-		case true:
-			state = "running"
-		case false:
-			state = "stopped"
-		}
-		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%v\t%s\n", c.ID[:12], c.Image.Name, c.Engine.ID, state, ports))
+		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%v\t%s\n", c.ID[:12], c.Image.Name, c.Engine.ID, c.State, ports))
 	}
 	w.Flush()
 }

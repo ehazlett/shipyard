@@ -29,18 +29,6 @@ angular.module('shipyard.filters', [])
             return l
         };
     })
-    .filter('formatState', function () {
-        return function (s) {
-            if (s == undefined) {
-                return "unknown";
-            }
-            var state = "stopped";
-            if (s.running) {
-                state = "running";
-            }
-            return state;
-        };
-    })
     .filter('formatMemory', function () {
         return function (s) {
             if (s == undefined) {
