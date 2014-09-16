@@ -11,5 +11,5 @@ RUN ln -s /gocode/src/app/cli /usr/local/bin/shipyard
 ENV PROG shipyard
 ADD .docker/autocomplete /.autocomplete
 ADD .docker/bashrc /.bashrc
-RUN shipyard --generate-bash-completion > /etc/bash_completion.d/shipyard
+RUN /usr/local/bin/shipyard --generate-bash-completion > /etc/bash_completion.d/shipyard
 CMD ["/bin/bash"]
