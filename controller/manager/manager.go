@@ -22,6 +22,7 @@ const (
 	tblNameAccounts    = "accounts"
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
+	tblNameExtensions  = "extensions"
 	storeKey           = "shipyard"
 )
 
@@ -31,6 +32,7 @@ var (
 	ErrRoleDoesNotExist       = errors.New("role does not exist")
 	ErrServiceKeyDoesNotExist = errors.New("service key does not exist")
 	ErrInvalidAuthToken       = errors.New("invalid auth token")
+	ErrExtensionDoesNotExist  = errors.New("extension does not exist")
 	logger                    = logrus.New()
 	store                     = sessions.NewCookieStore([]byte(storeKey))
 )
@@ -86,7 +88,7 @@ func (m *Manager) Store() *sessions.CookieStore {
 
 func (m *Manager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameExtensions}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -493,6 +495,61 @@ func (m *Manager) ChangePassword(username, password string) error {
 	}
 	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"password": hash}).Run(m.session); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (m *Manager) Extensions() ([]*shipyard.Extension, error) {
+	res, err := r.Table(tblNameExtensions).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	var exts []*shipyard.Extension
+	if err := res.All(&exts); err != nil {
+		return nil, err
+	}
+	return exts, nil
+}
+
+func (m *Manager) Extension(id string) (*shipyard.Extension, error) {
+	res, err := r.Table(tblNameExtensions).Get(id).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrExtensionDoesNotExist
+	}
+	var ext *shipyard.Extension
+	if err := res.One(&ext); err != nil {
+		return nil, err
+	}
+	return ext, nil
+}
+
+func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
+	if _, err := r.Table(tblNameExtensions).Insert(ext).RunWrite(m.session); err != nil {
+		return err
+	}
+	evt := &shipyard.Event{
+		Type:    "add-extension",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author),
+		Tags:    []string{"cluster"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) DeleteExtension(id string) error {
+	res, err := r.Table(tblNameRoles).Get(id).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrExtensionDoesNotExist
 	}
 	return nil
 }
