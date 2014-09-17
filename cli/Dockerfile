@@ -1,4 +1,5 @@
 FROM debian:jessie
+RUN apt-get update && apt-get install -y ca-certificates
 ADD cli /bin/shipyard
 ENV PROG shipyard
 ADD .docker/autocomplete /.autocomplete
