@@ -48,6 +48,16 @@ var addExtensionCommand = cli.Command{
 			Name:  "url",
 			Usage: "extension config url",
 		},
+		cli.StringSliceFlag{
+			Name:  "env",
+			Usage: "environment variables (key=value pairs)",
+			Value: &cli.StringSlice{},
+		},
+		cli.StringSliceFlag{
+			Name:  "arg",
+			Usage: "arguments",
+			Value: &cli.StringSlice{},
+		},
 	},
 }
 
@@ -61,14 +71,18 @@ func addExtensionAction(c *cli.Context) {
 	if extUrl == "" {
 		logger.Fatalf("you must specify an extension config url")
 	}
+	env := parseEnvironmentVariables(c.StringSlice("env"))
+	args := c.StringSlice("arg")
 	resp, err := http.Get(extUrl)
 	if err != nil {
 		logger.Fatalf("unable to get extension config: %s", err)
 	}
 	var ext *shipyard.Extension
 	if err := json.NewDecoder(resp.Body).Decode(&ext); err != nil {
-
+		logger.Fatalf("error parsing extension config: %s", err, err)
 	}
+	ext.Environment = env
+	ext.Args = args
 	if err := m.AddExtension(ext); err != nil {
 		logger.Fatalf("error adding extension: %s", err)
 	}

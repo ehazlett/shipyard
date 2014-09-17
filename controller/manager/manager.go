@@ -540,10 +540,31 @@ func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
 	if err := m.SaveEvent(evt); err != nil {
 		return err
 	}
+	// register
+	if err := m.RegisterExtension(ext); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
+	logger.Infof("registering extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
+	return nil
+}
+
+func (m *Manager) UnregisterExtension(ext *shipyard.Extension) error {
+	logger.Infof("un-registering extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
 	return nil
 }
 
 func (m *Manager) DeleteExtension(id string) error {
+	ext, err := m.Extension(id)
+	if err != nil {
+		return err
+	}
+	if err := m.UnregisterExtension(ext); err != nil {
+		return err
+	}
 	res, err := r.Table(tblNameExtensions).Get(id).Delete().Run(m.session)
 	if err != nil {
 		return err

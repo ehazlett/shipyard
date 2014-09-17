@@ -12,9 +12,9 @@ type (
 		Environment map[string]string `json:"environment,omitempty" gorethink:"environment,omitempty"`
 		Args        []string          `json:"args,omitempty" gorethink:"args,omitempty"`
 		Ports       []int             `json:"ports,omitempty" gorethink:"ports,omitempty"`
-		Config      *ExtensionConfig  `json:"config,omitempty" gorethink:"config,omitempty"`
+		Config      ExtensionConfig   `json:"config" gorethink:"config"`
 	}
 	ExtensionConfig struct {
-		DeployPerEngine bool `json:"deploy_per_engine,omitempty" gorethink:"deploy_per_engine,omitempty"`
+		DeployPerEngine bool `json:"deploy_per_engine" gorethink:"deploy_per_engine"`
 	}
 )
