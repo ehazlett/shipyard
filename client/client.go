@@ -331,3 +331,33 @@ func (m *Manager) RemoveServiceKey(key *shipyard.ServiceKey) error {
 	}
 	return nil
 }
+
+func (m *Manager) Extensions() ([]*shipyard.Extension, error) {
+	exts := []*shipyard.Extension{}
+	resp, err := m.doRequest("/api/extensions", "GET", 200, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&exts); err != nil {
+		return nil, err
+	}
+	return exts, nil
+}
+
+func (m *Manager) AddExtension(ext *shipyard.Extension) error {
+	b, err := json.Marshal(ext)
+	if err != nil {
+		return err
+	}
+	if _, err := m.doRequest("/api/extensions", "POST", 204, b); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) RemoveExtension(id string) error {
+	if _, err := m.doRequest(fmt.Sprintf("/api/extensions/%s", id), "DELETE", 204, nil); err != nil {
+		return err
+	}
+	return nil
+}

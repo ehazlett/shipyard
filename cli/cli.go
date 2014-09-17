@@ -50,6 +50,9 @@ func main() {
 		serviceKeysListCommand,
 		serviceKeyCreateCommand,
 		serviceKeyRemoveCommand,
+		extensionsCommand,
+		addExtensionCommand,
+		removeExtensionCommand,
 		infoCommand,
 		eventsCommand,
 	}

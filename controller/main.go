@@ -433,6 +433,64 @@ func deleteRole(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func extensions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	exts, err := controllerManager.Extensions()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(exts); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func extension(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+	ext, err := controllerManager.Extension(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(ext); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func addExtension(w http.ResponseWriter, r *http.Request) {
+	var ext *shipyard.Extension
+	if err := json.NewDecoder(r.Body).Decode(&ext); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := controllerManager.SaveExtension(ext); err != nil {
+		logger.Errorf("error saving extension: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("saved extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func deleteExtension(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	if err := controllerManager.DeleteExtension(id); err != nil {
+		logger.Errorf("error deleting extension: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func login(w http.ResponseWriter, r *http.Request) {
 	var creds *Credentials
 	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
@@ -518,6 +576,10 @@ func main() {
 	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")
 	apiRouter.HandleFunc("/api/engines/{id}", removeEngine).Methods("DELETE")
+	apiRouter.HandleFunc("/api/extensions", extensions).Methods("GET")
+	apiRouter.HandleFunc("/api/extensions/{id}", extension).Methods("GET")
+	apiRouter.HandleFunc("/api/extensions", addExtension).Methods("POST")
+	apiRouter.HandleFunc("/api/extensions/{id}", deleteExtension).Methods("DELETE")
 	apiRouter.HandleFunc("/api/servicekeys", serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", removeServiceKey).Methods("DELETE")

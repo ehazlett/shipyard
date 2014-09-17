@@ -3,7 +3,8 @@ package shipyard
 type (
 	Extension struct {
 		ID          string            `json:"id,omitempty" gorethink:"id,omitempty"`
-		Name        string            `json:"string,omitempty" gorethink:"name,omitempty"`
+		Name        string            `json:"name,omitempty" gorethink:"name,omitempty"`
+		Image       string            `json:"image,omitempty" gorethink:"image,omitempty"`
 		Author      string            `json:"author,omitempty" gorethink:"author,omitempty"`
 		Description string            `json:"description,omitempty" gorethink:"description,omitempty"`
 		Version     string            `json:"version,omitempty" gorethink:"version,omitempty"`

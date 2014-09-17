@@ -544,7 +544,7 @@ func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
 }
 
 func (m *Manager) DeleteExtension(id string) error {
-	res, err := r.Table(tblNameRoles).Get(id).Delete().Run(m.session)
+	res, err := r.Table(tblNameExtensions).Get(id).Delete().Run(m.session)
 	if err != nil {
 		return err
 	}
