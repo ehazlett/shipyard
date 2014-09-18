@@ -549,7 +549,7 @@ func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
 
 func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 	if ext.Config.Environment != nil {
-		ext.Config.Environment["_shipyard_extension"] = ext.ID
+		ext.Config.Environment["_shipyard_extension"] = ext.Name
 	}
 	image := &citadel.Image{
 		Name:        ext.Image,
@@ -572,7 +572,7 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 				logger.Errorf("error running %s for extension image %s: %s", image.Name, ext.Name, err)
 				return err
 			}
-			logger.Infof("started %s (%s) for extension %s", container.ID, image.Name, ext.Name)
+			logger.Infof("started %s (%s) for extension %s", container.ID[:8], image.Name, ext.Name)
 		}
 	} else {
 		container, err := m.clusterManager.Start(image, true)
@@ -580,7 +580,7 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 			logger.Errorf("error running %s for extension image %s: %s", image.Name, ext.Name, err)
 			return err
 		}
-		logger.Infof("started %s (%s) for extension %s", container.ID, image.Name, ext.Name)
+		logger.Infof("started %s (%s) for extension %s", container.ID[:8], image.Name, ext.Name)
 	}
 	logger.Infof("registered extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
 	return nil
