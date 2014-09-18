@@ -548,12 +548,46 @@ func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
 }
 
 func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
-	logger.Infof("registering extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
+	if ext.Config.Environment != nil {
+		ext.Config.Environment["_shipyard_extension"] = ext.ID
+	}
+	image := &citadel.Image{
+		Name:        ext.Image,
+		Cpus:        ext.Config.Cpus,
+		Memory:      ext.Config.Memory,
+		Environment: ext.Config.Environment,
+		Args:        ext.Config.Args,
+		BindPorts:   ext.Config.Ports,
+		Labels:      []string{},
+		Type:        "service",
+	}
+	if ext.Config.DeployPerEngine {
+		engs := m.clusterManager.Engines()
+		for _, eng := range engs {
+			image.Type = "host"
+			labels := []string{fmt.Sprintf("host:%s", eng.ID)}
+			image.Labels = labels
+			container, err := m.clusterManager.Start(image, true)
+			if err != nil {
+				logger.Errorf("error running %s for extension image %s: %s", image.Name, ext.Name, err)
+				return err
+			}
+			logger.Infof("started %s (%s) for extension %s", container.ID, image.Name, ext.Name)
+		}
+	} else {
+		container, err := m.clusterManager.Start(image, true)
+		if err != nil {
+			logger.Errorf("error running %s for extension image %s: %s", image.Name, ext.Name, err)
+			return err
+		}
+		logger.Infof("started %s (%s) for extension %s", container.ID, image.Name, ext.Name)
+	}
+	logger.Infof("registered extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
 	return nil
 }
 
 func (m *Manager) UnregisterExtension(ext *shipyard.Extension) error {
-	logger.Infof("un-registering extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
+	logger.Infof("un-registered extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
 	return nil
 }
 

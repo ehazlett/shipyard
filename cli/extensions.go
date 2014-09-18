@@ -81,8 +81,8 @@ func addExtensionAction(c *cli.Context) {
 	if err := json.NewDecoder(resp.Body).Decode(&ext); err != nil {
 		logger.Fatalf("error parsing extension config: %s", err, err)
 	}
-	ext.Environment = env
-	ext.Args = args
+	ext.Config.Environment = env
+	ext.Config.Args = args
 	if err := m.AddExtension(ext); err != nil {
 		logger.Fatalf("error adding extension: %s", err)
 	}
