@@ -528,7 +528,8 @@ func (m *Manager) Extension(id string) (*shipyard.Extension, error) {
 }
 
 func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
-	if _, err := r.Table(tblNameExtensions).Insert(ext).RunWrite(m.session); err != nil {
+	res, err := r.Table(tblNameExtensions).Insert(ext).RunWrite(m.session)
+	if err != nil {
 		return err
 	}
 	evt := &shipyard.Event{
@@ -540,6 +541,8 @@ func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
 	if err := m.SaveEvent(evt); err != nil {
 		return err
 	}
+	key := res.GeneratedKeys[0]
+	ext.ID = key
 	// register
 	if err := m.RegisterExtension(ext); err != nil {
 		return err
@@ -549,7 +552,7 @@ func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
 
 func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 	if ext.Config.Environment != nil {
-		ext.Config.Environment["_shipyard_extension"] = ext.Name
+		ext.Config.Environment["_SHIPYARD_EXTENSION"] = ext.ID
 	}
 	image := &citadel.Image{
 		Name:        ext.Image,
@@ -587,6 +590,26 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 }
 
 func (m *Manager) UnregisterExtension(ext *shipyard.Extension) error {
+	// remove containers that are linked to extension
+	containers, err := m.clusterManager.ListContainers(true)
+	if err != nil {
+		return err
+	}
+	for _, c := range containers {
+		// check if has the extension env var
+		if val, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
+			// check if the same parent extension
+			if val == ext.ID {
+				logger.Infof("terminating extension (%s) container %s", ext.Name, c.ID[:8])
+				if err := m.clusterManager.Kill(c, 9); err != nil {
+					logger.Warnf("error terminating extension (%s) container %s: %s", ext.Name, c.ID[:8], err)
+				}
+				if err := m.clusterManager.Remove(c); err != nil {
+					logger.Warnf("error removing extension (%s) container %s: %s", ext.Name, c.ID[:8], err)
+				}
+			}
+		}
+	}
 	logger.Infof("un-registered extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
 	return nil
 }
