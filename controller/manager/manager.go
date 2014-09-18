@@ -551,9 +551,11 @@ func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
 }
 
 func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
-	if ext.Config.Environment != nil {
-		ext.Config.Environment["_SHIPYARD_EXTENSION"] = ext.ID
+	if ext.Config.Environment == nil {
+		env := make(map[string]string)
+		ext.Config.Environment = env
 	}
+	ext.Config.Environment["_SHIPYARD_EXTENSION"] = ext.ID
 	image := &citadel.Image{
 		Name:        ext.Image,
 		Cpus:        ext.Config.Cpus,
