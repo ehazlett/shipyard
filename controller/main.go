@@ -120,6 +120,46 @@ func run(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func stopContainer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	container, err := controllerManager.Container(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := controllerManager.ClusterManager().Stop(container); err != nil {
+		logger.Errorf("error stopping %s: %s", container.ID, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("stopped container %s (%s)", container.ID, container.Image.Name)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func restartContainer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	container, err := controllerManager.Container(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := controllerManager.ClusterManager().Restart(container, 10); err != nil {
+		logger.Errorf("error restarting %s: %s", container.ID, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logger.Infof("restarted container %s (%s)", container.ID, container.Image.Name)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func engines(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -471,6 +511,8 @@ func main() {
 	apiRouter.HandleFunc("/api/containers", run).Methods("POST")
 	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}", destroy).Methods("DELETE")
+	apiRouter.HandleFunc("/api/containers/{id}/stop", stopContainer).Methods("GET")
+	apiRouter.HandleFunc("/api/containers/{id}/restart", restartContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")

@@ -100,6 +100,28 @@ func (m *Manager) Destroy(container *citadel.Container) error {
 	return nil
 }
 
+func (m *Manager) Stop(container *citadel.Container) error {
+	b, err := json.Marshal(container)
+	if err != nil {
+		return err
+	}
+	if _, err := m.doRequest(fmt.Sprintf("/api/containers/%s/stop", container.ID), "GET", 204, b); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) Restart(container *citadel.Container) error {
+	b, err := json.Marshal(container)
+	if err != nil {
+		return err
+	}
+	if _, err := m.doRequest(fmt.Sprintf("/api/containers/%s/restart", container.ID), "GET", 204, b); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *Manager) Engines() ([]*shipyard.Engine, error) {
 	engines := []*shipyard.Engine{}
 	resp, err := m.doRequest("/api/engines", "GET", 200, nil)
