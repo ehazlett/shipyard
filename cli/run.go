@@ -18,6 +18,10 @@ var runCommand = cli.Command{
 			Usage: "image name",
 		},
 		cli.StringFlag{
+			Name:  "container-name",
+			Usage: "container name",
+		},
+		cli.StringFlag{
 			Name:  "cpus",
 			Value: "0.1",
 			Usage: "cpu shares",
@@ -86,16 +90,17 @@ func runAction(c *cli.Context) {
 	env := parseEnvironmentVariables(c.StringSlice("env"))
 	ports := parsePorts(c.StringSlice("port"))
 	image := &citadel.Image{
-		Name:        c.String("name"),
-		Cpus:        c.Float64("cpus"),
-		Memory:      c.Float64("memory"),
-		Hostname:    c.String("hostname"),
-		Domainname:  c.String("domain"),
-		Labels:      c.StringSlice("label"),
-		Args:        c.StringSlice("arg"),
-		Environment: env,
-		BindPorts:   ports,
-		Type:        c.String("type"),
+		Name:          c.String("name"),
+		ContainerName: c.String("container-name"),
+		Cpus:          c.Float64("cpus"),
+		Memory:        c.Float64("memory"),
+		Hostname:      c.String("hostname"),
+		Domainname:    c.String("domain"),
+		Labels:        c.StringSlice("label"),
+		Args:          c.StringSlice("arg"),
+		Environment:   env,
+		BindPorts:     ports,
+		Type:          c.String("type"),
 	}
 	containers, err := m.Run(image, c.Int("count"), c.Bool("pull"))
 	if err != nil {
