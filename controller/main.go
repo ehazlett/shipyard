@@ -23,6 +23,7 @@ var (
 	listenAddr        string
 	rethinkdbAddr     string
 	rethinkdbDatabase string
+	rethinkdbAuthKey  string
 	controllerManager *manager.Manager
 	logger            = logrus.New()
 )
@@ -42,6 +43,7 @@ func init() {
 	flag.StringVar(&listenAddr, "listen", ":8080", "listen address")
 	flag.StringVar(&rethinkdbAddr, "rethinkdb-addr", "127.0.0.1:28015", "rethinkdb address")
 	flag.StringVar(&rethinkdbDatabase, "rethinkdb-database", "shipyard", "rethinkdb database")
+	flag.StringVar(&rethinkdbAuthKey, "rethinkdb-auth-key", "", "rethinkdb auth key")
 }
 
 func destroy(w http.ResponseWriter, r *http.Request) {
@@ -436,18 +438,22 @@ func main() {
 	rHost := os.Getenv("RETHINKDB_PORT_28015_TCP_ADDR")
 	rPort := os.Getenv("RETHINKDB_PORT_28015_TCP_PORT")
 	rDb := os.Getenv("RETHINKDB_DATABASE")
+	rAuthKey := os.Getenv("RETHINKDB_AUTH_KEY")
 	if rHost != "" && rPort != "" {
 		rethinkdbAddr = fmt.Sprintf("%s:%s", rHost, rPort)
 	}
 	if rDb != "" {
 		rethinkdbDatabase = rDb
 	}
+	if rAuthKey != "" {
+		rethinkdbAuthKey = rAuthKey
+	}
 	flag.Parse()
 	var (
 		mErr      error
 		globalMux = http.NewServeMux()
 	)
-	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase)
+	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey)
 	if mErr != nil {
 		logger.Fatal(mErr)
 	}

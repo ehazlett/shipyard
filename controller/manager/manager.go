@@ -39,6 +39,7 @@ type (
 	Manager struct {
 		address        string
 		database       string
+		authKey        string
 		session        *r.Session
 		clusterManager *cluster.Cluster
 		engines        []*shipyard.Engine
@@ -48,10 +49,11 @@ type (
 	}
 )
 
-func NewManager(addr string, database string) (*Manager, error) {
+func NewManager(addr string, database string, authKey string) (*Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:     addr,
 		Database:    database,
+		AuthKey:     authKey,
 		MaxIdle:     10,
 		IdleTimeout: time.Second * 30,
 	})
@@ -63,6 +65,7 @@ func NewManager(addr string, database string) (*Manager, error) {
 	m := &Manager{
 		address:       addr,
 		database:      database,
+		authKey:       authKey,
 		session:       session,
 		authenticator: &shipyard.Authenticator{},
 		store:         store,
