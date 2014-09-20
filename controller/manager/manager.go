@@ -557,15 +557,17 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 	}
 	ext.Config.Environment["_SHIPYARD_EXTENSION"] = ext.ID
 	image := &citadel.Image{
-		Name:        ext.Image,
-		Cpus:        ext.Config.Cpus,
-		Memory:      ext.Config.Memory,
-		Environment: ext.Config.Environment,
-		Args:        ext.Config.Args,
-		Volumes:     ext.Config.Volumes,
-		BindPorts:   ext.Config.Ports,
-		Labels:      []string{},
-		Type:        "service",
+		Name:          ext.Image,
+		ContainerName: ext.Config.ContainerName,
+		Cpus:          ext.Config.Cpus,
+		Memory:        ext.Config.Memory,
+		Environment:   ext.Config.Environment,
+		Args:          ext.Config.Args,
+		Volumes:       ext.Config.Volumes,
+		VolumesFrom:   ext.Config.VolumesFrom,
+		BindPorts:     ext.Config.Ports,
+		Labels:        []string{},
+		Type:          "service",
 	}
 	if ext.Config.DeployPerEngine {
 		engs := m.clusterManager.Engines()
