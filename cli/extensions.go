@@ -85,7 +85,7 @@ func addExtensionAction(c *cli.Context) {
 	fmt.Printf("configuring %s (%s for more info)\n", ext.Name, ext.Url)
 	// check for configuration
 	for _, pe := range ext.Config.PromptEnvironment {
-		fmt.Printf("enter value for container environment variable \"%s\": ", pe)
+		fmt.Printf("enter value for container environment variable %s: ", pe)
 		b := bufio.NewReader(os.Stdin)
 		r, _, err := b.ReadLine()
 		if err != nil {
@@ -94,13 +94,16 @@ func addExtensionAction(c *cli.Context) {
 		env[pe] = string(r)
 	}
 	for _, pa := range ext.Config.PromptArgs {
-		fmt.Printf("enter value for container argument \"%s\": ", pa)
+		fmt.Printf("enter value for container argument %s: ", pa)
 		b := bufio.NewReader(os.Stdin)
 		r, _, err := b.ReadLine()
 		if err != nil {
 			logger.Fatalf("unable to parse input: %s", err)
 		}
-		arg := fmt.Sprintf("%s=%s", pa, r)
+		arg := string(r)
+		if pa != "" {
+			arg = fmt.Sprintf("%s=%s", pa, r)
+		}
 		args = append(args, arg)
 	}
 	ext.Config.Environment = env

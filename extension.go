@@ -18,6 +18,7 @@ type (
 		Memory            float64           `json:"memory,omitempty" gorethink:"memory"`
 		Environment       map[string]string `json:"environment,omitempty" gorethink:"environment"`
 		Args              []string          `json:"args,omitempty" gorethink:"args"`
+		Volumes           []string          `json:"volumes,omitempty" gorethink:"volumes"`
 		Ports             []*citadel.Port   `json:"ports,omitempty" gorethink:"ports"`
 		DeployPerEngine   bool              `json:"deploy_per_engine" gorethink:"deploy_per_engine"`
 		PromptArgs        []string          `json:"prompt_args,omitempty" gorethink:"prompt_args"`
