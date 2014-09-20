@@ -67,6 +67,10 @@ var runCommand = cli.Command{
 			Value: &cli.StringSlice{},
 		},
 		cli.BoolFlag{
+			Name:  "publish",
+			Usage: "publish all exposed ports",
+		},
+		cli.BoolFlag{
 			Name:  "pull",
 			Usage: "pull the image from the repository",
 		},
@@ -99,6 +103,7 @@ func runAction(c *cli.Context) {
 		Labels:        c.StringSlice("label"),
 		Args:          c.StringSlice("arg"),
 		Environment:   env,
+		Publish:       c.Bool("publish"),
 		BindPorts:     ports,
 		Type:          c.String("type"),
 	}
