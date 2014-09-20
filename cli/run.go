@@ -62,11 +62,6 @@ var runCommand = cli.Command{
 			Value: &cli.StringSlice{},
 		},
 		cli.StringSliceFlag{
-			Name:  "volumes-from",
-			Usage: "mount other container volumes",
-			Value: &cli.StringSlice{},
-		},
-		cli.StringSliceFlag{
 			Name:  "label",
 			Usage: "labels",
 			Value: &cli.StringSlice{},
