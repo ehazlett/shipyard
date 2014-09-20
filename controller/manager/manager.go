@@ -151,7 +151,57 @@ func (m *Manager) init() []*shipyard.Engine {
 	clusterManager.RegisterScheduler("multi", multiScheduler)
 	clusterManager.RegisterScheduler("host", hostScheduler)
 	m.clusterManager = clusterManager
+	// start extension health check
+	go m.extensionHealthCheck()
 	return engines
+}
+
+func (m *Manager) extensionHealthCheck() {
+	t := time.NewTicker(time.Second * 1).C
+	for {
+		select {
+		case <-t:
+			exts, err := m.Extensions()
+			if err != nil {
+				logger.Warnf("error running extension health check: %s", err)
+				return
+			}
+			for _, ext := range exts {
+				go m.checkExtensionHealth(ext)
+			}
+		}
+	}
+}
+
+func (m *Manager) checkExtensionHealth(ext *shipyard.Extension) error {
+	containers, err := m.Containers(true)
+	if err != nil {
+		logger.Warnf("error running extension health check: %s", err)
+		return err
+	}
+	engs := m.Engines()
+	engines := []*citadel.Engine{}
+	for _, eng := range engs {
+		engines = append(engines, eng.Engine)
+	}
+	extEngines := []*citadel.Engine{}
+	for _, c := range containers {
+		if val, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
+			// check if the same parent extension
+			if val == ext.ID {
+				extEngines = append(extEngines, c.Engine)
+			}
+		}
+	}
+	if len(extEngines) == 0 || ext.Config.DeployPerEngine && len(extEngines) < len(engines) {
+		logger.Infof("recovering extension %s", ext.Name)
+		// extension is missing a container; deploy
+		if err := m.RegisterExtension(ext); err != nil {
+			logger.Warnf("error recovering extension: %s", err)
+			return err
+		}
+	}
+	return nil
 }
 
 func (m *Manager) Engines() []*shipyard.Engine {
@@ -223,6 +273,10 @@ func (m *Manager) Container(id string) (*citadel.Container, error) {
 		}
 	}
 	return nil, nil
+}
+
+func (m *Manager) Containers(all bool) ([]*citadel.Container, error) {
+	return m.clusterManager.ListContainers(all)
 }
 
 func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
@@ -556,6 +610,10 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 		ext.Config.Environment = env
 	}
 	ext.Config.Environment["_SHIPYARD_EXTENSION"] = ext.ID
+	rp := citadel.RestartPolicy{
+		Name:              "on-failure",
+		MaximumRetryCount: 10,
+	}
 	image := &citadel.Image{
 		Name:          ext.Image,
 		ContainerName: ext.Config.ContainerName,
@@ -568,10 +626,29 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 		BindPorts:     ext.Config.Ports,
 		Labels:        []string{},
 		Type:          "service",
+		RestartPolicy: rp,
 	}
 	if ext.Config.DeployPerEngine {
 		engs := m.clusterManager.Engines()
+		extEngines := []*citadel.Engine{}
+		containers, err := m.Containers(true)
+		if err != nil {
+			return err
+		}
+		for _, c := range containers {
+			if v, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
+				if v == ext.ID {
+					extEngines = append(extEngines, c.Engine)
+				}
+			}
+		}
 		for _, eng := range engs {
+			// skip if already present
+			for _, xe := range extEngines {
+				if xe == eng {
+					continue
+				}
+			}
 			image.Type = "host"
 			labels := []string{fmt.Sprintf("host:%s", eng.ID)}
 			image.Labels = labels
