@@ -57,6 +57,16 @@ var runCommand = cli.Command{
 			Value: &cli.StringSlice{},
 		},
 		cli.StringSliceFlag{
+			Name:  "vol",
+			Usage: "volume (/host/path:/container/path or /container/path)",
+			Value: &cli.StringSlice{},
+		},
+		cli.StringSliceFlag{
+			Name:  "volumes-from",
+			Usage: "mount other container volumes",
+			Value: &cli.StringSlice{},
+		},
+		cli.StringSliceFlag{
 			Name:  "label",
 			Usage: "labels",
 			Value: &cli.StringSlice{},
@@ -91,6 +101,7 @@ func runAction(c *cli.Context) {
 	if c.String("name") == "" {
 		logger.Fatal("you must specify an image name")
 	}
+	vols := c.StringSlice("vol")
 	env := parseEnvironmentVariables(c.StringSlice("env"))
 	ports := parsePorts(c.StringSlice("port"))
 	image := &citadel.Image{
@@ -104,6 +115,7 @@ func runAction(c *cli.Context) {
 		Args:          c.StringSlice("arg"),
 		Environment:   env,
 		Publish:       c.Bool("publish"),
+		Volumes:       vols,
 		BindPorts:     ports,
 		Type:          c.String("type"),
 	}
