@@ -622,7 +622,6 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 		Environment:   ext.Config.Environment,
 		Args:          ext.Config.Args,
 		Volumes:       ext.Config.Volumes,
-		VolumesFrom:   ext.Config.VolumesFrom,
 		BindPorts:     ext.Config.Ports,
 		Labels:        []string{},
 		Type:          "service",

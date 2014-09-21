@@ -20,7 +20,6 @@ type (
 		Environment       map[string]string `json:"environment,omitempty" gorethink:"environment"`
 		Args              []string          `json:"args,omitempty" gorethink:"args"`
 		Volumes           []string          `json:"volumes,omitempty" gorethink:"volumes"`
-		VolumesFrom       []string          `json:"volumes_from,omitempty" gorethink:"volumes_from"`
 		Ports             []*citadel.Port   `json:"ports,omitempty" gorethink:"ports"`
 		DeployPerEngine   bool              `json:"deploy_per_engine" gorethink:"deploy_per_engine"`
 		PromptArgs        []string          `json:"prompt_args,omitempty" gorethink:"prompt_args"`
