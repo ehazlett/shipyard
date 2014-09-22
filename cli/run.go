@@ -89,6 +89,11 @@ var runCommand = cli.Command{
 			Usage: "number of instances",
 			Value: 1,
 		},
+		cli.StringFlag{
+			Name:  "restart",
+			Value: "no",
+			Usage: "restart policy for container (on-failure, always, on-failure:5, etc.)",
+		},
 	},
 }
 
@@ -105,6 +110,14 @@ func runAction(c *cli.Context) {
 	env := parseEnvironmentVariables(c.StringSlice("env"))
 	ports := parsePorts(c.StringSlice("port"))
 	links := parseContainerLinks(c.StringSlice("link"))
+	policy, maxRetries, err := parseRestartPolicy(c.String("restart"))
+	if err != nil {
+		logger.Fatalf("error parsing restart policy: %s", err)
+	}
+	rp := citadel.RestartPolicy{
+		Name:              policy,
+		MaximumRetryCount: maxRetries,
+	}
 	image := &citadel.Image{
 		Name:          c.String("name"),
 		ContainerName: c.String("container-name"),
@@ -119,6 +132,7 @@ func runAction(c *cli.Context) {
 		Publish:       c.Bool("publish"),
 		Volumes:       vols,
 		BindPorts:     ports,
+		RestartPolicy: rp,
 		Type:          c.String("type"),
 	}
 	containers, err := m.Run(image, c.Int("count"), c.Bool("pull"))
