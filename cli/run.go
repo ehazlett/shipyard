@@ -52,6 +52,11 @@ var runCommand = cli.Command{
 			Value: &cli.StringSlice{},
 		},
 		cli.StringSliceFlag{
+			Name:  "link",
+			Usage: "container link (container:name pair)",
+			Value: &cli.StringSlice{},
+		},
+		cli.StringSliceFlag{
 			Name:  "arg",
 			Usage: "run arguments",
 			Value: &cli.StringSlice{},
@@ -99,6 +104,7 @@ func runAction(c *cli.Context) {
 	vols := c.StringSlice("vol")
 	env := parseEnvironmentVariables(c.StringSlice("env"))
 	ports := parsePorts(c.StringSlice("port"))
+	links := parseContainerLinks(c.StringSlice("link"))
 	image := &citadel.Image{
 		Name:          c.String("name"),
 		ContainerName: c.String("container-name"),
@@ -109,6 +115,7 @@ func runAction(c *cli.Context) {
 		Labels:        c.StringSlice("label"),
 		Args:          c.StringSlice("arg"),
 		Environment:   env,
+		Links:         links,
 		Publish:       c.Bool("publish"),
 		Volumes:       vols,
 		BindPorts:     ports,

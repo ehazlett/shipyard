@@ -27,6 +27,21 @@ func parseEnvironmentVariables(pairs []string) map[string]string {
 	return env
 }
 
+func parseContainerLinks(pairs []string) map[string]string {
+	links := make(map[string]string)
+	for _, p := range pairs {
+		parts := strings.Split(p, ":")
+		if len(parts) != 2 {
+			logger.Error("container links must be in container:name pairs")
+			return nil
+		}
+		k := parts[0]
+		v := parts[1]
+		links[k] = v
+	}
+	return links
+}
+
 func parsePorts(pairs []string) []*citadel.Port {
 	ports := []*citadel.Port{}
 	for _, p := range pairs {

@@ -31,7 +31,7 @@ func containersAction(c *cli.Context) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "ID\tName\tHost\tState\tPorts")
+	fmt.Fprintln(w, "ID\tImage\tName\tHost\tState\tPorts")
 	for _, c := range containers {
 		portDefs := []string{}
 		for _, port := range c.Ports {
@@ -39,7 +39,8 @@ func containersAction(c *cli.Context) {
 			portDefs = append(portDefs, p)
 		}
 		ports := strings.Join(portDefs, ", ")
-		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%v\t%s\n", c.ID[:12], c.Image.Name, c.Engine.ID, c.State, ports))
+		name := c.Name[1:]
+		fmt.Fprintf(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%v\t%s\n", c.ID[:12], c.Image.Name, name, c.Engine.ID, c.State, ports))
 	}
 	w.Flush()
 }
