@@ -22,6 +22,7 @@ const (
 	tblNameAccounts    = "accounts"
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
+	tblNameExtensions  = "extensions"
 	storeKey           = "shipyard"
 )
 
@@ -31,6 +32,7 @@ var (
 	ErrRoleDoesNotExist       = errors.New("role does not exist")
 	ErrServiceKeyDoesNotExist = errors.New("service key does not exist")
 	ErrInvalidAuthToken       = errors.New("invalid auth token")
+	ErrExtensionDoesNotExist  = errors.New("extension does not exist")
 	logger                    = logrus.New()
 	store                     = sessions.NewCookieStore([]byte(storeKey))
 )
@@ -86,7 +88,7 @@ func (m *Manager) Store() *sessions.CookieStore {
 
 func (m *Manager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameExtensions}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -149,7 +151,57 @@ func (m *Manager) init() []*shipyard.Engine {
 	clusterManager.RegisterScheduler("multi", multiScheduler)
 	clusterManager.RegisterScheduler("host", hostScheduler)
 	m.clusterManager = clusterManager
+	// start extension health check
+	go m.extensionHealthCheck()
 	return engines
+}
+
+func (m *Manager) extensionHealthCheck() {
+	t := time.NewTicker(time.Second * 1).C
+	for {
+		select {
+		case <-t:
+			exts, err := m.Extensions()
+			if err != nil {
+				logger.Warnf("error running extension health check: %s", err)
+				return
+			}
+			for _, ext := range exts {
+				go m.checkExtensionHealth(ext)
+			}
+		}
+	}
+}
+
+func (m *Manager) checkExtensionHealth(ext *shipyard.Extension) error {
+	containers, err := m.Containers(true)
+	if err != nil {
+		logger.Warnf("error running extension health check: %s", err)
+		return err
+	}
+	engs := m.Engines()
+	engines := []*citadel.Engine{}
+	for _, eng := range engs {
+		engines = append(engines, eng.Engine)
+	}
+	extEngines := []*citadel.Engine{}
+	for _, c := range containers {
+		if val, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
+			// check if the same parent extension
+			if val == ext.ID {
+				extEngines = append(extEngines, c.Engine)
+			}
+		}
+	}
+	if len(extEngines) == 0 || ext.Config.DeployPerEngine && len(extEngines) < len(engines) {
+		logger.Infof("recovering extension %s", ext.Name)
+		// extension is missing a container; deploy
+		if err := m.RegisterExtension(ext); err != nil {
+			logger.Warnf("error recovering extension: %s", err)
+			return err
+		}
+	}
+	return nil
 }
 
 func (m *Manager) Engines() []*shipyard.Engine {
@@ -221,6 +273,10 @@ func (m *Manager) Container(id string) (*citadel.Container, error) {
 		}
 	}
 	return nil, nil
+}
+
+func (m *Manager) Containers(all bool) ([]*citadel.Container, error) {
+	return m.clusterManager.ListContainers(all)
 }
 
 func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
@@ -493,6 +549,166 @@ func (m *Manager) ChangePassword(username, password string) error {
 	}
 	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"password": hash}).Run(m.session); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (m *Manager) Extensions() ([]*shipyard.Extension, error) {
+	res, err := r.Table(tblNameExtensions).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	var exts []*shipyard.Extension
+	if err := res.All(&exts); err != nil {
+		return nil, err
+	}
+	return exts, nil
+}
+
+func (m *Manager) Extension(id string) (*shipyard.Extension, error) {
+	res, err := r.Table(tblNameExtensions).Get(id).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrExtensionDoesNotExist
+	}
+	var ext *shipyard.Extension
+	if err := res.One(&ext); err != nil {
+		return nil, err
+	}
+	return ext, nil
+}
+
+func (m *Manager) SaveExtension(ext *shipyard.Extension) error {
+	res, err := r.Table(tblNameExtensions).Insert(ext).RunWrite(m.session)
+	if err != nil {
+		return err
+	}
+	evt := &shipyard.Event{
+		Type:    "add-extension",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author),
+		Tags:    []string{"cluster"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	key := res.GeneratedKeys[0]
+	ext.ID = key
+	// register
+	if err := m.RegisterExtension(ext); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
+	if ext.Config.Environment == nil {
+		env := make(map[string]string)
+		ext.Config.Environment = env
+	}
+	ext.Config.Environment["_SHIPYARD_EXTENSION"] = ext.ID
+	rp := citadel.RestartPolicy{
+		Name:              "on-failure",
+		MaximumRetryCount: 10,
+	}
+	image := &citadel.Image{
+		Name:          ext.Image,
+		ContainerName: ext.Config.ContainerName,
+		Cpus:          ext.Config.Cpus,
+		Memory:        ext.Config.Memory,
+		Environment:   ext.Config.Environment,
+		Args:          ext.Config.Args,
+		Volumes:       ext.Config.Volumes,
+		BindPorts:     ext.Config.Ports,
+		Labels:        []string{},
+		Type:          "service",
+		RestartPolicy: rp,
+	}
+	if ext.Config.DeployPerEngine {
+		engs := m.clusterManager.Engines()
+		extEngines := []*citadel.Engine{}
+		containers, err := m.Containers(true)
+		if err != nil {
+			return err
+		}
+		for _, c := range containers {
+			if v, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
+				if v == ext.ID {
+					extEngines = append(extEngines, c.Engine)
+				}
+			}
+		}
+		for _, eng := range engs {
+			// skip if already present
+			for _, xe := range extEngines {
+				if xe == eng {
+					continue
+				}
+			}
+			image.Type = "host"
+			labels := []string{fmt.Sprintf("host:%s", eng.ID)}
+			image.Labels = labels
+			container, err := m.clusterManager.Start(image, true)
+			if err != nil {
+				logger.Errorf("error running %s for extension image %s: %s", image.Name, ext.Name, err)
+				return err
+			}
+			logger.Infof("started %s (%s) for extension %s", container.ID[:8], image.Name, ext.Name)
+		}
+	} else {
+		container, err := m.clusterManager.Start(image, true)
+		if err != nil {
+			logger.Errorf("error running %s for extension image %s: %s", image.Name, ext.Name, err)
+			return err
+		}
+		logger.Infof("started %s (%s) for extension %s", container.ID[:8], image.Name, ext.Name)
+	}
+	logger.Infof("registered extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
+	return nil
+}
+
+func (m *Manager) UnregisterExtension(ext *shipyard.Extension) error {
+	// remove containers that are linked to extension
+	containers, err := m.clusterManager.ListContainers(true)
+	if err != nil {
+		return err
+	}
+	for _, c := range containers {
+		// check if has the extension env var
+		if val, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
+			// check if the same parent extension
+			if val == ext.ID {
+				logger.Infof("terminating extension (%s) container %s", ext.Name, c.ID[:8])
+				if err := m.clusterManager.Kill(c, 9); err != nil {
+					logger.Warnf("error terminating extension (%s) container %s: %s", ext.Name, c.ID[:8], err)
+				}
+				if err := m.clusterManager.Remove(c); err != nil {
+					logger.Warnf("error removing extension (%s) container %s: %s", ext.Name, c.ID[:8], err)
+				}
+			}
+		}
+	}
+	logger.Infof("un-registered extension name=%s version=%s author=%s", ext.Name, ext.Version, ext.Author)
+	return nil
+}
+
+func (m *Manager) DeleteExtension(id string) error {
+	ext, err := m.Extension(id)
+	if err != nil {
+		return err
+	}
+	if err := m.UnregisterExtension(ext); err != nil {
+		return err
+	}
+	res, err := r.Table(tblNameExtensions).Get(id).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrExtensionDoesNotExist
 	}
 	return nil
 }
