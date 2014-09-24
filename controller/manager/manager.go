@@ -729,6 +729,7 @@ func (m *Manager) RedeployContainers(image string) error {
 	if err != nil {
 		return err
 	}
+	deployed := false
 	for _, c := range containers {
 		if strings.Index(c.Image.Name, image) > -1 {
 			img = c.Image
@@ -746,7 +747,19 @@ func (m *Manager) RedeployContainers(image string) error {
 			if err != nil {
 				return err
 			}
+			deployed = true
 			logger.Infof("deployed updated container %s via webhook for %s", nc.ID[:8], image)
+		}
+	}
+	if deployed {
+		evt := &shipyard.Event{
+			Type:    "deploy",
+			Message: fmt.Sprintf("%s deployed", image),
+			Time:    time.Now(),
+			Tags:    []string{"deploy"},
+		}
+		if err := m.SaveEvent(evt); err != nil {
+			return err
 		}
 	}
 	return nil
