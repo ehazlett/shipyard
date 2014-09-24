@@ -56,16 +56,12 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := controllerManager.ClusterManager().Kill(container, 9); err != nil {
+	if err := controllerManager.Destroy(container); err != nil {
 		logger.Errorf("error destroying %s: %s", container.ID, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := controllerManager.ClusterManager().Remove(container); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	logger.Infof("destroyed container %s (%s)", container.ID, container.Image.Name)
 
 	w.WriteHeader(http.StatusNoContent)
@@ -537,10 +533,16 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 func hubWebhook(w http.ResponseWriter, r *http.Request) {
 	var webhook *dockerhub.Webhook
 	if err := json.NewDecoder(r.Body).Decode(&webhook); err != nil {
+		logger.Errorf("error parsing webhook: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	logger.Infof("received webhook for %s", webhook.Repository.RepoName)
+	if err := controllerManager.RedeployContainers(webhook.Repository.RepoName); err != nil {
+		logger.Errorf("error redeploying containers: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func main() {

@@ -287,6 +287,16 @@ func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
 	return info, nil
 }
 
+func (m *Manager) Destroy(container *citadel.Container) error {
+	if err := m.ClusterManager().Kill(container, 9); err != nil {
+		return err
+	}
+	if err := m.ClusterManager().Remove(container); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *Manager) SaveServiceKey(key *shipyard.ServiceKey) error {
 	if _, err := r.Table(tblNameServiceKeys).Insert(key).RunWrite(m.session); err != nil {
 		return err
@@ -709,6 +719,35 @@ func (m *Manager) DeleteExtension(id string) error {
 	}
 	if res.IsNil() {
 		return ErrExtensionDoesNotExist
+	}
+	return nil
+}
+
+func (m *Manager) RedeployContainers(image string) error {
+	var img *citadel.Image
+	containers, err := m.Containers(false)
+	if err != nil {
+		return err
+	}
+	for _, c := range containers {
+		if strings.Index(c.Image.Name, image) > -1 {
+			img = c.Image
+			logger.Infof("pulling latest image for %s", image)
+			if err := c.Engine.Pull(image); err != nil {
+				return err
+			}
+			m.Destroy(c)
+			// in order to keep fast deploys, we must deploy
+			// to the same host that the image was running on previously
+			img.Type = "host"
+			lbl := fmt.Sprintf("host:%s", c.Engine.ID)
+			img.Labels = []string{lbl}
+			nc, err := m.ClusterManager().Start(img, false)
+			if err != nil {
+				return err
+			}
+			logger.Infof("deployed updated container %s via webhook for %s", nc.ID[:8], image)
+		}
 	}
 	return nil
 }
