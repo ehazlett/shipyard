@@ -537,7 +537,7 @@ func hubWebhook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	logger.Infof("received webhook for %s", webhook.Repository.RepoName)
+	logger.Infof("received webhook notification for %s", webhook.Repository.RepoName)
 	if err := controllerManager.RedeployContainers(webhook.Repository.RepoName); err != nil {
 		logger.Errorf("error redeploying containers: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
