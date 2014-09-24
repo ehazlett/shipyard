@@ -16,6 +16,7 @@ import (
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
 	"github.com/shipyard/shipyard/controller/middleware/auth"
+	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/sirupsen/logrus"
 )
 
@@ -533,6 +534,15 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func hubWebhook(w http.ResponseWriter, r *http.Request) {
+	var webhook *dockerhub.Webhook
+	if err := json.NewDecoder(r.Body).Decode(&webhook); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("received webhook for %s", webhook.Repository.RepoName)
+}
+
 func main() {
 	rHost := os.Getenv("RETHINKDB_PORT_28015_TCP_ADDR")
 	rPort := os.Getenv("RETHINKDB_PORT_28015_TCP_PORT")
@@ -610,6 +620,11 @@ func main() {
 	loginRouter := mux.NewRouter()
 	loginRouter.HandleFunc("/auth/login", login).Methods("POST")
 	globalMux.Handle("/auth/", loginRouter)
+
+	// hub handler; public
+	hubRouter := mux.NewRouter()
+	hubRouter.HandleFunc("/hub/webhook/", hubWebhook).Methods("POST")
+	globalMux.Handle("/hub/", hubRouter)
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
