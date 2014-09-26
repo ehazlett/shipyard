@@ -42,6 +42,7 @@ func (m *Manager) doRequest(path string, method string, expectedStatus int, b []
 	} else {
 		req.Header.Add("X-Access-Token", fmt.Sprintf("%s:%s", m.config.Username, m.config.Token))
 	}
+	req.Header.Set("User-Agent", "shipyard-cli")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
