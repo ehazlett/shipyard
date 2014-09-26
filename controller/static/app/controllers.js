@@ -208,18 +208,29 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.predicate = 'container_port';
                 $scope.cpuMax = data.engine.cpus;
                 $scope.memoryMax = data.engine.memory;
-                $scope.containerCpuData = [
-                    {
-                        "key": "CPU",
-                        "values": [ [$scope.container.image.cpus, $scope.container.image.cpus] ]
-                    }
-                ];
-                $scope.containerMemoryData = [
-                    {
-                        "key": "Memory",
-                        "values": [ [$scope.container.image.memory, $scope.container.image.memory] ]
-                    }
-                ];
+                $scope.chartOptions = {
+                    animation: false,
+                    responsive: true,
+                    showTooltips: true
+                };
+                $scope.containerCpuData = {
+                    labels: ["Reserved"],
+                    datasets: [
+                        {
+                            fillColor: "#6D91AD",
+                            data: [ $scope.container.image.cpus ]
+                        }
+                    ]
+                };
+                $scope.containerMemoryData = {
+                    labels: ["Reserved"],
+                    datasets: [
+                        {
+                            fillColor: "#6D91AD",
+                            data: [ $scope.container.image.memory ]
+                        }
+                    ]
+                };
             });
         })
         .controller('EnginesController', function($scope, Engines) {
