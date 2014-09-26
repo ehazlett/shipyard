@@ -94,3 +94,8 @@ function isLoggedIn() {
     return true;
 }
 
+function getRandomColor() {
+    var colors = d3.scale.category20c().range();
+    var rand = colors[Math.floor(Math.random() * colors.length)];
+    return rand
+}

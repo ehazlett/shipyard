@@ -50,26 +50,27 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 };
             };
             ClusterInfo.query(function(data){
+                $scope.chartOptions = {
+                    animation: false,
+                    responsive: true,
+                    showTooltips: true
+                };
                 $scope.clusterInfo = data;
                 $scope.clusterCpuData = [
-                    { key: "Free", y: data.cpus },
-                    { key: "Reserved", y: 0 }
+                    { label: "Free", value: data.cpus, color: "#184465" },
+                    { label: "Reserved", value: 0, color: "#6D91AD" }
                 ];
                 if (data.cpus != undefined && data.reserved_cpus != undefined) {
-                    $scope.clusterCpuData = [
-                        { key: "Free", y: data.cpus - data.reserved_cpus },
-                        { key: "Reserved", y: data.reserved_cpus }
-                    ];
+                    $scope.clusterCpuData[0].value = data.cpus - data.reserved_cpus;
+                    $scope.clusterCpuData[1].value = data.reserved_cpus;
                 }
                 $scope.clusterMemoryData = [
-                    { key: "Free", y: data.memory },
-                    { key: "Reserved", y: 0 }
+                    { label: "Free", value: data.memory, color: "#184465" },
+                    { label: "Reserved", value: 0, color: "#6D91AD" }
                 ];
                 if (data.memory != undefined && data.reserved_memory != undefined) {
-                    $scope.clusterMemoryData = [
-                        { key: "Free", y: data.memory - data.reserved_memory },
-                        { key: "Reserved", y: data.reserved_memory }
-                    ];
+                    $scope.clusterMemoryData[0].value = data.memory - data.reserved_memory;
+                    $scope.clusterMemoryData[1].value = data.reserved_memory;
                 }
             });
         })
@@ -207,18 +208,29 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.predicate = 'container_port';
                 $scope.cpuMax = data.engine.cpus;
                 $scope.memoryMax = data.engine.memory;
-                $scope.containerCpuData = [
-                    {
-                        "key": "CPU",
-                        "values": [ [$scope.container.image.cpus, $scope.container.image.cpus] ]
-                    }
-                ];
-                $scope.containerMemoryData = [
-                    {
-                        "key": "Memory",
-                        "values": [ [$scope.container.image.memory, $scope.container.image.memory] ]
-                    }
-                ];
+                $scope.chartOptions = {
+                    animation: false,
+                    responsive: true,
+                    showTooltips: true
+                };
+                $scope.containerCpuData = {
+                    labels: ["Reserved"],
+                    datasets: [
+                        {
+                            fillColor: "#6D91AD",
+                            data: [ $scope.container.image.cpus ]
+                        }
+                    ]
+                };
+                $scope.containerMemoryData = {
+                    labels: ["Reserved"],
+                    datasets: [
+                        {
+                            fillColor: "#6D91AD",
+                            data: [ $scope.container.image.memory ]
+                        }
+                    ]
+                };
             });
         })
         .controller('EnginesController', function($scope, Engines) {
@@ -294,16 +306,24 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 Containers.query(function(d){
                     var cpuData = [];
                     var memoryData = [];
+                    $scope.chartOptions = {
+                        animation: false,
+                        responsive: true,
+                        showTooltips: true
+                    };
                     for (var i=0; i<d.length; i++) {
                         var c = d[i];
+                        var color = getRandomColor();
                         if (c.engine.id == data.engine.id){
                             var x = {
-                                key: c.image.hostname,
-                                y: c.image.cpus
+                                label: c.image.hostname,
+                                value: c.image.cpus,
+                                color: color
                             }
                             var y = {
-                                key: c.image.hostname,
-                                y: c.image.memory
+                                label: c.image.hostname,
+                                value: c.image.memory,
+                                color: color
                             }
                             cpuData.push(x);
                             memoryData.push(y);

@@ -1,41 +1,20 @@
 <div class="ui three column stackable grid" ng-cloak>
     <div class="row">
-        <div id="chart-cpu" class="one wide column">
+        <div id="chart-cpu" class="column">
             <h3 class="ui header center aligned">CPU</h3>
-            <nvd3-pie-chart
-                id="clusterCpuChart"
-                data="clusterCpuData"
-                width="450"
-                height="450"
-                showLabels="true"
-                showLegend="true"
-                x="showX()"
-                y="showY()"
-                labelType="percent"
-                >
-                <svg></svg>
-            </nvd3-pie-chart>
+            <div>
+                <canvas donutchart data="clusterCpuData" options="chartOptions" width="250" height="250"></canvas>
+            </div>
         </div>
 
-        <div id="chart-memory" class="one wide column">
+        <div id="chart-memory" class="column">
             <h3 class="ui header center aligned">Memory</h3>
-            <nvd3-pie-chart
-                id="clusterMemoryChart"
-                data="clusterMemoryData"
-                width="450"
-                height="450"
-                showLabels="true"
-                showLegend="true"
-                x="showX()"
-                y="showY()"
-                labelType="percent"
-                >
-                <svg></svg>
-            </nvd3-pie-chart>
+            <div>
+                <canvas donutchart data="clusterMemoryData" options="chartOptions" width="250" height="250"></canvas>
+            </div>
         </div>
 
         <div class="column">
-            <h3 class="ui header center aligned">Events</h3>
             <div class="ui feed" ng-repeat="event in events | limitTo: 5">
                 <div class="event">
                     <div class="label">

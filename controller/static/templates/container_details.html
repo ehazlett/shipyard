@@ -62,38 +62,14 @@
     </div>
     <div class="ui column">
         <h3 class="ui header">CPU</h3>
-        <nvd3-multi-bar-chart
-            data="containerCpuData"
-            id="containerCpuChart"
-            xAxisTickFormat="showX()"
-            width="350"
-            height="350"
-            showXAxis="false"
-            showYAxis="true"
-            forcey="[0, {{cpuMax}}]"
-            reduceXTicks="true"
-            tooltips="true"
-            tooltipcontent="tooltipFunction()"
-            >
-            <svg></svg>
-        </nvd3-multi-bar-chart>
+        <div>
+            <canvas barchart data="containerCpuData" options="chartOptions" width="250" height="250"></canvas>
+        </div>
     </div>
     <div class="ui column">
         <h3 class="ui header">Memory</h3>
-        <nvd3-multi-bar-chart
-            data="containerMemoryData"
-            id="containerMemoryChart"
-            xAxisTickFormat="showX()"
-            width="350"
-            height="350"
-            showXAxis="false"
-            showYAxis="true"
-            forcey="[0, {{memoryMax}}]"
-            reduceXTicks="true"
-            tooltips="true"
-            tooltipcontent="tooltipFunction()"
-            >
-            <svg></svg>
-        </nvd3-multi-bar-chart>
+        <div>
+            <canvas barchart data="containerMemoryData" options="chartOptions" width="250" height="250"></canvas>
+        </div>
     </div>
 </div>
