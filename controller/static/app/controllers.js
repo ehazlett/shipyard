@@ -50,26 +50,27 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 };
             };
             ClusterInfo.query(function(data){
+                $scope.chartOptions = {
+                    animation: false,
+                    responsive: true,
+                    showTooltips: true
+                };
                 $scope.clusterInfo = data;
                 $scope.clusterCpuData = [
-                    { key: "Free", y: data.cpus },
-                    { key: "Reserved", y: 0 }
+                    { label: "Free", value: data.cpus, color: "#184465" },
+                    { label: "Reserved", value: 0, color: "#6D91AD" }
                 ];
                 if (data.cpus != undefined && data.reserved_cpus != undefined) {
-                    $scope.clusterCpuData = [
-                        { key: "Free", y: data.cpus - data.reserved_cpus },
-                        { key: "Reserved", y: data.reserved_cpus }
-                    ];
+                    $scope.clusterCpuData[0].value = data.cpus - data.reserved_cpus;
+                    $scope.clusterCpuData[1].value = data.reserved_cpus;
                 }
                 $scope.clusterMemoryData = [
-                    { key: "Free", y: data.memory },
-                    { key: "Reserved", y: 0 }
+                    { label: "Free", value: data.memory, color: "#184465" },
+                    { label: "Reserved", value: 0, color: "#6D91AD" }
                 ];
                 if (data.memory != undefined && data.reserved_memory != undefined) {
-                    $scope.clusterMemoryData = [
-                        { key: "Free", y: data.memory - data.reserved_memory },
-                        { key: "Reserved", y: data.reserved_memory }
-                    ];
+                    $scope.clusterMemoryData[0].value = data.memory - data.reserved_memory;
+                    $scope.clusterMemoryData[1].value = data.reserved_memory;
                 }
             });
         })

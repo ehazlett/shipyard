@@ -30,7 +30,8 @@
     "angular-loader": "~1.2.23",
     "angular-cookies": "~1.2.23",
     "angularjs-nvd3-directives": "~0.0.7",
-    "angular-flash": "~0.1.13"
+    "angular-flash": "~0.1.13",
+    "angles": "*"
   },
   "resolutions": {
     "d3": "~3.4.11"

@@ -10,7 +10,8 @@ angular.module('shipyard', [
         'shipyard.directives',
         'nvd3ChartDirectives',
         'angular-flash.service',
-        'angular-flash.flash-alert-directive'
+        'angular-flash.flash-alert-directive',
+        'angles'
     ])
     .config(['$routeProvider', '$httpProvider', '$provide', 'flashProvider',
         function ($routeProvider, $httpProvider, $provide, flashProvider) {
