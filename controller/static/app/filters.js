@@ -84,6 +84,18 @@ angular.module('shipyard.filters', [])
                 case 'remove-service-key':
                     cls = "remove red";
                     break;
+                case 'add-account':
+                    cls = "user blue";
+                    break;
+                case 'delete-account':
+                    cls = "user";
+                    break;
+                case 'add-role':
+                    cls = "user blue";
+                    break;
+                case 'delete-role':
+                    cls = "user";
+                    break;
                 default:
                     cls = "text file"
             }

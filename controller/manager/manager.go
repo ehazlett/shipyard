@@ -420,6 +420,15 @@ func (m *Manager) SaveAccount(account *shipyard.Account) error {
 	if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
 		return err
 	}
+	evt := &shipyard.Event{
+		Type:    "add-account",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s", account.Username),
+		Tags:    []string{"cluster", "security"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -430,6 +439,15 @@ func (m *Manager) DeleteAccount(account *shipyard.Account) error {
 	}
 	if res.IsNil() {
 		return ErrAccountDoesNotExist
+	}
+	evt := &shipyard.Event{
+		Type:    "delete-account",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s", account.Username),
+		Tags:    []string{"cluster", "security"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
 	}
 	return nil
 }
@@ -485,6 +503,15 @@ func (m *Manager) DeleteRole(role *shipyard.Role) error {
 	}
 	if res.IsNil() {
 		return ErrRoleDoesNotExist
+	}
+	evt := &shipyard.Event{
+		Type:    "delete-role",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s", role.Name),
+		Tags:    []string{"cluster", "security"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
 	}
 	return nil
 }
