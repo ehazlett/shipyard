@@ -412,7 +412,7 @@ func (m *Manager) SaveAccount(account *shipyard.Account) error {
 	}
 	account.Password = hash
 	if acct != nil {
-		if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": account.Username}).Update(map[string]string{"password": hash, "token": ""}).RunWrite(m.session); err != nil {
+		if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": account.Username}).Update(map[string]string{"password": hash}).RunWrite(m.session); err != nil {
 			return err
 		}
 		return nil
@@ -492,21 +492,51 @@ func (m *Manager) DeleteRole(role *shipyard.Role) error {
 func (m *Manager) Authenticate(username, password string) bool {
 	acct, err := m.Account(username)
 	if err != nil {
+		logger.Error(err)
 		return false
 	}
 	return m.authenticator.Authenticate(password, acct.Password)
 }
 
-func (m *Manager) NewAuthToken(username string) (*shipyard.AuthToken, error) {
-	token, err := m.authenticator.GenerateToken()
+func (m *Manager) NewAuthToken(username string, userAgent string) (*shipyard.AuthToken, error) {
+	tk, err := m.authenticator.GenerateToken()
 	if err != nil {
 		return nil, err
 	}
-	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"token": token}).Run(m.session); err != nil {
+	if err != nil {
 		return nil, err
 	}
-	tk := &shipyard.AuthToken{Token: token}
-	return tk, nil
+	acct, err := m.Account(username)
+	if err != nil {
+		return nil, err
+	}
+	token := &shipyard.AuthToken{}
+	tokens := acct.Tokens
+	found := false
+	for _, t := range tokens {
+		if t.UserAgent == userAgent {
+			found = true
+			t.Token = tk
+			token = t
+			break
+		}
+	}
+	if !found {
+		token = &shipyard.AuthToken{
+			UserAgent: userAgent,
+			Token:     tk,
+		}
+		tokens = append(tokens, token)
+	}
+	// delete token
+	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Filter(r.Row.Field("user_agent").Eq(userAgent)).Delete().Run(m.session); err != nil {
+		return nil, err
+	}
+	// add
+	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]interface{}{"tokens": tokens}).RunWrite(m.session); err != nil {
+		return nil, err
+	}
+	return token, nil
 }
 
 func (m *Manager) VerifyAuthToken(username, token string) error {
@@ -514,7 +544,14 @@ func (m *Manager) VerifyAuthToken(username, token string) error {
 	if err != nil {
 		return err
 	}
-	if token != acct.Token {
+	found := false
+	for _, t := range acct.Tokens {
+		if token == t.Token {
+			found = true
+			break
+		}
+	}
+	if !found {
 		return ErrInvalidAuthToken
 	}
 	return nil

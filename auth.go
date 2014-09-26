@@ -13,25 +13,26 @@ var (
 
 type (
 	Account struct {
-		ID       string `json:"id,omitempty" gorethink:"id,omitempty"`
-		Username string `json:"username,omitempty" gorethink:"username"`
-		Password string `json:"password,omitempty" gorethink:"password"`
-		Token    string `json:"-" gorethink:"token"`
-		Role     *Role  `json:"role,omitempty" gorethink:"role,omitempty"`
+		ID       string       `json:"id,omitempty" gorethink:"id,omitempty"`
+		Username string       `json:"username,omitempty" gorethink:"username"`
+		Password string       `json:"password,omitempty" gorethink:"password"`
+		Tokens   []*AuthToken `json:"-" gorethink:"tokens"`
+		Role     *Role        `json:"role,omitempty" gorethink:"role"`
 	}
 	Role struct {
-		ID   string `json:"id,omitempty" gorethink:"id,omitempty"`
-		Name string `json:"name,omitempty" gorethink:"name,omitempty"`
+		ID   string `json:"id,omitempty" gorethink:"id"`
+		Name string `json:"name,omitempty" gorethink:"name"`
 	}
 	AuthToken struct {
-		Token string `json:"auth_token,omitempty"`
+		Token     string `json:"auth_token,omitempty" gorethink:"auth_token"`
+		UserAgent string `json:"user_agent,omitempty" gorethink:"user_agent"`
 	}
 	Authenticator struct {
 		salt []byte
 	}
 	ServiceKey struct {
-		Key         string `json:"key,omitempty" gorethink:"key,omitempty"`
-		Description string `json:"description,omitempty" gorethink:"description,omitempty"`
+		Key         string `json:"key,omitempty" gorethink:"key"`
+		Description string `json:"description,omitempty" gorethink:"description"`
 	}
 )
 

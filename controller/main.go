@@ -504,7 +504,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// return token
-	token, err := controllerManager.NewAuthToken(creds.Username)
+	token, err := controllerManager.NewAuthToken(creds.Username, r.UserAgent())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
