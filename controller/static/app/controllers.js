@@ -295,16 +295,24 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 Containers.query(function(d){
                     var cpuData = [];
                     var memoryData = [];
+                    $scope.chartOptions = {
+                        animation: false,
+                        responsive: true,
+                        showTooltips: true
+                    };
                     for (var i=0; i<d.length; i++) {
                         var c = d[i];
+                        var color = getRandomColor();
                         if (c.engine.id == data.engine.id){
                             var x = {
-                                key: c.image.hostname,
-                                y: c.image.cpus
+                                label: c.image.hostname,
+                                value: c.image.cpus,
+                                color: color
                             }
                             var y = {
-                                key: c.image.hostname,
-                                y: c.image.memory
+                                label: c.image.hostname,
+                                value: c.image.memory,
+                                color: color
                             }
                             cpuData.push(x);
                             memoryData.push(y);

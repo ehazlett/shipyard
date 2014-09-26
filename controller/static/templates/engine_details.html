@@ -48,36 +48,16 @@
     <div class="ui column">
         <div id="chart-cpu" class="one wide column">
             <h3 class="ui header center aligned">CPU Usage</h3>
-            <nvd3-pie-chart
-                id="engineCpuChart"
-                data="engineCpuData"
-                width="350"
-                height="350"
-                showLabels="true"
-                showLegend="true"
-                x="showX()"
-                y="showY()"
-                labelType="percent"
-                >
-                <svg></svg>
-            </nvd3-pie-chart>
+            <div>
+                <canvas donutchart data="engineCpuData" options="chartOptions" width="250" height="250"></canvas>
+            </div>
         </div>
     </div>
     <div class="ui column">
             <h3 class="ui header center aligned">Memory Usage</h3>
-            <nvd3-pie-chart
-                id="engineMemoryChart"
-                data="engineMemoryData"
-                width="350"
-                height="350"
-                showLabels="true"
-                showLegend="true"
-                x="showX()"
-                y="showY()"
-                labelType="percent"
-                >
-                <svg></svg>
-            </nvd3-pie-chart>
+            <div>
+                <canvas donutchart data="engineCpuData" options="chartOptions" width="250" height="250"></canvas>
+            </div>
         </div>
     </div>
 </div>
