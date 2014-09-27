@@ -845,8 +845,7 @@ func (m *Manager) WebhookKeys() ([]*dockerhub.WebhookKey, error) {
 }
 
 func (m *Manager) NewWebhookKey(image string) (*dockerhub.WebhookKey, error) {
-	// TODO: generate random sha
-	k := generateId()
+	k := generateId(16)
 	key := &dockerhub.WebhookKey{
 		Key:   k,
 		Image: image,
