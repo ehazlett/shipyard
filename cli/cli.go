@@ -53,6 +53,9 @@ func main() {
 		extensionsCommand,
 		addExtensionCommand,
 		removeExtensionCommand,
+		webhookKeysListCommand,
+		webhookKeyCreateCommand,
+		webhookKeyRemoveCommand,
 		infoCommand,
 		eventsCommand,
 	}

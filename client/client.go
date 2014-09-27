@@ -10,6 +10,7 @@ import (
 
 	"github.com/citadel/citadel"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/dockerhub"
 )
 
 type (
@@ -358,6 +359,44 @@ func (m *Manager) AddExtension(ext *shipyard.Extension) error {
 
 func (m *Manager) RemoveExtension(id string) error {
 	if _, err := m.doRequest(fmt.Sprintf("/api/extensions/%s", id), "DELETE", 204, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) WebhookKeys() ([]*dockerhub.WebhookKey, error) {
+	keys := []*dockerhub.WebhookKey{}
+	resp, err := m.doRequest("/api/webhookkeys", "GET", 200, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&keys); err != nil {
+		return nil, err
+	}
+	return keys, nil
+}
+
+func (m *Manager) NewWebhookKey(image string) (*dockerhub.WebhookKey, error) {
+	k := &dockerhub.WebhookKey{
+		Image: image,
+	}
+	b, err := json.Marshal(k)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.doRequest("/api/webhookkeys", "POST", 200, b)
+	if err != nil {
+		return nil, err
+	}
+	var key *dockerhub.WebhookKey
+	if err := json.NewDecoder(resp.Body).Decode(&key); err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+func (m *Manager) RemoveWebhookKey(key string) error {
+	if _, err := m.doRequest(fmt.Sprintf("/api/webhookkeys/%s", key), "DELETE", 204, nil); err != nil {
 		return err
 	}
 	return nil
