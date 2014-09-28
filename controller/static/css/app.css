@@ -20,12 +20,6 @@ body {
     text-decoration: none;
     color: #818181;
 }
-div.ui.logo {
-    text-align: center;
-}
-div.buttons {
-    text-align: center;
-}
 .ui.blue.button {
     background-color: #9AAFCB;
 }
