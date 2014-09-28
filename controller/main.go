@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/citadel/citadel"
 	"github.com/codegangsta/negroni"
@@ -489,6 +490,67 @@ func deleteExtension(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func webhookKeys(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	keys, err := controllerManager.WebhookKeys()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(keys); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func webhookKey(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+	key, err := controllerManager.WebhookKey(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(key); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func addWebhookKey(w http.ResponseWriter, r *http.Request) {
+	var k *dockerhub.WebhookKey
+	if err := json.NewDecoder(r.Body).Decode(&k); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	key, err := controllerManager.NewWebhookKey(k.Image)
+	if err != nil {
+		logger.Errorf("error generating webhook key: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("saved webhook key image=%s", key.Image)
+	if err := json.NewEncoder(w).Encode(key); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func deleteWebhookKey(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	if err := controllerManager.DeleteWebhookKey(id); err != nil {
+		logger.Errorf("error deleting webhook key: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("removed webhook key id=%s", id)
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func login(w http.ResponseWriter, r *http.Request) {
 	var creds *Credentials
 	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
@@ -531,10 +593,23 @@ func changePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func hubWebhook(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	key, err := controllerManager.WebhookKey(id)
+	if err != nil {
+		logger.Errorf("invalid webook key: id=%s from %s", id, r.RemoteAddr)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
 	var webhook *dockerhub.Webhook
 	if err := json.NewDecoder(r.Body).Decode(&webhook); err != nil {
 		logger.Errorf("error parsing webhook: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if strings.Index(webhook.Repository.RepoName, key.Image) == -1 {
+		logger.Errorf("webhook key image does not match: repo=%s image=%s", webhook.Repository.RepoName, key.Image)
+		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
 	logger.Infof("received webhook notification for %s", webhook.Repository.RepoName)
@@ -596,6 +671,10 @@ func main() {
 	apiRouter.HandleFunc("/api/servicekeys", serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", removeServiceKey).Methods("DELETE")
+	apiRouter.HandleFunc("/api/webhookkeys", webhookKeys).Methods("GET")
+	apiRouter.HandleFunc("/api/webhookkeys/{id}", webhookKey).Methods("GET")
+	apiRouter.HandleFunc("/api/webhookkeys", addWebhookKey).Methods("POST")
+	apiRouter.HandleFunc("/api/webhookkeys/{id}", deleteWebhookKey).Methods("DELETE")
 
 	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
@@ -625,7 +704,7 @@ func main() {
 
 	// hub handler; public
 	hubRouter := mux.NewRouter()
-	hubRouter.HandleFunc("/hub/webhook/", hubWebhook).Methods("POST")
+	hubRouter.HandleFunc("/hub/webhook/{id}", hubWebhook).Methods("POST")
 	globalMux.Handle("/hub/", hubRouter)
 
 	// check for admin user

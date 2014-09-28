@@ -13,6 +13,7 @@ import (
 	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/sirupsen/logrus"
 )
 
@@ -23,6 +24,7 @@ const (
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
 	tblNameExtensions  = "extensions"
+	tblNameWebhookKeys = "webhook_keys"
 	storeKey           = "shipyard"
 )
 
@@ -33,6 +35,7 @@ var (
 	ErrServiceKeyDoesNotExist = errors.New("service key does not exist")
 	ErrInvalidAuthToken       = errors.New("invalid auth token")
 	ErrExtensionDoesNotExist  = errors.New("extension does not exist")
+	ErrWebhookKeyDoesNotExist = errors.New("webhook key does not exist")
 	logger                    = logrus.New()
 	store                     = sessions.NewCookieStore([]byte(storeKey))
 )
@@ -88,7 +91,7 @@ func (m *Manager) Store() *sessions.CookieStore {
 
 func (m *Manager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameExtensions}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameExtensions, tblNameWebhookKeys}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -825,6 +828,86 @@ func (m *Manager) RedeployContainers(image string) error {
 		if err := m.SaveEvent(evt); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (m *Manager) WebhookKeys() ([]*dockerhub.WebhookKey, error) {
+	res, err := r.Table(tblNameWebhookKeys).OrderBy(r.Asc("image")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	var keys []*dockerhub.WebhookKey
+	if err := res.All(&keys); err != nil {
+		return nil, err
+	}
+	return keys, nil
+}
+
+func (m *Manager) NewWebhookKey(image string) (*dockerhub.WebhookKey, error) {
+	k := generateId(16)
+	key := &dockerhub.WebhookKey{
+		Key:   k,
+		Image: image,
+	}
+	if err := m.SaveWebhookKey(key); err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+func (m *Manager) WebhookKey(key string) (*dockerhub.WebhookKey, error) {
+	res, err := r.Table(tblNameWebhookKeys).Filter(map[string]string{"key": key}).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrWebhookKeyDoesNotExist
+	}
+	var k *dockerhub.WebhookKey
+	if err := res.One(&k); err != nil {
+		return nil, err
+	}
+	return k, nil
+}
+
+func (m *Manager) SaveWebhookKey(key *dockerhub.WebhookKey) error {
+	if _, err := r.Table(tblNameWebhookKeys).Insert(key).RunWrite(m.session); err != nil {
+		return err
+	}
+	evt := &shipyard.Event{
+		Type:    "add-webhook-key",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("image=%s", key.Image),
+		Tags:    []string{"docker", "hub"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) DeleteWebhookKey(id string) error {
+	key, err := m.WebhookKey(id)
+	if err != nil {
+		return err
+	}
+	res, err := r.Table(tblNameWebhookKeys).Get(key.ID).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrWebhookKeyDoesNotExist
+	}
+	evt := &shipyard.Event{
+		Type:    "delete-webhook-key",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("image=%s key=%s", key.Image, key.Key),
+		Tags:    []string{"docker", "hub"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
 	}
 	return nil
 }

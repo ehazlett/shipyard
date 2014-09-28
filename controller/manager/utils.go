@@ -1,9 +1,12 @@
 package manager
 
 import (
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/hex"
 	"net/url"
+	"time"
 
 	"github.com/citadel/citadel"
 )
@@ -37,4 +40,12 @@ func setEngineClient(docker *citadel.Engine, tlsConfig *tls.Config) error {
 	}
 
 	return docker.Connect(tc)
+}
+
+func generateId(n int) string {
+	hash := sha256.New()
+	hash.Write([]byte(time.Now().String()))
+	md := hash.Sum(nil)
+	mdStr := hex.EncodeToString(md)
+	return mdStr[:n]
 }

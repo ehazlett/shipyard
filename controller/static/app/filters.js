@@ -73,10 +73,10 @@ angular.module('shipyard.filters', [])
                     cls = "refresh blue";
                     break;
                 case 'add-engine':
-                    cls = "cloud upload green";
+                    cls = "cloud green";
                     break;
                 case 'remove-engine':
-                    cls = "remove";
+                    cls = "cloud";
                     break;
                 case 'add-service-key':
                     cls = "lock green";
@@ -95,6 +95,15 @@ angular.module('shipyard.filters', [])
                     break;
                 case 'delete-role':
                     cls = "user";
+                    break;
+                case 'add-webhook-key':
+                    cls = "exchange blue";
+                    break;
+                case 'delete-webhook-key':
+                    cls = "exchange";
+                    break;
+                case 'deploy':
+                    cls = "cloud upload green";
                     break;
                 default:
                     cls = "text file"
