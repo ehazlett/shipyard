@@ -35,7 +35,7 @@ func containersAction(c *cli.Context) {
 	for _, c := range containers {
 		portDefs := []string{}
 		for _, port := range c.Ports {
-			p := fmt.Sprintf("%s/%d:%d", port.Proto, port.Port, port.ContainerPort)
+			p := fmt.Sprintf("%s/:%s:%d:%d", port.Proto, port.HostIp, port.Port, port.ContainerPort)
 			portDefs = append(portDefs, p)
 		}
 		ports := strings.Join(portDefs, ", ")

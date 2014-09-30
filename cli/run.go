@@ -73,7 +73,7 @@ var runCommand = cli.Command{
 		},
 		cli.StringSliceFlag{
 			Name:  "port",
-			Usage: "expose container ports. usage: --port <proto>/<host-port>:<container-port> i.e. --port tcp/:8080 --port tcp/80:8080",
+			Usage: "expose container ports. usage: --port <proto>/<host-ip>:<host-port>:<container-port> i.e. --port tcp/::8080 --port tcp/:80:8080, tcp/10.1.2.3:80:8080",
 			Value: &cli.StringSlice{},
 		},
 		cli.BoolFlag{
