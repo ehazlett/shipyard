@@ -68,12 +68,13 @@ func parsePorts(pairs []string) []*citadel.Port {
 		portDef := parts[1]
 		// parse ports
 		portParts := strings.Split(portDef, ":")
-		if len(portParts) != 2 {
-			logger.Error("port definitions must be in <proto>/<host-port>:<container-port> pairs")
+		if len(portParts) != 3 {
+			logger.Error("port definitions must be in <proto>/<host-ip>:<host-port>:<container-port> pairs")
 			return nil
 		}
-		hostPortDef := portParts[0]
-		containerPortDef := portParts[1]
+		hostIp := portParts[0]
+		hostPortDef := portParts[1]
+		containerPortDef := portParts[2]
 		hostPort := 0
 		containerPort := 0
 		if hostPortDef != "" {
@@ -93,6 +94,7 @@ func parsePorts(pairs []string) []*citadel.Port {
 			containerPort = i
 		}
 		port := &citadel.Port{
+			HostIp:        hostIp,
 			Proto:         proto,
 			Port:          hostPort,
 			ContainerPort: containerPort,
