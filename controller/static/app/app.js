@@ -92,3 +92,7 @@ angular.module('shipyard', [
             flashProvider.successClassnames.push('green');
         }]);
 
+
+Chart.defaults.global.responsive = true;
+Chart.defaults.global.animation = false;
+Chart.defaults.global.showTooltips = true;
