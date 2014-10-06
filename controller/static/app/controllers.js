@@ -50,11 +50,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 };
             };
             ClusterInfo.query(function(data){
-                $scope.chartOptions = {
-                    animation: false,
-                    responsive: true,
-                    showTooltips: true
-                };
+                $scope.chartOptions = {};
                 $scope.clusterInfo = data;
                 $scope.clusterCpuData = [
                     { label: "Free", value: data.cpus, color: "#184465" },
@@ -171,7 +167,15 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 };
             };
             $scope.showRemoveContainerDialog = function() {
-                $('.basic.modal')
+                $('.basic.modal.removeContainer')
+                    .modal('show');
+            };
+            $scope.showStopContainerDialog = function() {
+                $('.basic.modal.stopContainer')
+                    .modal('show');
+            };
+            $scope.showRestartContainerDialog = function() {
+                $('.basic.modal.restartContainer')
                     .modal('show');
             };
             $scope.destroyContainer = function() {
@@ -182,6 +186,26 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     $location.path("/containers");
                 }, function(err) {
                     flash.error = 'error destroying container: ' + err.data;
+                });
+            };
+            $scope.stopContainer = function() {
+                Container.control({id: $routeParams.id, action: 'stop'}).$promise.then(function() {
+                    // we must remove the modal or it will come back
+                    // the next time the modal is shown
+                    $('.basic.modal').remove();
+                    $location.path("/containers/");
+                }, function(err) {
+                    flash.error = 'error stopping container: ' + err.data;
+                });
+            };
+            $scope.restartContainer = function() {
+                Container.control({id: $routeParams.id, action: 'restart'}).$promise.then(function() {
+                    // we must remove the modal or it will come back
+                    // the next time the modal is shown
+                    $('.basic.modal').remove();
+                    $location.path("/containers/");
+                }, function(err) {
+                    flash.error = 'error restarting container: ' + err.data;
                 });
             };
             var portLinks = [];
@@ -208,11 +232,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.predicate = 'container_port';
                 $scope.cpuMax = data.engine.cpus;
                 $scope.memoryMax = data.engine.memory;
-                $scope.chartOptions = {
-                    animation: false,
-                    responsive: true,
-                    showTooltips: true
-                };
+                $scope.chartOptions = {};
                 $scope.containerCpuData = {
                     labels: ["Reserved"],
                     datasets: [
@@ -306,23 +326,19 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 Containers.query(function(d){
                     var cpuData = [];
                     var memoryData = [];
-                    $scope.chartOptions = {
-                        animation: false,
-                        responsive: true,
-                        showTooltips: true
-                    };
+                    $scope.chartOptions = {};
                     for (var i=0; i<d.length; i++) {
                         var c = d[i];
                         var color = getRandomColor();
                         if (c.engine.id == data.engine.id){
                             var x = {
                                 label: c.image.hostname,
-                                value: c.image.cpus,
+                                value: c.image.cpus || 0.0,
                                 color: color
                             }
                             var y = {
                                 label: c.image.hostname,
-                                value: c.image.memory,
+                                value: c.image.memory || 0.0,
                                 color: color
                             }
                             cpuData.push(x);

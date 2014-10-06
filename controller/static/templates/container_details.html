@@ -1,4 +1,4 @@
-<div class="ui basic small modal">
+<div class="ui basic small modal removeContainer">
     <div class="header">
         Destroy Container
     </div>
@@ -11,6 +11,44 @@
     </div>
 </div>
 
+<div class="ui basic small modal stopContainer">
+    <div class="header">
+        Stop Container
+    </div>
+    <div class="content">
+        Stop {{container.image.name}} ({{container.id|truncate}})?
+    </div>
+    <div class="actions">
+        <div class="ui button small">Cancel</div>
+        <a ng-click="stopContainer()" class="ui button small blue">Ok</a>
+    </div>
+</div>
+
+<div class="ui basic small modal restartContainer">
+    <div class="header">
+        Restart Container
+    </div>
+    <div class="content">
+        Restart {{container.image.name}} ({{container.id|truncate}})?
+    </div>
+    <div class="actions">
+        <div class="ui button small">Cancel</div>
+        <a ng-click="restartContainer()" class="ui button small blue">Ok</a>
+    </div>
+</div>
+
+<div class="ui icon buttons toolbar">
+    <a ng-click="showRestartContainerDialog()" class="ui button mini green">
+        <i class="refresh icon"></i>
+        Restart
+    </a>
+</div>
+<div class="ui icon buttons toolbar">
+    <a ng-click="showStopContainerDialog()" class="ui button mini red">
+        <i class="stop icon"></i>
+        Stop
+    </a>
+</div>
 <div class="ui icon buttons toolbar">
     <a ng-click="showRemoveContainerDialog()" class="ui button mini red">
         <i class="remove sign icon"></i>
