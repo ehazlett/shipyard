@@ -167,7 +167,15 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 };
             };
             $scope.showRemoveContainerDialog = function() {
-                $('.basic.modal')
+                $('.basic.modal.removeContainer')
+                    .modal('show');
+            };
+            $scope.showStopContainerDialog = function() {
+                $('.basic.modal.stopContainer')
+                    .modal('show');
+            };
+            $scope.showRestartContainerDialog = function() {
+                $('.basic.modal.restartContainer')
                     .modal('show');
             };
             $scope.destroyContainer = function() {
@@ -178,6 +186,26 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     $location.path("/containers");
                 }, function(err) {
                     flash.error = 'error destroying container: ' + err.data;
+                });
+            };
+            $scope.stopContainer = function() {
+                Container.control({id: $routeParams.id, action: 'stop'}).$promise.then(function() {
+                    // we must remove the modal or it will come back
+                    // the next time the modal is shown
+                    $('.basic.modal').remove();
+                    $location.path("/containers/");
+                }, function(err) {
+                    flash.error = 'error stopping container: ' + err.data;
+                });
+            };
+            $scope.restartContainer = function() {
+                Container.control({id: $routeParams.id, action: 'restart'}).$promise.then(function() {
+                    // we must remove the modal or it will come back
+                    // the next time the modal is shown
+                    $('.basic.modal').remove();
+                    $location.path("/containers/");
+                }, function(err) {
+                    flash.error = 'error restarting container: ' + err.data;
                 });
             };
             var portLinks = [];
