@@ -32,6 +32,7 @@ var (
 
 const (
 	STORE_KEY = "shipyard"
+	VERSION   = "2.0.1"
 )
 
 type (
@@ -663,6 +664,9 @@ func main() {
 		mErr      error
 		globalMux = http.NewServeMux()
 	)
+
+	logger.Infof("shipyard version %s", VERSION)
+
 	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey)
 	if mErr != nil {
 		logger.Fatal(mErr)
@@ -762,7 +766,7 @@ func main() {
 		logger.Infof("created admin user: username: admin password: shipyard")
 	}
 
-	logger.Infof("shipyard controller listening on %s", listenAddr)
+	logger.Infof("controller listening on %s", listenAddr)
 
 	if err := http.ListenAndServe(listenAddr, context.ClearHandler(globalMux)); err != nil {
 		logger.Fatal(err)
