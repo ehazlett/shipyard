@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/citadel/citadel"
@@ -170,7 +171,8 @@ func (m *Manager) extensionHealthCheck() {
 				return
 			}
 			for _, ext := range exts {
-				go m.checkExtensionHealth(ext)
+				var once sync.Once
+				once.Do(func() { m.checkExtensionHealth(ext) })
 			}
 		}
 	}
@@ -201,7 +203,6 @@ func (m *Manager) checkExtensionHealth(ext *shipyard.Extension) error {
 		// extension is missing a container; deploy
 		if err := m.RegisterExtension(ext); err != nil {
 			logger.Warnf("error recovering extension: %s", err)
-			return err
 		}
 	}
 	return nil
