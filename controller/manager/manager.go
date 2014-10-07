@@ -990,6 +990,11 @@ func (m *Manager) Scale(container *citadel.Container, count int) error {
 			img.Type = "host"
 			img.Labels = lbls
 		}
+		// bindports must be updated to remove the hostport as they
+		// will fail to start
+		for _, p := range img.BindPorts {
+			p.Port = 0
+		}
 		m.Run(img, numAdd, false)
 	} else { // none
 		logger.Info("no need to scale")

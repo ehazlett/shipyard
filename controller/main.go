@@ -152,6 +152,36 @@ func restartContainer(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func scaleContainer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	r.ParseForm()
+	sCount := r.FormValue("count")
+	if sCount == "" {
+		http.Error(w, "you must specify a count", http.StatusBadRequest)
+		return
+	}
+	count, err := strconv.Atoi(sCount)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	container, err := controllerManager.Container(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := controllerManager.Scale(container, count); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("scaled container %s (%s) to %d", container.ID, container.Image.Name, count)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func engines(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -653,6 +683,7 @@ func main() {
 	apiRouter.HandleFunc("/api/containers/{id}", destroy).Methods("DELETE")
 	apiRouter.HandleFunc("/api/containers/{id}/stop", stopContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/restart", restartContainer).Methods("GET")
+	apiRouter.HandleFunc("/api/containers/{id}/scale", scaleContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")
