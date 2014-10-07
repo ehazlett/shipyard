@@ -92,22 +92,16 @@ func run(w http.ResponseWriter, r *http.Request) {
 	}
 	var image *citadel.Image
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
-		logger.Warnf("error running container: %s", err)
+		logger.Warnf("error decoding image: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	launched := []*citadel.Container{}
-
-	for i := 0; i < count; i++ {
-		container, err := controllerManager.ClusterManager().Start(image, pull)
-		if err != nil {
-			logger.Errorf("error running %s: %s", image.Name, err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		logger.Infof("started %s pull=%v", image.Name, pull)
-		launched = append(launched, container)
+	launched, err := controllerManager.Run(image, count, pull)
+	if err != nil {
+		logger.Warnf("error running container: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("content-type", "application/json")

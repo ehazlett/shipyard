@@ -912,3 +912,28 @@ func (m *Manager) DeleteWebhookKey(id string) error {
 	}
 	return nil
 }
+
+func (m *Manager) Run(image *citadel.Image, count int, pull bool) ([]*citadel.Container, error) {
+	launched := []*citadel.Container{}
+
+	var wg sync.WaitGroup
+	wg.Add(count)
+	var runErr error
+	for i := 0; i < count; i++ {
+		go func(wg *sync.WaitGroup) {
+			container, err := m.ClusterManager().Start(image, pull)
+			if err != nil {
+				runErr = err
+			}
+			launched = append(launched, container)
+			wg.Done()
+		}(&wg)
+	}
+	wg.Wait()
+	return launched, runErr
+}
+
+func (m *Manager) Scale(image *citadel.Image, count int) error {
+
+	return nil
+}
