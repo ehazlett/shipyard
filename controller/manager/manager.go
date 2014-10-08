@@ -995,6 +995,8 @@ func (m *Manager) Scale(container *citadel.Container, count int) error {
 		for _, p := range img.BindPorts {
 			p.Port = 0
 		}
+		// reset hostname
+		img.Hostname = ""
 		m.Run(img, numAdd, false)
 	} else { // none
 		logger.Info("no need to scale")
