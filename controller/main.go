@@ -26,6 +26,7 @@ var (
 	rethinkdbAddr     string
 	rethinkdbDatabase string
 	rethinkdbAuthKey  string
+	disableUsageInfo  bool
 	controllerManager *manager.Manager
 	logger            = logrus.New()
 )
@@ -47,6 +48,7 @@ func init() {
 	flag.StringVar(&rethinkdbAddr, "rethinkdb-addr", "127.0.0.1:28015", "rethinkdb address")
 	flag.StringVar(&rethinkdbDatabase, "rethinkdb-database", "shipyard", "rethinkdb database")
 	flag.StringVar(&rethinkdbAuthKey, "rethinkdb-auth-key", "", "rethinkdb auth key")
+	flag.BoolVar(&disableUsageInfo, "disable-usage-info", false, "disable anonymous usage info")
 }
 
 func destroy(w http.ResponseWriter, r *http.Request) {
@@ -667,7 +669,7 @@ func main() {
 
 	logger.Infof("shipyard version %s", VERSION)
 
-	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey)
+	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, VERSION, disableUsageInfo)
 	if mErr != nil {
 		logger.Fatal(mErr)
 	}
