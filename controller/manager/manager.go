@@ -1,9 +1,13 @@
 package manager
 
 import (
+	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
+	"net/http"
 	"strings"
 	"sync"
 	"time"
@@ -27,6 +31,7 @@ const (
 	tblNameExtensions  = "extensions"
 	tblNameWebhookKeys = "webhook_keys"
 	storeKey           = "shipyard"
+	TRACKER_HOST       = "http://tracker.shipyard-project.com"
 )
 
 var (
@@ -43,19 +48,21 @@ var (
 
 type (
 	Manager struct {
-		address        string
-		database       string
-		authKey        string
-		session        *r.Session
-		clusterManager *cluster.Cluster
-		engines        []*shipyard.Engine
-		authenticator  *shipyard.Authenticator
-		store          *sessions.CookieStore
-		StoreKey       string
+		address          string
+		database         string
+		authKey          string
+		session          *r.Session
+		clusterManager   *cluster.Cluster
+		engines          []*shipyard.Engine
+		authenticator    *shipyard.Authenticator
+		store            *sessions.CookieStore
+		StoreKey         string
+		version          string
+		disableUsageInfo bool
 	}
 )
 
-func NewManager(addr string, database string, authKey string) (*Manager, error) {
+func NewManager(addr string, database string, authKey string, version string, disableUsageInfo bool) (*Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:     addr,
 		Database:    database,
@@ -69,13 +76,15 @@ func NewManager(addr string, database string, authKey string) (*Manager, error) 
 	logger.Info("checking database")
 	r.DbCreate(database).Run(session)
 	m := &Manager{
-		address:       addr,
-		database:      database,
-		authKey:       authKey,
-		session:       session,
-		authenticator: &shipyard.Authenticator{},
-		store:         store,
-		StoreKey:      storeKey,
+		address:          addr,
+		database:         database,
+		authKey:          authKey,
+		session:          session,
+		authenticator:    &shipyard.Authenticator{},
+		store:            store,
+		StoreKey:         storeKey,
+		version:          version,
+		disableUsageInfo: disableUsageInfo,
 	}
 	m.initdb()
 	m.init()
@@ -157,7 +166,59 @@ func (m *Manager) init() []*shipyard.Engine {
 	m.clusterManager = clusterManager
 	// start extension health check
 	go m.extensionHealthCheck()
+	// anonymous usage info
+	go m.usageReport()
 	return engines
+}
+
+func (m *Manager) usageReport() {
+	if m.disableUsageInfo {
+		return
+	}
+	m.uploadUsage()
+	t := time.NewTicker(1 * time.Hour).C
+	for {
+		select {
+		case <-t:
+			go m.uploadUsage()
+		}
+	}
+}
+
+func (m *Manager) uploadUsage() {
+	id := "anon"
+	ifaces, err := net.Interfaces()
+	if err == nil {
+		for _, iface := range ifaces {
+			if iface.Name != "lo" {
+				hw := iface.HardwareAddr.String()
+				id = strings.Replace(hw, ":", "", -1)
+				break
+			}
+		}
+	}
+	info, err := m.clusterManager.ClusterInfo()
+	if err != nil {
+		logger.Warnf("error getting cluster info for usage: %s", err)
+		return
+	}
+	usage := &shipyard.Usage{
+		ID:              id,
+		Version:         m.version,
+		NumOfEngines:    info.EngineCount,
+		NumOfImages:     info.ImageCount,
+		NumOfContainers: info.ContainerCount,
+		TotalCpus:       info.Cpus,
+		TotalMemory:     info.Memory,
+	}
+	b, err := json.Marshal(usage)
+	if err != nil {
+		logger.Warnf("error serializing usage info: %s", err)
+	}
+	buf := bytes.NewBuffer(b)
+	if _, err := http.Post(fmt.Sprintf("%s/update", TRACKER_HOST), "application/json", buf); err != nil {
+		logger.Warnf("error sending usage info: %s", err)
+	}
 }
 
 func (m *Manager) extensionHealthCheck() {
