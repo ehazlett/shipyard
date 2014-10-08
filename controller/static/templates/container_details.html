@@ -37,6 +37,31 @@
     </div>
 </div>
 
+<div class="ui basic small modal scaleContainer">
+    <div class="header">
+        Scale Container
+    </div>
+    <div class="content">
+        <div class="ui active blue progress hide">
+              <div class="bar" style="width: 100%;"></div>
+        </div>
+        <div class="ui small form segment" ng-form="scaleForm" novalidate>
+            <div class="field">
+                <div class="ui left labeled icon input">
+                    <input type="text" name="count" ng-model="count" value="{{containerCount}}" placeholder="total number of instances">
+                    <i class="exchange icon"></i>
+                    <div class="ui corner label">
+                        <i class="icon asterisk"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui small blue button" ng-click="scale()">Scale</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="ui icon buttons toolbar">
     <a ng-click="showRestartContainerDialog()" class="ui button mini green">
         <i class="refresh icon"></i>
@@ -44,7 +69,7 @@
     </a>
 </div>
 <div class="ui icon buttons toolbar">
-    <a ng-click="showStopContainerDialog()" class="ui button mini red">
+    <a ng-click="showStopContainerDialog()" class="ui button mini black">
         <i class="stop icon"></i>
         Stop
     </a>
@@ -53,6 +78,12 @@
     <a ng-click="showRemoveContainerDialog()" class="ui button mini red">
         <i class="remove sign icon"></i>
         Destroy
+    </a>
+</div>
+<div class="ui icon buttons toolbar">
+    <a ng-click="showScaleContainerDialog()" class="ui button mini blue">
+        <i class="exchange icon"></i>
+        Scale
     </a>
 </div>
 
@@ -111,3 +142,22 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    $(function(){
+        $('.ui.form')
+            .form({
+                count: {
+                    identifier : 'count',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'enter a number of instances'
+                        }
+                    ]
+                }
+            }, {
+                inline: 'true'
+            });
+    });
+    $('.ui.dropdown').dropdown();
+</script>

@@ -178,6 +178,10 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $('.basic.modal.restartContainer')
                     .modal('show');
             };
+            $scope.showScaleContainerDialog = function() {
+                $('.basic.modal.scaleContainer')
+                    .modal('show');
+            };
             $scope.destroyContainer = function() {
                 Container.destroy({id: $routeParams.id}).$promise.then(function() {
                     // we must remove the modal or it will come back
@@ -206,6 +210,33 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     $location.path("/containers/");
                 }, function(err) {
                     flash.error = 'error restarting container: ' + err.data;
+                });
+            };
+            $scope.showProgress = function() {
+                $('.ui.form').addClass('hide');
+                $('.progress').removeClass('hide');
+            };
+            $scope.hideProgress = function() {
+                $('.ui.form').removeClass('hide');
+                $('.progress').addClass('hide');
+            };
+            $scope.scale = function() {
+                var valid = $(".ui.form").form('validate form');
+                if (!valid) {
+                    return false;
+                }
+                $scope.showProgress();
+                Container.control({id: $routeParams.id, action: 'scale', count: $scope.count}).$promise.then(function() {
+                    // we must remove the modal or it will come back
+                    // the next time the modal is shown
+                    $('.basic.modal').modal('hide');
+                    $('.basic.modal').remove();
+                    $location.path("/containers");
+                }, function(err) {
+                    flash.error = 'error scaling container: ' + err.data;
+                    $scope.hideProgress();
+                    $('.basic.modal').modal('hide');
+                    $('.basic.modal').remove();
                 });
             };
             var portLinks = [];

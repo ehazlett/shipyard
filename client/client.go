@@ -75,6 +75,18 @@ func (m *Manager) Containers() ([]*citadel.Container, error) {
 	return containers, nil
 }
 
+func (m *Manager) Container(id string) (*citadel.Container, error) {
+	container := &citadel.Container{}
+	resp, err := m.doRequest(fmt.Sprintf("/api/containers/%s", id), "GET", 200, nil)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&container); err != nil {
+		return nil, err
+	}
+	return container, nil
+}
+
 func (m *Manager) Run(image *citadel.Image, count int, pull bool) ([]*citadel.Container, error) {
 	b, err := json.Marshal(image)
 	if err != nil {
@@ -119,6 +131,17 @@ func (m *Manager) Restart(container *citadel.Container) error {
 		return err
 	}
 	if _, err := m.doRequest(fmt.Sprintf("/api/containers/%s/restart", container.ID), "GET", 204, b); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) Scale(container *citadel.Container, count int) error {
+	b, err := json.Marshal(container)
+	if err != nil {
+		return err
+	}
+	if _, err := m.doRequest(fmt.Sprintf("/api/containers/%s/scale?count=%d", container.ID, count), "GET", 204, b); err != nil {
 		return err
 	}
 	return nil

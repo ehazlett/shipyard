@@ -32,6 +32,7 @@ var (
 
 const (
 	STORE_KEY = "shipyard"
+	VERSION   = "2.0.1"
 )
 
 type (
@@ -92,22 +93,16 @@ func run(w http.ResponseWriter, r *http.Request) {
 	}
 	var image *citadel.Image
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
-		logger.Warnf("error running container: %s", err)
+		logger.Warnf("error decoding image: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	launched := []*citadel.Container{}
-
-	for i := 0; i < count; i++ {
-		container, err := controllerManager.ClusterManager().Start(image, pull)
-		if err != nil {
-			logger.Errorf("error running %s: %s", image.Name, err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		logger.Infof("started %s pull=%v", image.Name, pull)
-		launched = append(launched, container)
+	launched, err := controllerManager.Run(image, count, pull)
+	if err != nil {
+		logger.Warnf("error running container: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("content-type", "application/json")
@@ -154,6 +149,36 @@ func restartContainer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Infof("restarted container %s (%s)", container.ID, container.Image.Name)
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func scaleContainer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	r.ParseForm()
+	sCount := r.FormValue("count")
+	if sCount == "" {
+		http.Error(w, "you must specify a count", http.StatusBadRequest)
+		return
+	}
+	count, err := strconv.Atoi(sCount)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	container, err := controllerManager.Container(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := controllerManager.Scale(container, count); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Infof("scaled container %s (%s) to %d", container.ID, container.Image.Name, count)
 
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -639,6 +664,9 @@ func main() {
 		mErr      error
 		globalMux = http.NewServeMux()
 	)
+
+	logger.Infof("shipyard version %s", VERSION)
+
 	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey)
 	if mErr != nil {
 		logger.Fatal(mErr)
@@ -659,6 +687,7 @@ func main() {
 	apiRouter.HandleFunc("/api/containers/{id}", destroy).Methods("DELETE")
 	apiRouter.HandleFunc("/api/containers/{id}/stop", stopContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/restart", restartContainer).Methods("GET")
+	apiRouter.HandleFunc("/api/containers/{id}/scale", scaleContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")
@@ -737,7 +766,7 @@ func main() {
 		logger.Infof("created admin user: username: admin password: shipyard")
 	}
 
-	logger.Infof("shipyard controller listening on %s", listenAddr)
+	logger.Infof("controller listening on %s", listenAddr)
 
 	if err := http.ListenAndServe(listenAddr, context.ClearHandler(globalMux)); err != nil {
 		logger.Fatal(err)

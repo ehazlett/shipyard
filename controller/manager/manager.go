@@ -283,6 +283,36 @@ func (m *Manager) Containers(all bool) ([]*citadel.Container, error) {
 	return m.clusterManager.ListContainers(all)
 }
 
+func (m *Manager) ContainersByImage(name string, all bool) ([]*citadel.Container, error) {
+	allContainers, err := m.Containers(all)
+	if err != nil {
+		return nil, err
+	}
+	imageContainers := []*citadel.Container{}
+	for _, c := range allContainers {
+		if strings.Index(c.Image.Name, name) > -1 {
+			imageContainers = append(imageContainers, c)
+		}
+	}
+	return imageContainers, nil
+}
+
+func (m *Manager) IdenticalContainers(container *citadel.Container, all bool) ([]*citadel.Container, error) {
+	containers := []*citadel.Container{}
+	imageContainers, err := m.ContainersByImage(container.Image.Name, all)
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range imageContainers {
+		args := len(c.Image.Args)
+		origArgs := len(container.Image.Args)
+		if c.Image.Memory == container.Image.Memory && args == origArgs && c.Image.Type == container.Image.Type {
+			containers = append(containers, c)
+		}
+	}
+	return containers, nil
+}
+
 func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
 	info, err := m.clusterManager.ClusterInfo()
 	if err != nil {
@@ -909,6 +939,65 @@ func (m *Manager) DeleteWebhookKey(id string) error {
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (m *Manager) Run(image *citadel.Image, count int, pull bool) ([]*citadel.Container, error) {
+	launched := []*citadel.Container{}
+
+	var wg sync.WaitGroup
+	wg.Add(count)
+	var runErr error
+	for i := 0; i < count; i++ {
+		go func(wg *sync.WaitGroup) {
+			container, err := m.ClusterManager().Start(image, pull)
+			if err != nil {
+				runErr = err
+			}
+			launched = append(launched, container)
+			wg.Done()
+		}(&wg)
+	}
+	wg.Wait()
+	return launched, runErr
+}
+
+func (m *Manager) Scale(container *citadel.Container, count int) error {
+	imageContainers, err := m.IdenticalContainers(container, true)
+	if err != nil {
+		return err
+	}
+	containerCount := len(imageContainers)
+	// check which way we need to scale
+	if containerCount > count { // down
+		numKill := containerCount - count
+		delContainers := imageContainers[0:numKill]
+		for _, c := range delContainers {
+			if err := m.Destroy(c); err != nil {
+				return err
+			}
+		}
+	} else if containerCount < count { // up
+		numAdd := count - containerCount
+		// check for vols or links -- if so, launch on same engine
+		img := container.Image
+		if len(img.Volumes) > 0 || len(img.Links) > 0 {
+			eng := container.Engine
+			t := fmt.Sprintf("host:%s", eng.ID)
+			lbls := img.Labels
+			lbls = append(lbls, t)
+			img.Type = "host"
+			img.Labels = lbls
+		}
+		// bindports must be updated to remove the hostport as they
+		// will fail to start
+		for _, p := range img.BindPorts {
+			p.Port = 0
+		}
+		m.Run(img, numAdd, false)
+	} else { // none
+		logger.Info("no need to scale")
 	}
 	return nil
 }
