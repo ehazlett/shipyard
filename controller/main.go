@@ -27,13 +27,14 @@ var (
 	rethinkdbDatabase string
 	rethinkdbAuthKey  string
 	disableUsageInfo  bool
+	showVersion       bool
 	controllerManager *manager.Manager
 	logger            = logrus.New()
 )
 
 const (
 	STORE_KEY = "shipyard"
-	VERSION   = "2.0.1"
+	VERSION   = "2.0.2"
 )
 
 type (
@@ -49,6 +50,7 @@ func init() {
 	flag.StringVar(&rethinkdbDatabase, "rethinkdb-database", "shipyard", "rethinkdb database")
 	flag.StringVar(&rethinkdbAuthKey, "rethinkdb-auth-key", "", "rethinkdb auth key")
 	flag.BoolVar(&disableUsageInfo, "disable-usage-info", false, "disable anonymous usage info")
+	flag.BoolVar(&showVersion, "version", false, "show version and exit")
 }
 
 func destroy(w http.ResponseWriter, r *http.Request) {
@@ -662,6 +664,10 @@ func main() {
 		rethinkdbAuthKey = rAuthKey
 	}
 	flag.Parse()
+	if showVersion {
+		fmt.Println(VERSION)
+		os.Exit(0)
+	}
 	var (
 		mErr      error
 		globalMux = http.NewServeMux()
