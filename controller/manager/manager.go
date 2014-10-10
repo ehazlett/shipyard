@@ -437,7 +437,11 @@ func (m *Manager) SaveEvent(event *shipyard.Event) error {
 }
 
 func (m *Manager) Events(limit int) ([]*shipyard.Event, error) {
-	res, err := r.Table(tblNameEvents).OrderBy(r.Desc("Time")).Limit(limit).Run(m.session)
+	t := r.Table(tblNameEvents).OrderBy(r.Desc("Time"))
+	if limit > -1 {
+		t.Limit(limit)
+	}
+	res, err := t.Run(m.session)
 	if err != nil {
 		return nil, err
 	}
@@ -972,7 +976,7 @@ func (m *Manager) SaveWebhookKey(key *dockerhub.WebhookKey) error {
 		Type:    "add-webhook-key",
 		Time:    time.Now(),
 		Message: fmt.Sprintf("image=%s", key.Image),
-		Tags:    []string{"docker", "hub"},
+		Tags:    []string{"docker", "webhook"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
@@ -996,7 +1000,7 @@ func (m *Manager) DeleteWebhookKey(id string) error {
 		Type:    "delete-webhook-key",
 		Time:    time.Now(),
 		Message: fmt.Sprintf("image=%s key=%s", key.Image, key.Key),
-		Tags:    []string{"docker", "hub"},
+		Tags:    []string{"docker", "webhook"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err

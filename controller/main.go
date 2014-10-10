@@ -34,7 +34,7 @@ var (
 
 const (
 	STORE_KEY = "shipyard"
-	VERSION   = "2.0.2"
+	VERSION   = "2.0.3"
 )
 
 type (
@@ -326,7 +326,7 @@ func removeServiceKey(w http.ResponseWriter, r *http.Request) {
 func events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	limit := 25
+	limit := -1
 	l := r.FormValue("limit")
 	if l != "" {
 		lt, err := strconv.Atoi(l)
