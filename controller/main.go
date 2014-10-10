@@ -347,6 +347,17 @@ func events(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func purgeEvents(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	if err := controllerManager.PurgeEvents(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logger.Info("cluster events purged")
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func accounts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -697,6 +708,7 @@ func main() {
 	apiRouter.HandleFunc("/api/containers/{id}/restart", restartContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/scale", scaleContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
+	apiRouter.HandleFunc("/api/events", purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")
 	apiRouter.HandleFunc("/api/engines", addEngine).Methods("POST")
 	apiRouter.HandleFunc("/api/engines/{id}", inspectEngine).Methods("GET")

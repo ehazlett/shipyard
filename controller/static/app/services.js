@@ -29,7 +29,10 @@ angular.module('shipyard.services', ['ngResource', 'ngRoute'])
         });
     })
     .factory('Events', function($resource) {
-        return $resource('/api/events');
+        return $resource('/api/events', {}, {
+            'purge': { isArray: false, method: 'DELETE' },
+            query: { isArray: true }
+        });
     })
     .factory('ClusterInfo', function($resource) {
         return $resource('/api/cluster/info', [], {

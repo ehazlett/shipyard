@@ -445,11 +445,18 @@ func (m *Manager) Events(limit int) ([]*shipyard.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	var events []*shipyard.Event
+	events := []*shipyard.Event{}
 	if err := res.All(&events); err != nil {
 		return nil, err
 	}
 	return events, nil
+}
+
+func (m *Manager) PurgeEvents() error {
+	if _, err := r.Table(tblNameEvents).Delete().RunWrite(m.session); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *Manager) ServiceKey(key string) (*shipyard.ServiceKey, error) {
@@ -485,7 +492,7 @@ func (m *Manager) Accounts() ([]*shipyard.Account, error) {
 	if err != nil {
 		return nil, err
 	}
-	var accounts []*shipyard.Account
+	accounts := []*shipyard.Account{}
 	if err := res.All(&accounts); err != nil {
 		return nil, err
 	}
@@ -566,7 +573,7 @@ func (m *Manager) Roles() ([]*shipyard.Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	var roles []*shipyard.Role
+	roles := []*shipyard.Role{}
 	if err := res.All(&roles); err != nil {
 		return nil, err
 	}
@@ -731,7 +738,7 @@ func (m *Manager) Extensions() ([]*shipyard.Extension, error) {
 	if err != nil {
 		return nil, err
 	}
-	var exts []*shipyard.Extension
+	exts := []*shipyard.Extension{}
 	if err := res.All(&exts); err != nil {
 		return nil, err
 	}
@@ -933,7 +940,7 @@ func (m *Manager) WebhookKeys() ([]*dockerhub.WebhookKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	var keys []*dockerhub.WebhookKey
+	keys := []*dockerhub.WebhookKey{}
 	if err := res.All(&keys); err != nil {
 		return nil, err
 	}

@@ -1,4 +1,24 @@
-<div class="ui icon message" ng-show="events.length === 0">
+<div class="ui basic small modal purgeEvents">
+    <div class="header">
+        Purge Events
+    </div>
+    <div class="content">
+        Purge all events?  This is irreversible.
+    </div>
+    <div class="actions">
+        <div class="ui button small">Cancel</div>
+        <a ng-click="purgeEvents()" class="ui button small blue">Ok</a>
+    </div>
+</div>
+
+<div class="ui icon buttons toolbar">
+    <a ng-click="showPurgeEventsDialog()" class="ui button mini black">
+        <i class="delete icon sign"></i>
+        Purge
+    </a>
+</div>
+
+<div class="ui icon message" ng-show="events.length === 0" ngcloak>
     <i class="info icon"></i>
     <div class="content">
         <div class="header">
