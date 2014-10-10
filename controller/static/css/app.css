@@ -12,7 +12,7 @@ body {
     min-width: 320px;
 }
 .logo {
-    font-family: 'Poiret One', cursive;
+    font-family: 'Poiret One', arial;
     text-rendering: optimizeLegibility;
     font-size: 32px;
 }
