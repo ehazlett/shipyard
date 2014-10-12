@@ -374,12 +374,22 @@ func (m *Manager) IdenticalContainers(container *citadel.Container, all bool) ([
 	return containers, nil
 }
 
-func (m *Manager) ClusterInfo() (*citadel.ClusterInfo, error) {
+func (m *Manager) ClusterInfo() (*shipyard.ClusterInfo, error) {
 	info, err := m.clusterManager.ClusterInfo()
+	clusterInfo := &shipyard.ClusterInfo{
+		Cpus:           info.Cpus,
+		Memory:         info.Memory,
+		ContainerCount: info.ContainerCount,
+		EngineCount:    info.EngineCount,
+		ImageCount:     info.ImageCount,
+		ReservedCpus:   info.ReservedCpus,
+		ReservedMemory: info.ReservedMemory,
+		Version:        m.version,
+	}
 	if err != nil {
 		return nil, err
 	}
-	return info, nil
+	return clusterInfo, nil
 }
 
 func (m *Manager) Destroy(container *citadel.Container) error {

@@ -201,8 +201,8 @@ func (m *Manager) GetEngine(id string) (*shipyard.Engine, error) {
 	return engine, nil
 }
 
-func (m *Manager) Info() (*citadel.ClusterInfo, error) {
-	var info *citadel.ClusterInfo
+func (m *Manager) Info() (*shipyard.ClusterInfo, error) {
+	var info *shipyard.ClusterInfo
 	resp, err := m.doRequest("/api/cluster/info", "GET", 200, nil)
 	if err != nil {
 		return nil, err

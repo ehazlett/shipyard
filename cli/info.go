@@ -35,6 +35,7 @@ func infoAction(c *cli.Context) {
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
+	fmt.Fprintf(w, "Controller Version: %s\n", info.Version)
 	fmt.Fprintf(w, "Cpus: %.2f\n", info.Cpus)
 	fmt.Fprintf(w, "Memory: %.2f MB\n", info.Memory)
 	fmt.Fprintf(w, "Containers: %d\n", info.ContainerCount)
