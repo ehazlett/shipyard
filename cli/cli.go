@@ -43,6 +43,7 @@ func main() {
 		stopCommand,
 		restartCommand,
 		scaleCommand,
+		logsCommand,
 		destroyCommand,
 		engineListCommand,
 		engineAddCommand,

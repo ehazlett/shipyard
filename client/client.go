@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/citadel/citadel"
 	"github.com/shipyard/shipyard"
@@ -145,6 +147,37 @@ func (m *Manager) Scale(container *citadel.Container, count int) error {
 		return err
 	}
 	return nil
+}
+
+func (m *Manager) Logs(container *citadel.Container, stdout bool, stderr bool) (io.ReadCloser, error) {
+	v := url.Values{}
+	if stdout {
+		v.Add("stdout", "1")
+	}
+	if stderr {
+		v.Add("stderr", "1")
+	}
+
+	path := fmt.Sprintf("/api/containers/%s/logs?%s", container.ID, v.Encode())
+	url := m.buildUrl(path)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if m.config.ServiceKey != "" {
+		req.Header.Add("X-Service-Key", m.config.ServiceKey)
+	} else {
+		req.Header.Add("X-Access-Token", fmt.Sprintf("%s:%s", m.config.Username, m.config.Token))
+	}
+	req.Header.Set("User-Agent", "shipyard-cli")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Body, nil
 }
 
 func (m *Manager) Engines() ([]*shipyard.Engine, error) {

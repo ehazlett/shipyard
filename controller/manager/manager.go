@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"strings"
@@ -338,6 +339,14 @@ func (m *Manager) Container(id string) (*citadel.Container, error) {
 		}
 	}
 	return nil, nil
+}
+
+func (m *Manager) Logs(container *citadel.Container, stdout bool, stderr bool) (io.ReadCloser, error) {
+	data, err := m.clusterManager.Logs(container, stdout, stderr)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 func (m *Manager) Containers(all bool) ([]*citadel.Container, error) {
