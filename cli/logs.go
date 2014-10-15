@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
+	"bytes"
+	"io"
+	"os"
 
 	"github.com/codegangsta/cli"
 	"github.com/shipyard/shipyard/client"
@@ -29,12 +30,14 @@ func logsAction(c *cli.Context) {
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	m := client.NewManager(cfg)
 	ids := c.Args()
 	if len(ids) == 0 {
 		logger.Fatal("you must specify an id")
 	}
 	id := ids[0]
+
 	container, err := m.Container(id)
 	stdout := c.Bool("stdout")
 	stderr := c.Bool("stderr")
@@ -46,9 +49,12 @@ func logsAction(c *cli.Context) {
 	}
 
 	data, err := m.Logs(container, stdout, stderr)
-	d, err := ioutil.ReadAll(data)
 	if err != nil {
 		logger.Fatalf("error reading logs: %s", err)
 	}
-	fmt.Print(string(d))
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(data)
+
+	io.Copy(os.Stdout, buf)
 }
