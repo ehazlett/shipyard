@@ -10,9 +10,10 @@ import (
 )
 
 var logsCommand = cli.Command{
-	Name:   "logs",
-	Usage:  "show container logs",
-	Action: logsAction,
+	Name:        "logs",
+	Usage:       "show container logs",
+	Description: "logs <id> [--stdout] [--stderr]",
+	Action:      logsAction,
 	Flags: []cli.Flag{
 		cli.BoolFlag{
 			Name:  "stdout",
