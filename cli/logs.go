@@ -11,7 +11,7 @@ import (
 
 var logsCommand = cli.Command{
 	Name:   "logs",
-	Usage:  "logs <id>",
+	Usage:  "show container logs",
 	Action: logsAction,
 	Flags: []cli.Flag{
 		cli.BoolFlag{
