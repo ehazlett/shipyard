@@ -89,6 +89,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.domain = "";
             $scope.count = 1;
             $scope.args = null;
+            $scope.links = null;
             $scope.pull = true;
             $scope.types = types;
             $scope.selectType = function(type) {
@@ -129,13 +130,22 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 // format environment
                 var envParts = $scope.environment.match(/(?:['"].+?['"])|\S+/g);
                 var environment = {};
-                if ($scope.args != null) {
-                    var args = $scope.args.split(" ");
-                }
                 if (envParts != null) {
                     for (var i=0; i<envParts.length; i++) {
                         var env = envParts[i].split("=");
                         environment[env[0]] = env[1];
+                    }
+                }
+                if ($scope.args != null) {
+                    var args = $scope.args.split(" ");
+                }
+                // links
+                var linkParts = $scope.links.split(" ");
+                var links = {};
+                if (linkParts != "") {
+                    for (var i=0; i<linkParts.length; i++) {
+                        var l = linkParts[i].split(":");
+                        links[l[0]] = l[1];
                     }
                 }
                 var params = {
@@ -147,9 +157,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     domain: $scope.domain,
                     type: $scope.selectedType,
                     args: args,
+                    links: links,
                     labels: selectedLabels,
                     publish: true
                 };
+                console.log(params);
                 Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
                     $location.path("/containers");
                 }, function(err){
