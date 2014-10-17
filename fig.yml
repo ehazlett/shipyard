@@ -1,0 +1,14 @@
+shipyard:
+    image: shipyard/shipyard
+    ports:
+        - "8080:8080"
+    links:
+        - rethinkdb:rethinkdb
+
+rethinkdb:
+    image: shipyard/rethinkdb
+    expose:
+        - "8080"
+        - "28015"
+        - "29015"
+
