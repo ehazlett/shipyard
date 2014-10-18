@@ -10,7 +10,8 @@ angular.module('shipyard', [
         'shipyard.directives',
         'angular-flash.service',
         'angular-flash.flash-alert-directive',
-        'angles'
+        'angles',
+        'ansiToHtml'
     ])
     .config(['$routeProvider', '$httpProvider', '$provide', 'flashProvider',
         function ($routeProvider, $httpProvider, $provide, flashProvider) {
@@ -37,6 +38,10 @@ angular.module('shipyard', [
             $routeProvider.when('/containers/:id', {
                 templateUrl: 'templates/container_details.html',
                 controller: 'ContainerDetailsController'
+            });
+            $routeProvider.when('/containers/:id/logs', {
+                templateUrl: 'templates/container_logs.html',
+                controller: 'ContainerLogsController'
             });
             $routeProvider.when('/engines', {
                 templateUrl: 'templates/engines.html',

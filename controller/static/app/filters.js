@@ -37,6 +37,11 @@ angular.module('shipyard.filters', [])
             return s + " MB";
         };
     })
+    .filter('unsafe', function ($sce) {
+        return function(val) {
+            return $sce.trustAsHtml(val);  
+        };
+    })
     .filter('formatEvent', function () {
         return function (e) {
             var evt = "";

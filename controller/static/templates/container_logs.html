@@ -1,0 +1,14 @@
+<div class="ui breadcrumb">
+    <a href="/#/containers" class="section">containers</a>
+    <div class="divider"> / </div>
+    <a href="/#/containers/{{container.id}}" class="section">{{container.id | limitTo:12}}</a>
+    <div class="divider"> / </div>
+    <div class="active section">logs</div>
+</div>
+<div class="ui small message red" flash-alert="error" ng-show="flash.message" duration="0">
+    <i class="close icon"></i>
+    {{flash.message}}
+</div>
+<div class="ui segment">
+    <div ng-bind-html="logs|unsafe"></div>
+</div>

@@ -29,6 +29,7 @@
     "angular-loader": "~1.2.23",
     "angular-cookies": "~1.2.23",
     "angular-flash": "~0.1.13",
-    "angles": "*"
+    "angles": "*",
+    "ansi-to-html": "jorgeecardona/ansi-to-html"
   }
 }
