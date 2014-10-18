@@ -11,6 +11,9 @@ body {
     text-rendering: optimizeLegibility;
     min-width: 320px;
 }
+a {
+    cursor: pointer;
+}
 .logo {
     font-family: 'Poiret One', arial;
     text-rendering: optimizeLegibility;

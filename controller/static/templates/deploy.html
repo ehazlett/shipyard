@@ -76,6 +76,13 @@
                     </div>
                 </div>
             </div>
+            <label>Ports</label> <a ng-click="addPortDefinition()"><i class="plus sign icon tiny"></i></a>
+            <div class="ui segment ports">
+                <span class="ui label ports default-label">no port bindings specified</span>
+            </div>
+            <div class="field">
+                <checkbox name="publish" ng-model="publish">Publish all Exposed Ports</checkbox>
+            </div>
             <div class="field">
                 <label>Type</label>
                 <div class="ui left labeled selection dropdown">
@@ -89,7 +96,7 @@
             </div>
             <div class="field">
                 <label>Labels</label>
-                <checkbox checked="false" name="labels" value="{{label}}" ng-model="selectedLabels" ng-repeat="label in labels">{{label}}</checkbox>
+                <checkbox checked="false" name="labels" value="{{label}}" ng-model="selectedLabels" class="engine-label" ng-repeat="label in labels">{{label}}</checkbox>
             </div>
             <!--
             <div class="field">
@@ -101,7 +108,7 @@
     </div>
 </div>
 <script type="text/javascript">
-    $(function(){
+    function setValidationRules() {
         $('.ui.form')
             .form({
                 name: {
@@ -161,6 +168,9 @@
             }, {
                 inline: 'true'
             });
+    };
+    $(function(){
+        setValidationRules();
     });
     $('.ui.dropdown').dropdown();
 </script>
