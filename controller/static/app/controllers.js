@@ -88,6 +88,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.hostname = "";
             $scope.domain = "";
             $scope.count = 1;
+            $scope.publish = false;
             $scope.args = null;
             $scope.links = null;
             $scope.pull = true;
@@ -107,6 +108,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 });
                 $scope.labels = labels;
             });
+            $scope.addPortDefinition = addPortDefinition;
             $scope.showLoader = function() {
                 $(".ui.loader").removeClass("disabled");
                 $(".ui.active").addClass("dimmer");
@@ -123,7 +125,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     return false;
                 }
                 var selectedLabels = [];
-                $(".ui.checkbox").children(":checked").each(function(i, sel){
+                $(".ui.checkbox.engine-label").children(":checked").each(function(i, sel){
                     // HACK: use the label text to set the value
                     selectedLabels.push($(sel).next().text());
                 });
@@ -140,14 +142,39 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     var args = $scope.args.split(" ");
                 }
                 // links
-                var linkParts = $scope.links.split(" ");
                 var links = {};
-                if (linkParts != "") {
-                    for (var i=0; i<linkParts.length; i++) {
-                        var l = linkParts[i].split(":");
-                        links[l[0]] = l[1];
+                if ($scope.links != null) {
+                    var linkParts = $scope.links.split(" ");
+                    if (linkParts != "") {
+                        for (var i=0; i<linkParts.length; i++) {
+                            var l = linkParts[i].split(":");
+                            links[l[0]] = l[1];
+                        }
                     }
                 }
+                // ports
+                var ports = [];
+                $(".ui.segment.ports").children("div.four.fields").each(function(i, el){
+                    var portSpecs = $(el).children("div").children("div");
+                    var portDef = {};
+                    var proto = $(portSpecs[0]).children(":input")[0].value;
+                    var ip = $(portSpecs[1]).children(":input")[0].value;
+                    var port = $(portSpecs[2]).children(":input")[0].value;
+                    var container_port = $(portSpecs[3]).children(":input")[0].value;
+                    portDef["proto"] = proto;
+                    portDef["host_ip"] = ip || null;
+                    portDef["port"] = parseInt(port);
+                    portDef["container_port"] = parseInt(container_port) || null;
+                    ports.push(portDef);
+                    if (portDef["proto"] == "" || portDef["container_port"] == null) {
+                        $(portSpecs[0]).addClass("error");
+                        $(portSpecs[3]).addClass("error");
+                        $scope.error = "you must specify a protocol and container port for port bindings";
+                        $scope.hideLoader();
+                        valid = false;
+                        return false;
+                    }
+                });
                 var params = {
                     name: $scope.name,
                     cpus: parseFloat($scope.cpus),
@@ -158,17 +185,19 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     type: $scope.selectedType,
                     args: args,
                     links: links,
+                    bind_ports: ports,
                     labels: selectedLabels,
-                    publish: true
+                    publish: $scope.publish
                 };
-                console.log(params);
-                Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
-                    $location.path("/containers");
-                }, function(err){
-                    $scope.hideLoader();
-                    $scope.error = err.data;
-                    return false;
-                });
+                if (valid) {
+                    Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
+                        $location.path("/containers");
+                    }, function(err){
+                        $scope.hideLoader();
+                        $scope.error = err.data;
+                        return false;
+                    });
+                }
             };
         })
         .controller('ContainerDetailsController', function($scope, $location, $routeParams, flash, Container) {
