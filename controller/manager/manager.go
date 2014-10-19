@@ -810,6 +810,7 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 		Cpus:          ext.Config.Cpus,
 		Memory:        ext.Config.Memory,
 		Environment:   ext.Config.Environment,
+		Links:         ext.Config.Links,
 		Args:          ext.Config.Args,
 		Volumes:       ext.Config.Volumes,
 		BindPorts:     ext.Config.Ports,
