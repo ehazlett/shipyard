@@ -18,6 +18,7 @@ type (
 		Cpus              float64           `json:"cpus,omitempty" gorethink:"cpus"`
 		Memory            float64           `json:"memory,omitempty" gorethink:"memory"`
 		Environment       map[string]string `json:"environment,omitempty" gorethink:"environment"`
+		Links             map[string]string `json:"links,omitempty" gorethink:"links"`
 		Args              []string          `json:"args,omitempty" gorethink:"args"`
 		Volumes           []string          `json:"volumes,omitempty" gorethink:"volumes"`
 		Ports             []*citadel.Port   `json:"ports,omitempty" gorethink:"ports"`
