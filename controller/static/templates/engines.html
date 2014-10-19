@@ -18,7 +18,7 @@
 <table class="ui table segment" ng-show="engines">
     <thead>
         <tr>
-            <th>ID</th>
+            <th>Name</th>
             <th>CPUs</th>
             <th>Memory</th>
             <th>Addr</th>
@@ -28,7 +28,7 @@
     <tbody>
         <tr ng-repeat="e in engines">
             <td>
-                <a href="/#/engines/{{e.engine.id}}">{{e.engine.id}}</a>
+                <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
             </td>
             <td>{{e.engine.cpus}}</td>
             <td>{{e.engine.memory}} MB</td>
