@@ -171,7 +171,7 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 }
 
 func (m *Manager) RemoveEngine(engine *shipyard.Engine) error {
-	if _, err := m.doRequest(fmt.Sprintf("/api/engines/%s", engine.Engine.ID), "DELETE", 204, nil); err != nil {
+	if _, err := m.doRequest(fmt.Sprintf("/api/engines/%s", engine.ID), "DELETE", 204, nil); err != nil {
 		return err
 	}
 	return nil

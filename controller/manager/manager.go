@@ -275,7 +275,7 @@ func (m *Manager) Engines() []*shipyard.Engine {
 
 func (m *Manager) Engine(id string) *shipyard.Engine {
 	for _, e := range m.engines {
-		if e.Engine.ID == id {
+		if e.ID == id {
 			return e
 		}
 	}
@@ -301,7 +301,7 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 
 func (m *Manager) RemoveEngine(id string) error {
 	var engine *shipyard.Engine
-	res, err := r.Table(tblNameConfig).Get(id).Run(m.session)
+	res, err := r.Table(tblNameConfig).Filter(map[string]string{"id": id}).Run(m.session)
 	if err != nil {
 		return err
 	}
