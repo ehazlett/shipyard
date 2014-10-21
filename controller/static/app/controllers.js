@@ -325,6 +325,16 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 };
             });
         })
+        .controller('ContainerLogsController', function($scope, $location, $routeParams, $http, flash, Container, ansi2html) {
+            $scope.template = 'templates/container_logs.html';
+
+            $http.get('/api/containers/' + $routeParams.id + "/logs").success(function(data){
+                $scope.logs = ansi2html.toHtml(data.replace(/\n/g, '<br/>'));
+            });
+            Container.query({id: $routeParams.id}, function(data){
+                $scope.container = data;
+            });
+        })
         .controller('EnginesController', function($scope, Engines) {
             $scope.template = 'templates/engines.html';
             Engines.query(function(data){

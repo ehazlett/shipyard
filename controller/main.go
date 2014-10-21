@@ -11,6 +11,7 @@ import (
 
 	"github.com/citadel/citadel"
 	"github.com/codegangsta/negroni"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/shipyard/shipyard"
@@ -135,6 +136,25 @@ func stopContainer(w http.ResponseWriter, r *http.Request) {
 	logger.Infof("stopped container %s (%s)", container.ID, container.Image.Name)
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func containerLogs(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	container, err := controllerManager.Container(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := controllerManager.ClusterManager().Logs(container, true, true)
+	if err != nil {
+		logger.Errorf("error getting logs for %s: %s", container.ID, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	stdcopy.StdCopy(w, w, data)
 }
 
 func restartContainer(w http.ResponseWriter, r *http.Request) {
@@ -707,6 +727,7 @@ func main() {
 	apiRouter.HandleFunc("/api/containers/{id}/stop", stopContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/restart", restartContainer).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/scale", scaleContainer).Methods("GET")
+	apiRouter.HandleFunc("/api/containers/{id}/logs", containerLogs).Methods("GET")
 	apiRouter.HandleFunc("/api/events", events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/engines", engines).Methods("GET")

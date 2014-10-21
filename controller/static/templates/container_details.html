@@ -1,3 +1,9 @@
+<div class="ui breadcrumb">
+    <a href="/#/containers" class="section">containers</a>
+    <div class="divider"> / </div>
+    <div class="active section">{{container.id | limitTo:12}}</div>
+</div>
+
 <div class="ui basic small modal removeContainer">
     <div class="header">
         Destroy Container
@@ -62,6 +68,8 @@
     </div>
 </div>
 
+<div></div>
+
 <div class="ui icon buttons toolbar">
     <a ng-click="showRestartContainerDialog()" class="ui button mini green">
         <i class="refresh icon"></i>
@@ -84,6 +92,12 @@
     <a ng-click="showScaleContainerDialog()" class="ui button mini blue">
         <i class="exchange icon"></i>
         Scale
+    </a>
+</div>
+<div class="ui icon buttons toolbar">
+    <a href="/#/containers/{{container.id}}/logs" class="ui button mini black">
+        <i class="text file outline icon"></i>
+        Logs
     </a>
 </div>
 
