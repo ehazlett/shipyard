@@ -18,16 +18,16 @@
 <table class="ui table" ng-show="containers">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>CPUs</th>
-            <th>Memory</th>
-            <th>State</th>
-            <th>Type</th>
+            <th><a href="" ng-click="orderByField='id'; reverseSort = !reverseSort">ID</a></th>
+            <th><a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">Name</a></th>
+            <th><a href="" ng-click="orderByField='cpus'; reverseSort = !reverseSort">CPUs</a></th>
+            <th><a href="" ng-click="orderByField='memory'; reverseSort = !reverseSort">Memory</a></th>
+            <th><a href="" ng-click="orderByField='state'; reverseSort = !reverseSort">State</a></th>
+            <th><a href="" ng-click="orderByField='type'; reverseSort = !reverseSort">Type</a></th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in containers">
+        <tr ng-repeat="c in containers | orderBy:orderByField:reverseSort">
             <td>
                 <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
             </td>

@@ -71,6 +71,9 @@ angular.module('shipyard.controllers', ['ngCookies'])
             });
         })
         .controller('ContainersController', function($scope, Containers) {
+            $scope.orderByField = 'id';
+            $scope.reverseSort = false;
+
             $scope.template = 'templates/containers.html';
             Containers.query(function(data){
                 $scope.containers = data;
@@ -336,6 +339,9 @@ angular.module('shipyard.controllers', ['ngCookies'])
             });
         })
         .controller('EnginesController', function($scope, Engines) {
+            $scope.orderByField = 'name';
+            $scope.reverseSort = false;
+            
             $scope.template = 'templates/engines.html';
             Engines.query(function(data){
                 $scope.engines = data;
