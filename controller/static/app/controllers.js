@@ -134,8 +134,10 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 var environment = {};
                 if (envParts != null) {
                     for (var i=0; i<envParts.length; i++) {
-                        var env = envParts[i].split("=");
-                        environment[env[0]] = env[1];
+                        var separator_pos = envParts[i].indexOf('=');
+                        var key = envParts[i].substring(0, separator_pos)
+                        var val = envParts[i].substring(separator_pos+1)
+                        environment[key] = val;
                     }
                 }
                 if ($scope.args != null) {
