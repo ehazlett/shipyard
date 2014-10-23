@@ -11,6 +11,9 @@ body {
     text-rendering: optimizeLegibility;
     min-width: 320px;
 }
+th a {
+    color: #000000;
+}
 a {
     cursor: pointer;
 }
