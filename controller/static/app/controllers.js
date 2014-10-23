@@ -339,7 +339,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             });
         })
         .controller('EnginesController', function($scope, Engines) {
-            $scope.orderByField = 'name';
+            $scope.orderByField = 'engine.id';
             $scope.reverseSort = false;
             
             $scope.template = 'templates/engines.html';
