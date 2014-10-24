@@ -46,6 +46,11 @@ var runCommand = cli.Command{
 			Value: "",
 			Usage: "container domain name",
 		},
+		cli.StringFlag{
+			Name:  "network",
+			Value: "bridge",
+			Usage: "container network mode",
+		},
 		cli.StringSliceFlag{
 			Name:  "env",
 			Usage: "environment variables (key=value pairs)",
@@ -125,6 +130,7 @@ func runAction(c *cli.Context) {
 		Memory:        c.Float64("memory"),
 		Hostname:      c.String("hostname"),
 		Domainname:    c.String("domain"),
+		NetworkMode:   c.String("network"),
 		Labels:        c.StringSlice("label"),
 		Args:          c.StringSlice("arg"),
 		Environment:   env,
