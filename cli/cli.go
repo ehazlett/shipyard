@@ -28,7 +28,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "shipyard"
 	app.Usage = "manage a shipyard cluster"
-	app.Version = "2.0.3"
+	app.Version = "2.0.4"
 	app.EnableBashCompletion = true
 	app.Flags = []cli.Flag{}
 	app.Commands = []cli.Command{
