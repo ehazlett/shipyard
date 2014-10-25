@@ -23,7 +23,7 @@ func newManager() *Manager {
 		fmt.Println("env vars needed: RETHINKDB_TEST_PORT_28015_TCP_ADDR, RETHINKDB_TEST_PORT_28015_TCP_PORT, RETHINKDB_TEST_DATABASE, DOCKER_TEST_ADDR")
 		os.Exit(1)
 	}
-	m, err := NewManager(rethinkdbAddr, rDb, "")
+	m, err := NewManager(rethinkdbAddr, rDb, "", "test", true)
 	if err != nil {
 		fmt.Printf("unable to connect to test db: %s\n", err)
 		os.Exit(1)
