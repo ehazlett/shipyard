@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/citadel/citadel"
 	"github.com/citadel/citadel/cluster"
 	"github.com/citadel/citadel/scheduler"
@@ -20,7 +21,6 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/dockerhub"
-	"github.com/sirupsen/logrus"
 )
 
 const (
