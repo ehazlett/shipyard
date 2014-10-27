@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/citadel/citadel"
 	"github.com/codegangsta/negroni"
 	"github.com/docker/docker/pkg/stdcopy"
@@ -19,7 +20,6 @@ import (
 	"github.com/shipyard/shipyard/controller/middleware/access"
 	"github.com/shipyard/shipyard/controller/middleware/auth"
 	"github.com/shipyard/shipyard/dockerhub"
-	"github.com/sirupsen/logrus"
 )
 
 var (
