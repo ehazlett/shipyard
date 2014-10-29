@@ -83,14 +83,36 @@
             <div class="field">
                 <checkbox name="publish" ng-model="publish">Publish all Exposed Ports</checkbox>
             </div>
-            <div class="field">
-                <label>Type</label>
-                <div class="ui left labeled selection dropdown">
-                    <input type="hidden" name="type" ng-model="type" value="{{selectedType}}">
-                    <div class="default text">{{selectedType || 'Type'}}</div>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        <div class="item" ng-repeat="t in types" data-value="{{t}}" ng-click="selectType(t)">{{t}}</div>
+            <div class="three fields">
+                <div class="field">
+                    <label>Type</label>
+                    <div class="ui left labeled selection dropdown">
+                        <input type="hidden" name="type" ng-model="type" value="{{selectedType}}">
+                        <div class="default text">{{selectedType || 'Type'}}</div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div class="item" ng-repeat="t in types" data-value="{{t}}" ng-click="selectType(t)">{{t}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Network</label>
+                    <div class="ui left labeled selection dropdown">
+                        <input type="hidden" name="networkMode" ng-model="selectedNetworkMode" value="{{selectedNetworkMode}}">
+                        <div class="default text">{{selectedNetworkMode || 'Network'}}</div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div class="item" ng-repeat="n in networkModes" data-value="{{n}}" ng-click="selectNetworkMode(n)">{{n}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="networkMode" class="field" ng-show='showNetworkModeContainer'>
+                    <label>Container Name</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="networkModeContainerName" ng-model="networkModeContainerName">
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -162,6 +184,15 @@
                         {
                             type   : 'empty',
                             prompt : 'select a container type'
+                        }
+                    ]
+                },
+                networkMode: {
+                    identifier : 'networkMode',
+                    rules: [
+                        {
+                            type   : 'empty',
+                            prompt : 'select a network mode'
                         }
                     ]
                 }

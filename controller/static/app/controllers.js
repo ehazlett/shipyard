@@ -85,6 +85,12 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 "host",
                 "unique"
             ];
+            var networkModes = [
+                "bridge",
+                "none",
+                "container",
+                "host"
+            ]
             $scope.cpus = 0.1;
             $scope.memory = 256;
             $scope.environment = "";
@@ -98,6 +104,17 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.types = types;
             $scope.selectType = function(type) {
                 $scope.selectedType = type;
+                $(".ui.dropdown").dropdown('hide');
+            };
+            $scope.selectedNetworkMode = 'bridge';
+            $scope.networkModes = networkModes;
+            $scope.selectNetworkMode = function(mode) {
+                $scope.selectedNetworkMode = mode;
+                if (mode === 'container') {
+                    $scope.showNetworkModeContainer = true;
+                } else {
+                    $scope.showNetworkModeContainer = false;
+                }
                 $(".ui.dropdown").dropdown('hide');
             };
             var labels = [];
@@ -144,6 +161,19 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 if ($scope.args != null) {
                     var args = $scope.args.split(" ");
                 }
+                // network mode
+                var networkMode = $scope.selectedNetworkMode;
+                if ($scope.selectedNetworkMode == 'container') {
+                    var containerName = $scope.networkModeContainerName;
+                    networkMode = 'container:' + containerName;
+                    if (containerName == undefined || containerName == "") {
+                        $("div#networkMode").addClass("error");
+                        $scope.error = "you must specify a container name for the container network mode";
+                        $scope.hideLoader();
+                        valid = false;
+                        return false;
+                    }
+                }
                 // links
                 var links = {};
                 if ($scope.links != null) {
@@ -186,6 +216,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     hostname: $scope.hostname,
                     domain: $scope.domain,
                     type: $scope.selectedType,
+                    network_mode: networkMode,
                     args: args,
                     links: links,
                     bind_ports: ports,
