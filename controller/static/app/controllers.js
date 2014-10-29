@@ -154,7 +154,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 var environment = {};
                 if (envParts != null) {
                     for (var i=0; i<envParts.length; i++) {
-                        var env = envParts[i].split("=");
+                        var env = envParts[i].split(/=(.+)?/)
                         environment[env[0]] = env[1];
                     }
                 }
@@ -224,6 +224,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     labels: selectedLabels,
                     publish: $scope.publish
                 };
+                console.log(params);
                 if (valid) {
                     Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
                         $location.path("/containers");
