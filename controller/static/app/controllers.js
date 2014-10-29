@@ -210,6 +210,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 });
                 var params = {
                     name: $scope.name,
+                    container_name: $scope.containerName,
                     cpus: parseFloat($scope.cpus),
                     memory: parseFloat($scope.memory),
                     environment: environment,

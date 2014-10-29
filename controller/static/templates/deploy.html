@@ -1,4 +1,4 @@
-<div class="ui two column grid">
+<div class="ui grid">
     <div class="ui column">
         <div class="ui form segment" ng-form="deployForm" novalidate>
             <div class="ui active inverted"><div class="ui large text loader disabled">Launching... Please wait...</div></div>
@@ -6,7 +6,7 @@
                 <div class="header">Error</div>
                 <p>{{error}}</p>
             </div>
-            <div class="three fields">
+            <div class="four fields">
                 <div class="field">
                     <label>Image</label>
                     <div class="ui left labeled input">
@@ -26,6 +26,12 @@
                     <label>Domain</label>
                     <div class="ui left labeled input">
                         <input type="text" placeholder="example.com" ng-model="domain">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Container Name</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="containerName" placeholder="" ng-model="containerName">
                     </div>
                 </div>
             </div>
