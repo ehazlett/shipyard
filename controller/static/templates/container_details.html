@@ -109,7 +109,10 @@
     <div class="ui column">
         <div class="ui section">
             <h3 class="ui header">Name</h3>
-            <div>{{container.name}}</div>
+            <div>{{container.name|container_name}}</div>
+        </div>
+        <div class="ui divider"></div>
+        <div>
             <h3 class="ui header">Image</h3>
             <div>{{container.image.name}}</div>
         </div>
@@ -135,6 +138,11 @@
         <div class="ui section">
             <h3 class="ui header">Engine</h3>
             <div>{{container.engine.id}}</div>
+        </div>
+        <div class="ui divider"></div>
+        <div class="ui section">
+            <h3 class="ui header">Network Mode</h3>
+            <div>{{container.image.network_mode}}</div>
         </div>
         <div class="ui divider"></div>
         <h4 class="ui top attached block header">Ports</h4>

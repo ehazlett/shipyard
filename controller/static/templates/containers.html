@@ -19,7 +19,8 @@
     <thead>
         <tr>
             <th><a href="" ng-click="orderByField='id'; reverseSort = !reverseSort">ID</a></th>
-            <th><a href="" ng-click="orderByField='image.name'; reverseSort = !reverseSort">Name</a></th>
+            <th><a href="" ng-click="orderByField='name'; reverseSort = !reverseSort">Name</a></th>
+            <th><a href="" ng-click="orderByField='image.name'; reverseSort = !reverseSort">Image</a></th>
             <th><a href="" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Engine</a></th>
             <th><a href="" ng-click="orderByField='image.cpus'; reverseSort = !reverseSort">CPUs</a></th>
             <th><a href="" ng-click="orderByField='image.memory'; reverseSort = !reverseSort">Memory</a></th>
@@ -32,6 +33,7 @@
             <td>
                 <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
             </td>
+            <td>{{c.name|container_name}}</td>
             <td>{{c.image.name}}</td>
             <td>{{c.engine.id}}</td>
             <td>{{c.image.cpus}}</td>
