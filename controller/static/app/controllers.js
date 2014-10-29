@@ -100,6 +100,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.publish = false;
             $scope.args = null;
             $scope.links = null;
+            $scope.volumes = null;
             $scope.pull = true;
             $scope.types = types;
             $scope.selectType = function(type) {
@@ -185,6 +186,16 @@ angular.module('shipyard.controllers', ['ngCookies'])
                         }
                     }
                 }
+                // volumes
+                var volumes = [];
+                if ($scope.volumes != null) {
+                    var volParts = $scope.volumes.split(" ");
+                    if (volParts != "") {
+                        for (var i=0; i<volParts.length; i++) {
+                            volumes.push(volParts[i]);
+                        }
+                    }
+                }
                 // ports
                 var ports = [];
                 $(".ui.segment.ports").children("div.four.fields").each(function(i, el){
@@ -220,11 +231,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     network_mode: networkMode,
                     args: args,
                     links: links,
+                    volumes: volumes,
                     bind_ports: ports,
                     labels: selectedLabels,
                     publish: $scope.publish
                 };
-                console.log(params);
                 if (valid) {
                     Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
                         $location.path("/containers");
