@@ -33,6 +33,8 @@ const (
 	tblNameWebhookKeys = "webhook_keys"
 	storeKey           = "shipyard"
 	TRACKER_HOST       = "http://tracker.shipyard-project.com"
+	EngineHealthUp     = "up"
+	EngineHealthDown   = "down"
 )
 
 var (
@@ -167,6 +169,8 @@ func (m *Manager) init() []*shipyard.Engine {
 	m.clusterManager = clusterManager
 	// start extension health check
 	go m.extensionHealthCheck()
+	// start engine health check
+	go m.engineHealthCheck()
 	// anonymous usage info
 	go m.usageReport()
 	return engines
@@ -268,6 +272,31 @@ func (m *Manager) checkExtensionHealth(ext *shipyard.Extension) error {
 		}
 	}
 	return nil
+}
+
+func (m *Manager) engineHealthCheck() {
+	t := time.NewTicker(time.Second * 10).C
+	for {
+		select {
+		case <-t:
+			engs := m.Engines()
+			for _, eng := range engs {
+				uri := fmt.Sprintf("%s/v1.15/info", eng.Engine.Addr)
+				resp, err := http.Get(uri)
+				if err != nil {
+					eng.Health.Status = EngineHealthDown
+				} else {
+					defer resp.Body.Close()
+					if resp.StatusCode != 200 {
+						eng.Health.Status = EngineHealthDown
+					} else {
+						eng.Health.Status = EngineHealthUp
+					}
+				}
+			}
+
+		}
+	}
 }
 
 func (m *Manager) Engines() []*shipyard.Engine {
