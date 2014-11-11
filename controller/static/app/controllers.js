@@ -82,7 +82,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
         .controller('DeployController', function($scope, $location, Engines, Container) {
             var types = [
                 "service",
-                "engine",
+                //"engine", // removed until we get the UI to show engines to select
                 "unique"
             ];
             var networkModes = [
