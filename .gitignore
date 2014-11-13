@@ -2,3 +2,4 @@
 *.un*
 cli/cli
 controller/controller
+Godeps/_workspace

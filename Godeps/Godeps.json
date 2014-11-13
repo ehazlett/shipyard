@@ -1,0 +1,25 @@
+{
+	"ImportPath": "github.com/shipyard/shipyard",
+	"GoVersion": "go1.3.3",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
+			"Comment": "null-233",
+			"Rev": "8fec09c61d5d66f460d227fd1df3473d7e015bc6"
+		},
+		{
+			"ImportPath": "github.com/citadel/citadel",
+			"Comment": "beta4-41-g606f8dd",
+			"Rev": "606f8dde3f4dcf416580f496838cabdbbf5786c7"
+		},
+		{
+			"ImportPath": "github.com/samalba/dockerclient",
+			"Rev": "a79250ae5dc96514cf6b06b8a8b7481164da7d4d"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Comment": "null-233",
+			"Rev": "8fec09c61d5d66f460d227fd1df3473d7e015bc6"
+		}
+	]
+}
