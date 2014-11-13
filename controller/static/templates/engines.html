@@ -23,6 +23,7 @@
             <th><a href="" ng-click="orderByField='engine.memory'; reverseSort = !reverseSort">Memory</a></th>
             <th><a href="" ng-click="orderByField='engine.addr'; reverseSort = !reverseSort">Addr</a></th>
             <th><a href="" ng-click="orderByField='engine.labels'; reverseSort = !reverseSort">Labels</a></th>
+            <th><a href="" ng-click="orderByField='health.status'; reverseSort = !reverseSort">Health</a></th>
         </tr>
     </thead>
     <tbody>
@@ -34,6 +35,7 @@
             <td>{{e.engine.memory}} MB</td>
             <td>{{e.engine.addr}}</td>
             <td>{{e.engine.labels.join(', ')}}</td>
+            <td>{{e.health.status}}</td>
         </tr>
     </tbody>
 </table>
