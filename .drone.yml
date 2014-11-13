@@ -1,7 +1,13 @@
 image: go1.3
 script:
     - go get github.com/tools/godep
+    - pushd controller
     - /var/cache/drone/bin/godep restore
     - /var/cache/drone/bin/godep go test -v ./...
+    - popd
+    - pushd cli
+    - /var/cache/drone/bin/godep restore
+    - /var/cache/drone/bin/godep go test -v ./...
+    - popd
 services:
     - shipyard/rethinkdb
