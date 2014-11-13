@@ -1,8 +1,7 @@
 image: go1.3
 script:
     - go get github.com/tools/godep
-    - echo $GOPATH
-    - godep restore
-    - godep go test -v ./...
+    - /var/cache/drone/bin/godep restore
+    - /var/cache/drone/bin/godep go test -v ./...
 services:
     - shipyard/rethinkdb
