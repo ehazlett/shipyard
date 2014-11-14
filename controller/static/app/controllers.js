@@ -382,9 +382,13 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.container = data;
             });
         })
-        .controller('EnginesController', function($scope, Engines) {
+        .controller('EnginesController', function($scope, $location, Engines) {
             $scope.orderByField = 'engine.id';
             $scope.reverseSort = false;
+
+            $scope.go = function() {
+                $location.path("/engines/" + this.e.id)
+            };
             
             $scope.template = 'templates/engines.html';
             Engines.query(function(data){

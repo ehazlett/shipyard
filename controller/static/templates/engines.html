@@ -28,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort">
+        <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort" ng-click="go();">
             <td><span ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')" title="{{e.health.status}}"/></td>
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
