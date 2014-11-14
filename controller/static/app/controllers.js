@@ -484,6 +484,8 @@ angular.module('shipyard.controllers', ['ngCookies'])
         })
         .controller('EventsController', function($scope, $location, $window, Events) {
             $scope.template = 'templates/events.html';
+            $scope.orderByField = 'time';                                                                                                                                                                                                                              
+            $scope.reverseSort = true;
             $scope.showPurgeEventsDialog = function() {
                 $('.basic.modal.purgeEvents')
                     .modal('show');

@@ -28,18 +28,18 @@
     </div>
 </div>
 
-<table class="ui table segment" ng-show="events">
+<table class="ui sortable table segment" ng-show="events">
     <thead>
         <tr>
-            <th>Time</th>
-            <th>Container</th>
-            <th>Engine</th>
-            <th>Type</th>
-            <th>Tags</th>
+            <th ng-class="orderByField == 'time' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='time'; reverseSort = !reverseSort">Time</th>
+            <th ng-class="orderByField == 'container.id' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='container.id'; reverseSort = !reverseSort">Container</th>
+            <th ng-class="orderByField == 'engine.id' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Engine</th>
+            <th ng-class="orderByField == 'type' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='type'; reverseSort = !reverseSort">Type</th>
+            <th ng-class="orderByField == 'tags' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='tags'; reverseSort = !reverseSort">Tags</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="e in events">
+        <tr ng-repeat="e in events | orderBy:orderByField:reverseSort">
             <td>{{e.time}}</td>
             <td>{{e.container.id|truncate}}</td>
             <td>{{e.engine.id}}</td>
