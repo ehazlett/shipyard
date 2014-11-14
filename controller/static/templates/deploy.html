@@ -95,7 +95,7 @@
             <div class="field">
                 <checkbox name="publish" ng-model="publish">Publish all Exposed Ports</checkbox>
             </div>
-            <div class="three fields">
+            <div class="four fields">
                 <div class="field">
                     <label>Type</label>
                     <div class="ui left labeled selection dropdown">
@@ -104,6 +104,17 @@
                         <i class="dropdown icon"></i>
                         <div class="menu">
                             <div class="item" ng-repeat="t in types" data-value="{{t}}" ng-click="selectType(t)">{{t}}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Restart Policy</label>
+                    <div class="ui left labeled selection dropdown">
+                        <input type="hidden" name="restartPolicy" ng-model="selectedRestartPolicy" value="{{selectedRestartPolicy}}">
+                        <div class="default text">{{selectedRestartPolicy || 'Restart Policy'}}</div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div class="item" ng-repeat="r in restartPolicies" data-value="{{r}}" ng-click="selectRestartPolicy(r)">{{r}}</div>
                         </div>
                     </div>
                 </div>

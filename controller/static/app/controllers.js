@@ -112,6 +112,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 "container",
                 "host"
             ]
+            var restartPolicies = [
+                "no",
+                "on-failure",
+                "always"
+            ]
             $scope.cpus = 0.1;
             $scope.memory = 256;
             $scope.environment = "";
@@ -139,6 +144,12 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 }
                 $(".ui.dropdown").dropdown('hide');
             };
+            $scope.selectedRestartPolicy = 'no';
+            $scope.restartPolicies = restartPolicies;
+            $scope.selectRestartPolicy = function(policy) {
+                $scope.selectedRestartPolicy = policy;
+                $(".ui.dropdown").dropdown('hide');
+            }
             var labels = [];
             Engines.query(function(engines){
                 angular.forEach(engines, function(e) {
@@ -240,6 +251,9 @@ angular.module('shipyard.controllers', ['ngCookies'])
                         return false;
                     }
                 });
+                var restartPolicy = {
+                    name: $scope.selectedRestartPolicy,
+                }
                 var params = {
                     name: $scope.name,
                     container_name: $scope.containerName,
@@ -255,7 +269,8 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     volumes: volumes,
                     bind_ports: ports,
                     labels: selectedLabels,
-                    publish: $scope.publish
+                    publish: $scope.publish,
+                    restart_policy: restartPolicy, 
                 };
                 if (valid) {
                     Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
