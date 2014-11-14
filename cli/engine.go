@@ -38,7 +38,7 @@ func engineListAction(c *cli.Context) {
 	fmt.Fprintln(w, "ID\tName\tCpus\tMemory\tHost\tLabels\tHealth")
 	for _, e := range engines {
 		labels := strings.Join(e.Engine.Labels, ",")
-		fmt.Fprintf(w, "%s\t%s\t%.2f\t%.2f\t%s\t%s\t%s\n", e.ID, e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.Addr, labels, e.Health.Status)
+		fmt.Fprintf(w, "%s\t%s\t%.2f\t%.2f\t%s\t%s\t%s\t%s\n", e.ID, e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.Addr, labels, e.Health.Status)
 	}
 	w.Flush()
 }

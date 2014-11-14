@@ -263,6 +263,10 @@ func addEngine(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	health := &shipyard.Health{
+		Status: "pending",
+	}
+	engine.Health = health
 	if err := controllerManager.AddEngine(engine); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

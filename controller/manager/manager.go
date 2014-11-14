@@ -283,16 +283,19 @@ func (m *Manager) engineHealthCheck() {
 			for _, eng := range engs {
 				uri := fmt.Sprintf("%s/v1.15/info", eng.Engine.Addr)
 				resp, err := http.Get(uri)
+				health := &shipyard.Health{}
 				if err != nil {
-					eng.Health.Status = EngineHealthDown
+					health.Status = EngineHealthDown
 				} else {
 					defer resp.Body.Close()
 					if resp.StatusCode != 200 {
-						eng.Health.Status = EngineHealthDown
+						health.Status = EngineHealthDown
 					} else {
-						eng.Health.Status = EngineHealthUp
+						health.Status = EngineHealthUp
 					}
 				}
+				eng.Health = health
+				m.SaveEngine(eng)
 			}
 
 		}
@@ -324,6 +327,13 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 		Tags:   []string{"cluster"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Manager) SaveEngine(engine *shipyard.Engine) error {
+	if _, err := r.Table(tblNameConfig).Replace(engine).RunWrite(m.session); err != nil {
 		return err
 	}
 	return nil
