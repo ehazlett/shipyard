@@ -323,9 +323,6 @@ func (m *Manager) Engine(id string) *shipyard.Engine {
 }
 
 func (m *Manager) AddEngine(engine *shipyard.Engine) error {
-	if _, err := r.Table(tblNameConfig).Insert(engine).RunWrite(m.session); err != nil {
-		return err
-	}
 	m.init()
 	stat, err := m.pingEngine(engine.Engine.Addr)
 	if err != nil {
@@ -333,6 +330,9 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 	}
 	if stat != 200 {
 		err := fmt.Errorf("Received status code '%d' when contacting %s", stat, engine.Engine.Addr)
+		return err
+	}
+	if _, err := r.Table(tblNameConfig).Insert(engine).RunWrite(m.session); err != nil {
 		return err
 	}
 	evt := &shipyard.Event{
