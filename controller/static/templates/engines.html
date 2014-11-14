@@ -37,7 +37,7 @@
             <td>{{e.engine.addr}}</td>
             <td>{{e.engine.labels.join(', ')}}</td>
             <td>{{e.health.status}}</td>
-            <td>{{e.health.response_time}}</td>
+            <td>{{e.health.response_time || "-" }}</td>
         </tr>
     </tbody>
 </table>
