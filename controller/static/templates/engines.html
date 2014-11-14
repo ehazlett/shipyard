@@ -24,6 +24,7 @@
             <th><a href="" ng-click="orderByField='engine.addr'; reverseSort = !reverseSort">Addr</a></th>
             <th><a href="" ng-click="orderByField='engine.labels'; reverseSort = !reverseSort">Labels</a></th>
             <th><a href="" ng-click="orderByField='health.status'; reverseSort = !reverseSort">Health</a></th>
+            <th><a href="" ng-click="orderByField='health.response_time'; reverseSort = !reverseSort">Response Time (ms)</a></th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
             <td>{{e.engine.addr}}</td>
             <td>{{e.engine.labels.join(', ')}}</td>
             <td>{{e.health.status}}</td>
+            <td>{{e.health.response_time}}</td>
         </tr>
     </tbody>
 </table>

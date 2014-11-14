@@ -281,6 +281,7 @@ func (m *Manager) engineHealthCheck() {
 		case <-t:
 			engs := m.Engines()
 			for _, eng := range engs {
+				start_time := time.Now()
 				uri := fmt.Sprintf("%s/v1.15/info", eng.Engine.Addr)
 				resp, err := http.Get(uri)
 				health := &shipyard.Health{}
@@ -288,6 +289,7 @@ func (m *Manager) engineHealthCheck() {
 					health.Status = EngineHealthDown
 				} else {
 					defer resp.Body.Close()
+					health.ResponseTime = int64(time.Since(start_time) / time.Millisecond)
 					if resp.StatusCode != 200 {
 						health.Status = EngineHealthDown
 					} else {
@@ -297,7 +299,6 @@ func (m *Manager) engineHealthCheck() {
 				eng.Health = health
 				m.SaveEngine(eng)
 			}
-
 		}
 	}
 }
