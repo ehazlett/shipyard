@@ -18,7 +18,7 @@
 <table class="ui table segment" ng-show="engines">
     <thead>
         <tr>
-            <th/>
+            <th><a href="" ng-click="orderByField='health.status'; reverseSort = !reverseSort">Status</a></th>
             <th><a href="" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Name</a></th>
             <th><a href="" ng-click="orderByField='engine.cpus'; reverseSort = !reverseSort">CPUs</a></th>
             <th><a href="" ng-click="orderByField='engine.memory'; reverseSort = !reverseSort">Memory</a></th>
@@ -29,7 +29,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort">
-            <td><div ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')"/></td>
+            <td><span ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')" title="{{e.health.status}}"/></td>
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
             </td>
