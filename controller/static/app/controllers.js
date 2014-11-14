@@ -70,9 +70,13 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 }
             });
         })
-        .controller('ContainersController', function($scope, Containers) {
+        .controller('ContainersController', function($scope, $location, Containers) {
             $scope.orderByField = 'id';
             $scope.reverseSort = false;
+
+            $scope.go = function() {
+                $location.path("/containers/" + this.c.id)
+            }
 
             $scope.template = 'templates/containers.html';
             Containers.query(function(data){

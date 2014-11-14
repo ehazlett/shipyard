@@ -29,8 +29,8 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in containers | orderBy:orderByField:reverseSort">
-            <td>
+        <tr ng-repeat="c in containers | orderBy:orderByField:reverseSort" ng-click="go()">
+             <td>
                 <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
             </td>
             <td>{{c.name|container_name}}</td>
