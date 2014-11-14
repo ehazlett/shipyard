@@ -288,7 +288,7 @@ func (m *Manager) engineHealthCheck() {
 					health.Status = EngineHealthDown
 				} else {
 					health.Status = EngineHealthUp
-					health.ResponseTime = int64(time.Since(start_time) / time.Millisecond)
+					health.ResponseTime = int64(time.Since(start_time) / time.Nanosecond)
 				}
 				eng.Health = health
 				m.SaveEngine(eng)
