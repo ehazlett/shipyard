@@ -327,6 +327,14 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 		return err
 	}
 	m.init()
+	stat, err := m.pingEngine(engine.Engine.Addr)
+	if err != nil {
+		return err
+	}
+	if stat != 200 {
+		err := fmt.Errorf("Received status code '%d' when contacting %s", stat, engine.Engine.Addr)
+		return err
+	}
 	evt := &shipyard.Event{
 		Type:   "add-engine",
 		Time:   time.Now(),
