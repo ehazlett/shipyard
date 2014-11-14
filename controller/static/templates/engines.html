@@ -18,17 +18,18 @@
 <table class="ui table segment" ng-show="engines">
     <thead>
         <tr>
+            <th/>
             <th><a href="" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Name</a></th>
             <th><a href="" ng-click="orderByField='engine.cpus'; reverseSort = !reverseSort">CPUs</a></th>
             <th><a href="" ng-click="orderByField='engine.memory'; reverseSort = !reverseSort">Memory</a></th>
             <th><a href="" ng-click="orderByField='engine.addr'; reverseSort = !reverseSort">Addr</a></th>
             <th><a href="" ng-click="orderByField='engine.labels'; reverseSort = !reverseSort">Labels</a></th>
-            <th><a href="" ng-click="orderByField='health.status'; reverseSort = !reverseSort">Health</a></th>
             <th><a href="" ng-click="orderByField='health.response_time'; reverseSort = !reverseSort">Response Time (ms)</a></th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort">
+            <td><div ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')"/></td>
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
             </td>
@@ -36,7 +37,6 @@
             <td>{{e.engine.memory}} MB</td>
             <td>{{e.engine.addr}}</td>
             <td>{{e.engine.labels.join(', ')}}</td>
-            <td>{{e.health.status}}</td>
             <td>{{e.health.response_time || "-" }}</td>
         </tr>
     </tbody>
