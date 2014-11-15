@@ -4,6 +4,7 @@ env:
     - RETHINKDB_TEST_PORT_28015_TCP_PORT=28015
     - RETHINKDB_TEST_DATABASE=shipyard_test
 script:
+    - go get github.com/tools/godep
     - pushd controller
     - make test
     - popd
