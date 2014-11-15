@@ -3,7 +3,19 @@ all: deps build
 deps:
 	@godep restore
 
+clean:
+	@rm -rf Godeps/_workspace controller
+
 build:
 	@godep go build .
 
-.PHONY: all deps build
+test: clean 
+	@# set the GOPATH because godep on drone does not 
+	@# have the env vars injected from drone
+	@# fuck computers
+	@godep restore
+	@export GOPATH=$GOPATH:$(pwd)/Godeps/_workspace
+	@go test -v ./...
+
+
+.PHONY: all deps build clean test
