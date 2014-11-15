@@ -6,7 +6,8 @@ import (
 
 type (
 	Health struct {
-		Status string `json:"status,omitempty" gorethink:"status,omitempty"`
+		Status       string `json:"status,omitempty" gorethink:"status,omitempty"`
+		ResponseTime int64  `json:"response_time,omitempty" gorethink:"response_time,omitempty"`
 	}
 
 	Engine struct {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -35,12 +36,22 @@ func engineListAction(c *cli.Context) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "ID\tName\tCpus\tMemory\tHost\tLabels\tHealth")
+	fmt.Fprintln(w, "ID\tName\tCpus\tMemory\tHost\tLabels\tHealth\tResponse Time (ms)")
 	for _, e := range engines {
 		labels := strings.Join(e.Engine.Labels, ",")
-		fmt.Fprintf(w, "%s\t%s\t%.2f\t%.2f\t%s\t%s\t%s\n", e.ID, e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.Addr, labels, e.Health.Status)
+		responseTime := responseTimeToString(e.Health.ResponseTime)
+		fmt.Fprintf(w, "%s\t%s\t%.2f\t%.2f\t%s\t%s\t%s\t%s\n", e.ID, e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.Addr, labels, e.Health.Status, responseTime)
 	}
 	w.Flush()
+}
+
+func responseTimeToString(responseTime int64) (rt string) {
+	if responseTime == 0 {
+		rt = "-"
+	} else {
+		rt = strconv.FormatInt(responseTime, 10)
+	}
+	return
 }
 
 var engineAddCommand = cli.Command{
