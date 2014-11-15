@@ -1,4 +1,9 @@
 image: go1.3
+env:
+    - RETHINKDB_TEST_PORT_28015_TCP_ADDR=127.0.0.1
+    - RETHINKDB_TEST_PORT_28015_TCP_PORT=28015
+    - RETHINKDB_TEST_DATABASE=shipyard_test
+    - DOCKER_TEST_ADDR={{docker_test_addr}}
 script:
     - go get github.com/tools/godep
     - pushd controller
