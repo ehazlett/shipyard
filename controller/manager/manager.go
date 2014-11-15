@@ -281,7 +281,7 @@ func (m *Manager) engineHealthCheck() {
 		case <-t:
 			engs := m.Engines()
 			for _, eng := range engs {
-				uri := fmt.Sprintf("%s/v1.15/info", eng.Engine.Addr)
+				uri := fmt.Sprintf("%s/_ping", eng.Engine.Addr)
 				resp, err := http.Get(uri)
 				health := &shipyard.Health{}
 				if err != nil {
