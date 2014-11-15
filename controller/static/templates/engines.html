@@ -18,7 +18,7 @@
 <table class="ui sortable table segment" ng-show="engines">
     <thead>
         <tr>
-            <th ng-class="orderByField == 'health.status' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='health.status'; reverseSort = !reverseSort">Status</th>
+            <th class="healthcolumn" ng-click="orderByField='health.status'; reverseSort = !reverseSort"><i class="medkit icon"></i></th>
             <th ng-class="orderByField == 'engine.id' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Name</th>
             <th ng-class="orderByField == 'engine.cpus' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.cpus'; reverseSort = !reverseSort">CPUs</th>
             <th ng-class="orderByField == 'engine.memory' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.memory'; reverseSort = !reverseSort">Memory</th>
@@ -29,7 +29,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort" ng-click="go();" class="rowlink">
-            <td><span ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')" title="{{e.health.status}}"/></td>
+            <td class="healthcolumn"><span ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')" title="{{e.health.status}}"/></td>
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
             </td>

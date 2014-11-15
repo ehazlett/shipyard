@@ -51,6 +51,16 @@ div.container {
     cursor: pointer;
     background-color: rgba(0, 0, 0, 0.04) !important;
 }
+.healthcolumn {
+    width: 1px;
+}
+td.healthcolumn  {
+    text-align: center;
+}
+.ui.sortable.table thead th.healthcolumn:after { 
+    width: 0; 
+    margin: 0;  
+}
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
 }
