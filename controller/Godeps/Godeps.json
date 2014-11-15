@@ -19,8 +19,8 @@
 		},
 		{
 			"ImportPath": "github.com/citadel/citadel",
-			"Comment": "beta4-41-g606f8dd",
-			"Rev": "606f8dde3f4dcf416580f496838cabdbbf5786c7"
+			"Comment": "beta4-42-g45fc6e6",
+			"Rev": "45fc6e67dad74e4d125282b94e43eae6d0a5bad2"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/negroni",
