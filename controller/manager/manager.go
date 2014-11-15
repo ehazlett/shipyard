@@ -281,26 +281,32 @@ func (m *Manager) engineHealthCheck() {
 		case <-t:
 			engs := m.Engines()
 			for _, eng := range engs {
-				start_time := time.Now()
-				uri := fmt.Sprintf("%s/_ping", eng.Engine.Addr)
-				resp, err := http.Get(uri)
 				health := &shipyard.Health{}
-				if err != nil {
+				start_time := time.Now()
+				stat, _ := m.pingEngine(eng.Engine.Addr)
+				if stat != 200 {
 					health.Status = EngineHealthDown
 				} else {
-					defer resp.Body.Close()
-					health.ResponseTime = int64(time.Since(start_time) / time.Millisecond)
-					if resp.StatusCode != 200 {
-						health.Status = EngineHealthDown
-					} else {
-						health.Status = EngineHealthUp
-					}
+					health.Status = EngineHealthUp
+					health.ResponseTime = int64(time.Since(start_time) / time.Nanosecond)
 				}
 				eng.Health = health
 				m.SaveEngine(eng)
 			}
 		}
 	}
+}
+
+func (m *Manager) pingEngine(addr string) (status int, err error) {
+	uri := fmt.Sprintf("%s/_ping", addr)
+	resp, err := http.Get(uri)
+	if err != nil {
+		return 0, err
+	} else {
+		defer resp.Body.Close()
+		status = resp.StatusCode
+	}
+	return status, nil
 }
 
 func (m *Manager) Engines() []*shipyard.Engine {
@@ -321,6 +327,14 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 		return err
 	}
 	m.init()
+	stat, err := m.pingEngine(engine.Engine.Addr)
+	if err != nil {
+		return err
+	}
+	if stat != 200 {
+		err := fmt.Errorf("Received status code '%d' when contacting %s", stat, engine.Engine.Addr)
+		return err
+	}
 	evt := &shipyard.Event{
 		Type:   "add-engine",
 		Time:   time.Now(),
