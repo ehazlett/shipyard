@@ -49,7 +49,8 @@ func responseTimeToString(responseTime int64) (rt string) {
 	if responseTime == 0 {
 		rt = "-"
 	} else {
-		rt = strconv.FormatInt(responseTime, 10)
+		timeInMillis := float64(responseTime) / 1000000.
+		rt = strconv.FormatFloat(timeInMillis, 'f', 1, 64)
 	}
 	return
 }
