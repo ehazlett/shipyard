@@ -5,6 +5,7 @@ env:
     - RETHINKDB_TEST_DATABASE=shipyard_test
 script:
     - go get github.com/tools/godep
+    - ln -sf $GOPATH/bin/godep /usr/local/bin/godep
     - pushd controller
     - make test
     - popd
