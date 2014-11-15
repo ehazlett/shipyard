@@ -4,6 +4,11 @@ env:
     - RETHINKDB_TEST_PORT_28015_TCP_PORT=28015
     - RETHINKDB_TEST_DATABASE=shipyard_test
 script:
+    - echo "Using env vars:"
+    - echo $RETHINKDB_TEST_PORT_28015_TCP_ADDR
+    - echo $RETHINKDB_TEST_PORT_28015_TCP_PORT
+    - echo $RETHINKDB_TEST_DATABASE
+    - echo $DOCKER_TEST_ADDR
     - go get github.com/tools/godep
     - pushd controller
     - make test-drone
