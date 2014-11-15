@@ -4,13 +4,11 @@ env:
     - RETHINKDB_TEST_PORT_28015_TCP_PORT=28015
     - RETHINKDB_TEST_DATABASE=shipyard_test
 script:
-    - go get github.com/tools/godep
-    - ln -sf $GOPATH/bin/godep /usr/local/bin/godep
     - pushd controller
-    - make test
+    - make test-drone
     - popd
     - pushd cli
-    - make test
+    - make test-drone
     - popd
 services:
     - shipyard/rethinkdb
