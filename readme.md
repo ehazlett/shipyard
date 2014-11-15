@@ -1,4 +1,4 @@
-# Shipyard [![Build Status](http://ci.evanhazlett.com/buildStatus/icon?job=shipyard)](http://ci.evanhazlett.com/job/shipyard/)
+# Shipyard [![Build Status](http://ci.evanhazlett.com/api/badge/github.com/shipyard/shipyard/status.svg?branch=master)](http://ci.evanhazlett.com/github.com/shipyard/shipyard)
 
 Composable Docker Management
 
