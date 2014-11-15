@@ -28,6 +28,10 @@ func newManager() *Manager {
 		fmt.Printf("unable to connect to test db: %s\n", err)
 		os.Exit(1)
 	}
+	health := &shipyard.Health{
+		Status:       "up",
+		ResponseTime: 1,
+	}
 	eng := &shipyard.Engine{
 		ID: "test",
 		Engine: &citadel.Engine{
@@ -37,6 +41,7 @@ func newManager() *Manager {
 			Memory: 4096,
 			Labels: []string{"tests"},
 		},
+		Health: health,
 	}
 	m.AddEngine(eng)
 	return m
@@ -46,8 +51,9 @@ func getTestImage() *citadel.Image {
 	img := &citadel.Image{
 		Name:   "busybox",
 		Cpus:   0.1,
-		Memory: 16,
+		Memory: 8,
 		Type:   "service",
+		Labels: []string{"tests"},
 	}
 	return img
 }
