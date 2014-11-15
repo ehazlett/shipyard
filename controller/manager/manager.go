@@ -1128,7 +1128,9 @@ func (m *Manager) Scale(container *citadel.Container, count int) error {
 		}
 		// reset hostname
 		img.Hostname = ""
-		m.Run(img, numAdd, false)
+		if _, err := m.Run(img, numAdd, false); err != nil {
+			return err
+		}
 	} else { // none
 		logger.Info("no need to scale")
 	}

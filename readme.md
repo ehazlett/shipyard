@@ -1,4 +1,4 @@
-# Shipyard
+# Shipyard [![Build Status](https://ci.evanhazlett.com/buildStatus/icon?job=shipyard)](https://ci.evanhazlett.com/job/shipyard/)
 Docker Management
 
 Shipyard enables multi-host, Docker cluster management.  It uses the [Citadel](https://github.com/citadel/citadel) toolkit for cluster resourcing and scheduling.  Shipyard has been dramatically simiplified and only requires access to the Docker Remote API and a RethinkDB instance.
