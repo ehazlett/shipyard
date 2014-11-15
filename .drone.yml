@@ -16,3 +16,4 @@ script:
     - popd
 services:
     - shipyard/rethinkdb
+
