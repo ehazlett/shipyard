@@ -70,9 +70,13 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 }
             });
         })
-        .controller('ContainersController', function($scope, Containers) {
+        .controller('ContainersController', function($scope, $location, Containers) {
             $scope.orderByField = 'id';
             $scope.reverseSort = false;
+
+            $scope.go = function() {
+                $location.path("/containers/" + this.c.id)
+            }
 
             $scope.template = 'templates/containers.html';
             Containers.query(function(data){
@@ -382,9 +386,13 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.container = data;
             });
         })
-        .controller('EnginesController', function($scope, Engines) {
+        .controller('EnginesController', function($scope, $location, Engines) {
             $scope.orderByField = 'engine.id';
             $scope.reverseSort = false;
+
+            $scope.go = function() {
+                $location.path("/engines/" + this.e.id)
+            };
             
             $scope.template = 'templates/engines.html';
             Engines.query(function(data){
@@ -484,6 +492,8 @@ angular.module('shipyard.controllers', ['ngCookies'])
         })
         .controller('EventsController', function($scope, $location, $window, Events) {
             $scope.template = 'templates/events.html';
+            $scope.orderByField = 'time';                                                                                                                                                                                                                              
+            $scope.reverseSort = true;
             $scope.showPurgeEventsDialog = function() {
                 $('.basic.modal.purgeEvents')
                     .modal('show');

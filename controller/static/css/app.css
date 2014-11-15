@@ -41,12 +41,15 @@ div.container {
 .hide {
     display: none;
 }
-
 .toolbar {
     margin-bottom: 5px;
 }
 .checkbox {
     padding-right: 10px;
+}
+.rowlink:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.04) !important;
 }
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;

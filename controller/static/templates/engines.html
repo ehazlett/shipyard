@@ -15,20 +15,20 @@
     </div>
 </div>
 
-<table class="ui table segment" ng-show="engines">
+<table class="ui sortable table segment" ng-show="engines">
     <thead>
         <tr>
-            <th><a href="" ng-click="orderByField='health.status'; reverseSort = !reverseSort">Status</a></th>
-            <th><a href="" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Name</a></th>
-            <th><a href="" ng-click="orderByField='engine.cpus'; reverseSort = !reverseSort">CPUs</a></th>
-            <th><a href="" ng-click="orderByField='engine.memory'; reverseSort = !reverseSort">Memory</a></th>
-            <th><a href="" ng-click="orderByField='engine.addr'; reverseSort = !reverseSort">Addr</a></th>
-            <th><a href="" ng-click="orderByField='engine.labels'; reverseSort = !reverseSort">Labels</a></th>
-            <th><a href="" ng-click="orderByField='health.response_time'; reverseSort = !reverseSort">Response Time (ms)</a></th>
+            <th ng-class="orderByField == 'health.status' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='health.status'; reverseSort = !reverseSort">Status</th>
+            <th ng-class="orderByField == 'engine.id' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Name</th>
+            <th ng-class="orderByField == 'engine.cpus' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.cpus'; reverseSort = !reverseSort">CPUs</th>
+            <th ng-class="orderByField == 'engine.memory' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.memory'; reverseSort = !reverseSort">Memory</th>
+            <th ng-class="orderByField == 'engine.addr' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.addr'; reverseSort = !reverseSort">Addr</th>
+            <th ng-class="orderByField == 'engine.labels' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.labels'; reverseSort = !reverseSort">Labels</th>
+            <th ng-class="orderByField == 'health.response_time' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='health.response_time'; reverseSort = !reverseSort">Response Time (ms)</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort">
+        <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort" ng-click="go();" class="rowlink">
             <td><span ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')" title="{{e.health.status}}"/></td>
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
