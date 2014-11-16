@@ -29,7 +29,8 @@
     </thead>
     <tbody>
         <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort" ng-click="go();" class="rowlink">
-            <td class="healthcolumn"><span ng-class="e.health.status == 'up' ? 'ui green circular label' : (e.health.status == 'down' ? 'ui red circular label' : 'ui circular label')" title="{{e.health.status}}"/></td>
+            <td class="healthcolumn">
+                <span class="ui circular label ng-class:{'green': e.health.status = 'up', 'red': e.health.status == 'down'}" title="{{e.health.status}}" />
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
             </td>
