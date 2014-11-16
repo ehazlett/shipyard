@@ -399,8 +399,9 @@ angular.module('shipyard.controllers', ['ngCookies'])
                     if(match == null || match.length < 4) {
                         continue;
                     }
+                    var prettyTime = match[1].replace(/(.*?)T(.*?)\..*/, "$1 $2") 
                     var log = {
-                        timestamp: match[1],
+                        timestamp: prettyTime, 
                         level: match[2],
                         msg: match[3]
                     }
