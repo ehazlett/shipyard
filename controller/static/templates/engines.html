@@ -18,13 +18,13 @@
 <table class="ui sortable table segment" ng-show="engines">
     <thead>
         <tr>
-            <th class="healthcolumn" ng-click="orderByField='health.status'; reverseSort = !reverseSort"><i class="medkit icon"></i></th>
-            <th ng-class="sortedTableHeading('engine.id')" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Name</th>
-            <th ng-class="sortedTableHeading('engine.cpus')" ng-click="orderByField='engine.cpus'; reverseSort = !reverseSort">CPUs</th>
-            <th ng-class="sortedTableHeading('engine.memory')" ng-click="orderByField='engine.memory'; reverseSort = !reverseSort">Memory</th>
-            <th ng-class="sortedTableHeading('engine.addr')" ng-click="orderByField='engine.addr'; reverseSort = !reverseSort">Addr</th>
-            <th ng-class="sortedTableHeading('engine.labels')" ng-click="orderByField='engine.labels'; reverseSort = !reverseSort">Labels</th>
-            <th ng-class="sortedTableHeading('health.response_time')" ng-click="orderByField='health.response_time'; reverseSort = !reverseSort">Response Time (ms)</th>
+            <th class="healthcolumn" ng-click="selectSortColumn('health.status')"><i class="medkit icon"></i></th>
+            <th ng-class="sortedTableHeading('engine.id')" ng-click="selectSortColumn('engine.id')">Name</th>
+            <th ng-class="sortedTableHeading('engine.cpus')" ng-click="selectSortColumn('engine.cpus')">CPUs</th>
+            <th ng-class="sortedTableHeading('engine.memory')" ng-click="selectSortColumn('engine.memory')">Memory</th>
+            <th ng-class="sortedTableHeading('engine.addr')" ng-click="selectSortColumn('engine.addr')">Addr</th>
+            <th ng-class="sortedTableHeading('engine.labels')" ng-click="selectSortColumn('engine.labels')">Labels</th>
+            <th ng-class="sortedTableHeading('health.response_time')" ng-click="selectSortColumn('health.response_time')">Response Time (ms)</th>
         </tr>
     </thead>
     <tbody>

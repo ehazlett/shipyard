@@ -18,14 +18,14 @@
 <table class="ui sortable table segment" ng-show="containers">
     <thead>
         <tr>
-            <th ng-class="sortedTableHeading('id')" ng-click="orderByField='id'; reverseSort = !reverseSort">ID</th>
-            <th ng-class="sortedTableHeading('name')" ng-click="orderByField='name'; reverseSort = !reverseSort">Name</th>
-            <th ng-class="sortedTableHeading('image.name')" ng-click="orderByField='image.name'; reverseSort = !reverseSort">Image</th>
-            <th ng-class="sortedTableHeading('engine.id')" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Engine</th>
-            <th ng-class="sortedTableHeading('image.cpus')" ng-click="orderByField='image.cpus'; reverseSort = !reverseSort">CPUs</th>
-            <th ng-class="sortedTableHeading('image.memory')" ng-click="orderByField='image.memory'; reverseSort = !reverseSort">Memory</th>
-            <th ng-class="sortedTableHeading('state')" ng-click="orderByField='state'; reverseSort = !reverseSort">State</th>
-            <th ng-class="sortedTableHeading('image.type')" ng-click="orderByField='image.type'; reverseSort = !reverseSort">Type</th>
+            <th ng-class="sortedTableHeading('id')" ng-click="selectSortColumn('id')">ID</th>
+            <th ng-class="sortedTableHeading('name')" ng-click="selectSortColumn('name')">Name</th>
+            <th ng-class="sortedTableHeading('image.name')" ng-click="selectSortColumn('image.name')">Image</th>
+            <th ng-class="sortedTableHeading('engine.id')" ng-click="selectSortColumn('engine.id')">Engine</th>
+            <th ng-class="sortedTableHeading('image.cpus')" ng-click="selectSortColumn('image.cpus')">CPUs</th>
+            <th ng-class="sortedTableHeading('image.memory')" ng-click="selectSortColumn('image.memory')">Memory</th>
+            <th ng-class="sortedTableHeading('state')" ng-click="selectSortColumn('state')">State</th>
+            <th ng-class="sortedTableHeading('image.type')" ng-click="selectSortColumn('image.type')">Type</th>
         </tr>
     </thead>
     <tbody>

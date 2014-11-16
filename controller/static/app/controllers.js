@@ -78,6 +78,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $location.path("/containers/" + this.c.id)
             }
 
+            $scope.selectSortColumn = function(field) {
+                $scope.reverseSort = !$scope.reverseSort;
+                $scope.orderByField = field;
+            }
+
             $scope.sortedTableHeading = function(field) {
                 if($scope.orderByField != field) {                                                                                                                                            
                     return "";                                                                                                                                                                
@@ -406,6 +411,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $location.path("/engines/" + this.e.id)
             };
 
+            $scope.selectSortColumn = function(field) {
+                $scope.reverseSort = !$scope.reverseSort;
+                $scope.orderByField = field;
+            }
+
             $scope.sortedTableHeading = function(field) {
                 if($scope.orderByField != field) {                                                                                                                                            
                     return "";                                                                                                                                                                
@@ -518,6 +528,10 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.template = 'templates/events.html';
             $scope.orderByField = 'time';
             $scope.reverseSort = true;
+            $scope.selectSortColumn = function(field) {
+                $scope.reverseSort = !$scope.reverseSort;
+                $scope.orderByField = field;
+            }
             $scope.sortedTableHeading = function(field) {
                 if($scope.orderByField != field) {                                                                                                                                            
                     return "";                                                                                                                                                                
