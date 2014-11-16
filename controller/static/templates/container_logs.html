@@ -9,6 +9,19 @@
     <i class="close icon"></i>
     {{flash.message}}
 </div>
-<div class="ui segment">
-    <div ng-bind-html="logs|unsafe"></div>
-</div>
+<table class="ui compact table segment" ng-show="logtable">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Level</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-class="highlight(l)" ng-repeat="l in logtable">
+            <td>{{l.timestamp}}</td>
+            <td>{{l.level}}</td>
+            <td>{{l.msg|unsafe}}</td>
+        </tr>
+    </tbody>
+</table>

@@ -379,9 +379,36 @@ angular.module('shipyard.controllers', ['ngCookies'])
         .controller('ContainerLogsController', function($scope, $location, $routeParams, $http, flash, Container, ansi2html) {
             $scope.template = 'templates/container_logs.html';
 
+            $scope.highlight = function(log) {
+                if(log.level == "warn") {
+                    return "warning";
+                }
+                else if(log.level == "error") {
+                    return "error"
+                } else {
+                    return "";
+                }
+            }
+
             $http.get('/api/containers/' + $routeParams.id + "/logs").success(function(data){
-                $scope.logs = ansi2html.toHtml(data.replace(/\n/g, '<br/>'));
+                var logArray = data.split('\n');
+                var regex = /(.*?)\s(.*?):\s(.*)/;
+                var logs = [];
+                for(var i = 0; i < logArray.length; i++) {
+                    var match = regex.exec(logArray[i]);
+                    if(match == null || match.length < 4) {
+                        continue;
+                    }
+                    var log = {
+                        timestamp: match[1],
+                        level: match[2],
+                        msg: match[3]
+                    }
+                    logs.push(log);
+                }
+                $scope.logtable = logs;
             });
+
             Container.query({id: $routeParams.id}, function(data){
                 $scope.container = data;
             });
