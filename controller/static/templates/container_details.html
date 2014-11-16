@@ -145,6 +145,11 @@
             <div>{{container.image.network_mode}}</div>
         </div>
         <div class="ui divider"></div>
+        <div class="ui section">
+            <h3 class="ui header">Restart Policy</h3>
+            <div>{{container.image.restart_policy.name}}</div>
+        </div>
+        <div class="ui divider"></div>
         <h4 class="ui top attached block header">Ports</h4>
         <div class="ui segment attached">
             <div ng-hide="container.ports">No exposed ports</div>
