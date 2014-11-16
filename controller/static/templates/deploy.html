@@ -117,6 +117,13 @@
                             <div class="item" ng-repeat="r in restartPolicies" data-value="{{r}}" ng-click="selectRestartPolicy(r)">{{r}}</div>
                         </div>
                     </div>
+                    <div class="field" ng-show="showMaxRestarts">
+                        <div class="ui divider"></div> 
+                        <label>Maximum Restarts</label>
+                        <div class="ui left labeled input">
+                            <input type="text" placeholder="&infin;" name="maxRestarts" ng-model="maxRestarts">
+                        </div>
+                    </div>
                 </div>
                 <div class="field">
                     <label>Network</label>

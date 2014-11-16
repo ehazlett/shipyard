@@ -119,6 +119,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             ]
             $scope.cpus = 0.1;
             $scope.memory = 256;
+            $scope.maxRestarts = "";
             $scope.environment = "";
             $scope.hostname = "";
             $scope.domain = "";
@@ -148,6 +149,11 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.restartPolicies = restartPolicies;
             $scope.selectRestartPolicy = function(policy) {
                 $scope.selectedRestartPolicy = policy;
+                if (policy == 'on-failure') {
+                    $scope.showMaxRestarts = true;
+                } else {
+                    $scope.showMaxRestarts = false;
+                }
                 $(".ui.dropdown").dropdown('hide');
             }
             var labels = [];
@@ -253,6 +259,10 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 });
                 var restartPolicy = {
                     name: $scope.selectedRestartPolicy,
+                }
+                var maxRestarts = parseInt($scope.maxRestarts);
+                if(maxRestarts > 0) {
+                    restartPolicy.maximum_retry = maxRestarts;
                 }
                 var params = {
                     name: $scope.name,
