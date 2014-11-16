@@ -31,11 +31,11 @@
 <table class="ui sortable table segment" ng-show="events">
     <thead>
         <tr>
-            <th ng-class="orderByField == 'time' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='time'; reverseSort = !reverseSort">Time</th>
-            <th ng-class="orderByField == 'container.id' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='container.id'; reverseSort = !reverseSort">Container</th>
-            <th ng-class="orderByField == 'engine.id' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='engine.id'; reverseSort = !reverseSort">Engine</th>
-            <th ng-class="orderByField == 'type' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='type'; reverseSort = !reverseSort">Type</th>
-            <th ng-class="orderByField == 'tags' ? (reverseSort ? 'descending' : 'ascending') : ''" ng-click="orderByField='tags'; reverseSort = !reverseSort">Tags</th>
+            <th ng-class="sortedTableHeading('time')" ng-click="selectSortColumn('time')">Time</th>
+            <th ng-class="sortedTableHeading('container.id')" ng-click="selectSortColumn('container.id')">Container</th>
+            <th ng-class="sortedTableHeading('engine.id')" ng-click="selectSortColumn('engine.id')">Engine</th>
+            <th ng-class="sortedTableHeading('type')" ng-click="selectSortColumn('type')">Type</th>
+            <th ng-class="sortedTableHeading('tags')" ng-click="selectSortColumn('tags')">Tags</th>
         </tr>
     </thead>
     <tbody>

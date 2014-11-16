@@ -78,6 +78,23 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $location.path("/containers/" + this.c.id)
             }
 
+            $scope.selectSortColumn = function(field) {
+                $scope.reverseSort = !$scope.reverseSort;
+                $scope.orderByField = field;
+            }
+
+            $scope.sortedTableHeading = function(field) {
+                if($scope.orderByField != field) {                                                                                                                                            
+                    return "";                                                                                                                                                                
+                } else {                                                                                                                                                                      
+                    if($scope.reverseSort == true) {                                                                                                                                          
+                        return "descending";                                                                                                                                                  
+                    } else {                                                                                                                                                                  
+                        return "ascending";                                                                                                                                                   
+                    }                                                                                                                                                                         
+                }
+            }
+
             $scope.template = 'templates/containers.html';
             Containers.query(function(data){
                 $scope.containers = data;
@@ -393,6 +410,23 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.go = function() {
                 $location.path("/engines/" + this.e.id)
             };
+
+            $scope.selectSortColumn = function(field) {
+                $scope.reverseSort = !$scope.reverseSort;
+                $scope.orderByField = field;
+            }
+
+            $scope.sortedTableHeading = function(field) {
+                if($scope.orderByField != field) {                                                                                                                                            
+                    return "";                                                                                                                                                                
+                } else {                                                                                                                                                                      
+                    if($scope.reverseSort == true) {                                                                                                                                          
+                        return "descending";                                                                                                                                                  
+                    } else {                                                                                                                                                                  
+                        return "ascending";                                                                                                                                                   
+                    }                                                                                                                                                                         
+                }
+            }
             
             $scope.template = 'templates/engines.html';
             Engines.query(function(data){
@@ -492,8 +526,24 @@ angular.module('shipyard.controllers', ['ngCookies'])
         })
         .controller('EventsController', function($scope, $location, $window, Events) {
             $scope.template = 'templates/events.html';
-            $scope.orderByField = 'time';                                                                                                                                                                                                                              
+            $scope.orderByField = 'time';
             $scope.reverseSort = true;
+            $scope.selectSortColumn = function(field) {
+                $scope.reverseSort = !$scope.reverseSort;
+                $scope.orderByField = field;
+            }
+            $scope.sortedTableHeading = function(field) {
+                if($scope.orderByField != field) {                                                                                                                                            
+                    return "";                                                                                                                                                                
+                } else {                                                                                                                                                                      
+                    if($scope.reverseSort == true) {                                                                                                                                          
+                        return "descending";                                                                                                                                                  
+                    } else {                                                                                                                                                                  
+                        return "ascending";                                                                                                                                                   
+                    }                                                                                                                                                                         
+                }
+            }
+
             $scope.showPurgeEventsDialog = function() {
                 $('.basic.modal.purgeEvents')
                     .modal('show');
