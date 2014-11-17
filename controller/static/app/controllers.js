@@ -489,46 +489,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 });
             });
         })
-        .controller('EventsController', function($scope, $location, $window, Events) {
-            $scope.template = 'templates/events.html';
-            $scope.orderByField = 'time';
-            $scope.reverseSort = true;
-            $scope.selectSortColumn = function(field) {
-                $scope.reverseSort = !$scope.reverseSort;
-                $scope.orderByField = field;
-            }
-            $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {
-                    return "";
-                } else {
-                    if($scope.reverseSort == true) {
-                        return "descending";
-                    } else {
-                        return "ascending";
-                    }
-                }
-            }
-
-            $scope.showPurgeEventsDialog = function() {
-                $('.basic.modal.purgeEvents')
-                    .modal('show');
-            };
-            $scope.purgeEvents = function() {
-                Events.purge().$promise.then(function(c) {
-                    // we must remove the modal or it will come back
-                    // the next time the modal is shown
-                    $('.basic.modal').remove();
-                    $location.path('/events');
-                    $window.location.reload();
-                }, function(err) {
-                    flash.error = 'error purging events: ' + err.data;
-                });
-            };
-            Events.query(function(data){
-                $scope.events = data;
-            });
-        })
-
 
 $(function(){
     $('.message .close').on('click', function() {

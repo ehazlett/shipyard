@@ -23,9 +23,8 @@
                 controller: 'DashboardController'
             });
             $routeProvider.when('/containers', {
-                templateUrl: 'app/containers/containers.html',
-                controller: 'ContainersController',
-                controllerAs: 'vm'
+                templateUrl: 'templates/containers.html',
+                controller: 'ContainersController'
             });
             $routeProvider.when('/containers/deploy', {
                 templateUrl: 'templates/deploy.html',
@@ -53,8 +52,9 @@
                 controller: 'EngineDetailsController'
             });
             $routeProvider.when('/events', {
-                templateUrl: 'templates/events.html',
-                controller: 'EventsController'
+                templateUrl: 'app/events/events.html',
+                controller: 'EventsController',
+                controllerAs: 'vm'
             });
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'

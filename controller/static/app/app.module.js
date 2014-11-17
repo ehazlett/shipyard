@@ -6,6 +6,7 @@
         'ngCookies',
         'shipyard.engines',
         'shipyard.containers',
+        'shipyard.events',
         'shipyard.filters',
         'shipyard.services',
         'shipyard.controllers',
