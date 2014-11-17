@@ -3,19 +3,19 @@
         <div id="chart-cpu" class="column">
             <h3 class="ui header center aligned">CPU</h3>
             <div>
-                <canvas donutchart data="clusterCpuData" options="chartOptions" width="250" height="250"></canvas>
+                <canvas donutchart data="vm.clusterCpuData" options="chartOptions" width="250" height="250"></canvas>
             </div>
         </div>
 
         <div id="chart-memory" class="column">
             <h3 class="ui header center aligned">Memory</h3>
             <div>
-                <canvas donutchart data="clusterMemoryData" options="chartOptions" width="250" height="250"></canvas>
+                <canvas donutchart data="vm.clusterMemoryData" options="chartOptions" width="250" height="250"></canvas>
             </div>
         </div>
 
         <div class="column">
-            <div class="ui feed" ng-repeat="event in events | limitTo: 5">
+            <div class="ui feed" ng-repeat="event in vm.events | limitTo: 5">
                 <div class="event">
                     <div class="label">
                         <i class="circular icon" ng-class="event.type|eventCssClass"></i>

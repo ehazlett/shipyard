@@ -34,42 +34,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $window.location.href = '/#/login';
             $window.location.reload();
         })
-        .controller('DashboardController', function($http, $scope, Events, ClusterInfo, AuthToken) {
-            $scope.template = 'templates/dashboard.html';
-            Events.query(function(data){
-                $scope.events = data;
-            });
-            $scope.showX = function(){
-                return function(d){
-                    return d.key;
-                };
-            };
-            $scope.showY = function(){
-                return function(d){
-                    return d.y;
-                };
-            };
-            ClusterInfo.query(function(data){
-                $scope.chartOptions = {};
-                $scope.clusterInfo = data;
-                $scope.clusterCpuData = [
-                    { label: "Free", value: data.cpus, color: "#184465" },
-                    { label: "Reserved", value: 0, color: "#6D91AD" }
-                ];
-                if (data.cpus != undefined && data.reserved_cpus != undefined) {
-                    $scope.clusterCpuData[0].value = data.cpus - data.reserved_cpus;
-                    $scope.clusterCpuData[1].value = data.reserved_cpus;
-                }
-                $scope.clusterMemoryData = [
-                    { label: "Free", value: data.memory, color: "#184465" },
-                    { label: "Reserved", value: 0, color: "#6D91AD" }
-                ];
-                if (data.memory != undefined && data.reserved_memory != undefined) {
-                    $scope.clusterMemoryData[0].value = data.memory - data.reserved_memory;
-                    $scope.clusterMemoryData[1].value = data.reserved_memory;
-                }
-            });
-        })
         .controller('DeployController', function($scope, $location, Engines, Container) {
             var types = [
                 "service",

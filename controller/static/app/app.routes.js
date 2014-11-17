@@ -19,12 +19,14 @@
                 controller: 'LogoutController'
             });
             $routeProvider.when('/dashboard', {
-                templateUrl: 'templates/dashboard.html',
-                controller: 'DashboardController'
+                templateUrl: 'app/dashboard/dashboard.html',
+                controller: 'DashboardController',
+                controllerAs: 'vm'
             });
             $routeProvider.when('/containers', {
-                templateUrl: 'templates/containers.html',
-                controller: 'ContainersController'
+                templateUrl: 'app/containers/containers.html',
+                controller: 'ContainersController',
+                controllerAs: 'vm'
             });
             $routeProvider.when('/containers/deploy', {
                 templateUrl: 'templates/deploy.html',
