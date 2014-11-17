@@ -8,23 +8,25 @@
     EnginesController.$inject = ['$scope', '$location', 'Engines'];    
 
     function EnginesController($scope, $location, Engines) {
-        $scope.orderByField = 'engine.id';
-        $scope.reverseSort = false;
+
+        var vm = this;
+        vm.reverseSort = false;
+        vm.orderByField = 'engine.id';
 
         $scope.go = function() {
             $location.path("/engines/" + this.e.id)
         };
 
         $scope.selectSortColumn = function(field) {
-            $scope.reverseSort = !$scope.reverseSort;
-            $scope.orderByField = field;
+            vm.reverseSort = !vm.reverseSort;
+            vm.orderByField = field;
         }
 
         $scope.sortedTableHeading = function(field) {
-            if($scope.orderByField != field) {
+            if(vm.orderByField != field) {
                 return "";
             } else {
-                if($scope.reverseSort == true) {
+                if(vm.reverseSort == true) {
                     return "descending"
                 } else {
                     return "ascending";
@@ -33,7 +35,7 @@
         }
         
         Engines.query(function(data){
-            $scope.engines = data;
+            vm.engines = data;
         });
     }
 })();
