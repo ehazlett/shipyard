@@ -5,24 +5,24 @@
         .module('shipyard')
         .controller('EnginesController', EnginesController);
 
-    EnginesController.$inject = ['$scope', '$location', 'Engines'];    
+    EnginesController.$inject = ['$location', 'Engines'];    
 
-    function EnginesController($scope, $location, Engines) {
+    function EnginesController($location, Engines) {
 
         var vm = this;
         vm.reverseSort = false;
         vm.orderByField = 'engine.id';
 
-        $scope.go = function() {
-            $location.path("/engines/" + this.e.id)
+        vm.go = function(engine) {
+            $location.path("/engines/" + engine.id)
         };
 
-        $scope.selectSortColumn = function(field) {
+        vm.selectSortColumn = function(field) {
             vm.reverseSort = !vm.reverseSort;
             vm.orderByField = field;
         }
 
-        $scope.sortedTableHeading = function(field) {
+        vm.sortedTableHeading = function(field) {
             if(vm.orderByField != field) {
                 return "";
             } else {
