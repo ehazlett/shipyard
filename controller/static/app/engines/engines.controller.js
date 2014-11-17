@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('shipyard')
+        .module('shipyard.engines')
         .controller('EnginesController', EnginesController);
 
     EnginesController.$inject = ['$location', 'Engines'];    
