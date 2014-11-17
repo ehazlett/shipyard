@@ -323,7 +323,6 @@ func (m *Manager) Engine(id string) *shipyard.Engine {
 }
 
 func (m *Manager) AddEngine(engine *shipyard.Engine) error {
-	m.init()
 	stat, err := m.pingEngine(engine.Engine.Addr)
 	if err != nil {
 		return err
@@ -335,6 +334,7 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 	if _, err := r.Table(tblNameConfig).Insert(engine).RunWrite(m.session); err != nil {
 		return err
 	}
+	m.init()
 	evt := &shipyard.Event{
 		Type:   "add-engine",
 		Time:   time.Now(),
