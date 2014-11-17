@@ -32,7 +32,6 @@
             }
         }
         
-        $scope.template = 'app/engines/engines.html';
         Engines.query(function(data){
             $scope.engines = data;
         });

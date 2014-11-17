@@ -40,7 +40,8 @@
             });
             $routeProvider.when('/engines', {
                 templateUrl: 'app/engines/engines.html',
-                controller: 'EnginesController'
+                controller: 'EnginesController',
+                controllerAs: 'vm'
             });
             $routeProvider.when('/engines/add', {
                 templateUrl: 'templates/engine_add.html',
