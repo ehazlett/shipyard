@@ -147,12 +147,9 @@
         <div class="ui divider"></div>
         <div class="ui section">
             <h3 class="ui header">Restart Policy</h3>
-            <div>{{container.image.restart_policy.name || "no"}}</div>
-        </div>
-        <div ng-show="container.image.restart_policy.maximum_retry">
-            <div class="ui divider"></div>
-            <h3 class="ui header">Maximum Restarts</h3>
-            <div>{{container.image.restart_policy.maximum_retry}}</div>
+            <div>
+                {{container.image.restart_policy.name || "no"}}<span ng-show="container.image.restart_policy.maximum_retry">:{{container.image.restart_policy.maximum_retry}}</span>
+            </div>
         </div>
         <div class="ui divider"></div>
         <h4 class="ui top attached block header">Ports</h4>
