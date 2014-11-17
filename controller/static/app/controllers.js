@@ -70,36 +70,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 }
             });
         })
-        .controller('ContainersController', function($scope, $location, Containers) {
-            $scope.orderByField = 'id';
-            $scope.reverseSort = false;
-
-            $scope.go = function() {
-                $location.path("/containers/" + this.c.id)
-            }
-
-            $scope.selectSortColumn = function(field) {
-                $scope.reverseSort = !$scope.reverseSort;
-                $scope.orderByField = field;
-            }
-
-            $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {
-                    return "";
-                } else {
-                    if($scope.reverseSort == true) {
-                        return "descending";
-                    } else {
-                        return "ascending";
-                    }
-                }
-            }
-
-            $scope.template = 'templates/containers.html';
-            Containers.query(function(data){
-                $scope.containers = data;
-            });
-        })
         .controller('DeployController', function($scope, $location, Engines, Container) {
             var types = [
                 "service",

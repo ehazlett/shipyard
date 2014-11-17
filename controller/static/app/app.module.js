@@ -5,6 +5,7 @@
         'ngRoute',
         'ngCookies',
         'shipyard.engines',
+        'shipyard.containers',
         'shipyard.filters',
         'shipyard.services',
         'shipyard.controllers',

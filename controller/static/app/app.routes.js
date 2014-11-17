@@ -23,8 +23,9 @@
                 controller: 'DashboardController'
             });
             $routeProvider.when('/containers', {
-                templateUrl: 'templates/containers.html',
-                controller: 'ContainersController'
+                templateUrl: 'app/containers/containers.html',
+                controller: 'ContainersController',
+                controllerAs: 'vm'
             });
             $routeProvider.when('/containers/deploy', {
                 templateUrl: 'templates/deploy.html',
