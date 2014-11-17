@@ -28,7 +28,7 @@
                 }
             }
             
-            $scope.template = 'templates/engines.html';
+            $scope.template = 'app/engines/engines.html';
             Engines.query(function(data){
                 $scope.engines = data;
             });

@@ -39,7 +39,7 @@
                 controller: 'ContainerLogsController'
             });
             $routeProvider.when('/engines', {
-                templateUrl: 'templates/engines.html',
+                templateUrl: 'app/engines/engines.html',
                 controller: 'EnginesController'
             });
             $routeProvider.when('/engines/add', {
