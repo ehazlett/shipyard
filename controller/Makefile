@@ -24,4 +24,4 @@ test-drone: clean
 	@export GOPATH=$GOPATH:$(pwd)/Godeps/_workspace
 	@go test -v ./...
 
-.PHONY: all deps build clean test
+.PHONY: all deps build clean test test-drone
