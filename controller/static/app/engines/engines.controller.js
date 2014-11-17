@@ -3,34 +3,38 @@
 
     angular
         .module('shipyard')
-        .controller('EnginesController', function($scope, $location, Engines) {
-            $scope.orderByField = 'engine.id';
-            $scope.reverseSort = false;
+        .controller('EnginesController', EnginesController);
 
-            $scope.go = function() {
-                $location.path("/engines/" + this.e.id)
-            };
+    EnginesController.$inject = ['$scope', '$location', 'Engines'];    
 
-            $scope.selectSortColumn = function(field) {
-                $scope.reverseSort = !$scope.reverseSort;
-                $scope.orderByField = field;
-            }
+    function EnginesController($scope, $location, Engines) {
+        $scope.orderByField = 'engine.id';
+        $scope.reverseSort = false;
 
-            $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {
-                    return "";
+        $scope.go = function() {
+            $location.path("/engines/" + this.e.id)
+        };
+
+        $scope.selectSortColumn = function(field) {
+            $scope.reverseSort = !$scope.reverseSort;
+            $scope.orderByField = field;
+        }
+
+        $scope.sortedTableHeading = function(field) {
+            if($scope.orderByField != field) {
+                return "";
+            } else {
+                if($scope.reverseSort == true) {
+                    return "descending"
                 } else {
-                    if($scope.reverseSort == true) {
-                        return "descending"
-                    } else {
-                        return "ascending";
-                    }
+                    return "ascending";
                 }
             }
-            
-            $scope.template = 'app/engines/engines.html';
-            Engines.query(function(data){
-                $scope.engines = data;
-            });
+        }
+        
+        $scope.template = 'app/engines/engines.html';
+        Engines.query(function(data){
+            $scope.engines = data;
         });
+    }
 })();
