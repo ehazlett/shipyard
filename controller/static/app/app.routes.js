@@ -1,20 +1,15 @@
-'use strict';
+(function() {
+    'use strict';
 
-angular.module('shipyard', [
-        'ngRoute',
-        'ngCookies',
-        'shipyard.filters',
-        'shipyard.services',
-        'shipyard.controllers',
-        'shipyard.utils',
-        'shipyard.directives',
-        'angular-flash.service',
-        'angular-flash.flash-alert-directive',
-        'angles',
-        'ansiToHtml'
-    ])
-    .config(['$routeProvider', '$httpProvider', '$provide', 'flashProvider',
-        function ($routeProvider, $httpProvider, $provide, flashProvider) {
+    angular
+        .module('shipyard')
+        .config([
+                '$routeProvider', 
+                '$httpProvider', 
+                '$provide', 
+                'flashProvider',
+       
+         function ($routeProvider, $httpProvider, $provide, flashProvider) {
             $routeProvider.when('/login', {
                 templateUrl: 'templates/login.html',
                 controller: 'LoginController'
@@ -95,9 +90,6 @@ angular.module('shipyard', [
             flashProvider.warnClassnames.push('yellow');
             flashProvider.infoClassnames.push('blue');
             flashProvider.successClassnames.push('green');
-        }]);
-
-
-Chart.defaults.global.responsive = true;
-Chart.defaults.global.animation = false;
-Chart.defaults.global.showTooltips = true;
+         }
+    ]);
+})();
