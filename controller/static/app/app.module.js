@@ -13,7 +13,6 @@
         'shipyard.services',
         'shipyard.controllers',
         'shipyard.utils',
-        'shipyard.directives',
         'angular-flash.service',
         'angular-flash.flash-alert-directive',
         'angles',
