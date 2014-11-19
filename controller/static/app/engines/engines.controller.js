@@ -12,7 +12,7 @@
         var vm = this;
 
         vm.reverseSort = tablesort.isReverseSorted();
-        vm.orderByField = tablesort.getSortField(); 
+        vm.orderByField = tablesort.getSortField();
 
         vm.go = function(engine) {
             $location.path("/engines/" + engine.id)

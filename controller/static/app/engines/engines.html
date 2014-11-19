@@ -15,7 +15,7 @@
     </div>
 </div>
 
-<table class="ui sortable table segment" ng-show="vm.engines">
+<table class="ui sortable table segment" ng-show="vm.engines" ng-init="vm.selectSortColumn('engine.id')">
     <thead>
         <tr>
             <th class="healthcolumn" ng-click="vm.selectSortColumn('health.status')"><i class="medkit icon"></i></th>
