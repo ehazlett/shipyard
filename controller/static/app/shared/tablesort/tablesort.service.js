@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('shipyard')
+        .module('shipyard.shared')
         .factory('tablesort', tablesort);
     
     function tablesort() {
