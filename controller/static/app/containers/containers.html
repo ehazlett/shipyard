@@ -15,21 +15,21 @@
     </div>
 </div>
 
-<table class="ui sortable table segment" ng-show="vm.containers">
+<table class="ui sortable table segment" ng-show="vm.containers" ng-init="vm.tablesort.sortBy('id')">
     <thead>
         <tr>
-            <th ng-class="vm.sortedTableHeading('id')" ng-click="vm.selectSortColumn('id')">ID</th>
-            <th ng-class="vm.sortedTableHeading('name')" ng-click="vm.selectSortColumn('name')">Name</th>
-            <th ng-class="vm.sortedTableHeading('image.name')" ng-click="vm.selectSortColumn('image.name')">Image</th>
-            <th ng-class="vm.sortedTableHeading('engine.id')" ng-click="vm.selectSortColumn('engine.id')">Engine</th>
-            <th ng-class="vm.sortedTableHeading('image.cpus')" ng-click="vm.selectSortColumn('image.cpus')">CPUs</th>
-            <th ng-class="vm.sortedTableHeading('image.memory')" ng-click="vm.selectSortColumn('image.memory')">Memory</th>
-            <th ng-class="vm.sortedTableHeading('state')" ng-click="vm.selectSortColumn('state')">State</th>
-            <th ng-class="vm.sortedTableHeading('image.type')" ng-click="vm.selectSortColumn('image.type')">Type</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('id')" ng-click="vm.tablesort.sortBy('id')">ID</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('name')" ng-click="vm.tablesort.sortBy('name')">Name</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.name')" ng-click="vm.tablesort.sortBy('image.name')">Image</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.id')" ng-click="vm.tablesort.sortBy('engine.id')">Engine</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.cpus')" ng-click="vm.tablesort.sortBy('image.cpus')">CPUs</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.memory')" ng-click="vm.tablesort.sortBy('image.memory')">Memory</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('state')" ng-click="vm.tablesort.sortBy('state')">State</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.type')" ng-click="vm.tablesort.sortBy('image.type')">Type</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in vm.containers | orderBy:vm.orderByField:vm.reverseSort" ng-click="vm.go(c)" class="rowlink">
+        <tr ng-repeat="c in vm.containers | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()" ng-click="vm.go(c)" class="rowlink">
              <td>
                 <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
             </td>
