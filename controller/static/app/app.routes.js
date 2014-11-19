@@ -18,16 +18,6 @@
                 template: "",
                 controller: 'LogoutController'
             });
-            $routeProvider.when('/dashboard', {
-                templateUrl: 'app/dashboard/dashboard.html',
-                controller: 'DashboardController',
-                controllerAs: 'vm'
-            });
-            $routeProvider.when('/containers', {
-                templateUrl: 'app/containers/containers.html',
-                controller: 'ContainersController',
-                controllerAs: 'vm'
-            });
             $routeProvider.when('/containers/deploy', {
                 templateUrl: 'templates/deploy.html',
                 controller: 'DeployController'
@@ -47,11 +37,6 @@
             $routeProvider.when('/engines/:id', {
                 templateUrl: 'templates/engine_details.html',
                 controller: 'EngineDetailsController'
-            });
-            $routeProvider.when('/events', {
-                templateUrl: 'app/events/events.html',
-                controller: 'EventsController',
-                controllerAs: 'vm'
             });
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
