@@ -17,6 +17,10 @@
             }   
         }
 
+        function setReverseSort(reverse) {
+            reverseSort = reverse;
+        }
+
         function semanticHeaderClass(field) {
             if(field != sortField) {
                 return "";
@@ -41,6 +45,7 @@
             semanticHeaderClass: semanticHeaderClass,
             isReverseSorted: isReverseSorted,
             getSortField: getSortField,
+            setReverseSort: setReverseSort,
         };
 
         return service;

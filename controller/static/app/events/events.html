@@ -7,12 +7,12 @@
     </div>
     <div class="actions">
         <div class="ui button small">Cancel</div>
-        <a ng-click="vm.purgeEvents()" class="ui button small blue">Ok</a>
+        <a ng-click="vm.urgeEvents()" class="ui button small blue">Ok</a>
     </div>
 </div>
 
 <div class="ui icon buttons toolbar">
-    <a ng-click="vm.showPurgeEventsDialog()" class="ui button mini black">
+    <a ng-click="vm.howPurgeEventsDialog()" class="ui button mini black">
         <i class="delete icon sign"></i>
         Purge
     </a>
@@ -28,18 +28,18 @@
     </div>
 </div>
 
-<table class="ui sortable table segment" ng-show="vm.events">
+<table class="ui sortable table segment" ng-show="vm.events" ng-init="vm.initSort()">
     <thead>
         <tr>
-            <th ng-class="vm.sortedTableHeading('time')" ng-click="vm.selectSortColumn('time')">Time</th>
-            <th ng-class="vm.sortedTableHeading('container.id')" ng-click="vm.selectSortColumn('container.id')">Container</th>
-            <th ng-class="vm.sortedTableHeading('engine.id')" ng-click="vm.selectSortColumn('engine.id')">Engine</th>
-            <th ng-class="vm.sortedTableHeading('type')" ng-click="vm.selectSortColumn('type')">Type</th>
-            <th ng-class="vm.sortedTableHeading('tags')" ng-click="vm.selectSortColumn('tags')">Tags</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('time')" ng-click="vm.tablesort.sortBy('time')">Time</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('container.id')" ng-click="vm.tablesort.sortBy('container.id')">Container</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.id')" ng-click="vm.tablesort.sortBy('engine.id')">Engine</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('type')" ng-click="vm.tablesort.sortBy('type')">Type</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('tags')" ng-click="vm.tablesort.sortBy('tags')">Tags</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="e in vm.events | orderBy:orderByField:reverseSort">
+        <tr ng-repeat="e in vm.events | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()">
             <td>{{e.time}}</td>
             <td>{{e.container.id|truncate}}</td>
             <td>{{e.engine.id}}</td>
