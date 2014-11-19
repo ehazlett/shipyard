@@ -47,6 +47,12 @@ div.container {
 .checkbox {
     padding-right: 10px;
 }
+.logs {
+  font-family: Menlo, curier;
+  font-size: 12px;
+  word-break: break-word;
+  width: 100%;
+}
 .rowlink:hover {
     cursor: pointer;
     background-color: rgba(0, 0, 0, 0.04) !important;
