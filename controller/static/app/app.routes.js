@@ -40,11 +40,6 @@
                 templateUrl: 'templates/container_logs.html',
                 controller: 'ContainerLogsController'
             });
-            $routeProvider.when('/engines', {
-                templateUrl: 'app/engines/engines.html',
-                controller: 'EnginesController',
-                controllerAs: 'vm'
-            });
             $routeProvider.when('/engines/add', {
                 templateUrl: 'templates/engine_add.html',
                 controller: 'EngineAddController'
