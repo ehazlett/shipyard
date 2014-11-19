@@ -4,6 +4,7 @@
     angular.module('shipyard', [
         'ngRoute',
         'ngCookies',
+        'shipyard.layout',
         'shipyard.shared',
         'shipyard.dashboard',
         'shipyard.engines',

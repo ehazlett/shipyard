@@ -1,22 +1,6 @@
 'use strict';
 
 angular.module('shipyard.controllers', ['ngCookies'])
-        .controller('HeaderController', function($http, $scope, AuthToken) {
-            $scope.template = 'templates/header.html';
-            $scope.username = AuthToken.getUsername();
-            $scope.isLoggedIn = AuthToken.isLoggedIn();
-            $http.defaults.headers.common['X-Access-Token'] = AuthToken.get();
-        })
-        .controller('MenuController', function($scope, $location, $cookieStore, AuthToken) {
-            $scope.template = 'templates/menu.html';
-            $scope.isActive = function(path){
-                if ($location.path().substr(0, path.length) == path) {
-                    return true
-                }
-                return false
-            }
-            $scope.isLoggedIn = AuthToken.isLoggedIn();
-        })
         .controller('LoginController', function($scope, $cookieStore, $window, flash, Login, AuthToken) {
             $scope.template = 'templates/login.html';
             $scope.login = function() {
