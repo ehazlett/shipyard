@@ -5,33 +5,25 @@
         .module('shipyard.engines')
         .controller('EnginesController', EnginesController);
 
-    EnginesController.$inject = ['$location', 'Engines'];    
+    EnginesController.$inject = ['$location', 'Engines', 'tablesort'];    
 
-    function EnginesController($location, Engines) {
+    function EnginesController($location, Engines, tablesort) {
 
         var vm = this;
-        vm.reverseSort = false;
-        vm.orderByField = 'engine.id';
+
+        vm.reverseSort = tablesort.isReverseSorted();
+        vm.orderByField = tablesort.getSortField(); 
 
         vm.go = function(engine) {
             $location.path("/engines/" + engine.id)
         };
 
         vm.selectSortColumn = function(field) {
-            vm.reverseSort = !vm.reverseSort;
-            vm.orderByField = field;
+            tablesort.sortBy(field);
         }
 
         vm.sortedTableHeading = function(field) {
-            if(vm.orderByField != field) {
-                return "";
-            } else {
-                if(vm.reverseSort == true) {
-                    return "descending"
-                } else {
-                    return "ascending";
-                }
-            }
+            return tablesort.semanticHeaderClass(field);
         }
         
         Engines.query(function(data){

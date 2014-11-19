@@ -29,7 +29,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in vm.containers | orderBy:orderByField:reverseSort" ng-click="vm.go(c)" class="rowlink">
+        <tr ng-repeat="c in vm.containers | orderBy:vm.orderByField:vm.reverseSort" ng-click="vm.go(c)" class="rowlink">
              <td>
                 <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
             </td>
