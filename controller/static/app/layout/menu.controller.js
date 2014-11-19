@@ -5,7 +5,7 @@
         .module('shipyard.layout')
         .controller('MenuController', MenuController);
 
-    function MenuController($scope, $location, $cookieStore, AuthToken) {
+    function MenuController($scope, $location, $cookieStore, authtoken) {
         $scope.template = 'app/layout/menu.html';
         $scope.isActive = function(path){
             if ($location.path().substr(0, path.length) == path) {
@@ -13,6 +13,6 @@
             }
             return false
         }
-        $scope.isLoggedIn = AuthToken.isLoggedIn();
+        $scope.isLoggedIn = authtoken.isLoggedIn();
     }
 })()

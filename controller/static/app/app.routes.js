@@ -41,7 +41,7 @@
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
             });
-            $provide.factory('httpInterceptor', function ($q, $window, flash, AuthToken) {
+            $provide.factory('httpInterceptor', function ($q, $window, flash, authtoken) {
                 return {
                     request: function (config) {
                         return config || $q.when(config);
@@ -55,7 +55,7 @@
                     responseError: function (rejection) {
                         switch (rejection.status) {
                             case 401:
-                                AuthToken.delete();
+                                authtoken.delete();
                                 $window.location.href = '/#/login';
                                 $window.location.reload();
                                 return $q.reject(rejection);

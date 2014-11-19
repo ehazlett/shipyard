@@ -5,9 +5,9 @@
         .module('shipyard.dashboard')
         .controller('DashboardController', DashboardController);
 
-    DashboardController.$inject = ['$http', 'Events', 'ClusterInfo', 'AuthToken'];
+    DashboardController.$inject = ['$http', 'Events', 'ClusterInfo', 'authtoken'];
 
-    function DashboardController($http, Events, ClusterInfo, AuthToken) {
+    function DashboardController($http, Events, ClusterInfo, authtoken) {
         var vm = this;
 
         Events.query(function(data){
