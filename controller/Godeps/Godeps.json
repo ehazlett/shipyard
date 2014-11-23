@@ -55,7 +55,7 @@
 		},
 		{
 			"ImportPath": "github.com/samalba/dockerclient",
-			"Rev": "01af20a060a93dcec0b121bfb7cabcba8c5c569d"
+			"Rev": "55c12a9bee0501fee75e1143a3ca9dc0f1c8eca9"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",

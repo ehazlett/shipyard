@@ -27,7 +27,7 @@ func parseEnvironmentVariables(pairs []string) map[string]string {
 	return env
 }
 
-func parseRestartPolicy(policy string) (string, int, error) {
+func parseRestartPolicy(policy string) (string, int64, error) {
 	retry := 0
 	if strings.Index(policy, ":") > -1 {
 		parts := strings.Split(policy, ":")
@@ -38,7 +38,7 @@ func parseRestartPolicy(policy string) (string, int, error) {
 		retry = r
 		policy = parts[0]
 	}
-	return policy, retry, nil
+	return policy, int64(retry), nil
 }
 
 func parseContainerLinks(pairs []string) map[string]string {

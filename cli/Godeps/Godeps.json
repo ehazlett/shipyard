@@ -19,8 +19,8 @@
 		},
 		{
 			"ImportPath": "github.com/citadel/citadel",
-			"Comment": "beta4-52-g5d8966b",
-			"Rev": "5d8966b01796107a26f578aa6a7189f23f5d02d2"
+			"Comment": "beta4-57-gc9fe6dd",
+			"Rev": "c9fe6ddf3eed9fdc0fe2e01b8fbe525246f96a97"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
@@ -33,7 +33,7 @@
 		},
 		{
 			"ImportPath": "github.com/samalba/dockerclient",
-			"Rev": "01af20a060a93dcec0b121bfb7cabcba8c5c569d"
+			"Rev": "55c12a9bee0501fee75e1143a3ca9dc0f1c8eca9"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
