@@ -17,5 +17,6 @@ type (
 		CACertificate  string          `json:"ca_cert,omitempty" gorethink:"ca_cert,omitempty"`
 		Engine         *citadel.Engine `json:"engine,omitempty" gorethink:"engine,omitempty"`
 		Health         *Health         `json:"health,omitempty" gorethink:"health,omitempty"`
+		DockerVersion  string          `json:"docker_version,omitempty"`
 	}
 )

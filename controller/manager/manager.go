@@ -327,6 +327,12 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 		err := fmt.Errorf("Received status code '%d' when contacting %s", stat, engine.Engine.Addr)
 		return err
 	}
+	// get version
+	version, err := engine.Engine.Version()
+	if err != nil {
+		return err
+	}
+	engine.DockerVersion = version.Version
 	if _, err := r.Table(tblNameConfig).Insert(engine).RunWrite(m.session); err != nil {
 		return err
 	}
