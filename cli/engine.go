@@ -36,11 +36,11 @@ func engineListAction(c *cli.Context) {
 		return
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', 0)
-	fmt.Fprintln(w, "ID\tName\tCpus\tMemory\tHost\tLabels\tHealth\tResponse Time (ms)")
+	fmt.Fprintln(w, "ID\tName\tCpus\tMemory\tHost\tLabels\tHealth\tResponse Time (ms)\tDocker Version")
 	for _, e := range engines {
 		labels := strings.Join(e.Engine.Labels, ",")
 		responseTime := responseTimeToString(e.Health.ResponseTime)
-		fmt.Fprintf(w, "%s\t%s\t%.2f\t%.2f\t%s\t%s\t%s\t%s\n", e.ID, e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.Addr, labels, e.Health.Status, responseTime)
+		fmt.Fprintf(w, "%s\t%s\t%.2f\t%.2f\t%s\t%s\t%s\t%s\t%s\n", e.ID, e.Engine.ID, e.Engine.Cpus, e.Engine.Memory, e.Engine.Addr, labels, e.Health.Status, responseTime, e.DockerVersion)
 	}
 	w.Flush()
 }

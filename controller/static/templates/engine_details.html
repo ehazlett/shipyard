@@ -41,6 +41,11 @@
         </div>
         <div class="ui divider"></div>
         <div>
+            <h3 class="ui header">Docker Version</h3>
+            <div>{{engine.docker_version}}</div>
+        </div>
+        <div class="ui divider"></div>
+        <div>
             <h3 class="ui header">Labels</h3>
             <div class="ui blue label" ng-repeat="label in engine.engine.labels">{{label}}</div>
         </div>

@@ -25,6 +25,7 @@
             <th ng-class="sortedTableHeading('engine.addr')" ng-click="selectSortColumn('engine.addr')">Addr</th>
             <th ng-class="sortedTableHeading('engine.labels')" ng-click="selectSortColumn('engine.labels')">Labels</th>
             <th ng-class="sortedTableHeading('health.response_time')" ng-click="selectSortColumn('health.response_time')">Response Time (ms)</th>
+            <th ng-class="sortedTableHeading('engine.docker_version')" ng-click="selectSortColumn('engine.docker_version')">Docker Version</th>
         </tr>
     </thead>
     <tbody>
@@ -39,6 +40,7 @@
             <td>{{e.engine.addr}}</td>
             <td>{{e.engine.labels.join(', ')}}</td>
             <td>{{((e.health.response_time / 1000000) | number:1) || "-" }}</td>
+            <td>{{e.docker_version}}</td>
         </tr>
     </tbody>
 </table>

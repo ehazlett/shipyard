@@ -169,8 +169,8 @@ func (m *Manager) init() []*shipyard.Engine {
 	m.clusterManager = clusterManager
 	// start extension health check
 	go m.extensionHealthCheck()
-	// start engine health check
-	go m.engineHealthCheck()
+	// start engine check
+	go m.engineCheck()
 	// anonymous usage info
 	go m.usageReport()
 	return engines
@@ -270,7 +270,7 @@ func (m *Manager) checkExtensionHealth(ext *shipyard.Extension) error {
 	return nil
 }
 
-func (m *Manager) engineHealthCheck() {
+func (m *Manager) engineCheck() {
 	t := time.NewTicker(time.Second * 10).C
 	for {
 		select {
@@ -287,6 +287,13 @@ func (m *Manager) engineHealthCheck() {
 					health.ResponseTime = int64(time.Since(start_time) / time.Nanosecond)
 				}
 				eng.Health = health
+				// get version
+				version, err := eng.Engine.Version()
+				if err != nil {
+					logger.Warnf("unable to detect docker version: %s", err)
+					return
+				}
+				eng.DockerVersion = version.Version
 				m.SaveEngine(eng)
 			}
 		}
@@ -327,12 +334,6 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 		err := fmt.Errorf("Received status code '%d' when contacting %s", stat, engine.Engine.Addr)
 		return err
 	}
-	// get version
-	version, err := engine.Engine.Version()
-	if err != nil {
-		return err
-	}
-	engine.DockerVersion = version.Version
 	if _, err := r.Table(tblNameConfig).Insert(engine).RunWrite(m.session); err != nil {
 		return err
 	}

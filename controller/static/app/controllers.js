@@ -84,14 +84,14 @@ angular.module('shipyard.controllers', ['ngCookies'])
             }
 
             $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {                                                                                                                                            
-                    return "";                                                                                                                                                                
-                } else {                                                                                                                                                                      
-                    if($scope.reverseSort == true) {                                                                                                                                          
-                        return "descending";                                                                                                                                                  
-                    } else {                                                                                                                                                                  
-                        return "ascending";                                                                                                                                                   
-                    }                                                                                                                                                                         
+                if($scope.orderByField != field) {
+                    return "";
+                } else {
+                    if($scope.reverseSort == true) {
+                        return "descending";
+                    } else {
+                        return "ascending";
+                    }
                 }
             }
 
@@ -442,14 +442,14 @@ angular.module('shipyard.controllers', ['ngCookies'])
             }
 
             $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {                                                                                                                                            
-                    return "";                                                                                                                                                                
-                } else {                                                                                                                                                                      
-                    if($scope.reverseSort == true) {                                                                                                                                          
-                        return "descending";                                                                                                                                                  
-                    } else {                                                                                                                                                                  
-                        return "ascending";                                                                                                                                                   
-                    }                                                                                                                                                                         
+                if($scope.orderByField != field) {
+                    return "";
+                } else {
+                    if($scope.reverseSort == true) {
+                        return "descending";
+                    } else {
+                        return "ascending";
+                    }
                 }
             }
             
@@ -558,14 +558,14 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.orderByField = field;
             }
             $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {                                                                                                                                            
-                    return "";                                                                                                                                                                
-                } else {                                                                                                                                                                      
-                    if($scope.reverseSort == true) {                                                                                                                                          
-                        return "descending";                                                                                                                                                  
-                    } else {                                                                                                                                                                  
-                        return "ascending";                                                                                                                                                   
-                    }                                                                                                                                                                         
+                if($scope.orderByField != field) {
+                    return "";
+                } else {
+                    if($scope.reverseSort == true) {
+                        return "descending";
+                    } else {
+                        return "ascending";
+                    }
                 }
             }
 
