@@ -245,11 +245,7 @@ func (m *Manager) extensionHealthCheck() {
 }
 
 func (m *Manager) checkExtensionHealth(ext *shipyard.Extension) error {
-	containers, err := m.Containers(true)
-	if err != nil {
-		logger.Warnf("error running extension health check: %s", err)
-		return err
-	}
+	containers := m.Containers(true)
 	engs := m.Engines()
 	engines := []*citadel.Engine{}
 	for _, eng := range engs {
@@ -383,10 +379,7 @@ func (m *Manager) RemoveEngine(id string) error {
 }
 
 func (m *Manager) Container(id string) (*citadel.Container, error) {
-	containers, err := m.clusterManager.ListContainers(true)
-	if err != nil {
-		return nil, err
-	}
+	containers := m.clusterManager.ListContainers(true)
 	for _, cnt := range containers {
 		if strings.HasPrefix(cnt.ID, id) {
 			return cnt, nil
@@ -403,15 +396,12 @@ func (m *Manager) Logs(container *citadel.Container, stdout bool, stderr bool) (
 	return data, nil
 }
 
-func (m *Manager) Containers(all bool) ([]*citadel.Container, error) {
+func (m *Manager) Containers(all bool) []*citadel.Container {
 	return m.clusterManager.ListContainers(all)
 }
 
 func (m *Manager) ContainersByImage(name string, all bool) ([]*citadel.Container, error) {
-	allContainers, err := m.Containers(all)
-	if err != nil {
-		return nil, err
-	}
+	allContainers := m.Containers(all)
 	imageContainers := []*citadel.Container{}
 	for _, c := range allContainers {
 		if strings.Index(c.Image.Name, name) > -1 {
@@ -884,10 +874,7 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 	if ext.Config.DeployPerEngine {
 		engs := m.clusterManager.Engines()
 		extEngines := []*citadel.Engine{}
-		containers, err := m.Containers(true)
-		if err != nil {
-			return err
-		}
+		containers := m.Containers(true)
 		for _, c := range containers {
 			if v, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
 				if v == ext.ID {
@@ -926,10 +913,7 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 
 func (m *Manager) UnregisterExtension(ext *shipyard.Extension) error {
 	// remove containers that are linked to extension
-	containers, err := m.clusterManager.ListContainers(true)
-	if err != nil {
-		return err
-	}
+	containers := m.clusterManager.ListContainers(true)
 	for _, c := range containers {
 		// check if has the extension env var
 		if val, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
@@ -969,10 +953,7 @@ func (m *Manager) DeleteExtension(id string) error {
 
 func (m *Manager) RedeployContainers(image string) error {
 	var img *citadel.Image
-	containers, err := m.Containers(false)
-	if err != nil {
-		return err
-	}
+	containers := m.Containers(false)
 	deployed := false
 	for _, c := range containers {
 		if strings.Index(c.Image.Name, image) > -1 {
