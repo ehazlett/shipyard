@@ -47,6 +47,7 @@ var (
 	ErrWebhookKeyDoesNotExist = errors.New("webhook key does not exist")
 	logger                    = logrus.New()
 	store                     = sessions.NewCookieStore([]byte(storeKey))
+	httpTimeout               = time.Duration(1 * time.Second)
 )
 
 type (
@@ -64,6 +65,10 @@ type (
 		disableUsageInfo bool
 	}
 )
+
+func dialTimeout(network, addr string) (net.Conn, error) {
+	return net.DialTimeout(network, addr, httpTimeout)
+}
 
 func NewManager(addr string, database string, authKey string, version string, disableUsageInfo bool) (*Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
@@ -169,9 +174,8 @@ func (m *Manager) init() []*shipyard.Engine {
 	m.clusterManager = clusterManager
 	// start extension health check
 	go m.extensionHealthCheck()
-	// FIXME: these have been temporarily disabled due to performance issues
-	//// start engine check
-	//go m.engineCheck()
+	// start engine check
+	go m.engineCheck()
 	// anonymous usage info
 	go m.usageReport()
 	return engines
@@ -280,7 +284,10 @@ func (m *Manager) engineCheck() {
 			for _, eng := range engs {
 				health := &shipyard.Health{}
 				start_time := time.Now()
-				stat, _ := m.pingEngine(eng.Engine.Addr)
+				stat, err := m.pingEngine(eng.Engine.Addr)
+				if err != nil {
+					logger.Warnf("unable to ping engine: %s", err)
+				}
 				if stat != 200 {
 					health.Status = EngineHealthDown
 				} else {
@@ -292,9 +299,12 @@ func (m *Manager) engineCheck() {
 				version, err := eng.Engine.Version()
 				if err != nil {
 					logger.Warnf("unable to detect docker version: %s", err)
-					return
 				}
-				eng.DockerVersion = version.Version
+				ver := "unknown"
+				if version != nil {
+					ver = version.Version
+				}
+				eng.DockerVersion = ver
 				m.SaveEngine(eng)
 			}
 		}
@@ -302,8 +312,14 @@ func (m *Manager) engineCheck() {
 }
 
 func (m *Manager) pingEngine(addr string) (status int, err error) {
+	transport := http.Transport{
+		Dial: dialTimeout,
+	}
+	client := http.Client{
+		Transport: &transport,
+	}
 	uri := fmt.Sprintf("%s/_ping", addr)
-	resp, err := http.Get(uri)
+	resp, err := client.Get(uri)
 	if err != nil {
 		return 0, err
 	} else {
