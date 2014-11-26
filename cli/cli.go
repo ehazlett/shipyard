@@ -2,6 +2,8 @@ package main
 
 import (
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
@@ -11,6 +13,14 @@ var (
 	shipyardHost string
 	logger       = logrus.New()
 )
+
+func waitForInterrupt() {
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	for _ = range sigChan {
+		os.Exit(0)
+	}
+}
 
 func main() {
 	cfg, err := loadConfig()
@@ -60,6 +70,7 @@ func main() {
 		webhookKeyRemoveCommand,
 		infoCommand,
 		eventsCommand,
+		viewCommand,
 	}
 	app.Run(os.Args)
 }

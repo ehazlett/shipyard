@@ -32,8 +32,28 @@
 			"Rev": "438f04ab2449de187e96e9b2dbaead5dde5f78ab"
 		},
 		{
+			"ImportPath": "github.com/olekukonko/tablewriter",
+			"Rev": "37f85ed61c00a85092550bf43fc51087a10475fd"
+		},
+		{
 			"ImportPath": "github.com/samalba/dockerclient",
 			"Rev": "55c12a9bee0501fee75e1143a3ca9dc0f1c8eca9"
+		},
+		{
+			"ImportPath": "github.com/stretchr/objx",
+			"Rev": "cbeaeb16a013161a98496fad62933b1d21786672"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "faedd6eb633a4cd77c15f6c9856608701e40d9a2"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/mock",
+			"Rev": "faedd6eb633a4cd77c15f6c9856608701e40d9a2"
+		},
+		{
+			"ImportPath": "github.com/wsxiaoys/terminal/color",
+			"Rev": "9dcaf1d63119a8ac00eef82270eaef08b6aa2328"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
