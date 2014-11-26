@@ -18,20 +18,21 @@
 <table class="ui sortable table segment" ng-show="engines">
     <thead>
         <tr>
-            <th class="healthcolumn" ng-click="selectSortColumn('health.status')"><i class="medkit icon"></i></th>
+            <!--<th class="healthcolumn" ng-click="selectSortColumn('health.status')"><i class="medkit icon"></i></th>-->
             <th ng-class="sortedTableHeading('engine.id')" ng-click="selectSortColumn('engine.id')">Name</th>
             <th ng-class="sortedTableHeading('engine.cpus')" ng-click="selectSortColumn('engine.cpus')">CPUs</th>
             <th ng-class="sortedTableHeading('engine.memory')" ng-click="selectSortColumn('engine.memory')">Memory</th>
             <th ng-class="sortedTableHeading('engine.addr')" ng-click="selectSortColumn('engine.addr')">Addr</th>
             <th ng-class="sortedTableHeading('engine.labels')" ng-click="selectSortColumn('engine.labels')">Labels</th>
-            <th ng-class="sortedTableHeading('health.response_time')" ng-click="selectSortColumn('health.response_time')">Response Time (ms)</th>
+            <!--<th ng-class="sortedTableHeading('health.response_time')" ng-click="selectSortColumn('health.response_time')">Response Time (ms)</th>-->
             <th ng-class="sortedTableHeading('engine.docker_version')" ng-click="selectSortColumn('engine.docker_version')">Docker Version</th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="e in engines | orderBy:orderByField:reverseSort" ng-click="go();" class="rowlink">
+            <!--
             <td class="healthcolumn">
-                <span class="ui circular label ng-class:{'green': e.health.status = 'up', 'red': e.health.status == 'down'}" title="{{e.health.status}}" />
+            <span class="ui circular label ng-class:{'green': e.health.status = 'up', 'red': e.health.status == 'down'}" title="{{e.health.status}}" />-->
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
             </td>
@@ -39,7 +40,7 @@
             <td>{{e.engine.memory}} MB</td>
             <td>{{e.engine.addr}}</td>
             <td>{{e.engine.labels.join(', ')}}</td>
-            <td>{{((e.health.response_time / 1000000) | number:1) || "-" }}</td>
+            <!--<td>{{((e.health.response_time / 1000000) | number:1) || "-" }}</td>-->
             <td>{{e.docker_version}}</td>
         </tr>
     </tbody>
