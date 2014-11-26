@@ -36,5 +36,34 @@ The Shipyard CLI is a Docker inspired command line interface to a Shipyard clust
 ## UI
 The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyard API for all interaction.  It is an AngularJS app that is served via the Controller.
 
+# Contributing
+
+## Controller
+To get a development environment you will need:
+
+* Go 1.3+
+* Node.js: (npm for bower to build the Angular frontend)
+
+Run the following:
+
+* install [Godep](https://github.com/tools/godep): `go get github.com/tools/godep`
+* run `make deps` to get the Go dependencies
+* run `npm install -g bower` to install bower
+* `cd` into the `static` directory and run `bower install`
+* run `make build` to build the binary
+* run `./controller -h` for options
+
+## CLI
+For CLI hacking you will need:
+
+* Go 1.3+
+
+Run the following:
+
+* install [Godep](https://github.com/tools/godep): `go get github.com/tools/godep`
+* run `make deps` to get the Go dependencies
+* run `make build` to build the binary
+* run `./cli -h` for options 
+
 # License
 Shipyard is licensed under the Apache License, Version 2.0. See LICENSE for full license text.
