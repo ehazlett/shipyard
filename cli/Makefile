@@ -9,6 +9,10 @@ clean:
 build:
 	@godep go build .
 
+release: deps build
+	docker build -t shipyard/shipyard-cli:$(VERSION) .
+	docker push shipyard/shipyard-cli:$(VERSION)
+
 test: clean 
 	@# set the GOPATH because godep on drone does not 
 	@# have the env vars injected from drone
@@ -25,4 +29,4 @@ test-drone: clean
 	@export GOPATH=$GOPATH:$(pwd)/Godeps/_workspace
 	@go test -v ./...
 
-.PHONY: all deps build clean test test-drone
+.PHONY: all deps build clean test test-drone release
