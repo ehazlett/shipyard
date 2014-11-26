@@ -300,7 +300,7 @@ func (m *Manager) engineCheck() {
 				if err != nil {
 					logger.Warnf("unable to detect docker version: %s", err)
 				}
-				ver := "unknown"
+				ver := ""
 				if version != nil {
 					ver = version.Version
 				}
