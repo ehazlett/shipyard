@@ -169,8 +169,9 @@ func (m *Manager) init() []*shipyard.Engine {
 	m.clusterManager = clusterManager
 	// start extension health check
 	go m.extensionHealthCheck()
-	// start engine check
-	go m.engineCheck()
+	// FIXME: these have been temporarily disabled due to performance issues
+	//// start engine check
+	//go m.engineCheck()
 	// anonymous usage info
 	go m.usageReport()
 	return engines
