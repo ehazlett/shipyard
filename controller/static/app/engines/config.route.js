@@ -3,8 +3,8 @@
 
     angular
         .module('shipyard.engines')
-        .config(enginesRoute); 
-                
+        .config(enginesRoute);
+
     enginesRoute.$inject = ['$routeProvider'];
 
     function enginesRoute($routeProvider) {

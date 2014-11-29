@@ -4,7 +4,7 @@
     angular
         .module('shipyard.shared')
         .factory('tablesort', tablesort);
-    
+
     function tablesort() {
         var sortField = "";
         var reverseSort = false;
@@ -14,7 +14,7 @@
                 reverseSort = !reverseSort;
             } else {
                 sortField = field;
-            }   
+            }
         }
 
         function setReverseSort(reverse) {

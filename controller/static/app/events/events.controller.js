@@ -3,7 +3,7 @@
     angular
         .module('shipyard.events')
         .controller('EventsController', EventsController);
-       
+
     EventsController.$inject = ['$location', '$window', 'Events', 'tablesort'];
 
     function EventsController($location, $window, Events, tablesort) {

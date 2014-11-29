@@ -5,7 +5,7 @@
         .module('shipyard.engines')
         .controller('EnginesController', EnginesController);
 
-    EnginesController.$inject = ['$location', 'Engines', 'tablesort'];    
+    EnginesController.$inject = ['$location', 'Engines', 'tablesort'];
 
     function EnginesController($location, Engines, tablesort) {
 
@@ -15,7 +15,7 @@
         vm.go = function(engine) {
             $location.path("/engines/" + engine.id)
         };
-        
+
         Engines.query(function(data){
             vm.engines = data;
         });

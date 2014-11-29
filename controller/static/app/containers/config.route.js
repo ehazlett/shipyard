@@ -3,8 +3,7 @@
 
     angular
         .module('shipyard.containers')
-        .config(containersRoute); 
-                
+        .config(containersRoute);
     containersRoute.$inject = ['$routeProvider'];
 
     function containersRoute($routeProvider) {

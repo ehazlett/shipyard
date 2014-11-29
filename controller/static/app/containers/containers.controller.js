@@ -3,7 +3,7 @@
         .module('shipyard.containers')
         .controller('ContainersController', ContainersController);
 
-    ContainersController.$inject = ['$location', 'Containers', 'tablesort'];    
+    ContainersController.$inject = ['$location', 'Containers', 'tablesort'];
 
     function ContainersController($location, Containers, tablesort) {
         var vm = this;

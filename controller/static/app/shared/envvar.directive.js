@@ -1,10 +1,10 @@
 (function(){
-    'use strict'; 
+    'use strict';
 
     angular
         .module('shipyard.shared')
         .directive('envvar', envvar);
-    
+
     function envvar() {
         return {
             restrict: 'A',

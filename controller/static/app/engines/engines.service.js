@@ -1,8 +1,8 @@
 (function() {
     'use strict';
-    
+
     angular
-        .module('shipyard.engines') 
+        .module('shipyard.engines')
         .factory('Engines', function($resource) {
             return $resource('/api/engines');
         })

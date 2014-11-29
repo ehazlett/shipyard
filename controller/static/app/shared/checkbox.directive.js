@@ -1,10 +1,10 @@
 (function(){
-    'use strict'; 
+    'use strict';
 
     angular
         .module('shipyard.shared')
         .directive('checkbox', checkbox);
-            
+
     // this is from https://github.com/angularify/angular-semantic-ui/tree/master/src/checkbox
     function checkbox() {
         return {
@@ -40,7 +40,6 @@
                 } else if (scope.size == 'huge') {
                     scope.checkbox_class = scope.checkbox_class + ' huge';
                 }
-    
                 if (scope.checked == 'false' || scope.checked == undefined) {
                     scope.checked = false;
                 } else {

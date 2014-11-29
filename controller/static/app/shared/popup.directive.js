@@ -1,10 +1,10 @@
 (function(){
-    'use strict'; 
+    'use strict';
 
     angular
         .module('shipyard.shared')
         .directive('popup', popup);
-    
+
     function popup() {
         return {
             restrict: 'A',

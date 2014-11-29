@@ -3,8 +3,8 @@
 
     angular
         .module('shipyard.dashboard')
-        .config(dashboardRoute); 
-                
+        .config(dashboardRoute);
+
     dashboardRoute.$inject = ['$routeProvider'];
 
     function dashboardRoute($routeProvider) {

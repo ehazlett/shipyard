@@ -4,11 +4,10 @@
     angular
         .module('shipyard')
         .config([
-                '$routeProvider', 
-                '$httpProvider', 
-                '$provide', 
+                '$routeProvider',
+                '$httpProvider',
+                '$provide',
                 'flashProvider',
-       
          function ($routeProvider, $httpProvider, $provide, flashProvider) {
             $routeProvider.when('/login', {
                 templateUrl: 'templates/login.html',

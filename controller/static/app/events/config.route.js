@@ -3,8 +3,8 @@
 
     angular
         .module('shipyard.events')
-        .config(eventsRoute); 
-                
+        .config(eventsRoute);
+
     eventsRoute.$inject = ['$routeProvider'];
 
     function eventsRoute($routeProvider) {
