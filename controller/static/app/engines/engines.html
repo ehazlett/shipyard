@@ -1,0 +1,46 @@
+<div class="ui icon buttons toolbar">
+    <a href="/#/engines/add" class="ui button mini green">
+        <i class="add icon"></i>
+        Add
+    </a>
+</div>
+
+<div class="ui icon message" ng-show="vm.engines.length === 0">
+    <i class="info icon"></i>
+    <div class="content">
+        <div class="header">
+            Engines
+        </div>
+        <p>There are no engines in the cluster.</p>
+    </div>
+</div>
+
+<table class="ui sortable table segment" ng-show="vm.engines" ng-init="vm.tablesort.sortBy('engine.id')">
+    <thead>
+        <tr>
+            <th class="healthcolumn" ng-click="vm.tablesort.sortBy('health.status')"><i class="medkit icon"></i></th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.id')" ng-click="vm.tablesort.sortBy('engine.id')">Name</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.cpus')" ng-click="vm.tablesort.sortBy('engine.cpus')">CPUs</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.memory')" ng-click="vm.tablesort.sortBy('engine.memory')">Memory</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.addr')" ng-click="vm.tablesort.sortBy('engine.addr')">Addr</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.labels')" ng-click="vm.tablesort.sortBy('engine.labels')">Labels</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('health.response_time')" ng-click="vm.tablesort.sortBy('health.response_time')">Response Time (ms)</th>
+            <th ng-class="vvm.tablesort.semanticHeaderClass('engine.docker_version')" ng-click="vm.stablesort.sortBy('engine.docker_version')">Docker Version</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="e in vm.engines | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()" ng-click="vm.go(e);" class="rowlink">
+            <td class="healthcolumn">
+            <span class="ui circular label ng-class:{'green': e.health.status == 'up', 'red': e.health.status == 'down'}" title="{{e.health.status}}" />
+            <td>
+                <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
+            </td>
+            <td>{{e.engine.cpus}}</td>
+            <td>{{e.engine.memory}} MB</td>
+            <td>{{e.engine.addr}}</td>
+            <td>{{e.engine.labels.join(', ')}}</td>
+            <td>{{((e.health.response_time / 1000000) | number:1) || "-" }}</td>
+            <td>{{e.docker_version}}</td>
+        </tr>
+    </tbody>
+</table>

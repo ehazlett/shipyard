@@ -1,20 +1,14 @@
-'use strict';
+(function() {
+    'use strict';
 
-angular.module('shipyard', [
-        'ngRoute',
-        'ngCookies',
-        'shipyard.filters',
-        'shipyard.services',
-        'shipyard.controllers',
-        'shipyard.utils',
-        'shipyard.directives',
-        'angular-flash.service',
-        'angular-flash.flash-alert-directive',
-        'angles',
-        'ansiToHtml'
-    ])
-    .config(['$routeProvider', '$httpProvider', '$provide', 'flashProvider',
-        function ($routeProvider, $httpProvider, $provide, flashProvider) {
+    angular
+        .module('shipyard')
+        .config([
+                '$routeProvider',
+                '$httpProvider',
+                '$provide',
+                'flashProvider',
+         function ($routeProvider, $httpProvider, $provide, flashProvider) {
             $routeProvider.when('/login', {
                 templateUrl: 'templates/login.html',
                 controller: 'LoginController'
@@ -22,14 +16,6 @@ angular.module('shipyard', [
             $routeProvider.when('/logout', {
                 template: "",
                 controller: 'LogoutController'
-            });
-            $routeProvider.when('/dashboard', {
-                templateUrl: 'templates/dashboard.html',
-                controller: 'DashboardController'
-            });
-            $routeProvider.when('/containers', {
-                templateUrl: 'templates/containers.html',
-                controller: 'ContainersController'
             });
             $routeProvider.when('/containers/deploy', {
                 templateUrl: 'templates/deploy.html',
@@ -43,10 +29,6 @@ angular.module('shipyard', [
                 templateUrl: 'templates/container_logs.html',
                 controller: 'ContainerLogsController'
             });
-            $routeProvider.when('/engines', {
-                templateUrl: 'templates/engines.html',
-                controller: 'EnginesController'
-            });
             $routeProvider.when('/engines/add', {
                 templateUrl: 'templates/engine_add.html',
                 controller: 'EngineAddController'
@@ -55,14 +37,10 @@ angular.module('shipyard', [
                 templateUrl: 'templates/engine_details.html',
                 controller: 'EngineDetailsController'
             });
-            $routeProvider.when('/events', {
-                templateUrl: 'templates/events.html',
-                controller: 'EventsController'
-            });
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
             });
-            $provide.factory('httpInterceptor', function ($q, $window, flash, AuthToken) {
+            $provide.factory('httpInterceptor', function ($q, $window, flash, authtoken) {
                 return {
                     request: function (config) {
                         return config || $q.when(config);
@@ -76,7 +54,7 @@ angular.module('shipyard', [
                     responseError: function (rejection) {
                         switch (rejection.status) {
                             case 401:
-                                AuthToken.delete();
+                                authtoken.delete();
                                 $window.location.href = '/#/login';
                                 $window.location.reload();
                                 return $q.reject(rejection);
@@ -95,9 +73,6 @@ angular.module('shipyard', [
             flashProvider.warnClassnames.push('yellow');
             flashProvider.infoClassnames.push('blue');
             flashProvider.successClassnames.push('green');
-        }]);
-
-
-Chart.defaults.global.responsive = true;
-Chart.defaults.global.animation = false;
-Chart.defaults.global.showTooltips = true;
+         }
+    ]);
+})();

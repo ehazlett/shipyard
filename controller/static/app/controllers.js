@@ -1,27 +1,11 @@
 'use strict';
 
 angular.module('shipyard.controllers', ['ngCookies'])
-        .controller('HeaderController', function($http, $scope, AuthToken) {
-            $scope.template = 'templates/header.html';
-            $scope.username = AuthToken.getUsername();
-            $scope.isLoggedIn = AuthToken.isLoggedIn();
-            $http.defaults.headers.common['X-Access-Token'] = AuthToken.get();
-        })
-        .controller('MenuController', function($scope, $location, $cookieStore, AuthToken) {
-            $scope.template = 'templates/menu.html';
-            $scope.isActive = function(path){
-                if ($location.path().substr(0, path.length) == path) {
-                    return true
-                }
-                return false
-            }
-            $scope.isLoggedIn = AuthToken.isLoggedIn();
-        })
-        .controller('LoginController', function($scope, $cookieStore, $window, flash, Login, AuthToken) {
+        .controller('LoginController', function($scope, $cookieStore, $window, flash, Login, authtoken) {
             $scope.template = 'templates/login.html';
             $scope.login = function() {
                 Login.login({username: $scope.username, password: $scope.password}).$promise.then(function(data){
-                    AuthToken.save($scope.username, data.auth_token);
+                    authtoken.save($scope.username, data.auth_token);
                     $window.location.href = '/#/dashboard';
                     $window.location.reload();
                 }, function() {
@@ -29,76 +13,10 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 });
             }
         })
-        .controller('LogoutController', function($scope, $window, AuthToken) {
-            AuthToken.delete();
+        .controller('LogoutController', function($scope, $window, authtoken) {
+            authtoken.delete();
             $window.location.href = '/#/login';
             $window.location.reload();
-        })
-        .controller('DashboardController', function($http, $scope, Events, ClusterInfo, AuthToken) {
-            $scope.template = 'templates/dashboard.html';
-            Events.query(function(data){
-                $scope.events = data;
-            });
-            $scope.showX = function(){
-                return function(d){
-                    return d.key;
-                };
-            };
-            $scope.showY = function(){
-                return function(d){
-                    return d.y;
-                };
-            };
-            ClusterInfo.query(function(data){
-                $scope.chartOptions = {};
-                $scope.clusterInfo = data;
-                $scope.clusterCpuData = [
-                    { label: "Free", value: data.cpus, color: "#184465" },
-                    { label: "Reserved", value: 0, color: "#6D91AD" }
-                ];
-                if (data.cpus != undefined && data.reserved_cpus != undefined) {
-                    $scope.clusterCpuData[0].value = data.cpus - data.reserved_cpus;
-                    $scope.clusterCpuData[1].value = data.reserved_cpus;
-                }
-                $scope.clusterMemoryData = [
-                    { label: "Free", value: data.memory, color: "#184465" },
-                    { label: "Reserved", value: 0, color: "#6D91AD" }
-                ];
-                if (data.memory != undefined && data.reserved_memory != undefined) {
-                    $scope.clusterMemoryData[0].value = data.memory - data.reserved_memory;
-                    $scope.clusterMemoryData[1].value = data.reserved_memory;
-                }
-            });
-        })
-        .controller('ContainersController', function($scope, $location, Containers) {
-            $scope.orderByField = 'id';
-            $scope.reverseSort = false;
-
-            $scope.go = function() {
-                $location.path("/containers/" + this.c.id)
-            }
-
-            $scope.selectSortColumn = function(field) {
-                $scope.reverseSort = !$scope.reverseSort;
-                $scope.orderByField = field;
-            }
-
-            $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {
-                    return "";
-                } else {
-                    if($scope.reverseSort == true) {
-                        return "descending";
-                    } else {
-                        return "ascending";
-                    }
-                }
-            }
-
-            $scope.template = 'templates/containers.html';
-            Containers.query(function(data){
-                $scope.containers = data;
-            });
         })
         .controller('DeployController', function($scope, $location, Engines, Container) {
             var types = [
@@ -428,36 +346,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 $scope.container = data;
             });
         })
-        .controller('EnginesController', function($scope, $location, Engines) {
-            $scope.orderByField = 'engine.id';
-            $scope.reverseSort = false;
-
-            $scope.go = function() {
-                $location.path("/engines/" + this.e.id)
-            };
-
-            $scope.selectSortColumn = function(field) {
-                $scope.reverseSort = !$scope.reverseSort;
-                $scope.orderByField = field;
-            }
-
-            $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {
-                    return "";
-                } else {
-                    if($scope.reverseSort == true) {
-                        return "descending";
-                    } else {
-                        return "ascending";
-                    }
-                }
-            }
-            
-            $scope.template = 'templates/engines.html';
-            Engines.query(function(data){
-                $scope.engines = data;
-            });
-        })
         .controller('EngineAddController', function($scope, $location, $routeParams, flash, Engines) {
             $scope.template = 'templates/engine_add.html';
             $scope.id = "";
@@ -549,46 +437,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
                 });
             });
         })
-        .controller('EventsController', function($scope, $location, $window, Events) {
-            $scope.template = 'templates/events.html';
-            $scope.orderByField = 'time';
-            $scope.reverseSort = true;
-            $scope.selectSortColumn = function(field) {
-                $scope.reverseSort = !$scope.reverseSort;
-                $scope.orderByField = field;
-            }
-            $scope.sortedTableHeading = function(field) {
-                if($scope.orderByField != field) {
-                    return "";
-                } else {
-                    if($scope.reverseSort == true) {
-                        return "descending";
-                    } else {
-                        return "ascending";
-                    }
-                }
-            }
-
-            $scope.showPurgeEventsDialog = function() {
-                $('.basic.modal.purgeEvents')
-                    .modal('show');
-            };
-            $scope.purgeEvents = function() {
-                Events.purge().$promise.then(function(c) {
-                    // we must remove the modal or it will come back
-                    // the next time the modal is shown
-                    $('.basic.modal').remove();
-                    $location.path('/events');
-                    $window.location.reload();
-                }, function(err) {
-                    flash.error = 'error purging events: ' + err.data;
-                });
-            };
-            Events.query(function(data){
-                $scope.events = data;
-            });
-        })
-
 
 $(function(){
     $('.message .close').on('click', function() {

@@ -1,39 +1,12 @@
-'use strict';
+(function(){
+    'use strict';
 
-angular.module('shipyard.directives', [])
-    .directive('popup', function () {
-        return {
-            restrict: 'A',
-            link: function(scope, element, attrs) {
-                $(element).popup(scope.$eval(attrs.popup));
-            }
-        };
-    })
-    .directive('dropdown', function () {
-        return {
-            restrict: 'A',
-            link: function(scope, element, attrs) {
-                $(element).dropdown(scope.$eval(attrs.dropdown));
-            }
-        };
-    })
-    .directive('envvar', function () {
-        return {
-            restrict: 'A',
-            link: function(scope, element, attrs) {
-                element.bind('click', function() {
-                    $(element).parent().children('.hide').transition();
-                    if ($(element).parent().children('.hide').hasClass('visible')) {
-                        $(element).text('Show');
-                    } else {
-                        $(element).text('Hide');
-                    }
-                });
-            }
-        };
-    })
-    .directive('checkbox', function () {
-        // this is from https://github.com/angularify/angular-semantic-ui/tree/master/src/checkbox
+    angular
+        .module('shipyard.shared')
+        .directive('checkbox', checkbox);
+
+    // this is from https://github.com/angularify/angular-semantic-ui/tree/master/src/checkbox
+    function checkbox() {
         return {
             restrict: 'E',
             replace: true,
@@ -67,7 +40,6 @@ angular.module('shipyard.directives', [])
                 } else if (scope.size == 'huge') {
                     scope.checkbox_class = scope.checkbox_class + ' huge';
                 }
-    
                 if (scope.checked == 'false' || scope.checked == undefined) {
                     scope.checked = false;
                 } else {
@@ -100,12 +72,6 @@ angular.module('shipyard.directives', [])
                 });
             }
         }
-    })
-    .directive('accordion', function () {
-        return {
-            restrict: 'A',
-            link: function(scope, element, attrs) {
-                $(element).accordion(scope.$eval(attrs.accordion));
-            }
-        };
-    });
+    }
+
+})()

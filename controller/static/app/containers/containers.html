@@ -1,0 +1,45 @@
+<div class="ui icon buttons toolbar">
+    <a href="/#/containers/deploy" class="ui button mini green">
+        <i class="add icon"></i>
+        Deploy
+    </a>
+</div>
+
+<div class="ui icon message" ng-show="vm.containers.length === 0">
+    <i class="info icon"></i>
+    <div class="content">
+        <div class="header">
+            Containers
+        </div>
+        <p>There are no containers deployed.</p>
+    </div>
+</div>
+
+<table class="ui sortable table segment" ng-show="vm.containers" ng-init="vm.tablesort.sortBy('id')">
+    <thead>
+        <tr>
+            <th ng-class="vm.tablesort.semanticHeaderClass('id')" ng-click="vm.tablesort.sortBy('id')">ID</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('name')" ng-click="vm.tablesort.sortBy('name')">Name</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.name')" ng-click="vm.tablesort.sortBy('image.name')">Image</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('engine.id')" ng-click="vm.tablesort.sortBy('engine.id')">Engine</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.cpus')" ng-click="vm.tablesort.sortBy('image.cpus')">CPUs</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.memory')" ng-click="vm.tablesort.sortBy('image.memory')">Memory</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('state')" ng-click="vm.tablesort.sortBy('state')">State</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('image.type')" ng-click="vm.tablesort.sortBy('image.type')">Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="c in vm.containers | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()" ng-click="vm.go(c)" class="rowlink">
+             <td>
+                <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
+            </td>
+            <td>{{c.name|container_name}}</td>
+            <td>{{c.image.name}}</td>
+            <td>{{c.engine.id}}</td>
+            <td>{{c.image.cpus}}</td>
+            <td>{{c.image.memory|formatMemory}}</td>
+            <td>{{c.state}}</td>
+            <td>{{c.image.type}}</td>
+        </tr>
+    </tbody>
+</table>
