@@ -55,7 +55,7 @@
                         }
                         cpuData.push(x);
                         memoryData.push(y);
-                    } 
+                    }
                 }
                 $scope.engineCpuData = cpuData;
                 $scope.engineMemoryData = memoryData;

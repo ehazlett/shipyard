@@ -5,7 +5,7 @@
         .module('shipyard.containers')
         .controller('DeployController', DeployController);
 
-    DeployController.$inject = ['$scope', '$location', 'Engines', 'Container']; 
+    DeployController.$inject = ['$scope', '$location', 'Engines', 'Container'];
 
     function DeployController($scope, $location, Engines, Container) {
         var types = [
@@ -187,7 +187,7 @@
                 bind_ports: ports,
                 labels: selectedLabels,
                 publish: $scope.publish,
-                restart_policy: restartPolicy, 
+                restart_policy: restartPolicy,
             };
             if (valid) {
                 Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
