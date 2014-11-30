@@ -207,11 +207,7 @@ func (m *Manager) uploadUsage() {
 			}
 		}
 	}
-	info, err := m.clusterManager.ClusterInfo()
-	if err != nil {
-		logger.Warnf("error getting cluster info for usage: %s", err)
-		return
-	}
+	info := m.clusterManager.ClusterInfo()
 	usage := &shipyard.Usage{
 		ID:              id,
 		Version:         m.version,
@@ -451,11 +447,8 @@ func (m *Manager) IdenticalContainers(container *citadel.Container, all bool) ([
 	return containers, nil
 }
 
-func (m *Manager) ClusterInfo() (*shipyard.ClusterInfo, error) {
-	info, err := m.clusterManager.ClusterInfo()
-	if err != nil {
-		return nil, err
-	}
+func (m *Manager) ClusterInfo() *shipyard.ClusterInfo {
+	info := m.clusterManager.ClusterInfo()
 	clusterInfo := &shipyard.ClusterInfo{
 		Cpus:           info.Cpus,
 		Memory:         info.Memory,
@@ -466,7 +459,7 @@ func (m *Manager) ClusterInfo() (*shipyard.ClusterInfo, error) {
 		ReservedMemory: info.ReservedMemory,
 		Version:        m.version,
 	}
-	return clusterInfo, nil
+	return clusterInfo
 }
 
 func (m *Manager) Destroy(container *citadel.Container) error {

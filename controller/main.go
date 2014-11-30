@@ -287,11 +287,7 @@ func removeEngine(w http.ResponseWriter, r *http.Request) {
 func clusterInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	info, err := controllerManager.ClusterInfo()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	info := controllerManager.ClusterInfo()
 	if err := json.NewEncoder(w).Encode(info); err != nil {
 		logger.Error(err)
 	}
