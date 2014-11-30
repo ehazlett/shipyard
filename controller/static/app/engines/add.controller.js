@@ -8,7 +8,6 @@
     EngineAddController.$inject = ['$scope', '$location', '$routeParams', 'flash', 'Engines'];
 
     function EngineAddController($scope, $location, $routeParams, flash, Engines) {
-        $scope.template = 'templates/engine_add.html';
         $scope.id = "";
         $scope.addr = "";
         $scope.cpus = 1.0;

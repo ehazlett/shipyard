@@ -8,7 +8,6 @@
     ContainerDetailsController.$inject = ['$scope', '$location', '$routeParams', 'flash', 'Container'];
 
     function ContainerDetailsController($scope, $location, $routeParams, flash, Container) {
-        $scope.template = 'templates/container_details.html';
         $scope.showX = function(){
             return function(d){
                 return d.key;
