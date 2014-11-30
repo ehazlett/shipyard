@@ -17,10 +17,6 @@
                 template: "",
                 controller: 'LogoutController'
             });
-            $routeProvider.when('/containers/deploy', {
-                templateUrl: 'templates/deploy.html',
-                controller: 'DeployController'
-            });
             $routeProvider.when('/containers/:id', {
                 templateUrl: 'templates/container_details.html',
                 controller: 'ContainerDetailsController'

@@ -12,6 +12,10 @@
             controller: 'ContainersController',
             controllerAs: 'vm'
         })
+        $routeProvider.when('/containers/deploy', {
+            templateUrl: 'templates/deploy.html',
+            controller: 'DeployController'
+        });
     };
 })()
 
