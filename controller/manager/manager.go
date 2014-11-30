@@ -453,6 +453,9 @@ func (m *Manager) IdenticalContainers(container *citadel.Container, all bool) ([
 
 func (m *Manager) ClusterInfo() (*shipyard.ClusterInfo, error) {
 	info, err := m.clusterManager.ClusterInfo()
+	if err != nil {
+		return nil, err
+	}
 	clusterInfo := &shipyard.ClusterInfo{
 		Cpus:           info.Cpus,
 		Memory:         info.Memory,
@@ -462,9 +465,6 @@ func (m *Manager) ClusterInfo() (*shipyard.ClusterInfo, error) {
 		ReservedCpus:   info.ReservedCpus,
 		ReservedMemory: info.ReservedMemory,
 		Version:        m.version,
-	}
-	if err != nil {
-		return nil, err
 	}
 	return clusterInfo, nil
 }
