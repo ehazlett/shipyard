@@ -13,5 +13,9 @@
             controller: 'EnginesController',
             controllerAs: 'vm'
         })
+        $routeProvider.when('/engines/add', {
+            templateUrl: 'app/engines/add.html',
+            controller: 'EngineAddController'
+        });
     };
 })()

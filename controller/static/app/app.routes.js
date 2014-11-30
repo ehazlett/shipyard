@@ -17,10 +17,6 @@
                 template: "",
                 controller: 'LogoutController'
             });
-            $routeProvider.when('/engines/add', {
-                templateUrl: 'templates/engine_add.html',
-                controller: 'EngineAddController'
-            });
             $routeProvider.when('/engines/:id', {
                 templateUrl: 'templates/engine_details.html',
                 controller: 'EngineDetailsController'
