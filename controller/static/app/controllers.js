@@ -18,16 +18,6 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $window.location.href = '/#/login';
             $window.location.reload();
         })
-        .controller('ContainerLogsController', function($scope, $location, $routeParams, $http, flash, Container, ansi2html) {
-            $scope.template = 'templates/container_logs.html';
-
-            $http.get('/api/containers/' + $routeParams.id + "/logs").success(function(data){
-                $scope.logs = ansi2html.toHtml(data.replace(/\n/g, '<br/>'));
-            });
-            Container.query({id: $routeParams.id}, function(data){
-                $scope.container = data;
-            });
-        })
         .controller('EngineAddController', function($scope, $location, $routeParams, flash, Engines) {
             $scope.template = 'templates/engine_add.html';
             $scope.id = "";

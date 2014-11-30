@@ -20,6 +20,10 @@
             templateUrl: 'app/containers/details.html',
             controller: 'ContainerDetailsController'
         });
+        $routeProvider.when('/containers/:id/logs', {
+            templateUrl: 'app/containers/logs.html',
+            controller: 'ContainerLogsController'
+        });
     };
 })()
 

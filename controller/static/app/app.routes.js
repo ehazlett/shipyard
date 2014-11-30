@@ -17,10 +17,6 @@
                 template: "",
                 controller: 'LogoutController'
             });
-            $routeProvider.when('/containers/:id/logs', {
-                templateUrl: 'templates/container_logs.html',
-                controller: 'ContainerLogsController'
-            });
             $routeProvider.when('/engines/add', {
                 templateUrl: 'templates/engine_add.html',
                 controller: 'EngineAddController'
