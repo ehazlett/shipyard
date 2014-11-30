@@ -35,7 +35,7 @@ var (
 
 const (
 	STORE_KEY = "shipyard"
-	VERSION   = "2.0.6"
+	VERSION   = shipyard.VERSION
 )
 
 type (
