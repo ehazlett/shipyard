@@ -1,4 +1,6 @@
 (function() {
+    'use strict';
+
     angular
         .module('shipyard.containers')
         .controller('ContainersController', ContainersController);

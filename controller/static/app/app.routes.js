@@ -17,26 +17,6 @@
                 template: "",
                 controller: 'LogoutController'
             });
-            $routeProvider.when('/containers/deploy', {
-                templateUrl: 'templates/deploy.html',
-                controller: 'DeployController'
-            });
-            $routeProvider.when('/containers/:id', {
-                templateUrl: 'templates/container_details.html',
-                controller: 'ContainerDetailsController'
-            });
-            $routeProvider.when('/containers/:id/logs', {
-                templateUrl: 'templates/container_logs.html',
-                controller: 'ContainerLogsController'
-            });
-            $routeProvider.when('/engines/add', {
-                templateUrl: 'templates/engine_add.html',
-                controller: 'EngineAddController'
-            });
-            $routeProvider.when('/engines/:id', {
-                templateUrl: 'templates/engine_details.html',
-                controller: 'EngineDetailsController'
-            });
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
             });
