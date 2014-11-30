@@ -16,6 +16,10 @@
             templateUrl: 'app/containers/deploy.html',
             controller: 'DeployController',
         });
+        $routeProvider.when('/containers/:id', {
+            templateUrl: 'app/containers/details.html',
+            controller: 'ContainerDetailsController'
+        });
     };
 })()
 
