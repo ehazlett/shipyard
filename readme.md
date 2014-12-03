@@ -7,8 +7,12 @@ Shipyard enables multi-host, Docker cluster management.  It uses the [Citadel](h
 
 # Quick Start
 
-* `docker run -d -P --name rethinkdb shipyard/rethinkdb`
-* `docker run -d -p 8080:8080 --link rethinkdb:rethinkdb shipyard/shipyard`
+* docker run -it -d --name shipyard-rethinkdb-data \
+    --entrypoint /bin/bash shipyard/rethinkdb -l
+* docker run -it -P -d --name shipyard-rethinkdb \
+    --volumes-from shipyard-rethinkdb-data shipyard/rethinkdb
+* docker run -it -p 8080:8080 -d --name shipyard \
+    --link shipyard-rethinkdb:rethinkdb shipyard/shipyard
 
 You can then use the Shipyard CLI to interact:
 
