@@ -27,6 +27,11 @@ var runCommand = cli.Command{
 			Usage: "cpu shares",
 		},
 		cli.StringFlag{
+			Name:  "cpuset",
+			Value: "",
+			Usage: "cpuset to run on",
+		},
+		cli.StringFlag{
 			Name:  "memory",
 			Value: "256",
 			Usage: "memory (in MB)",
@@ -127,6 +132,7 @@ func runAction(c *cli.Context) {
 		Name:          c.String("name"),
 		ContainerName: c.String("container-name"),
 		Cpus:          c.Float64("cpus"),
+		Cpuset:        c.String("cpuset"),
 		Memory:        c.Float64("memory"),
 		Hostname:      c.String("hostname"),
 		Domainname:    c.String("domain"),
