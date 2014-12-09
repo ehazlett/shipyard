@@ -59,8 +59,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
-			"Comment": "null-233",
-			"Rev": "8fec09c61d5d66f460d227fd1df3473d7e015bc6"
+			"Rev": "731db29863ea7213d9556d0170afb38987f401d4"
 		},
 		{
 			"ImportPath": "gopkg.in/fatih/pool.v2",
