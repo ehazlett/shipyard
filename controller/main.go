@@ -778,27 +778,27 @@ func main() {
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
 		// create roles
 		r := &shipyard.Role{
-			ID: "0",
+			ID:   "0",
 			Name: "admin",
 		}
 		if err := controllerManager.SaveRole(r); err != nil {
 			logger.Fatal(err)
 		}
-                logger.Infof("created the admin role")
-                ru := &shipyard.Role{
-			ID: "1",
-                        Name: "user",
-                }
+		logger.Infof("created the admin role")
+		ru := &shipyard.Role{
+			ID:   "1",
+			Name: "user",
+		}
 		if err := controllerManager.SaveRole(ru); err != nil {
 			logger.Fatal(err)
 		}
-                logger.Infof("created the user role")
+		logger.Infof("created the user role")
 		role, err := controllerManager.Role(r.Name)
 		if err != nil {
 			logger.Fatal(err)
 		}
 		acct := &shipyard.Account{
-			ID: "0",
+			ID:       "0",
 			Username: "admin",
 			Password: "shipyard",
 			Role:     role,
