@@ -36,6 +36,18 @@
 			"Rev": "55c12a9bee0501fee75e1143a3ca9dc0f1c8eca9"
 		},
 		{
+			"ImportPath": "github.com/stretchr/objx",
+			"Rev": "cbeaeb16a013161a98496fad62933b1d21786672"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/assert",
+			"Rev": "8ce79b9f0b77745113f82c17d0756771456ccbd3"
+		},
+		{
+			"ImportPath": "github.com/stretchr/testify/mock",
+			"Rev": "8ce79b9f0b77745113f82c17d0756771456ccbd3"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
 			"Comment": "null-233",
 			"Rev": "8fec09c61d5d66f460d227fd1df3473d7e015bc6"
