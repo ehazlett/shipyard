@@ -10,7 +10,10 @@
                 <div class="field">
                     <label>Image</label>
                     <div class="ui left labeled input">
-                        <input type="text" name="name" placeholder="ehazlett/go-demo" ng-model="name">
+                        <input type="text" name="name" list="datalist" placeholder="ehazlett/go-demo" ng-model="name">
+                        <datalist id="datalist">
+                            <option ng-repeat="c in containers" value = {{c.image.name}}> {{c.image.name}}</option>
+                        </datalist>
                         <div class="ui corner label">
                             <i class="icon asterisk"></i>
                         </div>

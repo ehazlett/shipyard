@@ -5,9 +5,9 @@
         .module('shipyard.containers')
         .controller('DeployController', DeployController);
 
-    DeployController.$inject = ['$scope', '$location', 'Engines', 'Container'];
+    DeployController.$inject = ['$scope', '$location', 'Engines', 'Container', 'Containers'];
 
-    function DeployController($scope, $location, Engines, Container) {
+    function DeployController($scope, $location, Engines, Container, Containers) {
         var types = [
             "service",
             //"engine", // removed until we get the UI to show engines to select
@@ -24,6 +24,9 @@
         "on-failure",
         "always"
         ]
+        Containers.query(function(data){
+            $scope.containers = data;
+        });
         $scope.cpus = 0.1;
         $scope.memory = 256;
         $scope.maxRestarts = "";
