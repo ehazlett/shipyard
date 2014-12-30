@@ -399,7 +399,7 @@ func (m *Manager) RemoveEngine(id string) error {
 }
 
 func (m *Manager) Container(id string) (*citadel.Container, error) {
-	containers := m.clusterManager.ListContainers(true)
+	containers := m.clusterManager.ListContainers(true, false, "")
 	for _, cnt := range containers {
 		if strings.HasPrefix(cnt.ID, id) {
 			return cnt, nil
@@ -417,7 +417,7 @@ func (m *Manager) Logs(container *citadel.Container, stdout bool, stderr bool) (
 }
 
 func (m *Manager) Containers(all bool) []*citadel.Container {
-	return m.clusterManager.ListContainers(all)
+	return m.clusterManager.ListContainers(all, false, "")
 }
 
 func (m *Manager) ContainersByImage(name string, all bool) ([]*citadel.Container, error) {
@@ -930,7 +930,7 @@ func (m *Manager) RegisterExtension(ext *shipyard.Extension) error {
 
 func (m *Manager) UnregisterExtension(ext *shipyard.Extension) error {
 	// remove containers that are linked to extension
-	containers := m.clusterManager.ListContainers(true)
+	containers := m.clusterManager.ListContainers(true, false, "")
 	for _, c := range containers {
 		// check if has the extension env var
 		if val, ok := c.Image.Environment["_SHIPYARD_EXTENSION"]; ok {
