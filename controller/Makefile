@@ -8,6 +8,9 @@ clean:
 build:
 	@godep go build .
 
+media:
+	@cd static && bower install
+
 release: deps build
 	docker build -t shipyard/shipyard:$(VERSION) .
 	docker push shipyard/shipyard:$(VERSION)
