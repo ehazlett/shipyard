@@ -37,8 +37,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
-			"Comment": "null-233",
-			"Rev": "8fec09c61d5d66f460d227fd1df3473d7e015bc6"
+			"Rev": "1fbbd62cfec66bd39d91e97749579579d4d3037e"
 		}
 	]
 }
