@@ -47,7 +47,6 @@ var (
 	ErrWebhookKeyDoesNotExist = errors.New("webhook key does not exist")
 	logger                    = logrus.New()
 	store                     = sessions.NewCookieStore([]byte(storeKey))
-	httpTimeout               = time.Duration(1 * time.Second)
 )
 
 type (
@@ -65,10 +64,6 @@ type (
 		disableUsageInfo bool
 	}
 )
-
-func dialTimeout(network, addr string) (net.Conn, error) {
-	return net.DialTimeout(network, addr, httpTimeout)
-}
 
 func NewManager(addr string, database string, authKey string, version string, disableUsageInfo bool) (*Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
@@ -280,7 +275,7 @@ func (m *Manager) engineCheck() {
 			for _, eng := range engs {
 				health := &shipyard.Health{}
 				start_time := time.Now()
-				stat, err := m.pingEngine(eng.Engine.Addr)
+				stat, err := eng.Ping()
 				if err != nil {
 					logger.Warnf("unable to ping engine: %s", err)
 				}
@@ -307,24 +302,6 @@ func (m *Manager) engineCheck() {
 	}
 }
 
-func (m *Manager) pingEngine(addr string) (status int, err error) {
-	transport := http.Transport{
-		Dial: dialTimeout,
-	}
-	client := http.Client{
-		Transport: &transport,
-	}
-	uri := fmt.Sprintf("%s/_ping", addr)
-	resp, err := client.Get(uri)
-	if err != nil {
-		return 0, err
-	} else {
-		defer resp.Body.Close()
-		status = resp.StatusCode
-	}
-	return status, nil
-}
-
 func (m *Manager) Engines() []*shipyard.Engine {
 	return m.engines
 }
@@ -339,7 +316,7 @@ func (m *Manager) Engine(id string) *shipyard.Engine {
 }
 
 func (m *Manager) AddEngine(engine *shipyard.Engine) error {
-	stat, err := m.pingEngine(engine.Engine.Addr)
+	stat, err := engine.Ping()
 	if err != nil {
 		return err
 	}

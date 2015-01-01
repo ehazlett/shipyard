@@ -1,7 +1,19 @@
 package shipyard
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
+	"net"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/citadel/citadel"
+)
+
+const (
+	httpTimeout = time.Duration(1 * time.Second)
 )
 
 type (
@@ -20,3 +32,59 @@ type (
 		DockerVersion  string          `json:"docker_version,omitempty"`
 	}
 )
+
+func dialTimeout(network, addr string) (net.Conn, error) {
+	return net.DialTimeout(network, addr, httpTimeout)
+}
+
+func (e *Engine) Certificate() (*tls.Certificate, error) {
+
+	if e.SSLCertificate == "" {
+		return nil, nil
+	}
+	cert, err := tls.X509KeyPair([]byte(e.SSLCertificate), []byte(e.SSLKey))
+	return &cert, err
+}
+
+func (e *Engine) Ping() (int, error) {
+	status := 0
+	addr := e.Engine.Addr
+	tlsConfig := &tls.Config{}
+
+	// check for https
+	if strings.Index(addr, "https") != -1 {
+		cert, err := e.Certificate()
+		if err != nil {
+			return 0, err
+		}
+
+		tlsConfig = &tls.Config{
+			Certificates: []tls.Certificate{*cert},
+		}
+
+		// use custom ca cert if specified
+		if e.CACertificate != "" {
+			caCertPool := x509.NewCertPool()
+			caCertPool.AppendCertsFromPEM([]byte(e.CACertificate))
+			tlsConfig.RootCAs = caCertPool
+		}
+	}
+
+	transport := http.Transport{
+		Dial:            dialTimeout,
+		TLSClientConfig: tlsConfig,
+	}
+
+	client := http.Client{
+		Transport: &transport,
+	}
+	uri := fmt.Sprintf("%s/_ping", addr)
+	resp, err := client.Get(uri)
+	if err != nil {
+		return 0, err
+	} else {
+		defer resp.Body.Close()
+		status = resp.StatusCode
+	}
+	return status, nil
+}
