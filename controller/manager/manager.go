@@ -32,7 +32,7 @@ const (
 	tblNameExtensions  = "extensions"
 	tblNameWebhookKeys = "webhook_keys"
 	storeKey           = "shipyard"
-	TRACKER_HOST       = "http://tracker.shipyard-project.com"
+	trackerHost        = "http://tracker.shipyard-project.com"
 	EngineHealthUp     = "up"
 	EngineHealthDown   = "down"
 )
@@ -222,7 +222,7 @@ func (m *Manager) uploadUsage() {
 		logger.Warnf("error serializing usage info: %s", err)
 	}
 	buf := bytes.NewBuffer(b)
-	if _, err := http.Post(fmt.Sprintf("%s/update", TRACKER_HOST), "application/json", buf); err != nil {
+	if _, err := http.Post(fmt.Sprintf("%s/update", trackerHost), "application/json", buf); err != nil {
 		logger.Warnf("error sending usage info: %s", err)
 	}
 }
