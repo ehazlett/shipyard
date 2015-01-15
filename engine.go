@@ -69,6 +69,8 @@ func (e *Engine) Ping() (int, error) {
 			tlsConfig.RootCAs = caCertPool
 		}
 	}
+	// allow insecure
+	tlsConfig.InsecureSkipVerify = true
 
 	transport := http.Transport{
 		Dial:            dialTimeout,
