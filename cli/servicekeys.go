@@ -17,7 +17,7 @@ var serviceKeysListCommand = cli.Command{
 }
 
 func serviceKeysListAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -52,7 +52,7 @@ var serviceKeyCreateCommand = cli.Command{
 }
 
 func serviceKeyCreateAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -72,7 +72,7 @@ var serviceKeyRemoveCommand = cli.Command{
 }
 
 func serviceKeyRemoveAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

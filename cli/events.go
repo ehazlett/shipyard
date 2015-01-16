@@ -18,7 +18,7 @@ var eventsCommand = cli.Command{
 }
 
 func eventsAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

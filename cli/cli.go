@@ -14,7 +14,7 @@ var (
 )
 
 func main() {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(nil)
 	if err != nil {
 		if err != ErrConfigDoesNotExist {
 			logger.Fatal(err)
@@ -31,7 +31,12 @@ func main() {
 	app.Usage = "manage a shipyard cluster"
 	app.Version = shipyard.VERSION
 	app.EnableBashCompletion = true
-	app.Flags = []cli.Flag{}
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "allow-insecure",
+			Usage: "allow insecure certificates if using TLS",
+		},
+	}
 	app.Commands = []cli.Command{
 		loginCommand,
 		changePasswordCommand,

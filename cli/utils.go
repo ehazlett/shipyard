@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/citadel/citadel"
+	"github.com/codegangsta/cli"
 	"github.com/shipyard/shipyard/client"
 )
 
@@ -104,7 +105,7 @@ func parsePorts(pairs []string) []*citadel.Port {
 	return ports
 }
 
-func loadConfig() (*client.ShipyardConfig, error) {
+func loadConfig(c *cli.Context) (*client.ShipyardConfig, error) {
 	usr, err := user.Current()
 	if err != nil {
 		return nil, err
@@ -122,6 +123,9 @@ func loadConfig() (*client.ShipyardConfig, error) {
 	var cfg *client.ShipyardConfig
 	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
 		return nil, ErrInvalidConfig
+	}
+	if c != nil && c.GlobalBool("allow-insecure") {
+		cfg.AllowInsecure = true
 	}
 	return cfg, nil
 }

@@ -26,7 +26,7 @@ var scaleCommand = cli.Command{
 }
 
 func scaleAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

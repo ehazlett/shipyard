@@ -17,7 +17,7 @@ var accountsCommand = cli.Command{
 }
 
 func accountsAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -58,7 +58,7 @@ var addAccountCommand = cli.Command{
 }
 
 func addAccountAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -90,7 +90,7 @@ var deleteAccountCommand = cli.Command{
 }
 
 func deleteAccountAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

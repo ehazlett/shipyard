@@ -16,7 +16,7 @@ var destroyCommand = cli.Command{
 }
 
 func destroyAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/citadel/citadel"
 	"github.com/shipyard/shipyard"
@@ -36,6 +38,14 @@ func (m *Manager) buildUrl(path string) string {
 func (m *Manager) doRequest(path string, method string, expectedStatus int, b []byte) (*http.Response, error) {
 	url := m.buildUrl(path)
 	buf := bytes.NewBuffer(b)
+	transport := &http.Transport{}
+	if strings.Index(url, "https") != -1 {
+		if m.config.AllowInsecure {
+			transport.TLSClientConfig = &tls.Config{
+				InsecureSkipVerify: true,
+			}
+		}
+	}
 	req, err := http.NewRequest(method, url, buf)
 	if err != nil {
 		return nil, err
@@ -47,7 +57,9 @@ func (m *Manager) doRequest(path string, method string, expectedStatus int, b []
 	}
 	req.Header.Set("User-Agent", "shipyard-cli")
 
-	resp, err := http.DefaultClient.Do(req)
+	client := &http.Client{Transport: transport}
+	//resp, err := http.DefaultClient.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}

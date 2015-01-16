@@ -16,7 +16,7 @@ var webhookKeysListCommand = cli.Command{
 }
 
 func webhookKeysListAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -51,7 +51,7 @@ var webhookKeyCreateCommand = cli.Command{
 }
 
 func webhookKeyCreateAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -71,7 +71,7 @@ var webhookKeyRemoveCommand = cli.Command{
 }
 
 func webhookKeyRemoveAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

@@ -65,8 +65,9 @@ func loginAction(c *cli.Context) {
 	pass := strings.TrimSpace(string(p[:]))
 
 	cfg := &client.ShipyardConfig{
-		Url:      sUrl,
-		Username: username,
+		Url:           sUrl,
+		Username:      username,
+		AllowInsecure: c.GlobalBool("allow-insecure"),
 	}
 	m := client.NewManager(cfg)
 	token, err := m.Login(username, pass)
@@ -86,7 +87,7 @@ var changePasswordCommand = cli.Command{
 }
 
 func changePasswordAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

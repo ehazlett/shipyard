@@ -18,7 +18,7 @@ var containersCommand = cli.Command{
 }
 
 func containersAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -52,7 +52,7 @@ var containerInspectCommand = cli.Command{
 }
 
 func containerInspectAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

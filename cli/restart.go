@@ -16,7 +16,7 @@ var restartCommand = cli.Command{
 }
 
 func restartAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

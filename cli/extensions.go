@@ -20,7 +20,7 @@ var extensionsCommand = cli.Command{
 }
 
 func extensionsAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -63,7 +63,7 @@ var addExtensionCommand = cli.Command{
 }
 
 func addExtensionAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -122,7 +122,7 @@ var removeExtensionCommand = cli.Command{
 }
 
 func removeExtensionAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

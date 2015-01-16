@@ -16,7 +16,7 @@ var infoCommand = cli.Command{
 }
 
 func infoAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

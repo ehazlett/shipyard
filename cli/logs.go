@@ -27,7 +27,7 @@ var logsCommand = cli.Command{
 }
 
 func logsAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}

@@ -22,7 +22,7 @@ var engineListCommand = cli.Command{
 }
 
 func engineListAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -104,7 +104,7 @@ var engineAddCommand = cli.Command{
 }
 
 func engineAddAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -184,7 +184,7 @@ var engineRemoveCommand = cli.Command{
 }
 
 func engineRemoveAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -215,7 +215,7 @@ var engineInspectCommand = cli.Command{
 }
 
 func engineInspectAction(c *cli.Context) {
-	cfg, err := loadConfig()
+	cfg, err := loadConfig(c)
 	if err != nil {
 		logger.Fatal(err)
 	}
