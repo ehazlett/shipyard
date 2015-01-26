@@ -32,6 +32,7 @@
         $scope.domain = "";
         $scope.count = 1;
         $scope.publish = false;
+        $scope.privileged = false;
         $scope.args = null;
         $scope.links = null;
         $scope.volumes = null;
@@ -187,6 +188,7 @@
                 bind_ports: ports,
                 labels: selectedLabels,
                 publish: $scope.publish,
+                privileged: $scope.privileged,
                 restart_policy: restartPolicy,
             };
             if (valid) {
