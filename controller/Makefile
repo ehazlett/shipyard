@@ -15,7 +15,7 @@ build:
 	@godep go build -a -tags 'netgo' -ldflags '-w -linkmode external -extldflags -static' .
 
 media:
-	@cd static && bower install
+	@cd static && bower install --allow-root
 
 image: media build
 	@docker build -t shipyard/shipyard:$(VERSION) .
