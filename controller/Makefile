@@ -17,7 +17,7 @@ build:
 media:
 	@cd static && bower install
 
-image:
+image: media build
 	@docker build -t shipyard/shipyard:$(VERSION) .
 
 release: deps build image
