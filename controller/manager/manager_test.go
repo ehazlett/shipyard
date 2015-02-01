@@ -59,6 +59,9 @@ func getTestImage() *citadel.Image {
 }
 
 func TestRun(t *testing.T) {
+	if os.Getenv("RUN_INTEGRATION_TEST") == "" {
+		t.Skipf("set RUN_INTEGRATION_TEST env var to run")
+	}
 	m := newManager()
 	img := getTestImage()
 	cTest, err := m.Run(img, 1, true)
@@ -82,6 +85,9 @@ func TestRun(t *testing.T) {
 }
 
 func TestScaleUp(t *testing.T) {
+	if os.Getenv("RUN_INTEGRATION_TEST") == "" {
+		t.Skipf("set RUN_INTEGRATION_TEST env var to run")
+	}
 	m := newManager()
 	img := getTestImage()
 	cTest, err := m.Run(img, 1, true)
@@ -113,6 +119,9 @@ func TestScaleUp(t *testing.T) {
 }
 
 func TestScaleDown(t *testing.T) {
+	if os.Getenv("RUN_INTEGRATION_TEST") == "" {
+		t.Skipf("set RUN_INTEGRATION_TEST env var to run")
+	}
 	m := newManager()
 	img := getTestImage()
 	cTest, err := m.Run(img, 4, true)

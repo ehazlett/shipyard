@@ -10,6 +10,7 @@ deps:
 
 clean:
 	@rm -rf Godeps/_workspace controller
+
 build:
 	@godep go build -a -tags 'netgo' -ldflags '-w -linkmode external -extldflags -static' .
 
