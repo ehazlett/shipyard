@@ -1,4 +1,71 @@
+<div>
+    <div class="ui basic small modal removeContainer">
+        <div class="header">
+            Destroy Container
+        </div>
+        <div class="content">
+            Destroy {{vm.activeContainer.image.name}} ({{vm.activeContainer.id|truncate}})?
+        </div>
+        <div class="actions">
+            <div class="ui button small">Cancel</div>
+            <a ng-click="vm.destroyContainer(vm.activeContainer)" class="ui button small blue">Ok</a>
+        </div>
+    </div>
+
+    <div class="ui basic small modal stopContainer">
+        <div class="header">
+            Stop Container
+        </div>
+        <div class="content">
+            Stop {{vm.activeContainer.image.name}} ({{vm.activeContainer.id|truncate}})?
+        </div>
+        <div class="actions">
+            <div class="ui button small">Cancel</div>
+            <a ng-click="vm.stopContainer(vm.activeContainer)" class="ui button small blue">Ok</a>
+        </div>
+    </div>
+
+    <div class="ui basic small modal restartContainer">
+        <div class="header">
+            Restart Container
+        </div>
+        <div class="content">
+            Restart {{vm.activeContainer.image.name}} ({{vm.activeContainer.id|truncate}})?
+        </div>
+        <div class="actions">
+            <div class="ui button small">Cancel</div>
+            <a ng-click="vm.restartContainer(vm.activeContainer)" class="ui button small blue">Ok</a>
+        </div>
+    </div>
+
+    <div class="ui basic small modal scaleContainer">
+        <div class="header">
+            Scale Container
+        </div>
+        <div class="content">
+            <div class="ui active blue progress hide">
+                <div class="bar" style="width: 100%;"></div>
+            </div>
+            <div class="ui small form segment" ng-form="scaleForm" novalidate>
+                <div class="field">
+                    <div class="ui left labeled icon input">
+                        <input type="text" name="count" ng-model="count" value="{{vm.activeContainer.count}}" placeholder="total number of instances">
+                        <i class="exchange icon"></i>
+                        <div class="ui corner label">
+                            <i class="icon asterisk"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui small blue button" ng-click="vm.scaleContainer(vm.activeContainer)">Scale</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="ui icon buttons toolbar">
+
     <a href="/#/containers/deploy" class="ui button mini green">
         <i class="add icon"></i>
         Deploy
@@ -18,17 +85,18 @@
 <table class="ui sortable table segment" ng-show="vm.containers" ng-init="vm.tablesort.sortBy('id')">
     <thead>
         <tr>
-            <th ng-class="vm.tablesort.semanticHeaderClass('state')" ng-click="vm.tablesort.sortBy('state')">Status</th>
+            <th class="healthcolumn" ng-click="vm.tablesort.sortBy('health.status')"><i class="medkit icon"></i></th>
             <th ng-class="vm.tablesort.semanticHeaderClass('id')" ng-click="vm.tablesort.sortBy('id')">ID</th>
             <th ng-class="vm.tablesort.semanticHeaderClass('name')" ng-click="vm.tablesort.sortBy('name')">Name</th>
             <th ng-class="vm.tablesort.semanticHeaderClass('image.name')" ng-click="vm.tablesort.sortBy('image.name')">Image</th>
             <th ng-class="vm.tablesort.semanticHeaderClass('engine.id')" ng-click="vm.tablesort.sortBy('engine.id')">Engine</th>
             <th ng-class="vm.tablesort.semanticHeaderClass('image.cpus')" ng-click="vm.tablesort.sortBy('image.cpus')">CPUs</th>
             <th ng-class="vm.tablesort.semanticHeaderClass('image.memory')" ng-click="vm.tablesort.sortBy('image.memory')">Memory</th>
+            <th>Admin</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in vm.containers | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()" ng-click="vm.go(c)" class="rowlink">
+        <tr ng-repeat="c in vm.containers | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()">
             <td class="healthcolumn">
                 <span class="ui circular label ng-class:{'green': c.state == 'running', 'grey': c.state == 'stopped'}" title="{{c.state}}" />
             </td>
@@ -40,6 +108,18 @@
             <td>{{c.engine.id}}</td>
             <td>{{c.image.cpus | default:"&infin;"}}</td>
             <td>{{c.image.memory|formatMemory | default:"&infin;"}}</td>
+            <td>
+                <div dropdown class="ui right pointing icon dropdown">
+                    <i class="wrench icon"></i>
+                    <div class="menu">
+                        <a ng-click="vm.showRestartContainerDialog(c)" class="item"><i class="green refresh icon"></i> Restart</a>
+                        <a ng-click="vm.showStopContainerDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
+                        <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
+                        <a href="/#/containers/{{c.id}}/logs" class="item"><i class="text file outline icon"></i> Logs</a>
+                    </div>
+                </div>
+            </td>
         </tr>
     </tbody>
 </table>
+
