@@ -1,7 +1,7 @@
 CGO_ENABLED=0
 GOOS=linux
 GOARCH=amd64
-VERSION=${VERSION:-latest}
+TAG=${TAG:-latest}
 
 all: deps build
 
@@ -18,10 +18,10 @@ media:
 	@cd static && bower install --allow-root
 
 image: media build
-	@docker build -t shipyard/shipyard:$(VERSION) .
+	@docker build -t shipyard/shipyard:$(TAG) .
 
 release: deps build image
-	@docker push shipyard/shipyard:$(VERSION)
+	@docker push shipyard/shipyard:$(TAG)
 
 test: clean 
 	@godep go test -v ./...
