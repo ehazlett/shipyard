@@ -1,3 +1,5 @@
+TAG=${TAG:-latest}
+
 all: deps build
 
 deps:
@@ -9,24 +11,15 @@ clean:
 build:
 	@godep go build .
 
-release: deps build
-	docker build -t shipyard/shipyard-cli:$(VERSION) .
-	docker push shipyard/shipyard-cli:$(VERSION)
+image: build
+	@docker build -t shipyard/shipyard-cli:$(TAG) .
+
+release: image
+	@docker push shipyard/shipyard-cli:$(TAG)
 
 test: clean 
-	@# set the GOPATH because godep on drone does not 
-	@# have the env vars injected from drone
-	@# fuck computers
 	@godep restore
 	@export GOPATH=$GOPATH:$(pwd)/Godeps/_workspace
-	@go test -v ./...
+	@godep go test -v ./...
 
-test-drone: clean 
-	@# set the GOPATH because godep on drone does not 
-	@# have the env vars injected from drone
-	@# fuck computers
-	@/var/cache/drone/bin/godep restore
-	@export GOPATH=$GOPATH:$(pwd)/Godeps/_workspace
-	@go test -v ./...
-
-.PHONY: all deps build clean test test-drone release
+.PHONY: all deps build clean image test release
