@@ -36,11 +36,11 @@ func eventsAction(c *cli.Context) {
 		tags := strings.Join(e.Tags, ",")
 		message := e.Message
 		engine := ""
-		if e.Container != nil {
+		if e.Container.ID != "" {
 			cntId := e.Container.ID[:12]
 			message = fmt.Sprintf("container:%s %s", cntId, e.Message)
 		}
-		if e.Engine != nil {
+		if e.Engine.ID != "" {
 			engine = e.Engine.ID
 		}
 		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", e.Time.Format(time.RubyDate), message, engine, e.Type, tags)
