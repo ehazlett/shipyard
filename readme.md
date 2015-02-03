@@ -7,6 +7,14 @@ Shipyard enables multi-host, Docker cluster management.  It uses the [Citadel](h
 
 # Quick Start
 
+## Shipyard Deploy
+Shipyard Deploy will automatically start a Shipyard stack on a desired Docker Engine.
+
+```
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock shipyard/deploy start
+```
+
+## Manual
 * Start a data volume instance of RethinkDB:
 ```
 docker run -it -d --name shipyard-rethinkdb-data \
