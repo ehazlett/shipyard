@@ -20,7 +20,7 @@ type (
 		Role     *Role        `json:"role,omitempty" gorethink:"role"`
 	}
 	Role struct {
-		ID   string `json:"id,omitempty" gorethink:"id"`
+		ID   string `json:"id,omitempty" gorethink:"id,omitempty"`
 		Name string `json:"name,omitempty" gorethink:"name"`
 	}
 	AuthToken struct {
