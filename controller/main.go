@@ -62,6 +62,10 @@ func destroy(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if container == nil {
+		http.Error(w, "container not found", http.StatusNotFound)
+		return
+	}
 
 	if err := controllerManager.Destroy(container); err != nil {
 		logger.Errorf("error destroying %s: %s", container.ID, err)
@@ -126,6 +130,10 @@ func stopContainer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if container == nil {
+		http.Error(w, "container not found", http.StatusNotFound)
+		return
+	}
 
 	if err := controllerManager.ClusterManager().Stop(container); err != nil {
 		logger.Errorf("error stopping %s: %s", container.ID, err)
@@ -146,6 +154,10 @@ func containerLogs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if container == nil {
+		http.Error(w, "container not found", http.StatusNotFound)
+		return
+	}
 
 	data, err := controllerManager.ClusterManager().Logs(container, true, true)
 	if err != nil {
@@ -163,6 +175,10 @@ func restartContainer(w http.ResponseWriter, r *http.Request) {
 	container, err := controllerManager.Container(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if container == nil {
+		http.Error(w, "container not found", http.StatusNotFound)
 		return
 	}
 
@@ -195,6 +211,10 @@ func scaleContainer(w http.ResponseWriter, r *http.Request) {
 	container, err := controllerManager.Container(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if container == nil {
+		http.Error(w, "container not found", http.StatusNotFound)
 		return
 	}
 
@@ -246,6 +266,10 @@ func inspectContainer(w http.ResponseWriter, r *http.Request) {
 	container, err := controllerManager.Container(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if container == nil {
+		http.Error(w, "container not found", http.StatusNotFound)
 		return
 	}
 	if err := json.NewEncoder(w).Encode(container); err != nil {
