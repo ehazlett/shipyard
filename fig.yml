@@ -11,4 +11,11 @@ rethinkdb:
         - "8080"
         - "28015"
         - "29015"
+    volumes_from:
+	- dbstore
 
+dbstore:
+    image: shipyard/rethinkdb
+    entrypoint: /bin/bash
+    volumes:
+  	- ./data:/data/:rw
