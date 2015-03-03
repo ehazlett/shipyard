@@ -252,7 +252,7 @@ func inspectEngine(w http.ResponseWriter, r *http.Request) {
 func containers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	containers := controllerManager.Containers(true)
+	containers := controllerManager.ClusterManager().ListContainers(true, false, "")
 	if err := json.NewEncoder(w).Encode(containers); err != nil {
 		logger.Error(err)
 	}

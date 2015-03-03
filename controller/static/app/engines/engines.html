@@ -31,7 +31,8 @@
     <tbody>
         <tr ng-repeat="e in vm.engines | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()" ng-click="vm.go(e);" class="rowlink">
             <td class="healthcolumn">
-            <span class="ui circular label ng-class:{'green': e.health.status == 'up', 'red': e.health.status == 'down'}" title="{{e.health.status}}" />
+                <span class="ui circular label ng-class:{'green': e.health.status == 'up', 'red': e.health.status == 'down'}" title="{{e.health.status}}" />
+            </td>
             <td>
                 <a href="/#/engines/{{e.id}}">{{e.engine.id}}</a>
             </td>

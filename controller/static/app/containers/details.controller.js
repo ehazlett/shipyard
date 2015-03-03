@@ -103,7 +103,7 @@
                 l.protocol = p.proto;
                 l.port = p.port;
                 l.container_port = p.container_port;
-                l.link = h.protocol + '//' + h.hostname + ':' + p.port;
+                l.link = 'http://' + h.hostname + ':' + p.port;
                 this.push(l);
             }, portLinks);
             $scope.portLinks = portLinks;

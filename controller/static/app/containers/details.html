@@ -163,7 +163,7 @@
         <div class="ui segment attached">
             <div ng-hide="container.ports">No exposed ports</div>
             <div ng-repeat="l in portLinks | orderBy:predicate">
-                <a href="{{l.link}}">{{l.protocol}}/{{l.container_port}} -> {{l.hostname}}:{{l.port}}</a>
+                <a href="{{l.link}}" target="_{{container.id}}">{{l.protocol}}/{{l.container_port}} -> {{l.hostname}}:{{l.port}}</a>
             </div>
         </div>
     </div>

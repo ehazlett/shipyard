@@ -329,10 +329,11 @@ func (m *Manager) AddEngine(engine *shipyard.Engine) error {
 	}
 	m.init()
 	evt := &shipyard.Event{
-		Type:   "add-engine",
-		Time:   time.Now(),
-		Engine: engine.Engine,
-		Tags:   []string{"cluster"},
+		Type:    "add-engine",
+		Message: fmt.Sprintf("addr=%s", engine.Engine.Addr),
+		Time:    time.Now(),
+		Engine:  engine.Engine,
+		Tags:    []string{"cluster"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
@@ -360,10 +361,11 @@ func (m *Manager) RemoveEngine(id string) error {
 		return err
 	}
 	evt := &shipyard.Event{
-		Type:   "remove-engine",
-		Time:   time.Now(),
-		Engine: engine.Engine,
-		Tags:   []string{"cluster"},
+		Type:    "remove-engine",
+		Message: fmt.Sprintf("addr=%s", engine.Engine.Addr),
+		Time:    time.Now(),
+		Engine:  engine.Engine,
+		Tags:    []string{"cluster"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
@@ -596,7 +598,7 @@ func (m *Manager) SaveAccount(account *shipyard.Account) error {
 	evt := &shipyard.Event{
 		Type:    "add-account",
 		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s", account.Username),
+		Message: fmt.Sprintf("username=%s", account.Username),
 		Tags:    []string{"cluster", "security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
@@ -616,7 +618,7 @@ func (m *Manager) DeleteAccount(account *shipyard.Account) error {
 	evt := &shipyard.Event{
 		Type:    "delete-account",
 		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s", account.Username),
+		Message: fmt.Sprintf("username=%s", account.Username),
 		Tags:    []string{"cluster", "security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {

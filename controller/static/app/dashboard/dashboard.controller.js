@@ -5,10 +5,17 @@
         .module('shipyard.dashboard')
         .controller('DashboardController', DashboardController);
 
-    DashboardController.$inject = ['$http', 'Events', 'ClusterInfo', 'authtoken'];
+    DashboardController.$inject = ['$location', 'Containers', 'Events', 'ClusterInfo', 'authtoken'];
 
-    function DashboardController($http, Events, ClusterInfo, authtoken) {
+    function DashboardController($location, Containers, Events, ClusterInfo, authtoken) {
         var vm = this;
+
+        Containers.query().$promise.then(function(data){
+            if (data != undefined && data.length == 0) {
+                $location.path("/engines");
+            }
+        }, function() {
+        });
 
         Events.query(function(data){
             vm.events = data;
@@ -23,6 +30,7 @@
                 return d.y;
             };
         };
+
         ClusterInfo.query(function(data){
             vm.chartOptions = {};
             vm.clusterInfo = data;

@@ -15,9 +15,10 @@ build:
 	@godep go build -a -tags 'netgo' -ldflags '-w -linkmode external -extldflags -static' .
 
 media:
-	@cd static && bower install --allow-root
+	@cd static && bower -s install --allow-root -p | xargs echo
 
 image: media build
+	@echo Building Shipyard image $(TAG)
 	@docker build -t shipyard/shipyard:$(TAG) .
 
 release: deps build image

@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/citadel/citadel"
@@ -21,7 +22,9 @@ func (h *EventHandler) Handle(e *citadel.Event) error {
 
 func (h *EventHandler) logDockerEvent(e *citadel.Event) error {
 	evt := &shipyard.Event{
-		Type:      e.Type,
+		Type: e.Type,
+		Message: fmt.Sprintf("action=%s container=%s",
+			e.Type, e.Container.ID[:12]),
 		Time:      e.Time,
 		Container: e.Container,
 		Engine:    e.Engine,

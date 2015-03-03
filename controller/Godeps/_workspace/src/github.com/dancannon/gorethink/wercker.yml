@@ -1,0 +1,36 @@
+box: wercker/golang
+# Services
+services:
+    - mies/rethinkdb@0.3.0
+# Build definition
+build:
+    # The steps that will be executed on build
+    steps:
+      # Sets the go workspace and places you package
+      # at the right place in the workspace tree
+      - setup-go-workspace
+
+      # Gets the dependencies
+      - script:
+          name: get dependencies
+          code: |
+            cd $WERCKER_SOURCE_DIR
+            go version
+            go get ./... && go get -u gopkg.in/check.v1 && go test -i
+
+      # Build the project
+      - script:
+          name: build
+          code: |
+            go build ./...
+
+      # Test the project
+      - script:
+          name: test
+          code: |
+            go test -test.v=true ./...
+      # - script:
+      #     name: test auth keys
+      #     code: |
+      #       sh -c "echo 'set auth test_key' | rethinkdb admin --join $$HOST$$:29015"
+      #       RETHINKDB_AUTHKEY=test_key go test -test.run="Test" -test.v=true -gocheck.f="TestConnectAuthKey"

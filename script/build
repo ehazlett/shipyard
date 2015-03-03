@@ -1,0 +1,12 @@
+#!/bin/bash
+TAG=${1:-}
+
+if [ -z "$TAG" ]; then
+    echo "Usage: $0 <version>"
+    echo "  Example: $0 2.0.10"
+    exit 1
+fi
+
+echo "Building Shipyard $TAG"
+docker build -t shipyard-build -f Dockerfile.build .
+docker run -ti --rm -e TAG=$TAG -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/go/src/github.com/shipyard/shipyard -w /go/src/github.com/shipyard/shipyard/controller shipyard-build make TAG=$TAG image

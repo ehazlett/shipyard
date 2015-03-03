@@ -1,0 +1,11 @@
+#!/bin/bash
+TAG=${1:-}
+
+if [ -z "$TAG" ]; then
+    echo "Usage: $0 <version>"
+    echo "  Example: $0 2.0.10"
+    exit 1
+fi
+
+./script/build $TAG
+./script/push $TAG

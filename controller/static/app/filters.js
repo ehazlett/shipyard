@@ -1,9 +1,12 @@
 'use strict';
 function truncate(t) {
-   if (t.length < 12) {
-       return t;
-   }
-   return t.substring(0, 12);
+    if (t == undefined) {
+        return t;
+    }
+    if (t.length < 12) {
+        return t;
+    }
+    return t.substring(0, 12);
 }
 
 angular.module('shipyard.filters', [])
@@ -50,19 +53,16 @@ angular.module('shipyard.filters', [])
             return $sce.trustAsHtml(val);  
         };
     })
+    .filter('default', function () {
+        return function(input, defaultValue) {
+            if (!input) return defaultValue;
+            return input;
+        };
+    })
     .filter('formatEvent', function () {
         return function (e) {
             var evt = "";
-            evt += e.type + " ";
-            if (e.container !== undefined) {
-                evt += truncate(e.container.id) + " " + e.container.image.name + " ";
-            } else if (e.engine !== undefined) {
-                evt += e.engine.id + " (" + e.engine.addr + ") ";
-            } else {
-                if (e.message !== undefined) {
-                    evt += e.message + " ";
-                }
-            }
+            evt += e.type + " " + e.message;
             return evt;
         };
     })
