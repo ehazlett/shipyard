@@ -67,11 +67,11 @@ type (
 
 func NewManager(addr string, database string, authKey string, version string, disableUsageInfo bool) (*Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
-		Address:     addr,
-		Database:    database,
-		AuthKey:     authKey,
-		MaxIdle:     10,
-		IdleTimeout: time.Second * 30,
+		Address:  addr,
+		Database: database,
+		AuthKey:  authKey,
+		MaxIdle:  10,
+		Timeout:  time.Second * 30,
 	})
 	if err != nil {
 		return nil, err
