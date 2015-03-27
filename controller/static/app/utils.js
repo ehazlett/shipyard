@@ -110,3 +110,7 @@ function addPortDefinition() {
     $(".ui.dropdown").dropdown();
     setValidationRules();
 }
+
+function removePortDefinition() {
+    // figure out how to remove the appended stuff from addPortDefinition
+}

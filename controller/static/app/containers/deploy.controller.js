@@ -76,6 +76,7 @@
             $scope.labels = labels;
         });
         $scope.addPortDefinition = addPortDefinition;
+        $scope.removePortDefinition = removePortDefinition;
         $scope.showLoader = function() {
             $(".ui.loader").removeClass("disabled");
             $(".ui.active").addClass("dimmer");
