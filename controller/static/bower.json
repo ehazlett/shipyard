@@ -30,6 +30,7 @@
     "angular-cookies": "~1.2.23",
     "angular-flash": "~0.1.13",
     "angles": "*",
-    "ansi-to-html": "jorgeecardona/ansi-to-html"
+    "ansi-to-html": "jorgeecardona/ansi-to-html",
+    "angular-jwt": "~0.0.6"
   }
 }

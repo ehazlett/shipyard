@@ -6,6 +6,7 @@ angular.module('shipyard.controllers', ['ngCookies'])
             $scope.login = function() {
                 Login.login({username: $scope.username, password: $scope.password}).$promise.then(function(data){
                     authtoken.save($scope.username, data.auth_token);
+                    localStorage.setItem('X-Access-Token', authtoken.get());
                     $window.location.href = '/#/dashboard';
                     $window.location.reload();
                 }, function() {
