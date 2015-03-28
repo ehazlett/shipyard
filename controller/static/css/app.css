@@ -32,6 +32,9 @@ a {
 .ui.blue.button:hover {
     background-color: #6581A7;
 }
+.ui.icon.button {
+    padding: 0.25em;
+} 
 div.container {
     margin-top: 10px;
 }

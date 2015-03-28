@@ -92,7 +92,7 @@
             <th ng-class="vm.tablesort.semanticHeaderClass('engine.id')" ng-click="vm.tablesort.sortBy('engine.id')">Engine</th>
             <th ng-class="vm.tablesort.semanticHeaderClass('image.cpus')" ng-click="vm.tablesort.sortBy('image.cpus')">CPUs</th>
             <th ng-class="vm.tablesort.semanticHeaderClass('image.memory')" ng-click="vm.tablesort.sortBy('image.memory')">Memory</th>
-            <th>Admin</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -109,8 +109,10 @@
             <td>{{c.image.cpus | default:"&infin;"}}</td>
             <td>{{c.image.memory|formatMemory | default:"&infin;"}}</td>
             <td>
-                <div dropdown class="ui right pointing icon dropdown">
-                    <i class="wrench icon"></i>
+                <div dropdown class="ui right pointing dropdown">
+                    <div class="ui icon button">
+                        <i class="wrench icon"></i>
+                    </div>
                     <div class="menu">
                         <a ng-click="vm.showRestartContainerDialog(c)" class="item"><i class="green refresh icon"></i> Restart</a>
                         <a ng-click="vm.showStopContainerDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
