@@ -13,8 +13,11 @@
             controller: 'ContainersController',
             controllerAs: 'vm',
             resolve: {
-                resolveContainers: ['Containers', function (Containers) {
-                    return Containers.query().$promise; 
+                resolveContainers: ['Containers', '$window', function (Containers, $window) {
+                    return Containers.query().$promise.then(null, function(errorData) {
+                            $window.location.href = '/#/error';
+                            $window.location.reload();
+                    }); 
                 }] 
             }
         })
