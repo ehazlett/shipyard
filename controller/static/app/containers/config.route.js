@@ -11,7 +11,12 @@
         $routeProvider.when('/containers', {
             templateUrl: 'app/containers/containers.html',
             controller: 'ContainersController',
-            controllerAs: 'vm'
+            controllerAs: 'vm',
+            resolve: {
+                resolveContainers: ['Containers', function (Containers) {
+                    return Containers.query().$promise; 
+                }] 
+            }
         })
         $routeProvider.when('/containers/deploy', {
             templateUrl: 'app/containers/deploy.html',
@@ -26,5 +31,6 @@
             controller: 'ContainerLogsController'
         });
     };
+
 })()
 
