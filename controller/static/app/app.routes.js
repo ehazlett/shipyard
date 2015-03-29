@@ -17,6 +17,9 @@
                 template: "",
                 controller: 'LogoutController'
             });
+            $routeProvider.when('/error', {
+                templateUrl: "app/layout/error.html",
+            });
             $routeProvider.otherwise({
                 redirectTo: '/dashboard'
             });

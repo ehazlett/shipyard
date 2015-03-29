@@ -11,7 +11,15 @@
         $routeProvider.when('/containers', {
             templateUrl: 'app/containers/containers.html',
             controller: 'ContainersController',
-            controllerAs: 'vm'
+            controllerAs: 'vm',
+            resolve: {
+                resolveContainers: ['Containers', '$window', function (Containers, $window) {
+                    return Containers.query().$promise.then(null, function(errorData) {
+                            $window.location.href = '/#/error';
+                            $window.location.reload();
+                    }); 
+                }] 
+            }
         })
         $routeProvider.when('/containers/deploy', {
             templateUrl: 'app/containers/deploy.html',
@@ -26,5 +34,6 @@
             controller: 'ContainerLogsController'
         });
     };
+
 })()
 
