@@ -13,6 +13,16 @@ Shipyard Deploy will automatically start a Shipyard stack on a desired Docker En
 ```
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock shipyard/deploy start
 ```
+## Using fig ([fig.yml from project](https://raw.githubusercontent.com/llitfkitfk/shipyard/master/fig.yml)) 
+
+* Create containers
+```
+fig up -d
+```
+* Start the Shipyard project:
+```
+fig start
+```
 
 ## Manual
 * Start a data volume instance of RethinkDB:
