@@ -5,31 +5,32 @@
         .module('shipyard.containers')
         .controller('ContainerDetailsController', ContainerDetailsController);
 
-    ContainerDetailsController.$inject = ['$scope', 'resolveContainer', '$location', '$routeParams', 'flash', 'Container'];
+    ContainerDetailsController.$inject = ['resolveContainer', '$location', '$routeParams', 'flash', 'Container'];
 
-    function ContainerDetailsController($scope, resolveContainer, $location, $routeParams, flash, Container) {
-        $scope.showX = function(){
+    function ContainerDetailsController(resolveContainer, $location, $routeParams, flash, Container) {
+        var vm = this;
+        vm.showX = function(){
             return function(d){
                 return d.key;
             };
         };
-        $scope.showRemoveContainerDialog = function() {
+        vm.showRemoveContainerDialog = function() {
             $('.basic.modal.removeContainer')
                 .modal('show');
         };
-        $scope.showStopContainerDialog = function() {
+        vm.showStopContainerDialog = function() {
             $('.basic.modal.stopContainer')
                 .modal('show');
         };
-        $scope.showRestartContainerDialog = function() {
+        vm.showRestartContainerDialog = function() {
             $('.basic.modal.restartContainer')
                 .modal('show');
         };
-        $scope.showScaleContainerDialog = function() {
+        vm.showScaleContainerDialog = function() {
             $('.basic.modal.scaleContainer')
                 .modal('show');
         };
-        $scope.destroyContainer = function() {
+        vm.destroyContainer = function() {
             Container.destroy({id: $routeParams.id}).$promise.then(function() {
                 // we must remove the modal or it will come back
                 // the next time the modal is shown
@@ -39,7 +40,7 @@
                 flash.error = 'error destroying container: ' + err.data;
             });
         };
-        $scope.stopContainer = function() {
+        vm.stopContainer = function() {
             Container.control({id: $routeParams.id, action: 'stop'}).$promise.then(function() {
                 // we must remove the modal or it will come back
                 // the next time the modal is shown
@@ -49,7 +50,7 @@
                 flash.error = 'error stopping container: ' + err.data;
             });
         };
-        $scope.restartContainer = function() {
+        vm.restartContainer = function() {
             Container.control({id: $routeParams.id, action: 'restart'}).$promise.then(function() {
                 // we must remove the modal or it will come back
                 // the next time the modal is shown
@@ -59,21 +60,21 @@
                 flash.error = 'error restarting container: ' + err.data;
             });
         };
-        $scope.showProgress = function() {
+        vm.showProgress = function() {
             $('.ui.form').addClass('hide');
             $('.progress').removeClass('hide');
         };
-        $scope.hideProgress = function() {
+        vm.hideProgress = function() {
             $('.ui.form').removeClass('hide');
             $('.progress').addClass('hide');
         };
-        $scope.scale = function() {
+        vm.scale = function() {
             var valid = $(".ui.form").form('validate form');
             if (!valid) {
                 return false;
             }
-            $scope.showProgress();
-            Container.control({id: $routeParams.id, action: 'scale', count: $scope.count}).$promise.then(function() {
+            vm.showProgress();
+            Container.control({id: $routeParams.id, action: 'scale', count: vm.count}).$promise.then(function() {
                 // we must remove the modal or it will come back
                 // the next time the modal is shown
                 $('.basic.modal').modal('hide');
@@ -81,15 +82,15 @@
                 $location.path("/containers");
             }, function(err) {
                 flash.error = 'error scaling container: ' + err.data;
-                $scope.hideProgress();
+                vm.hideProgress();
                 $('.basic.modal').modal('hide');
                 $('.basic.modal').remove();
             });
         };
         var portLinks = [];
-        $scope.container = resolveContainer;
+        vm.container = resolveContainer;
         // build port links
-        $scope.tooltipFunction = function(){
+        vm.tooltipFunction = function(){
             return function(key, x, y, e, graph) {
                 return "<div class='ui block small header'>Reserved</div>" + '<p>' + y + '</p>';
             }
@@ -105,26 +106,26 @@
             l.link = 'http://' + h.hostname + ':' + p.port;
             this.push(l);
         }, portLinks);
-        $scope.portLinks = portLinks;
-        $scope.predicate = 'container_port';
-        $scope.cpuMax = resolveContainer.engine.cpus;
-        $scope.memoryMax = resolveContainer.engine.memory;
-        $scope.chartOptions = {};
-        $scope.containerCpuData = {
+        vm.portLinks = portLinks;
+        vm.predicate = 'container_port';
+        vm.cpuMax = resolveContainer.engine.cpus;
+        vm.memoryMax = resolveContainer.engine.memory;
+        vm.chartOptions = {};
+        vm.containerCpuData = {
             labels: ["Reserved"],
             datasets: [
             {
                 fillColor: "#6D91AD",
-                data: [ $scope.container.image.cpus ]
+                data: [ vm.container.image.cpus ]
             }
             ]
         };
-        $scope.containerMemoryData = {
+        vm.containerMemoryData = {
             labels: ["Reserved"],
             datasets: [
             {
                 fillColor: "#6D91AD",
-                data: [ $scope.container.image.memory ]
+                data: [ vm.container.image.memory ]
             }
             ]
         };

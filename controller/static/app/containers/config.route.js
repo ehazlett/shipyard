@@ -28,6 +28,7 @@
         $routeProvider.when('/containers/:id', {
             templateUrl: 'app/containers/details.html',
             controller: 'ContainerDetailsController',
+            controllerAs: 'vm',
             resolve: {
                 resolveContainer: ['Container', '$route', '$window', function (Container, $route, $window) {
                     return Container.query({id: $route.current.params.id}).$promise.then(null, function(errorData) {
