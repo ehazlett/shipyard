@@ -27,7 +27,15 @@
         });
         $routeProvider.when('/containers/:id', {
             templateUrl: 'app/containers/details.html',
-            controller: 'ContainerDetailsController'
+            controller: 'ContainerDetailsController',
+            resolve: {
+                resolveContainer: ['Container', '$route', '$window', function (Container, $route, $window) {
+                    return Container.query({id: $route.current.params.id}).$promise.then(null, function(errorData) {
+                            $window.location.href = '/#/error';
+                            $window.location.reload();
+                    }); 
+                }] 
+            }
         });
         $routeProvider.when('/containers/:id/logs', {
             templateUrl: 'app/containers/logs.html',

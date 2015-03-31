@@ -5,9 +5,9 @@
         .module('shipyard.containers')
         .controller('ContainerDetailsController', ContainerDetailsController);
 
-    ContainerDetailsController.$inject = ['$scope', '$location', '$routeParams', 'flash', 'Container'];
+    ContainerDetailsController.$inject = ['$scope', 'resolveContainer', '$location', '$routeParams', 'flash', 'Container'];
 
-    function ContainerDetailsController($scope, $location, $routeParams, flash, Container) {
+    function ContainerDetailsController($scope, resolveContainer, $location, $routeParams, flash, Container) {
         $scope.showX = function(){
             return function(d){
                 return d.key;
@@ -87,48 +87,46 @@
             });
         };
         var portLinks = [];
-        Container.query({id: $routeParams.id}, function(data){
-            $scope.container = data;
-            // build port links
-            $scope.tooltipFunction = function(){
-                return function(key, x, y, e, graph) {
-                    return "<div class='ui block small header'>Reserved</div>" + '<p>' + y + '</p>';
-                }
-            };
-            angular.forEach(data.ports, function(p) {
-                var h = document.createElement('a');
-                h.href = data.engine.addr;
-                var l = {};
-                l.hostname = h.hostname;
-                l.protocol = p.proto;
-                l.port = p.port;
-                l.container_port = p.container_port;
-                l.link = 'http://' + h.hostname + ':' + p.port;
-                this.push(l);
-            }, portLinks);
-            $scope.portLinks = portLinks;
-            $scope.predicate = 'container_port';
-            $scope.cpuMax = data.engine.cpus;
-            $scope.memoryMax = data.engine.memory;
-            $scope.chartOptions = {};
-            $scope.containerCpuData = {
-                labels: ["Reserved"],
-                datasets: [
-                {
-                    fillColor: "#6D91AD",
-                    data: [ $scope.container.image.cpus ]
-                }
-                ]
-            };
-            $scope.containerMemoryData = {
-                labels: ["Reserved"],
-                datasets: [
-                {
-                    fillColor: "#6D91AD",
-                    data: [ $scope.container.image.memory ]
-                }
-                ]
-            };
-        });
+        $scope.container = resolveContainer;
+        // build port links
+        $scope.tooltipFunction = function(){
+            return function(key, x, y, e, graph) {
+                return "<div class='ui block small header'>Reserved</div>" + '<p>' + y + '</p>';
+            }
+        };
+        angular.forEach(resolveContainer.ports, function(p) {
+            var h = document.createElement('a');
+            h.href = resolveContainer.engine.addr;
+            var l = {};
+            l.hostname = h.hostname;
+            l.protocol = p.proto;
+            l.port = p.port;
+            l.container_port = p.container_port;
+            l.link = 'http://' + h.hostname + ':' + p.port;
+            this.push(l);
+        }, portLinks);
+        $scope.portLinks = portLinks;
+        $scope.predicate = 'container_port';
+        $scope.cpuMax = resolveContainer.engine.cpus;
+        $scope.memoryMax = resolveContainer.engine.memory;
+        $scope.chartOptions = {};
+        $scope.containerCpuData = {
+            labels: ["Reserved"],
+            datasets: [
+            {
+                fillColor: "#6D91AD",
+                data: [ $scope.container.image.cpus ]
+            }
+            ]
+        };
+        $scope.containerMemoryData = {
+            labels: ["Reserved"],
+            datasets: [
+            {
+                fillColor: "#6D91AD",
+                data: [ $scope.container.image.memory ]
+            }
+            ]
+        };
     }
 })()
