@@ -25,12 +25,6 @@ import (
 )
 
 var (
-	listenAddr        string
-	rethinkdbAddr     string
-	rethinkdbDatabase string
-	rethinkdbAuthKey  string
-	disableUsageInfo  bool
-	showVersion       bool
 	controllerManager *manager.Manager
 )
 
@@ -362,12 +356,20 @@ func hubWebhook(w http.ResponseWriter, r *http.Request) {
 	//TODO: redeploy containers
 }
 
+func writeCorsHeaders(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+	w.Header().Add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
+}
+
 func CmdServer(c *cli.Context) {
 	rethinkdbAddr := c.String("rethinkdb-addr")
 	rethinkdbDatabase := c.String("rethinkdb-database")
 	rethinkdbAuthKey := c.String("rethinkdb-auth-key")
 	disableUsageInfo := c.Bool("disable-usage-info")
 	listenAddr := c.String("listen")
+	authWhitelist := c.StringSlice("auth-whitelist-cidr")
+	enableCors := c.Bool("enable-cors")
 
 	var (
 		mErr      error
@@ -375,6 +377,10 @@ func CmdServer(c *cli.Context) {
 	)
 
 	log.Infof("shipyard version %s", shipyard.Version)
+
+	if len(authWhitelist) > 0 {
+		log.Infof("whitelisting the following subnets: %v", authWhitelist)
+	}
 
 	dockerUrl := c.String("docker")
 	tlsCaCert := c.String("tls-ca-cert")
@@ -392,6 +398,8 @@ func CmdServer(c *cli.Context) {
 		log.Fatal(mErr)
 	}
 
+	log.Debugf("connected to docker: url=%s", dockerUrl)
+
 	// forwarder for swarm
 	fwd, err := forward.New()
 	if err != nil {
@@ -403,8 +411,14 @@ func CmdServer(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	// TODO: handle TLS
-	dUrl := fmt.Sprintf("http://%s", u.Host)
+	// TODO: handle TLS -- this isn't working yet
+	scheme := "http://"
+	if client.TLSConfig != nil {
+		scheme = "https://"
+	}
+	dUrl := fmt.Sprintf("%s%s", scheme, u.Host)
+
+	log.Debugf("configured docker proxy: %s", dUrl)
 
 	swarmRedirect := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		req.URL = testutils.ParseURI(dUrl)
@@ -434,7 +448,7 @@ func CmdServer(c *cli.Context) {
 
 	// api router; protected by auth
 	apiAuthRouter := negroni.New()
-	apiAuthRequired := mAuth.NewAuthRequired(controllerManager)
+	apiAuthRequired := mAuth.NewAuthRequired(controllerManager, authWhitelist)
 	apiAccessRequired := access.NewAccessRequired(controllerManager)
 	apiAuthRouter.Use(negroni.HandlerFunc(apiAuthRequired.HandlerFuncWithNext))
 	apiAuthRouter.Use(negroni.HandlerFunc(apiAccessRequired.HandlerFuncWithNext))
@@ -445,7 +459,7 @@ func CmdServer(c *cli.Context) {
 	accountRouter := mux.NewRouter()
 	accountRouter.HandleFunc("/account/changepassword", changePassword).Methods("POST")
 	accountAuthRouter := negroni.New()
-	accountAuthRequired := mAuth.NewAuthRequired(controllerManager)
+	accountAuthRequired := mAuth.NewAuthRequired(controllerManager, authWhitelist)
 	accountAuthRouter.Use(negroni.HandlerFunc(accountAuthRequired.HandlerFuncWithNext))
 	accountAuthRouter.UseHandler(accountRouter)
 	globalMux.Handle("/account/", accountAuthRouter)
@@ -462,51 +476,85 @@ func CmdServer(c *cli.Context) {
 
 	// swarm
 	swarmRouter := mux.NewRouter()
-	swarmRouter.HandleFunc("/_ping", swarmRedirect)
-	swarmRouter.HandleFunc("/events", swarmRedirect)
-	swarmRouter.HandleFunc("/version", swarmRedirect)
-	swarmRouter.HandleFunc("/images/json", swarmRedirect)
-	swarmRouter.HandleFunc("/images/viz", swarmRedirect)
-	swarmRouter.HandleFunc("/images/search", swarmRedirect)
-	swarmRouter.HandleFunc("/images/get", swarmRedirect)
-	swarmRouter.HandleFunc("/images/create", swarmRedirect)
-	swarmRouter.HandleFunc("/images/load", swarmRedirect)
-	swarmRouter.HandleFunc("/images/{name:.*}", swarmRedirect)
-	swarmRouter.HandleFunc("/images/{name:.*}/get", swarmRedirect)
-	swarmRouter.HandleFunc("/images/{name:.*}/history", swarmRedirect)
-	swarmRouter.HandleFunc("/images/{name:.*}/json", swarmRedirect)
-	swarmRouter.HandleFunc("/images/{name:.*}/push", swarmRedirect)
-	swarmRouter.HandleFunc("/images/{name:.*}/tag", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/ps", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/json", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/create", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/export", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/kill", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/pause", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/unpause", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/rename", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/restart", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/start", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/stop", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/wait", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/resize", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/attach", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/copy", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/exec", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/changes", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/json", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/top", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/logs", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/stats", swarmRedirect)
-	swarmRouter.HandleFunc("/containers/{name:.*}/attach/ws", swarmRedirect)
-	swarmRouter.HandleFunc("/exec/{execid:.*}/json", swarmRedirect)
-	swarmRouter.HandleFunc("/exec/{execid:.*}/start", swarmRedirect)
-	swarmRouter.HandleFunc("/exec/{execid:.*}/resize", swarmRedirect)
-	swarmRouter.HandleFunc("/commit", swarmRedirect)
-	swarmRouter.HandleFunc("/build", swarmRedirect)
+	// these are pulled from the swarm api code to proxy and allow
+	// usage with the standard Docker cli
+	m := map[string]map[string]http.HandlerFunc{
+		"GET": {
+			"/_ping":                          swarmRedirect,
+			"/events":                         swarmRedirect,
+			"/info":                           swarmRedirect,
+			"/version":                        swarmRedirect,
+			"/images/json":                    swarmRedirect,
+			"/images/viz":                     swarmRedirect,
+			"/images/search":                  swarmRedirect,
+			"/images/get":                     swarmRedirect,
+			"/images/{name:.*}/get":           swarmRedirect,
+			"/images/{name:.*}/history":       swarmRedirect,
+			"/images/{name:.*}/json":          swarmRedirect,
+			"/containers/ps":                  swarmRedirect,
+			"/containers/json":                swarmRedirect,
+			"/containers/{name:.*}/export":    swarmRedirect,
+			"/containers/{name:.*}/changes":   swarmRedirect,
+			"/containers/{name:.*}/json":      swarmRedirect,
+			"/containers/{name:.*}/top":       swarmRedirect,
+			"/containers/{name:.*}/logs":      swarmRedirect,
+			"/containers/{name:.*}/stats":     swarmRedirect,
+			"/containers/{name:.*}/attach/ws": swarmRedirect,
+			"/exec/{execid:.*}/json":          swarmRedirect,
+		},
+		"POST": {
+			"/auth":                         swarmRedirect,
+			"/commit":                       swarmRedirect,
+			"/build":                        swarmRedirect,
+			"/images/create":                swarmRedirect,
+			"/images/load":                  swarmRedirect,
+			"/images/{name:.*}/push":        swarmRedirect,
+			"/images/{name:.*}/tag":         swarmRedirect,
+			"/containers/create":            swarmRedirect,
+			"/containers/{name:.*}/kill":    swarmRedirect,
+			"/containers/{name:.*}/pause":   swarmRedirect,
+			"/containers/{name:.*}/unpause": swarmRedirect,
+			"/containers/{name:.*}/rename":  swarmRedirect,
+			"/containers/{name:.*}/restart": swarmRedirect,
+			"/containers/{name:.*}/start":   swarmRedirect,
+			"/containers/{name:.*}/stop":    swarmRedirect,
+			"/containers/{name:.*}/wait":    swarmRedirect,
+			"/containers/{name:.*}/resize":  swarmRedirect,
+			"/containers/{name:.*}/attach":  swarmRedirect,
+			"/containers/{name:.*}/copy":    swarmRedirect,
+			"/containers/{name:.*}/exec":    swarmRedirect,
+			"/exec/{execid:.*}/start":       swarmRedirect,
+			"/exec/{execid:.*}/resize":      swarmRedirect,
+		},
+		"DELETE": {
+			"/containers/{name:.*}": swarmRedirect,
+			"/images/{name:.*}":     swarmRedirect,
+		},
+		"OPTIONS": {
+			"": swarmRedirect,
+		},
+	}
+
+	for method, routes := range m {
+		for route, fct := range routes {
+			localRoute := route
+			localFct := fct
+			wrap := func(w http.ResponseWriter, r *http.Request) {
+				if enableCors {
+					writeCorsHeaders(w, r)
+				}
+				localFct(w, r)
+			}
+			localMethod := method
+
+			// add the new route
+			swarmRouter.Path("/v{version:[0-9.]+}" + localRoute).Methods(localMethod).HandlerFunc(wrap)
+			swarmRouter.Path(localRoute).Methods(localMethod).HandlerFunc(wrap)
+		}
+	}
+
 	swarmAuthRouter := negroni.New()
-	swarmAuthRequired := mAuth.NewAuthRequired(controllerManager)
+	swarmAuthRequired := mAuth.NewAuthRequired(controllerManager, authWhitelist)
 	swarmAccessRequired := access.NewAccessRequired(controllerManager)
 	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAuthRequired.HandlerFuncWithNext))
 	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAccessRequired.HandlerFuncWithNext))
@@ -519,6 +567,8 @@ func CmdServer(c *cli.Context) {
 	globalMux.Handle("/version", swarmAuthRouter)
 	globalMux.Handle("/images/", swarmAuthRouter)
 	globalMux.Handle("/exec/", swarmAuthRouter)
+	globalMux.Handle("/v1.17/", swarmAuthRouter)
+	globalMux.Handle("/v1.18/", swarmAuthRouter)
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
