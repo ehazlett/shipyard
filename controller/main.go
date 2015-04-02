@@ -81,6 +81,15 @@ func main() {
 					Name:  "allow-insecure",
 					Usage: "enable insecure tls communication",
 				},
+				cli.BoolFlag{
+					Name:  "enable-cors",
+					Usage: "enable cors with swarm",
+				},
+				cli.StringSliceFlag{
+					Name:  "auth-whitelist-cidr",
+					Usage: "whitelist CIDR to bypass auth",
+					Value: &cli.StringSlice{},
+				},
 			},
 		},
 	}
