@@ -2,10 +2,11 @@ package manager
 
 import (
 	"fmt"
-	"time"
 
-	"github.com/citadel/citadel"
+	log "github.com/Sirupsen/logrus"
+	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/utils"
 )
 
 type (
@@ -14,21 +15,30 @@ type (
 	}
 )
 
-func (h *EventHandler) Handle(e *citadel.Event) error {
-	logger.Infof("event: date=%s type=%s image=%s container=%s", e.Time.Format(time.RubyDate), e.Type, e.Container.Image.Name, e.Container.ID[:12])
+func (h *EventHandler) Handle(e *dockerclient.Event) error {
+	log.Infof("event: date=%d status=%s container=%s", e.Time, e.Status, e.Id[:12])
 	h.logDockerEvent(e)
 	return nil
 }
 
-func (h *EventHandler) logDockerEvent(e *citadel.Event) error {
+func (h *EventHandler) logDockerEvent(e *dockerclient.Event) error {
+	info, err := h.Manager.Container(e.Id)
+	if err != nil {
+		return err
+	}
+
+	ts, err := utils.FromUnixTimestamp(e.Time)
+	if err != nil {
+		return err
+	}
+
 	evt := &shipyard.Event{
-		Type: e.Type,
+		Type: e.Status,
 		Message: fmt.Sprintf("action=%s container=%s",
-			e.Type, e.Container.ID[:12]),
-		Time:      e.Time,
-		Container: e.Container,
-		Engine:    e.Engine,
-		Tags:      []string{"docker"},
+			e.Status, e.Id[:12]),
+		Time:          *ts,
+		ContainerInfo: info,
+		Tags:          []string{"docker"},
 	}
 	if err := h.Manager.SaveEvent(evt); err != nil {
 		return err

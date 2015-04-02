@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
 )
 
@@ -86,7 +86,7 @@ func (a *AccessRequired) handleRequest(w http.ResponseWriter, r *http.Request) e
 	return nil
 }
 
-func (a *AccessRequired) checkAccess(path string, role *shipyard.Role) bool {
+func (a *AccessRequired) checkAccess(path string, role *auth.Role) bool {
 	valid := false
 	for _, v := range a.acl[role.Name] {
 		if v == "*" || strings.HasPrefix(path, v) {
