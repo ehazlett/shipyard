@@ -411,11 +411,25 @@ func CmdServer(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	// TODO: handle TLS -- this isn't working yet
+	// setup redirect target to swarm
 	scheme := "http://"
+
+	// check if TLS is enabled and configure if so
 	if client.TLSConfig != nil {
 		scheme = "https://"
+		// setup custom roundtripper with TLS transport
+		r := forward.RoundTripper(
+			&http.Transport{
+				TLSClientConfig: client.TLSConfig,
+			})
+		f, err := forward.New(r)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fwd = f
 	}
+
 	dUrl := fmt.Sprintf("%s%s", scheme, u.Host)
 
 	log.Debugf("configured docker proxy: %s", dUrl)
