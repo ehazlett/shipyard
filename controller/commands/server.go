@@ -2,7 +2,9 @@ package commands
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -11,6 +13,8 @@ import (
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
+	"github.com/mailgun/oxy/forward"
+	"github.com/mailgun/oxy/testutils"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
@@ -372,11 +376,12 @@ func CmdServer(c *cli.Context) {
 
 	log.Infof("shipyard version %s", shipyard.Version)
 
-	dockerUrl := c.GlobalString("docker")
-	tlsCaCert := c.GlobalString("tls-ca-cert")
-	tlsCert := c.GlobalString("tls-cert")
-	tlsKey := c.GlobalString("tls-key")
-	allowInsecure := c.GlobalBool("allow-insecure")
+	dockerUrl := c.String("docker")
+	tlsCaCert := c.String("tls-ca-cert")
+	tlsCert := c.String("tls-cert")
+	tlsKey := c.String("tls-key")
+	allowInsecure := c.Bool("allow-insecure")
+
 	client, err := utils.GetClient(dockerUrl, tlsCaCert, tlsCert, tlsKey, allowInsecure)
 	if err != nil {
 		log.Fatal(err)
@@ -386,6 +391,25 @@ func CmdServer(c *cli.Context) {
 	if mErr != nil {
 		log.Fatal(mErr)
 	}
+
+	// forwarder for swarm
+	fwd, err := forward.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	u, err := url.Parse(dockerUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// TODO: handle TLS
+	dUrl := fmt.Sprintf("http://%s", u.Host)
+
+	swarmRedirect := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req.URL = testutils.ParseURI(dUrl)
+		fwd.ServeHTTP(w, req)
+	})
 
 	apiRouter := mux.NewRouter()
 	apiRouter.HandleFunc("/api/accounts", accounts).Methods("GET")
@@ -436,6 +460,66 @@ func CmdServer(c *cli.Context) {
 	hubRouter.HandleFunc("/hub/webhook/{id}", hubWebhook).Methods("POST")
 	globalMux.Handle("/hub/", hubRouter)
 
+	// swarm
+	swarmRouter := mux.NewRouter()
+	swarmRouter.HandleFunc("/_ping", swarmRedirect)
+	swarmRouter.HandleFunc("/events", swarmRedirect)
+	swarmRouter.HandleFunc("/version", swarmRedirect)
+	swarmRouter.HandleFunc("/images/json", swarmRedirect)
+	swarmRouter.HandleFunc("/images/viz", swarmRedirect)
+	swarmRouter.HandleFunc("/images/search", swarmRedirect)
+	swarmRouter.HandleFunc("/images/get", swarmRedirect)
+	swarmRouter.HandleFunc("/images/create", swarmRedirect)
+	swarmRouter.HandleFunc("/images/load", swarmRedirect)
+	swarmRouter.HandleFunc("/images/{name:.*}", swarmRedirect)
+	swarmRouter.HandleFunc("/images/{name:.*}/get", swarmRedirect)
+	swarmRouter.HandleFunc("/images/{name:.*}/history", swarmRedirect)
+	swarmRouter.HandleFunc("/images/{name:.*}/json", swarmRedirect)
+	swarmRouter.HandleFunc("/images/{name:.*}/push", swarmRedirect)
+	swarmRouter.HandleFunc("/images/{name:.*}/tag", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/ps", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/json", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/create", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/export", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/kill", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/pause", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/unpause", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/rename", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/restart", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/start", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/stop", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/wait", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/resize", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/attach", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/copy", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/exec", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/changes", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/json", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/top", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/logs", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/stats", swarmRedirect)
+	swarmRouter.HandleFunc("/containers/{name:.*}/attach/ws", swarmRedirect)
+	swarmRouter.HandleFunc("/exec/{execid:.*}/json", swarmRedirect)
+	swarmRouter.HandleFunc("/exec/{execid:.*}/start", swarmRedirect)
+	swarmRouter.HandleFunc("/exec/{execid:.*}/resize", swarmRedirect)
+	swarmRouter.HandleFunc("/commit", swarmRedirect)
+	swarmRouter.HandleFunc("/build", swarmRedirect)
+	swarmAuthRouter := negroni.New()
+	swarmAuthRequired := mAuth.NewAuthRequired(controllerManager)
+	swarmAccessRequired := access.NewAccessRequired(controllerManager)
+	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAuthRequired.HandlerFuncWithNext))
+	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAccessRequired.HandlerFuncWithNext))
+	swarmAuthRouter.UseHandler(swarmRouter)
+	globalMux.Handle("/containers/", swarmAuthRouter)
+	globalMux.Handle("/_ping", swarmAuthRouter)
+	globalMux.Handle("/commit", swarmAuthRouter)
+	globalMux.Handle("/build", swarmAuthRouter)
+	globalMux.Handle("/events", swarmAuthRouter)
+	globalMux.Handle("/version", swarmAuthRouter)
+	globalMux.Handle("/images/", swarmAuthRouter)
+	globalMux.Handle("/exec/", swarmAuthRouter)
+
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
 		// create roles
@@ -468,7 +552,16 @@ func CmdServer(c *cli.Context) {
 
 	log.Infof("controller listening on %s", listenAddr)
 
-	if err := http.ListenAndServe(listenAddr, context.ClearHandler(globalMux)); err != nil {
+	s := &http.Server{
+		Addr:    listenAddr,
+		Handler: context.ClearHandler(globalMux),
+	}
+
+	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
+
+	//if err := s.ListenAndServe(context.ClearHandler(globalMux)); err != nil {
+	//	log.Fatal(err)
+	//}
 }
