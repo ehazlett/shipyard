@@ -432,7 +432,7 @@ func CmdServer(c *cli.Context) {
 
 	dUrl := fmt.Sprintf("%s%s", scheme, u.Host)
 
-	log.Debugf("configured docker proxy: %s", dUrl)
+	log.Debugf("configured docker proxy target: %s", dUrl)
 
 	swarmRedirect := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		req.URL = testutils.ParseURI(dUrl)
