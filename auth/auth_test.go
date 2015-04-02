@@ -1,4 +1,4 @@
-package shipyard
+package auth
 
 import (
 	"testing"
