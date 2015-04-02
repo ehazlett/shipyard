@@ -19,12 +19,9 @@
     <thead>
         <tr>
             <th ng-class="vm.tablesort.semanticHeaderClass('state')" ng-click="vm.tablesort.sortBy('state')">Status</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('id')" ng-click="vm.tablesort.sortBy('id')">ID</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('name')" ng-click="vm.tablesort.sortBy('name')">Name</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('image.name')" ng-click="vm.tablesort.sortBy('image.name')">Image</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('engine.id')" ng-click="vm.tablesort.sortBy('engine.id')">Engine</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('image.cpus')" ng-click="vm.tablesort.sortBy('image.cpus')">CPUs</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('image.memory')" ng-click="vm.tablesort.sortBy('image.memory')">Memory</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('Id')" ng-click="vm.tablesort.sortBy('Id')">ID</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('Names')" ng-click="vm.tablesort.sortBy('Names')">Name</th>
+            <th ng-class="vm.tablesort.semanticHeaderClass('Image')" ng-click="vm.tablesort.sortBy('Image')">Image</th>
         </tr>
     </thead>
     <tbody>
@@ -33,13 +30,10 @@
                 <span class="ui circular label ng-class:{'green': c.state == 'running', 'grey': c.state == 'stopped'}" title="{{c.state}}" />
             </td>
             <td>
-                <a href="/#/containers/{{c.id}}">{{c.id|truncate}}</a>
+                <a href="/#/containers/{{c.Id}}">{{c.Id|truncate}}</a>
             </td>
-            <td>{{c.name|container_name}}</td>
-            <td>{{c.image.name}}</td>
-            <td>{{c.engine.id}}</td>
-            <td>{{c.image.cpus | default:"&infin;"}}</td>
-            <td>{{c.image.memory|formatMemory | default:"&infin;"}}</td>
+            <td>{{c.Names}}</td>
+            <td>{{c.Image}}</td>
         </tr>
     </tbody>
 </table>
