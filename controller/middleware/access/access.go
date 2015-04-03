@@ -20,7 +20,7 @@ func defaultDeniedHandler(w http.ResponseWriter, r *http.Request) {
 
 type AccessRequired struct {
 	deniedHandler http.Handler
-	manager       *manager.Manager
+	manager       manager.Manager
 	acl           map[string][]string
 }
 
@@ -36,7 +36,7 @@ func defaultAccessLevels() map[string][]string {
 	return acl
 }
 
-func NewAccessRequired(m *manager.Manager) *AccessRequired {
+func NewAccessRequired(m manager.Manager) *AccessRequired {
 	acl := defaultAccessLevels()
 	a := &AccessRequired{
 		deniedHandler: http.HandlerFunc(defaultDeniedHandler),
@@ -99,7 +99,7 @@ func (a *AccessRequired) checkAccess(path string, role *auth.Role) bool {
 
 func (a *AccessRequired) HandlerFuncWithNext(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	err := a.handleRequest(w, r)
-	session, _ := a.manager.Store().Get(r, a.manager.StoreKey)
+	session, _ := a.manager.Store().Get(r, a.manager.StoreKey())
 	username := session.Values["username"]
 	if err != nil {
 		logger.Warnf("access denied for %s to %s from %s", username, r.URL.Path, r.RemoteAddr)

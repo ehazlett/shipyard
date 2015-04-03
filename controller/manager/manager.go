@@ -17,6 +17,7 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	"github.com/shipyard/shipyard/version"
 )
 
 const (
@@ -45,9 +46,8 @@ var (
 )
 
 type (
-	Manager struct {
-		StoreKey         string
-		address          string
+	DefaultManager struct {
+		storeKey         string
 		database         string
 		authKey          string
 		session          *r.Session
@@ -56,9 +56,42 @@ type (
 		client           *dockerclient.DockerClient
 		disableUsageInfo bool
 	}
+
+	Manager interface {
+		Accounts() ([]*auth.Account, error)
+		Account(username string) (*auth.Account, error)
+		Authenticate(username, password string) bool
+		SaveAccount(account *auth.Account) error
+		DeleteAccount(account *auth.Account) error
+		Roles() ([]*auth.Role, error)
+		Role(name string) (*auth.Role, error)
+		SaveRole(role *auth.Role) error
+		DeleteRole(role *auth.Role) error
+		Store() *sessions.CookieStore
+		StoreKey() string
+		Container(id string) (*dockerclient.ContainerInfo, error)
+		SaveServiceKey(key *auth.ServiceKey) error
+		RemoveServiceKey(key string) error
+		SaveEvent(event *shipyard.Event) error
+		Events(limit int) ([]*shipyard.Event, error)
+		PurgeEvents() error
+		ServiceKey(key string) (*auth.ServiceKey, error)
+		ServiceKeys() ([]*auth.ServiceKey, error)
+		NewAuthToken(username string, userAgent string) (*auth.AuthToken, error)
+		VerifyAuthToken(username, token string) error
+		VerifyServiceKey(key string) error
+		NewServiceKey(description string) (*auth.ServiceKey, error)
+		ChangePassword(username, password string) error
+		WebhookKey(key string) (*dockerhub.WebhookKey, error)
+		WebhookKeys() ([]*dockerhub.WebhookKey, error)
+		NewWebhookKey(image string) (*dockerhub.WebhookKey, error)
+		SaveWebhookKey(key *dockerhub.WebhookKey) error
+		DeleteWebhookKey(id string) error
+		DockerClient() *dockerclient.DockerClient
+	}
 )
 
-func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool) (*Manager, error) {
+func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool) (Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:     addr,
 		Database:    database,
@@ -71,15 +104,14 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 	}
 	log.Info("checking database")
 	r.DbCreate(database).Run(session)
-	m := &Manager{
-		address:          addr,
+	m := &DefaultManager{
 		database:         database,
 		authKey:          authKey,
 		session:          session,
 		authenticator:    &auth.Authenticator{},
 		store:            store,
 		client:           client,
-		StoreKey:         storeKey,
+		storeKey:         storeKey,
 		disableUsageInfo: disableUsageInfo,
 	}
 	m.initdb()
@@ -87,11 +119,19 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 	return m, nil
 }
 
-func (m *Manager) Store() *sessions.CookieStore {
+func (m DefaultManager) Store() *sessions.CookieStore {
 	return m.store
 }
 
-func (m *Manager) initdb() {
+func (m DefaultManager) DockerClient() *dockerclient.DockerClient {
+	return m.client
+}
+
+func (m DefaultManager) StoreKey() string {
+	return m.storeKey
+}
+
+func (m DefaultManager) initdb() {
 	// create tables if needed
 	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameExtensions, tblNameWebhookKeys}
 	for _, tbl := range tables {
@@ -104,13 +144,13 @@ func (m *Manager) initdb() {
 	}
 }
 
-func (m *Manager) init() error {
+func (m DefaultManager) init() error {
 	// anonymous usage info
 	go m.usageReport()
 	return nil
 }
 
-func (m *Manager) usageReport() {
+func (m DefaultManager) usageReport() {
 	if m.disableUsageInfo {
 		return
 	}
@@ -124,7 +164,7 @@ func (m *Manager) usageReport() {
 	}
 }
 
-func (m *Manager) uploadUsage() {
+func (m DefaultManager) uploadUsage() {
 	id := "anon"
 	ifaces, err := net.Interfaces()
 	if err == nil {
@@ -138,7 +178,7 @@ func (m *Manager) uploadUsage() {
 	}
 	usage := &shipyard.Usage{
 		ID:      id,
-		Version: shipyard.Version,
+		Version: version.Version,
 	}
 	b, err := json.Marshal(usage)
 	if err != nil {
@@ -150,11 +190,11 @@ func (m *Manager) uploadUsage() {
 	}
 }
 
-func (m *Manager) Container(id string) (*dockerclient.ContainerInfo, error) {
+func (m DefaultManager) Container(id string) (*dockerclient.ContainerInfo, error) {
 	return m.client.InspectContainer(id)
 }
 
-func (m *Manager) SaveServiceKey(key *auth.ServiceKey) error {
+func (m DefaultManager) SaveServiceKey(key *auth.ServiceKey) error {
 	if _, err := r.Table(tblNameServiceKeys).Insert(key).RunWrite(m.session); err != nil {
 		return err
 	}
@@ -171,7 +211,7 @@ func (m *Manager) SaveServiceKey(key *auth.ServiceKey) error {
 	return nil
 }
 
-func (m *Manager) RemoveServiceKey(key string) error {
+func (m DefaultManager) RemoveServiceKey(key string) error {
 	k, err := m.ServiceKey(key)
 	if err != nil {
 		return err
@@ -191,14 +231,14 @@ func (m *Manager) RemoveServiceKey(key string) error {
 	return nil
 }
 
-func (m *Manager) SaveEvent(event *shipyard.Event) error {
+func (m DefaultManager) SaveEvent(event *shipyard.Event) error {
 	if _, err := r.Table(tblNameEvents).Insert(event).RunWrite(m.session); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Manager) Events(limit int) ([]*shipyard.Event, error) {
+func (m DefaultManager) Events(limit int) ([]*shipyard.Event, error) {
 	t := r.Table(tblNameEvents).OrderBy(r.Desc("Time"))
 	if limit > -1 {
 		t.Limit(limit)
@@ -214,14 +254,14 @@ func (m *Manager) Events(limit int) ([]*shipyard.Event, error) {
 	return events, nil
 }
 
-func (m *Manager) PurgeEvents() error {
+func (m DefaultManager) PurgeEvents() error {
 	if _, err := r.Table(tblNameEvents).Delete().RunWrite(m.session); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Manager) ServiceKey(key string) (*auth.ServiceKey, error) {
+func (m DefaultManager) ServiceKey(key string) (*auth.ServiceKey, error) {
 	res, err := r.Table(tblNameServiceKeys).Filter(map[string]string{"key": key}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -237,7 +277,7 @@ func (m *Manager) ServiceKey(key string) (*auth.ServiceKey, error) {
 	return k, nil
 }
 
-func (m *Manager) ServiceKeys() ([]*auth.ServiceKey, error) {
+func (m DefaultManager) ServiceKeys() ([]*auth.ServiceKey, error) {
 	res, err := r.Table(tblNameServiceKeys).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -249,7 +289,7 @@ func (m *Manager) ServiceKeys() ([]*auth.ServiceKey, error) {
 	return keys, nil
 }
 
-func (m *Manager) Accounts() ([]*auth.Account, error) {
+func (m DefaultManager) Accounts() ([]*auth.Account, error) {
 	res, err := r.Table(tblNameAccounts).OrderBy(r.Asc("username")).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -261,7 +301,7 @@ func (m *Manager) Accounts() ([]*auth.Account, error) {
 	return accounts, nil
 }
 
-func (m *Manager) Account(username string) (*auth.Account, error) {
+func (m DefaultManager) Account(username string) (*auth.Account, error) {
 	res, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -277,7 +317,7 @@ func (m *Manager) Account(username string) (*auth.Account, error) {
 	return account, nil
 }
 
-func (m *Manager) SaveAccount(account *auth.Account) error {
+func (m DefaultManager) SaveAccount(account *auth.Account) error {
 	pass := account.Password
 	hash, err := m.authenticator.Hash(pass)
 	if err != nil {
@@ -310,7 +350,7 @@ func (m *Manager) SaveAccount(account *auth.Account) error {
 	return nil
 }
 
-func (m *Manager) DeleteAccount(account *auth.Account) error {
+func (m DefaultManager) DeleteAccount(account *auth.Account) error {
 	res, err := r.Table(tblNameAccounts).Filter(map[string]string{"id": account.ID}).Delete().Run(m.session)
 	if err != nil {
 		return err
@@ -330,7 +370,7 @@ func (m *Manager) DeleteAccount(account *auth.Account) error {
 	return nil
 }
 
-func (m *Manager) Roles() ([]*auth.Role, error) {
+func (m DefaultManager) Roles() ([]*auth.Role, error) {
 	res, err := r.Table(tblNameRoles).OrderBy(r.Asc("name")).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -342,7 +382,7 @@ func (m *Manager) Roles() ([]*auth.Role, error) {
 	return roles, nil
 }
 
-func (m *Manager) Role(name string) (*auth.Role, error) {
+func (m DefaultManager) Role(name string) (*auth.Role, error) {
 	res, err := r.Table(tblNameRoles).Filter(map[string]string{"name": name}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -358,7 +398,7 @@ func (m *Manager) Role(name string) (*auth.Role, error) {
 	return role, nil
 }
 
-func (m *Manager) SaveRole(role *auth.Role) error {
+func (m DefaultManager) SaveRole(role *auth.Role) error {
 	if _, err := r.Table(tblNameRoles).Insert(role).RunWrite(m.session); err != nil {
 		return err
 	}
@@ -377,7 +417,7 @@ func (m *Manager) SaveRole(role *auth.Role) error {
 	return nil
 }
 
-func (m *Manager) DeleteRole(role *auth.Role) error {
+func (m DefaultManager) DeleteRole(role *auth.Role) error {
 	res, err := r.Table(tblNameRoles).Get(role.ID).Delete().Run(m.session)
 	if err != nil {
 		return err
@@ -397,7 +437,7 @@ func (m *Manager) DeleteRole(role *auth.Role) error {
 	return nil
 }
 
-func (m *Manager) Authenticate(username, password string) bool {
+func (m DefaultManager) Authenticate(username, password string) bool {
 	acct, err := m.Account(username)
 	if err != nil {
 		log.Error(err)
@@ -406,7 +446,7 @@ func (m *Manager) Authenticate(username, password string) bool {
 	return m.authenticator.Authenticate(password, acct.Password)
 }
 
-func (m *Manager) NewAuthToken(username string, userAgent string) (*auth.AuthToken, error) {
+func (m DefaultManager) NewAuthToken(username string, userAgent string) (*auth.AuthToken, error) {
 	tk, err := m.authenticator.GenerateToken()
 	if err != nil {
 		return nil, err
@@ -447,7 +487,7 @@ func (m *Manager) NewAuthToken(username string, userAgent string) (*auth.AuthTok
 	return token, nil
 }
 
-func (m *Manager) VerifyAuthToken(username, token string) error {
+func (m DefaultManager) VerifyAuthToken(username, token string) error {
 	acct, err := m.Account(username)
 	if err != nil {
 		return err
@@ -465,14 +505,14 @@ func (m *Manager) VerifyAuthToken(username, token string) error {
 	return nil
 }
 
-func (m *Manager) VerifyServiceKey(key string) error {
+func (m DefaultManager) VerifyServiceKey(key string) error {
 	if _, err := m.ServiceKey(key); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Manager) NewServiceKey(description string) (*auth.ServiceKey, error) {
+func (m DefaultManager) NewServiceKey(description string) (*auth.ServiceKey, error) {
 	k, err := m.authenticator.GenerateToken()
 	if err != nil {
 		return nil, err
@@ -487,7 +527,7 @@ func (m *Manager) NewServiceKey(description string) (*auth.ServiceKey, error) {
 	return key, nil
 }
 
-func (m *Manager) ChangePassword(username, password string) error {
+func (m DefaultManager) ChangePassword(username, password string) error {
 	hash, err := m.authenticator.Hash(password)
 	if err != nil {
 		return err
@@ -498,7 +538,7 @@ func (m *Manager) ChangePassword(username, password string) error {
 	return nil
 }
 
-func (m *Manager) WebhookKey(key string) (*dockerhub.WebhookKey, error) {
+func (m DefaultManager) WebhookKey(key string) (*dockerhub.WebhookKey, error) {
 	res, err := r.Table(tblNameWebhookKeys).Filter(map[string]string{"key": key}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -519,7 +559,7 @@ func (m *Manager) WebhookKey(key string) (*dockerhub.WebhookKey, error) {
 	return k, nil
 }
 
-func (m *Manager) WebhookKeys() ([]*dockerhub.WebhookKey, error) {
+func (m DefaultManager) WebhookKeys() ([]*dockerhub.WebhookKey, error) {
 	res, err := r.Table(tblNameWebhookKeys).OrderBy(r.Asc("image")).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -531,7 +571,7 @@ func (m *Manager) WebhookKeys() ([]*dockerhub.WebhookKey, error) {
 	return keys, nil
 }
 
-func (m *Manager) NewWebhookKey(image string) (*dockerhub.WebhookKey, error) {
+func (m DefaultManager) NewWebhookKey(image string) (*dockerhub.WebhookKey, error) {
 	k := generateId(16)
 	key := &dockerhub.WebhookKey{
 		Key:   k,
@@ -545,7 +585,7 @@ func (m *Manager) NewWebhookKey(image string) (*dockerhub.WebhookKey, error) {
 	return key, nil
 }
 
-func (m *Manager) SaveWebhookKey(key *dockerhub.WebhookKey) error {
+func (m DefaultManager) SaveWebhookKey(key *dockerhub.WebhookKey) error {
 	if _, err := r.Table(tblNameWebhookKeys).Insert(key).RunWrite(m.session); err != nil {
 		return err
 
@@ -564,7 +604,8 @@ func (m *Manager) SaveWebhookKey(key *dockerhub.WebhookKey) error {
 
 	return nil
 }
-func (m *Manager) DeleteWebhookKey(id string) error {
+
+func (m DefaultManager) DeleteWebhookKey(id string) error {
 	key, err := m.WebhookKey(id)
 	if err != nil {
 		return err
