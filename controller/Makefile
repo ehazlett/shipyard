@@ -2,6 +2,7 @@ CGO_ENABLED=0
 GOOS=linux
 GOARCH=amd64
 TAG=${TAG:-latest}
+COMMIT=`git rev-parse --short HEAD`
 
 all: deps build
 
@@ -12,7 +13,7 @@ clean:
 	@rm -rf Godeps/_workspace controller
 
 build:
-	@godep go build -a -tags 'netgo' -ldflags '-w -linkmode external -extldflags -static' .
+	@godep go build -a -tags 'netgo' -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit $(COMMIT) -linkmode external -extldflags -static" .
 
 media:
 	@cd static && bower -s install --allow-root -p | xargs echo

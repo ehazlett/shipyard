@@ -5,8 +5,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/commands"
+	"github.com/shipyard/shipyard/version"
 )
 
 const (
@@ -17,7 +17,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "shipyard"
 	app.Usage = "composable docker management"
-	app.Version = shipyard.Version
+	app.Version = version.Version + " (" + version.GitCommit + ")"
 	app.Author = ""
 	app.Email = ""
 	app.Before = func(c *cli.Context) error {

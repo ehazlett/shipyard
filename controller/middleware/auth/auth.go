@@ -20,11 +20,11 @@ func defaultDeniedHostHandler(w http.ResponseWriter, r *http.Request) {
 
 type AuthRequired struct {
 	deniedHostHandler http.Handler
-	manager           *manager.Manager
+	manager           manager.Manager
 	whitelistCIDRs    []string
 }
 
-func NewAuthRequired(m *manager.Manager, whitelistCIDRs []string) *AuthRequired {
+func NewAuthRequired(m manager.Manager, whitelistCIDRs []string) *AuthRequired {
 	return &AuthRequired{
 		deniedHostHandler: http.HandlerFunc(defaultDeniedHostHandler),
 		manager:           m,
@@ -91,7 +91,7 @@ func (a *AuthRequired) handleRequest(w http.ResponseWriter, r *http.Request) err
 			if err := a.manager.VerifyAuthToken(user, token); err == nil {
 				valid = true
 				// set current user
-				session, _ := a.manager.Store().Get(r, a.manager.StoreKey)
+				session, _ := a.manager.Store().Get(r, a.manager.StoreKey())
 				session.Values["username"] = user
 				session.Save(r, w)
 			}

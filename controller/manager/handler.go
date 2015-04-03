@@ -11,7 +11,7 @@ import (
 
 type (
 	EventHandler struct {
-		Manager *Manager
+		Manager Manager
 	}
 )
 
