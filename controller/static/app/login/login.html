@@ -1,0 +1,53 @@
+<div class="ui center aligned grid">
+<div class="ui form four wide column segment" ng-submit="vm.login()">
+    <div class="ui negative icon message" ng-show="vm.error">
+        <i class="warning sign icon"></i>
+        <div class="content">
+            <div class="header">
+                {{vm.error}}
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <div class="ui left labeled icon input">
+            <input name="username" placeholder="username" type="text" ng-model="vm.username">
+            <i class="user icon"></i>
+        </div>
+    </div>
+    <div class="field">
+        <div class="ui left labeled icon input">
+            <input name="password" placeholder="password" type="password" ng-model="vm.password">
+            <i class="lock icon"></i>
+        </div>
+    </div>
+    <div class="buttons">
+        <div class="ui blue submit button">Login</div>
+    </div>
+</div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $('.ui.form')
+        .form({
+            username: {
+                identifier : 'username',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter a username'
+                }
+                ]
+            },
+            password: {
+                identifier : 'password',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter a password'
+                }
+                ]
+            }
+        });
+});
+</script>

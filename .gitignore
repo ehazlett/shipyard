@@ -3,3 +3,4 @@
 cli/cli
 controller/controller
 Godeps/_workspace
+bower_components

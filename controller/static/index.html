@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html ng-app="shipyard">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+        <title>Shipyard</title>
+
+        <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" class="ui" href="./semantic/dist/semantic.min.css">
+        <script src="./semantic/dist/semantic.min.js"></script>
+
+        <script src="./bower_components/angular/angular.min.js"></script>
+        <script src="./bower_components/angular-resource/angular-resource.min.js"></script>
+        <script src="./bower_components/angular-jwt/dist/angular-jwt.min.js"></script>
+        <script src="./bower_components/ui-router/release/angular-ui-router.min.js"></script>
+
+
+        <script src="./app/services/services.module.js"></script>
+        <script src="./app/services/auth.service.js"></script>
+
+        <script src="./app/containers/containers.module.js"></script>
+        <script src="./app/containers/containers.service.js"></script>
+        <script src="./app/containers/containers.controller.js"></script>
+        <script src="./app/containers/config.routes.js"></script>
+
+        <script src="./app/login/login.module.js"></script>
+        <script src="./app/login/login.controller.js"></script>
+        <script src="./app/login/logout.controller.js"></script>
+        <script src="./app/login/config.routes.js"></script>
+
+        <script src="./app/events/events.module.js"></script>
+        <script src="./app/events/events.service.js"></script>
+        <script src="./app/events/events.controller.js"></script>
+        <script src="./app/events/config.routes.js"></script>
+
+        <script src="./app/shipyard.module.js"></script>
+        <script src="./app/shipyard.js"></script>
+        <script src="./app/shipyard.jwt.js"></script>
+        <script src="./app/shipyard.config.js"></script>
+        <script src="./app/config.routes.js"></script>
+
+        <link href="http://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet" type="text/css">
+    </head>
+
+    <body>
+
+        <link rel="stylesheet" type="text/css" href="main.css">
+
+        <div class="ui grid">
+            <div class="computer tablet only row">      
+                <div id="menu" class="ui inverted fixed menu navbar grid">
+                    <div class="ui inverted header item">
+                        <a>
+                            Shipyard
+                        </a>
+                    </div>
+                    <a ui-sref="containers" ng-class="{active: $state.includes('containers')}" class="item">
+                        <i class="tasks icon"></i> Containers
+                    </a>
+                    <a ui-sref="events" ng-class="{active: $state.includes('events')}" class="item">
+                        <i class="browser icon"></i> Events
+                    </a>
+                    <div class="ui inverted right menu">
+                        <div class="ui item">
+                            <div class="ui simple active dropdown">
+                                Admin <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <div ui-sref="logout" class="item"><i class="sign out icon"></i>Logout</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui grid main" ng-hide="doingResolve">
+            <div class="row">
+                <div ui-view class="column"></div>
+            </div>
+            <div class="ui divider"></div>
+            <div class="row">
+                <div class="center aligned column">
+                    <p><a href="//shipyard-project.com">Shipyard</a> © 2015. All rights reserved.</p>
+                    <a href="//github.com/shipyard"><i class="big black github icon"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="centered" ng-show="doingResolve">
+            <div class="ui icon message">
+                <i class="notched circle loading icon"></i>
+                <div class="content">
+                    <div class="header">
+                        Just one second
+                    </div>
+                    <p>We're fetching that content for you.</p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
