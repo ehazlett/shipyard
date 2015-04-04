@@ -10,7 +10,7 @@
 	function getRoutes($stateProvider, $urlRouterProvider) {
 		$stateProvider
 			.state('dashboard.events', {
-				url: '/events',
+				url: '^/events',
 				templateUrl: 'app/events/events.html',
                 controller: 'EventsController',
                 controllerAs: 'vm',
