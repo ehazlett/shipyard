@@ -1,0 +1,25 @@
+#menu .header.item {
+    font-size: 20px;
+    font-family: 'Poiret One', sans-serif;
+    background-color: rgba(0, 68, 91, 1) !important;
+    display: inline-block;
+    text-transform: none;
+}
+
+#menu .item {
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.ui.grid.main{
+    margin-top: 40px;
+    padding: 20px;
+}
+
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    text-align: center;
+}

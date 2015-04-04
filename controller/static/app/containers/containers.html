@@ -1,0 +1,38 @@
+<div>
+<div class="tiny ui blue button">
+    Deploy
+</div>
+<div class="ui icon message" ng-show="vm.containers.length === 0">
+    <i class="info icon"></i>
+    <div class="content">
+        <div class="header">
+            Containers
+        </div>
+        <p>There are no containers deployed.</p>
+    </div>
+</div>
+<table class="ui sortable celled table" ng-show="vm.containers">
+    <thead>
+        <tr>
+            <th class="collapsing">Id</th>
+            <th>Node</th>
+            <th class="ascending">Name</th>
+            <th>Image</th>
+            <th>Status</th>
+            <th>Command</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="c in vm.containers">
+            <td class="collapsing">{{c.Id | limitTo:8 }}</td>
+            <td>{{c.Names[0].split('/')[1]}}</td>
+            <td>{{c.Names[0].split('/')[2]}}</td>
+            <td>{{c.Image}}</td>
+            <td>{{c.Status}}</td>
+            <td>{{c.Command}}</td>
+            <td>{{c.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+        </tr>
+    </tbody>
+</table>
+</div>
