@@ -65,7 +65,7 @@
                     </a>
                     <div class="ui inverted right menu">
                         <div class="ui item">
-                            <div class="ui simple active dropdown">
+                            <div class="ui dropdown">
                                 Admin <i class="dropdown icon"></i>
                                 <div class="menu">
                                     <div ui-sref="logout" class="item"><i class="sign out icon"></i>Logout</div>
@@ -76,6 +76,10 @@
                 </div>
             </div>
         </div>
+        <script>
+            $('.ui.dropdown')
+              .dropdown();
+        </script>
 
         <div class="ui grid main" ng-hide="doingResolve">
             <div class="row">
