@@ -13,7 +13,7 @@
                     .post('/auth/login', credentials)
                     .success(function(data, status, headers, config) {
                         localStorage.setItem('X-Access-Token', credentials.username + ':' + data.auth_token);
-                        $state.transitionTo('containers');
+                        $state.transitionTo('dashboard.containers');
                     })
                     .error(function(data, status, headers, config) {
                         localStorage.removeItem('X-Access-Token');

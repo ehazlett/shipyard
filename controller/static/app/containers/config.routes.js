@@ -9,7 +9,7 @@
 
     function getRoutes($stateProvider, $urlRouterProvider) {
         $stateProvider
-            .state('containers', {
+            .state('dashboard.containers', {
                 url: '/containers',
                 templateUrl: 'app/containers/containers.html',
                 controller: 'ContainersController',

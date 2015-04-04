@@ -2,19 +2,18 @@
     'use strict';
 
     angular
-        .module('shipyard')
+        .module('shipyard.layout')
         .config(getRoutes);
 
     getRoutes.$inject = ['$stateProvider', '$urlRouterProvider'];
 
     function getRoutes($stateProvider, $urlRouterProvider) {	
         $stateProvider
-            .state('error', {
-                url: '/error',
-                templateUrl: 'app/error/error.html',
-                authenticate: false
+            .state('dashboard', {
+                url: '/dashboard',
+                abstract: true,
+                templateUrl: 'app/layout/dashboard.html',
             });
-
-        $urlRouterProvider.otherwise('/dashboard/containers');
     }
 })();
+
