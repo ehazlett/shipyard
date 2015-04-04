@@ -3,18 +3,6 @@
     .dropdown();
 </script>
 
-<div class="centered" ng-show="doingResolve">
-    <div class="ui icon message">
-        <i class="notched circle loading icon"></i>
-        <div class="content">
-            <div class="header">
-                Just one second
-            </div>
-            <p>We're fetching that content for you.</p>
-        </div>
-    </div>
-</div>
-
 <div class="ui grid">
     <div class="computer tablet only row">      
         <div id="menu" class="ui inverted fixed menu navbar grid">
@@ -42,6 +30,23 @@
         </div>
     </div>
 </div>
+
+<div class="ui grid main" ng-show="doingResolve">
+    <div class="row" style="text-align: center;">
+        <div class="five wide column">
+            <div class="ui icon message">
+                <i class="notched circle loading icon"></i>
+                <div class="content">
+                    <div class="header">
+                        Just one second
+                    </div>
+                    <p>We're fetching that content for you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="ui grid main" ng-hide="doingResolve">
     <div class="row">
