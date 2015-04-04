@@ -10,7 +10,7 @@
     function getRoutes($stateProvider, $urlRouterProvider) {	
         $stateProvider
             .state('dashboard', {
-                url: '/dashboard',
+                url: '/',
                 abstract: true,
                 templateUrl: 'app/layout/dashboard.html',
             });

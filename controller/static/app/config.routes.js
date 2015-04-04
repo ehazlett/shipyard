@@ -15,6 +15,6 @@
                 authenticate: false
             });
 
-        $urlRouterProvider.otherwise('/dashboard/containers');
+        $urlRouterProvider.otherwise('/containers');
     }
 })();
