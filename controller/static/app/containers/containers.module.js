@@ -3,6 +3,7 @@
 
 	angular
 		.module('shipyard.containers', [
+            'shipyard.layout',
 			'ngResource',
 			'ui.router'
 		]);
