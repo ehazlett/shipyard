@@ -1,6 +1,11 @@
-(function() {
-    'use strict';
+(function(){
+	'use strict';
 
-    angular.
-        module('shipyard.containers', []);
-})()
+	angular
+		.module('shipyard.containers', [
+            'shipyard.layout',
+			'ngResource',
+			'ui.router'
+		]);
+		
+})();

@@ -1,6 +1,10 @@
-(function() {
-    'use strict';
+(function(){
+	'use strict';
 
-    angular.
-        module('shipyard.events', []);
-})()
+	angular
+		.module('shipyard.events', [
+            'ngResource',
+			'ui.router',
+		]);
+		
+})();

@@ -1,0 +1,63 @@
+<script>
+    $('.ui.dropdown')
+    .dropdown();
+</script>
+
+<div class="ui grid">
+    <div class="computer tablet only row">      
+        <div id="menu" class="ui inverted fixed menu navbar grid">
+            <div class="ui inverted header item">
+                <a>
+                    Shipyard
+                </a>
+            </div>
+            <a ui-sref="dashboard.containers" ng-class="{active: $state.includes('containers')}" class="item">
+                <i class="tasks icon"></i> Containers
+            </a>
+            <a ui-sref="dashboard.events" ng-class="{active: $state.includes('events')}" class="item">
+                <i class="browser icon"></i> Events
+            </a>
+            <div class="ui inverted right menu">
+                <div class="ui item">
+                    <div class="ui dropdown">
+                        Admin <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <div ui-sref="logout" class="item"><i class="sign out icon"></i>Logout</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui grid main" ng-show="doingResolve">
+    <div class="row" style="text-align: center;">
+        <div class="five wide column">
+            <div class="ui icon message">
+                <i class="notched circle loading icon"></i>
+                <div class="content">
+                    <div class="header">
+                        Just one second
+                    </div>
+                    <p>We're fetching that content for you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="ui grid main" ng-hide="doingResolve">
+    <div class="row">
+        <div ui-view class="column"></div>
+    </div>
+    <div class="ui divider"></div>
+    <div class="row">
+        <div class="center aligned column">
+            <p><a href="//shipyard-project.com">Shipyard</a> © 2015. All rights reserved.</p>
+            <a href="//github.com/shipyard"><i class="big black github icon"></i></a>
+        </div>
+    </div>
+</div>
+

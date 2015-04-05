@@ -1,13 +1,12 @@
 (function(){
-    'use strict';
+	'use strict';
 
-    angular
-        .module('shipyard.events')
-        .factory('Events', function($resource) {
-            return $resource('/api/events', {}, {
-                'purge': { isArray: false, method: 'DELETE' },
-                query: { isArray: true }
-            });
-        });
+	angular
+		.module('shipyard.events')
+        .factory('EventsService', EventsService);
 
-})()
+	EventsService.$inject = ['$resource'];
+	function EventsService($resource) {
+        return $resource('/api/events');
+	}
+})();

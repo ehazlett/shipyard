@@ -1,10 +1,7 @@
-<div class="ui icon buttons toolbar">
-    <a href="/#/containers/deploy" class="ui button mini green">
-        <i class="add icon"></i>
-        Deploy
-    </a>
+<div>
+<div class="tiny ui blue button">
+    Deploy
 </div>
-
 <div class="ui icon message" ng-show="vm.containers.length === 0">
     <i class="info icon"></i>
     <div class="content">
@@ -14,26 +11,28 @@
         <p>There are no containers deployed.</p>
     </div>
 </div>
-
-<table class="ui sortable table segment" ng-show="vm.containers" ng-init="vm.tablesort.sortBy('id')">
+<table class="ui sortable celled table" ng-show="vm.containers">
     <thead>
         <tr>
-            <th ng-class="vm.tablesort.semanticHeaderClass('state')" ng-click="vm.tablesort.sortBy('state')">Status</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('Id')" ng-click="vm.tablesort.sortBy('Id')">ID</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('Names')" ng-click="vm.tablesort.sortBy('Names')">Name</th>
-            <th ng-class="vm.tablesort.semanticHeaderClass('Image')" ng-click="vm.tablesort.sortBy('Image')">Image</th>
+            <th class="collapsing">Id</th>
+            <th>Node</th>
+            <th class="ascending">Name</th>
+            <th>Image</th>
+            <th>Status</th>
+            <th>Command</th>
+            <th>Created</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in vm.containers | orderBy:vm.tablesort.getSortField():vm.tablesort.isReverseSorted()" ng-click="vm.go(c)" class="rowlink">
-            <td class="healthcolumn">
-                <span class="ui circular label ng-class:{'green': c.state == 'running', 'grey': c.state == 'stopped'}" title="{{c.state}}" />
-            </td>
-            <td>
-                <a href="/#/containers/{{c.Id}}">{{c.Id|truncate}}</a>
-            </td>
-            <td>{{c.Names}}</td>
+        <tr ng-repeat="c in vm.containers">
+            <td class="collapsing">{{c.Id | limitTo:8 }}</td>
+            <td>{{c.Names[0].split('/')[1]}}</td>
+            <td>{{c.Names[0].split('/')[2]}}</td>
             <td>{{c.Image}}</td>
+            <td>{{c.Status}}</td>
+            <td>{{c.Command}}</td>
+            <td>{{c.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
         </tr>
     </tbody>
 </table>
+</div>

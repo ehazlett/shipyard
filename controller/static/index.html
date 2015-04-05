@@ -1,86 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html ng-app="shipyard">
     <head>
-        <meta charset="utf-8">
-        <title>Shipyard</title>
+        <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <meta name="description" content="Docker Management">
-        <meta name="author" content="shipyard">
-        <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
-        <link href='//fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
-        <script src="bower_components/jquery/dist/jquery.min.js"></script>
-        <script src="bower_components/semantic-ui/build/packaged/javascript/semantic.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/build/packaged/css/semantic.min.css">
-        <link rel="stylesheet" type="text/css" href="css/app.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+        <title>Shipyard</title>
+
+        <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" class="ui" href="./semantic/dist/semantic.min.css">
+        <script src="./semantic/dist/semantic.min.js"></script>
+
+        <script src="./bower_components/angular/angular.min.js"></script>
+        <script src="./bower_components/angular-resource/angular-resource.min.js"></script>
+        <script src="./bower_components/angular-jwt/dist/angular-jwt.min.js"></script>
+        <script src="./bower_components/ui-router/release/angular-ui-router.min.js"></script>
+
+
+        <script src="./app/services/services.module.js"></script>
+        <script src="./app/services/auth.service.js"></script>
+
+        <script src="./app/layout/layout.module.js"></script>
+        <script src="./app/layout/config.routes.js"></script>
+
+        <script src="./app/containers/containers.module.js"></script>
+        <script src="./app/containers/containers.service.js"></script>
+        <script src="./app/containers/containers.controller.js"></script>
+        <script src="./app/containers/config.routes.js"></script>
+
+        <script src="./app/login/login.module.js"></script>
+        <script src="./app/login/login.controller.js"></script>
+        <script src="./app/login/logout.controller.js"></script>
+        <script src="./app/login/config.routes.js"></script>
+
+        <script src="./app/events/events.module.js"></script>
+        <script src="./app/events/events.service.js"></script>
+        <script src="./app/events/events.controller.js"></script>
+        <script src="./app/events/config.routes.js"></script>
+
+        <script src="./app/shipyard.module.js"></script>
+        <script src="./app/shipyard.js"></script>
+        <script src="./app/shipyard.jwt.js"></script>
+        <script src="./app/config.routes.js"></script>
+
+        <link href="http://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet" type="text/css">
     </head>
-    <body ng-app="shipyard">
-        <div ng-include="template" ng-controller="HeaderController"></div>
-        <div ng-include="template" ng-controller="MenuController"></div>
-        <div class="container">
-            <div ng-view></div>
-        </div>
-        <script src="bower_components/angular/angular.min.js"></script>
-        <script src="bower_components/angular-route/angular-route.min.js"></script>
-        <script src="bower_components/angular-loader/angular-loader.min.js"></script>
-        <script src="bower_components/angular-resource/angular-resource.min.js"></script>
-        <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
-        <script src="bower_components/d3/d3.min.js"></script>
-        <script src="bower_components/angular-flash/dist/angular-flash.min.js"></script>
-        <script src="bower_components/chartjs/Chart.min.js"></script>
-        <script src="bower_components/angles/angles.js"></script>
-        <script src="bower_components/ansi-to-html/ansi2html.js"></script>
 
-        <!-- Angular app bootstrap -->
-        <script src="app/app.module.js"></script>
-        <script src="app/app.routes.js"></script>
-
-        <!-- Layout -->
-        <script src="app/layout/layout.module.js"></script>
-        <script src="app/layout/menu.controller.js"></script>
-        <script src="app/layout/header.controller.js"></script>
-
-        <!-- Shared -->
-        <script src="app/shared/shared.module.js"></script>
-        <script src="app/shared/tablesort.service.js"></script>
-        <script src="app/shared/authtoken.service.js"></script>
-        <script src="app/shared/popup.directive.js"></script>
-        <script src="app/shared/dropdown.directive.js"></script>
-        <script src="app/shared/envvar.directive.js"></script>
-        <script src="app/shared/checkbox.directive.js"></script>
-        <script src="app/shared/accordion.directive.js"></script>
-
-        <!-- Dashboard -->
-        <script src="app/dashboard/dashboard.module.js"></script>
-        <script src="app/dashboard/dashboard.controller.js"></script>
-        <script src="app/dashboard/config.route.js"></script>
-
-        <!-- Events -->
-        <script src="app/events/events.module.js"></script>
-        <script src="app/events/events.controller.js"></script>
-        <script src="app/events/events.service.js"></script>
-        <script src="app/events/config.route.js"></script>
-
-        <!-- Containers -->
-        <script src="app/containers/containers.module.js"></script>
-        <script src="app/containers/containers.service.js"></script>
-        <script src="app/containers/containers.controller.js"></script>
-        <script src="app/containers/deploy.controller.js"></script>
-        <script src="app/containers/details.controller.js"></script>
-        <script src="app/containers/logs.controller.js"></script>
-        <script src="app/containers/config.route.js"></script>
-
-        <!-- Engines -->
-        <script src="app/engines/engines.module.js"></script>
-        <script src="app/engines/engines.service.js"></script>
-        <script src="app/engines/engines.controller.js"></script>
-        <script src="app/engines/add.controller.js"></script>
-        <script src="app/engines/details.controller.js"></script>
-        <script src="app/engines/config.route.js"></script>
-
-        <script src="app/services.js"></script>
-        <script src="app/controllers.js"></script>
-        <script src="app/filters.js"></script>
-        <script src="app/utils.js"></script>
+    <body>
+        <link rel="stylesheet" type="text/css" href="main.css">
+        <div ui-view></div>
     </body>
 </html>
