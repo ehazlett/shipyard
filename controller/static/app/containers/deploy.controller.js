@@ -11,20 +11,24 @@
         vm.deploy = deploy;
         vm.containerName = "";
         vm.error = "";
-        vm.request = {};
+        vm.request = {
+            AttachStdin: false,
+            Tty: true,
+        };
 
         ////
 
         function deploy() {
             console.log(vm);
+            vm.deploying = true;
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
                 .success(function(data, status, headers, config) {
                     $state.transitionTo('dashboard.containers');
                 })
                 .error(function(data, status, headers, config) {
-                    console.log(data);
                     vm.error = data;
+                    vm.deploying = false;
                 });
         }
     }
