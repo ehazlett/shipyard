@@ -1,18 +1,37 @@
-<div>
-<div class="ui grid">
-    <div class="eight wide left floated column">
-        <div ui-sref="dashboard.deploy" class="ui small blue labeled icon button">
-            <i class="add icon"></i> Deploy Container
-        </div>
+<div class="ui small destroy modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+   Destroy Container
+</div>
+<div class="content">
+    <p>Are you sure you want to destroy this container?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        No
     </div>
-
-    <div class="eight wide right aligned right floated column">
-        <div class="ui small icon input">
-            <input ng-model="tableFilter" placeholder="Search containers..."/>
-            <i class="search icon"></i>
-        </div>
+    <div ng-click="vm.destroyContainer()" class="ui positive right labeled icon button">
+        Yes
+        <i class="checkmark icon"></i>
     </div>
 </div>
+</div>
+
+<div>
+    <div class="ui grid">
+        <div class="eight wide left floated column">
+            <div ui-sref="dashboard.deploy" class="ui small blue labeled icon button">
+                <i class="add icon"></i> Deploy Container
+            </div>
+        </div>
+
+        <div class="eight wide right aligned right floated column">
+            <div class="ui small icon input">
+                <input ng-model="tableFilter" placeholder="Search containers..."/>
+                <i class="search icon"></i>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="ui icon message" ng-show="vm.containers.length === 0">
@@ -33,6 +52,7 @@
             <th>Image</th>
             <th>Status</th>
             <th>Created</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -43,6 +63,22 @@
             <td>{{c.Image}}</td>
             <td>{{c.Status}}</td>
             <td>{{c.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+            <td class="collapsing">
+                <div class="ui right pointing dropdown">
+                    <div class="ui icon button">
+                        <i class="wrench icon"></i>
+                    </div>
+                    <div class="menu">
+                        <a ng-click="vm.showRestartContainerDialog(c)" class="item"><i class="green refresh icon"></i> Restart</a>
+                        <a ng-click="vm.showStopContainerDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
+                        <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
+                        <a class="item"><i class="text file outline icon"></i> Logs</a>
+                    </div>
+                </div>
+                <script>
+$('.ui.right.pointing.dropdown').dropdown();
+                </script>
+            </td>
         </tr>
     </tbody>
 </table>
