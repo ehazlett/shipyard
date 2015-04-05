@@ -63,7 +63,7 @@
     </thead>
     <tbody>
         <tr ng-repeat="c in vm.containers | filter:tableFilter">
-            <td class="collapsing">{{c.Id | limitTo:8 }}</td>
+            <td class="collapsing">{{c.Id | limitTo:12 }}</td>
             <td>{{c.Names[0].split('/')[1]}}</td>
             <td>{{c.Names[0].split('/')[2]}}</td>
             <td>{{c.Image}}</td>
