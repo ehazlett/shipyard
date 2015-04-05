@@ -1,13 +1,25 @@
 (function(){
-	'use strict';
+    'use strict';
 
     angular
         .module('shipyard.containers')
+        .factory('ContainerService', ContainerService)
         .factory('ContainersService', ContainersService);
 
-	ContainersService.$inject = ['$resource'];
-	function ContainersService($resource) {
+    ContainersService.$inject = ['$resource'];
+    function ContainersService($resource) {
         return $resource('/containers/json?all=1');
-	}
+    }
+
+    ContainerService.$inject = ['$resource'];
+    function ContainerService($resource) {
+        return $resource('/containers/:id/:action', {id: '@id' }, {
+            destroy: { method: 'DELETE' },
+            'save': { isArray: true, method: 'POST' },
+            'control': { isArray: false, method: 'GET' },
+            kill: { isArray: false, method: 'POST' }
+        });
+    }
+
 
 })();
