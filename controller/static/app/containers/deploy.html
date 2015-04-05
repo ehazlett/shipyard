@@ -1,0 +1,74 @@
+<div style="width: 66%; margin: 0 auto;">
+    <div class="ui top attached tabular menu">
+        <div class="active item">Basic</div>
+        <div class="item">Advanced</div>
+    </div>
+    <div class="ui bottom attached active tab segment">
+        <div class="ui error message" ng-show="vm.error">
+            <div class="header">Oops...</div>
+            <p>{{vm.error}}</p>
+        </div>
+        <div class="ui form" ng-submit="vm.deploy()">
+
+            <h4 class="ui dividing header">Container Information</h4>
+            <div class="two fields">
+
+                <div class="field">
+                    <label>Image Name 
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Image Name</h5>
+                            <p>The full namespaced name of the image that you wish to use to deploy your container.</p> 
+                            <p>Docker image names follow the convention: <i>registry.myorganization.org:5000/namespace/image-name</i></p> 
+                            <p>Where:</p>
+                            <ul>
+                                <li><i>registry.myorganization.org:5000</i> is the location of the <b>registry</b> that contains the image you wish to deploy</li>
+                                <li><i>namespace</i> is an optional <b>namespace</b> to help organize and avoid image name collisions</li>
+                                <li><i>image-name</i> is the <b>image name</b> that identifies the image that you wish to deploy</li>
+                            </ul>
+                            <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the <a href="https://registry.hub.docker.com/" target="_blank">Official Docker Hub</a>.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the <a href="https://registry.hub.docker.com/repos/library/" target="_blank">Docker Library</a></p>
+                        </div>
+                    </label>
+                    <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image Name"></input> 
+                </div>
+
+                <div class="field">
+                    <label>Container Name 
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Container Name</h5>
+                            <p>A simple name that can be used to identify the container, please note that two containers with the same name are not able to run on the same swarm node.</p>
+                            <p>If a container name is not specified, then Docker will automatically generate a name, e.g. <i>furious_brown</i></p>
+                        </div>
+                    </label>
+                    <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
+                </div>
+
+            </div>
+
+
+
+        </div>
+        <div class="large ui blue submit button">
+            Deploy 
+        </div>
+    </div>
+</div>
+<script>
+$(function(){
+    $('.help.circle.icon').popup({inline: true});
+
+    $('.ui.form')
+        .form({
+            image: {
+                identifier : 'image',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter an image'
+                }
+                ]
+            },
+        });
+});
+</script>

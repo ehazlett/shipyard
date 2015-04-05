@@ -20,11 +20,16 @@
             <div class="ui inverted right menu">
                 <div class="ui item">
                     <div class="ui dropdown">
-                        Admin <i class="dropdown icon"></i>
+                        {{ username }} <i class="dropdown icon"></i>
                         <div class="menu">
                             <div ui-sref="logout" class="item"><i class="sign out icon"></i>Logout</div>
                         </div>
                     </div>
+                </div>
+                <div class="ui item">
+                    <a ui-sref="dashboard.help">
+                        <i class="help circle icon"></i>
+                    </a>
                 </div>
             </div>
         </div>

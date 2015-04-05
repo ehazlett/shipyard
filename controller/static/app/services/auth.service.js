@@ -24,6 +24,13 @@
             },
             isLoggedIn: function() {
                 return localStorage.getItem('X-Access-Token') != null;
+            },
+            getUsername: function() {
+                var token = localStorage.getItem('X-Access-Token');
+                if(token == null) {
+                    return "";
+                }
+                return token.split(':')[0];
             }
         };
     }

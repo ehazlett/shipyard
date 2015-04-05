@@ -15,6 +15,7 @@
                             $state.transitionTo('login');
                             event.preventDefault(); 
                         }
+                        $rootScope.username = AuthService.getUsername();
                     });
 
                     $rootScope.$on("$stateChangeSuccess", function(event, toState, toParams, fromState, fromParams){

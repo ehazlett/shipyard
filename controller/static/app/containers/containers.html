@@ -1,7 +1,45 @@
-<div>
-<div class="tiny ui blue button">
-    Deploy
+<div class="ui small destroy modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+    Destroy Container
 </div>
+<div class="content">
+    <p>Are you sure you want to destroy this container?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        No
+    </div>
+    <div ng-click="vm.destroyContainer()" class="ui positive right labeled icon button">
+        Yes
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
+
+<div>
+    <div class="ui grid">
+        <div class="eight wide left floated column">
+            <div ui-sref="dashboard.deploy" class="ui small blue labeled icon button">
+                <i class="add icon"></i> Deploy Container
+            </div>
+        </div>
+
+        <div class="eight wide right aligned right floated column">
+            <div class="ui small icon input">
+                <input ng-model="tableFilter" placeholder="Search containers..."/>
+                <i class="search icon"></i>
+            </div>
+        </div>
+        <div class="sixteen wide column" ng-show="vm.error">
+            <div class="ui error message">
+                <div class="header">Oops...</div>
+                <p>{{vm.error}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="ui icon message" ng-show="vm.containers.length === 0">
     <i class="info icon"></i>
     <div class="content">
@@ -16,23 +54,45 @@
         <tr>
             <th class="collapsing">Id</th>
             <th>Node</th>
-            <th class="ascending">Name</th>
+            <th>Name</th>
             <th>Image</th>
             <th>Status</th>
-            <th>Command</th>
             <th>Created</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in vm.containers">
-            <td class="collapsing">{{c.Id | limitTo:8 }}</td>
+        <tr ng-repeat="c in vm.containers | filter:tableFilter">
+            <td class="collapsing">{{c.Id | limitTo:12 }}</td>
             <td>{{c.Names[0].split('/')[1]}}</td>
             <td>{{c.Names[0].split('/')[2]}}</td>
             <td>{{c.Image}}</td>
             <td>{{c.Status}}</td>
-            <td>{{c.Command}}</td>
             <td>{{c.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+            <td class="collapsing">
+                <div ui-sref="dashboard.inspect({id: c.Id})" class="ui icon button">
+                    <i class="search icon"></i>
+                </div>
+                <div class="ui right pointing dropdown">
+                    <div class="ui icon button">
+                        <i class="wrench icon"></i>
+                    </div>
+                    <div class="menu">
+                        <a ng-click="vm.restartContainer(c)" class="item"><i class="green refresh icon"></i> Restart</a>
+                        <a ng-click="vm.stopContainer(c)" class="item"><i class="black stop icon"></i> Stop</a>
+                        <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
+                        <a class="item"><i class="text file outline icon"></i> Logs</a>
+                    </div>
+                </div>
+                <script>
+$('.ui.right.pointing.dropdown').dropdown();
+                </script>
+            </td>
         </tr>
     </tbody>
 </table>
 </div>
+
+<script>
+$('.ui.sortable.celled.table').tablesort();
+</script>
