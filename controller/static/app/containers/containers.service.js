@@ -7,7 +7,7 @@
 
 	ContainersService.$inject = ['$resource'];
 	function ContainersService($resource) {
-        return $resource('/containers/json');
+        return $resource('/containers/json?all=1');
 	}
 
 })();
