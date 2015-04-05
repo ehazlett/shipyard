@@ -22,6 +22,13 @@
                         }); 
                     }] 
                 }
+            })
+            .state('dashboard.deploy', {
+                url: '^/deploy',
+                templateUrl: 'app/containers/deploy.html',
+                controller: 'ContainerDeployController',
+                controllerAs: 'vm',
+                authenticate: true
             });
     }
 })();
