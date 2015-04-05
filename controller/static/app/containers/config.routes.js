@@ -23,6 +23,17 @@
                     }] 
                 }
             })
+            .state('dashboard.inspect', {
+                url: '^/containers/{id}',
+                templateUrl: 'app/containers/inspect.html',
+                controllerAs: 'vm',
+                authenticate: true,
+                    resolve: { 
+                        container: ['$http', '$state', function($http, $state) {
+
+                        } 
+                    }
+           })
             .state('dashboard.deploy', {
                 url: '^/deploy',
                 templateUrl: 'app/containers/deploy.html',
