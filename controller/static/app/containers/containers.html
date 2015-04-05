@@ -1,7 +1,7 @@
 <div class="ui small destroy modal transition" style="margin-top: -98px;">
 <i class="close icon"></i>
 <div class="header">
-   Destroy Container
+    Destroy Container
 </div>
 <div class="content">
     <p>Are you sure you want to destroy this container?</p>
@@ -70,6 +70,9 @@
             <td>{{c.Status}}</td>
             <td>{{c.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
             <td class="collapsing">
+                <div ui-sref="dashboard.inspect({id: c.Id})" class="ui icon button">
+                    <i class="search icon"></i>
+                </div>
                 <div class="ui right pointing dropdown">
                     <div class="ui icon button">
                         <i class="wrench icon"></i>

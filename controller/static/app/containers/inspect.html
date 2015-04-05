@@ -1,19 +1,19 @@
 <div class="ui segment centered page">
 
-<h1>{{ vm.container.Id }}</h1>
+<h1>{{ vm.container.Id.substring(0,11) }}</h1>
 <div class= "ui grid">
     <div class="eight wide column">
         <div class="ui divided list"> 
             <div class="item">
                 <div class="content">
                     <a class="header">Image Name</a>
-                    <div class="description">{{ vm.container.Image }}</div>
+                    <div class="description">{{ vm.container.Config.Image }}</div>
                 </div>
             </div>
             <div class="item">
                 <div class="content">
                     <a class="header">Cmd</a>
-                    <div class="description">{{ vm.container.Cmd[0] }}</div>
+                    <div class="description">{{ vm.container.Config.Cmd.join(" ") }}</div>
                 </div>
             </div>
         </div>
@@ -29,7 +29,7 @@
             <div class="item">
                 <div class="content">
                     <a class="header">Node</a>
-                    <div class="description">{{ vm.container.Node }}</div>
+                    <div class="description">{{ vm.container.Node.Name }}</div>
                 </div>
             </div>
         </div>
