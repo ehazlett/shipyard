@@ -1,7 +1,20 @@
 <div>
-<div ui-sref="dashboard.deploy" class="ui small blue labeled icon button">
-    <i class="add icon"></i> Deploy Container
+<div class="ui grid">
+    <div class="eight wide left floated column">
+        <div ui-sref="dashboard.deploy" class="ui small blue labeled icon button">
+            <i class="add icon"></i> Deploy Container
+        </div>
+    </div>
+
+    <div class="eight wide right aligned right floated column">
+        <div class="ui small icon input">
+            <input ng-model="tableFilter" placeholder="Search containers..."/>
+            <i class="search icon"></i>
+        </div>
+    </div>
 </div>
+</div>
+
 <div class="ui icon message" ng-show="vm.containers.length === 0">
     <i class="info icon"></i>
     <div class="content">
@@ -23,7 +36,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="c in vm.containers">
+        <tr ng-repeat="c in vm.containers | filter:tableFilter">
             <td class="collapsing">{{c.Id | limitTo:8 }}</td>
             <td>{{c.Names[0].split('/')[1]}}</td>
             <td>{{c.Names[0].split('/')[2]}}</td>
@@ -36,5 +49,5 @@
 </div>
 
 <script>
-    $('.ui.sortable.celled.table').tablesort();
+$('.ui.sortable.celled.table').tablesort();
 </script>
