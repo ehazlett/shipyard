@@ -31,6 +31,12 @@
                 <i class="search icon"></i>
             </div>
         </div>
+        <div class="sixteen wide column" ng-show="vm.error">
+            <div class="ui error message">
+                <div class="header">Oops...</div>
+                <p>{{vm.error}}</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -69,8 +75,8 @@
                         <i class="wrench icon"></i>
                     </div>
                     <div class="menu">
-                        <a ng-click="vm.showRestartContainerDialog(c)" class="item"><i class="green refresh icon"></i> Restart</a>
-                        <a ng-click="vm.showStopContainerDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
+                        <a ng-click="vm.restartContainer(c)" class="item"><i class="green refresh icon"></i> Restart</a>
+                        <a ng-click="vm.stopContainer(c)" class="item"><i class="black stop icon"></i> Stop</a>
                         <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
                         <a class="item"><i class="text file outline icon"></i> Logs</a>
                     </div>

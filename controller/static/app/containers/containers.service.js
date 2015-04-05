@@ -13,11 +13,10 @@
 
     ContainerService.$inject = ['$resource'];
     function ContainerService($resource) {
-        return $resource('/containers/:id/:action', {id: '@id' }, {
-            destroy: { method: 'DELETE' },
-            'save': { isArray: true, method: 'POST' },
-            'control': { isArray: false, method: 'GET' },
-            kill: { isArray: false, method: 'POST' }
+        return $resource('/containers/:id/:action', {id: '@id' }, {action: '@action'}, {
+            kill: { method: 'DELETE' },
+            control: { method: 'POST' },
+            query: { isArray: false }
         });
     }
 
