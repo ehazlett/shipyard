@@ -1,0 +1,37 @@
+<div class="ui segment centered page">
+
+<h1>{{ vm.container.Id }}</h1>
+<div class= "ui grid">
+    <div class="eight wide column">
+        <div class="ui divided list"> 
+            <div class="item">
+                <div class="content">
+                    <a class="header">Image Name</a>
+                    <div class="description">{{ vm.container.Image }}</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <a class="header">Cmd</a>
+                    <div class="description">{{ vm.container.Cmd[0] }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="eight wide column">
+        <div class="ui divided list"> 
+            <div class="item">
+                <div class="content">
+                    <a class="header">Container Name</a>
+                    <div class="description">{{ vm.container.Name }}</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="content">
+                    <a class="header">Node</a>
+                    <div class="description">{{ vm.container.Node }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
