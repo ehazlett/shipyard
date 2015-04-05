@@ -19,7 +19,6 @@
         ////
 
         function deploy() {
-            console.log(vm);
             vm.deploying = true;
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
