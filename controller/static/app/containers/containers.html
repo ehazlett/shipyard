@@ -19,7 +19,6 @@
             <th class="ascending">Name</th>
             <th>Image</th>
             <th>Status</th>
-            <th>Command</th>
             <th>Created</th>
         </tr>
     </thead>
@@ -30,7 +29,6 @@
             <td>{{c.Names[0].split('/')[2]}}</td>
             <td>{{c.Image}}</td>
             <td>{{c.Status}}</td>
-            <td>{{c.Command}}</td>
             <td>{{c.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
         </tr>
     </tbody>
