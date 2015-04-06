@@ -1,35 +1,74 @@
-<div class="ui segment centered page">
+<div class="ui segment page">
 
-<h1>{{ vm.container.Id.substring(0,11) }}</h1>
 <div class= "ui grid">
-    <div class="eight wide column">
-        <div class="ui divided list"> 
-            <div class="item">
+    <div class="row">
+        <div class="column">
+            <h3 class="ui header">
+                <i class="circle icon" ng-class="{ 'green': vm.container.State.Running, 'red': !vm.container.State.Running }"></i>
                 <div class="content">
-                    <a class="header">Image Name</a>
-                    <div class="description">{{ vm.container.Config.Image }}</div>
+                    {{ vm.container.Name }}
+                    <div class="sub header">{{ vm.container.Config.Image }}</div>
                 </div>
+            </h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="column">
+            <div class="ui small disabled black labeled icon button">
+                <i class="stop icon"></i> Stop 
             </div>
-            <div class="item">
-                <div class="content">
-                    <a class="header">Cmd</a>
-                    <div class="description">{{ vm.container.Config.Cmd.join(" ") }}</div>
-                </div>
+            <div class="ui small disabled green labeled icon button">
+                <i class="refresh icon"></i> Restart 
+            </div>
+            <div class="ui small disabled red labeled icon button">
+                <i class="delete icon"></i> Destroy 
+            </div>
+            <div class="ui small disabled blue labeled icon button">
+                <i class="file icon"></i> Logs 
             </div>
         </div>
     </div>
-    <div class="eight wide column">
-        <div class="ui divided list"> 
-            <div class="item">
-                <div class="content">
-                    <a class="header">Container Name</a>
-                    <div class="description">{{ vm.container.Name }}</div>
+    <div class="three column row">
+        <div class="column">
+            <div class="ui divided list"> 
+                <div class="item">
+                    <div class="content">
+                        <a class="header">Cmd</a>
+                        <div class="description">{{ vm.container.Config.Cmd.join(" ") }}</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="content">
+                        <a class="header">Node</a>
+                        <div class="description">{{ vm.container.Node.Name }}</div>
+                    </div>
                 </div>
             </div>
-            <div class="item">
-                <div class="content">
-                    <a class="header">Node</a>
-                    <div class="description">{{ vm.container.Node.Name }}</div>
+        </div>
+        <div class="column">
+            <h4>Exposed Ports</h4>
+            <div ng-show="vm.container.NetworkSettings.Ports.length === 0">
+                <div>No exposed ports configured</div>
+            </div>
+            <div class="ui divided list" ng-show="vm.container.NetworkSettings.Ports"> 
+                <div class="item" ng-repeat="p in vm.container.NetworkSettings.Ports">
+                    <div class="content">
+                        <div>{{ p }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <h4>Environment</h4>
+            <div ng-show="vm.container.Config.Env.length === 0">
+                <div>No environment variables configured</div>
+            </div>
+            <div class="ui divided list" ng-show="vm.container.Config.Env"> 
+                <div class="item" ng-repeat="e in vm.container.Config.Env">
+                    <div class="content">
+                        <div>{{ e }}</div>
+                    </div>
                 </div>
             </div>
         </div>

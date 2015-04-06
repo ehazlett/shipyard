@@ -1,7 +1,7 @@
 <div class="ui small destroy modal transition" style="margin-top: -98px;">
 <i class="close icon"></i>
 <div class="header">
-    Destroy Container
+    Destroy Container: {{ vm.selectedContainerId | limitTo:12 }}
 </div>
 <div class="content">
     <p>Are you sure you want to destroy this container?</p>
@@ -22,6 +22,9 @@
         <div class="eight wide left floated column">
             <div ui-sref="dashboard.deploy" class="ui small blue labeled icon button">
                 <i class="add icon"></i> Deploy Container
+            </div>
+            <div ng-click="vm.refresh()" class="ui small green labeled icon button">
+                <i class="refresh icon"></i> Refresh Containers
             </div>
         </div>
 
@@ -49,6 +52,7 @@
         <p>There are no containers deployed.</p>
     </div>
 </div>
+
 <table class="ui sortable celled table" ng-show="vm.containers">
     <thead>
         <tr>
