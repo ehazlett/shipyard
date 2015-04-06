@@ -23,6 +23,9 @@
             <div ui-sref="dashboard.deploy" class="ui small blue labeled icon button">
                 <i class="add icon"></i> Deploy Container
             </div>
+            <div ng-click="vm.refresh" class="ui small green labeled icon button">
+                <i class="refresh icon"></i> Refresh Containers
+            </div>
         </div>
 
         <div class="eight wide right aligned right floated column">
@@ -49,6 +52,7 @@
         <p>There are no containers deployed.</p>
     </div>
 </div>
+
 <table class="ui sortable celled table" ng-show="vm.containers">
     <thead>
         <tr>
