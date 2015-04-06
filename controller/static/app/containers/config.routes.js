@@ -43,6 +43,20 @@
             controller: 'ContainerDeployController',
             controllerAs: 'vm',
             authenticate: true
+        })
+        .state('dashboard.logs', {
+            url:'^/containers/{id}/logs',
+            templateUrl: 'app/containers/logs.html',
+            controller: 'LogsController', 
+            controllerAs: 'vm',
+            authenticate: 'true',
+            resolve: { 
+                resolvedLogs: ['ContainerService', '$state', '$stateParams', function(ContainerService, $state, $stateParams) {
+                    return ContainerService.logs($stateParams.id).then(null, function(errorData) {
+                        $state.go('error');
+                    });
+                }]
+            }
         });
     }
 })();

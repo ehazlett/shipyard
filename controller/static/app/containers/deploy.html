@@ -1,4 +1,19 @@
-<div style="width: 66%; margin: 0 auto;">
+<div class="row" ng-show="vm.deploying" style="text-align: center;">
+<div class="six wide column">
+    <div class="ui icon message">
+        <i class="notched circle loading icon"></i>
+        <div class="content">
+            <div class="header">
+                Hang on to your hats!    
+            </div>
+            <p>We're deploying the image to the swarm cluster now.</p>
+            <p>Please note that this could take a few minutes, depending on availability and size of the image</p>
+        </div>
+    </div>
+</div>
+</div>
+<div class="row" ng-hide="vm.deploying">
+<div class="column">
     <div class="ui top attached tabular menu">
         <div class="active item">Basic</div>
         <div class="item">Advanced</div>
@@ -49,6 +64,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <script>
 $(function(){

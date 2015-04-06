@@ -1,43 +1,41 @@
 <script>
-    $('.ui.dropdown')
-    .dropdown();
+$('.ui.dropdown')
+.dropdown();
 </script>
 
-<div class="ui grid">
-    <div class="computer tablet only row">      
-        <div id="menu" class="ui inverted fixed menu navbar grid">
-            <div class="ui inverted header item">
-                <a>
-                    shipyard
-                </a>
-            </div>
-            <a ui-sref="dashboard.containers" ng-class="{active: $state.includes('containers')}" class="item">
-                <i class="tasks icon"></i> Containers
-            </a>
-            <a ui-sref="dashboard.events" ng-class="{active: $state.includes('events')}" class="item">
-                <i class="browser icon"></i> Events
-            </a>
-            <div class="ui inverted right menu">
-                <div class="ui item">
-                    <div class="ui dropdown">
-                        {{ username }} <i class="dropdown icon"></i>
-                        <div class="menu">
-                            <div ui-sref="logout" class="item"><i class="sign out icon"></i>Logout</div>
-                        </div>
+
+<div class="ui fixed inverted main menu">
+    <div class="container">
+        <a ui-sref="dashboard.containers" class="title item" id="logo">
+            shipyard
+        </a>
+        <a ui-sref="dashboard.containers" ng-class="{active: $state.includes('containers')}" class="title item">
+            <i class="tasks icon"></i> Containers
+        </a>
+        <a ui-sref="dashboard.events" ng-class="{active: $state.includes('events')}" class="title item">
+            <i class="browser icon"></i> Events
+        </a>
+        <div class="ui right inverted menu">
+            <div class="ui item">
+                <div class="ui dropdown">
+                    {{ username }} <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div ui-sref="logout" class="item"><i class="sign out icon"></i>Logout</div>
                     </div>
                 </div>
-                <div class="ui item">
-                    <a ui-sref="dashboard.help">
-                        <i class="help circle icon"></i>
-                    </a>
-                </div>
+            </div>
+            <div class="ui item">
+                <a ui-sref="dashboard.help">
+                    <i class="help circle icon"></i>
+                </a>
             </div>
         </div>
     </div>
+
 </div>
 
-<div class="ui grid main" ng-show="doingResolve">
-    <div class="row" style="text-align: center;">
+<div class="ui padded grid">
+    <div class="row" ng-show="doingResolve" style="text-align: center;">
         <div class="five wide column">
             <div class="ui icon message">
                 <i class="notched circle loading icon"></i>
@@ -50,12 +48,11 @@
             </div>
         </div>
     </div>
-</div>
-
-
-<div class="ui grid main" ng-hide="doingResolve">
-    <div class="row">
-        <div ui-view class="column"></div>
+    <div class="row" ng-hide="doingResolve">
+        <div class="column">
+            <div ui-view class="ui grid">
+            </div>
+        </div>
     </div>
     <div class="ui divider"></div>
     <div class="row">

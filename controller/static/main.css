@@ -1,22 +1,18 @@
-#menu .header.item {
-    font-size: 20px;
+#logo {
     font-family: 'Poiret One', sans-serif;
     background-color: rgba(0, 68, 91, 1) !important;
-    display: inline-block;
+    font-size: 16px;
     text-transform: none;
 }
 
-#menu .item {
-    font-size: 20px;
+.ui.fixed.inverted.main.menu {
     text-transform: uppercase;
 }
 
-.ui.grid.main{
-    margin-top: 40px;
-    padding: 20px;
+.logs {
+    font-family: Menlo, curier;
+    font-size: 12px;
+    word-break: break-word;
+    width: 100%;
 }
 
-.ui.segment.centered.page {
-    width: 66%;
-    margin: 0 auto;
-}

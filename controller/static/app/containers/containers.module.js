@@ -5,6 +5,7 @@
 		.module('shipyard.containers', [
             'shipyard.layout',
 			'ngResource',
+			'ngSanitize',
 			'ui.router'
 		]);
 		
