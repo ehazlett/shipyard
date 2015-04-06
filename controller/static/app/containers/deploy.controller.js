@@ -9,6 +9,7 @@
     function ContainerDeployController($http, $state) {
         var vm = this;
         vm.deploy = deploy;
+        vm.deploying = false;
         vm.containerName = "";
         vm.error = "";
         vm.request = {
