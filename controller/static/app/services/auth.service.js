@@ -9,14 +9,16 @@
     function AuthService($http, $state) {
         return {
             login: function(credentials) {
-                $http
+                return $http
                     .post('/auth/login', credentials)
                     .success(function(data, status, headers, config) {
                         localStorage.setItem('X-Access-Token', credentials.username + ':' + data.auth_token);
-                        $state.transitionTo('dashboard.containers');
                     })
                     .error(function(data, status, headers, config) {
                         localStorage.removeItem('X-Access-Token');
+                    })
+                    .then(function(response) {
+                        return response.data;
                     });
             },
             logout: function() {
