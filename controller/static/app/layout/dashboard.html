@@ -6,13 +6,13 @@ $('.ui.dropdown')
 
 <div class="ui fixed inverted main menu">
     <div class="container">
-        <a ui-sref="dashboard.containers">
-            <div class="title item">Shipyard</div>
+        <a ui-sref="dashboard.containers" class="title item" id="logo">
+            Shipyard
         </a>
-        <a ui-sref="dashboard.containers" ng-class="{active: $state.includes('containers')}" class="item">
+        <a ui-sref="dashboard.containers" ng-class="{active: $state.includes('containers')}" class="title item">
             <i class="tasks icon"></i> Containers
         </a>
-        <a ui-sref="dashboard.events" ng-class="{active: $state.includes('events')}" class="item">
+        <a ui-sref="dashboard.events" ng-class="{active: $state.includes('events')}" class="title item">
             <i class="browser icon"></i> Events
         </a>
         <div class="ui right inverted menu">
