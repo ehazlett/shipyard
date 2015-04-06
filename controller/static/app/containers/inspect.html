@@ -1,6 +1,12 @@
-<div class="ui segment centered page">
+<div class="ui segment page">
 
-<h3 class="ui dividing header">Container: {{ vm.container.Id.substring(0,11) }}</h3>
+<h3 class="ui dividing header">
+    <i class="circle icon" ng-class="{ 'green': vm.container.State.Running, 'red': !vm.container.State.Running }"></i>
+    <div class="content">
+        {{ vm.container.Name }}
+        <div class="sub header">{{ vm.container.Config.Image }}</div>
+    </div>
+</h3>
 <div class= "ui grid">
     <div class="row">
         <div class="eight wide column">
