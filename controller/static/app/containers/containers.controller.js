@@ -25,33 +25,29 @@
 
         function destroyContainer() {
             ContainerService.destroy(vm.selectedContainerId)
-                .success(function(data, status, headers, config) {
+                .then(function(data) {
                     $state.reload();
-                })
-                .error(function(data, status, headers, config) {
+                }, function(data) {
                     vm.error = data;
                 });
         }
 
         function stopContainer(container) {
             ContainerService.stop(container.Id)
-                .success(function(data, status, headers, config) {
+                .then(function(data) {
                     $state.reload();
-                })
-                .error(function(data, status, headers, config) {
+                }, function(data) {
                     vm.error = data;
                 });
-        };
+        }
 
         function restartContainer(container) {
             ContainerService.restart(container.Id)
-                .success(function(data, status, headers, config) {
+                .then(function(data) {
                     $state.reload();
-                })
-                .error(function(data, status, headers, config) {
+                }, function(data) {
                     vm.error = data;
                 });
-        };
-
+        }
     }
 })();
