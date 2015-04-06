@@ -1,7 +1,5 @@
-#asdf {
-    font-size: 20px;
-    font-family: 'Poiret One', sans-serif;
+#temp {
     background-color: rgba(0, 68, 91, 1) !important;
-    text-transform: none;
+    text-transform: uppercase;
 }
 
