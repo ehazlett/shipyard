@@ -1,5 +1,11 @@
-#temp {
+#logo {
+    font-family: 'Poiret One', sans-serif;
     background-color: rgba(0, 68, 91, 1) !important;
+    font-size: 16px;
+    text-transform: none;
+}
+
+.ui.fixed.inverted.main.menu {
     text-transform: uppercase;
 }
 
