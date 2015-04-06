@@ -5,11 +5,11 @@
         .module('shipyard.containers')
         .controller('ContainersController', ContainersController);
 
-    ContainersController.$inject = ['containers', '$http', '$state'];
-    function ContainersController(containers, $http, $state) {
+    ContainersController.$inject = ['resolvedContainers', 'ContainerService', '$state'];
+    function ContainersController(resolvedContainers, ContainerService, $state) {
         var vm = this;
         vm.error = "";
-        vm.containers = containers;
+        vm.containers = resolvedContainers;
         vm.selectedContainerId = "";
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.destroyContainer = destroyContainer;
@@ -24,8 +24,7 @@
         }
 
         function destroyContainer() {
-            $http
-                .delete('/containers/' + vm.selectedContainerId)
+            ContainerService.destroy(vm.selectedContainerId)
                 .success(function(data, status, headers, config) {
                     $state.reload();
                 })
@@ -35,8 +34,7 @@
         }
 
         function stopContainer(container) {
-            $http
-                .post('/containers/' + container.Id + '/stop')
+            ContainerService.stop(container.Id)
                 .success(function(data, status, headers, config) {
                     $state.reload();
                 })
@@ -46,8 +44,7 @@
         };
 
         function restartContainer(container) {
-            $http
-                .post('/containers/' + container.Id + '/restart')
+            ContainerService.restart(container.Id)
                 .success(function(data, status, headers, config) {
                     $state.reload();
                 })
