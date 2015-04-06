@@ -27,6 +27,8 @@
                 }, function(data) {
                     vm.error = data;
                 });
+
+            vm.error = "";
         }
 
         function intervalFunction() {
