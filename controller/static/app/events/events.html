@@ -1,4 +1,5 @@
-<div>
+<div class="row">
+<div class="column">
 <div class="ui icon message" ng-show="vm.events.length === 0" ngcloak>
     <i class="info icon"></i>
     <div class="content">
@@ -8,6 +9,10 @@
         <p>There are no events recorded.</p>
     </div>
 </div>
+</div>
+</div>
+<div class="row">
+<div class="column">
 
 <table class="ui sortable celled table" ng-show="vm.events">
     <thead>
@@ -29,6 +34,7 @@
         </tr>
     </tbody>
 </table>
+</div>
 </div>
 
 <script>

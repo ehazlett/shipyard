@@ -1,22 +1,7 @@
-#menu .header.item {
+#asdf {
     font-size: 20px;
     font-family: 'Poiret One', sans-serif;
     background-color: rgba(0, 68, 91, 1) !important;
-    display: inline-block;
     text-transform: none;
 }
 
-#menu .item {
-    font-size: 20px;
-    text-transform: uppercase;
-}
-
-.ui.grid.main{
-    margin-top: 40px;
-    padding: 20px;
-}
-
-.ui.segment.centered.page {
-    width: 66%;
-    margin: 0 auto;
-}
