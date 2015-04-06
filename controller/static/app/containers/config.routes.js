@@ -16,8 +16,8 @@
                 controllerAs: 'vm',
                 authenticate: true,
                 resolve: {
-                    containers: ['ContainersService', '$state', function (ContainersService, $state) {
-                        return ContainersService.query().$promise.then(null, function(errorData) {	                            
+                    resolvedContainers: ['ContainerService', '$state', function (ContainerService, $state) {
+                        return ContainerService.list().then(null, function(errorData) {	                            
                             $state.go('error');
                         }); 
                     }] 
@@ -30,25 +30,19 @@
             controllerAs: 'vm',
             authenticate: true,
             resolve: { 
-                container: ['$http', '$state', '$stateParams', function($http, $state, $stateParams) {
-                    var container = {};
-                    return $http
-                                .get('/containers/' + $stateParams.id + '/json')
-                                .success(function(data, status, headers, config) {
-                                    return data;
-                                })
-                                .error(function(data, status, headers, config) {
-                                    $state.go('error');
-                                });
-                } 
-           ]}
-    })
-    .state('dashboard.deploy', {
-        url: '^/deploy',
-        templateUrl: 'app/containers/deploy.html',
-        controller: 'ContainerDeployController',
-        controllerAs: 'vm',
-        authenticate: true
-    });
-}
+                resolvedContainer: ['ContainerService', '$state', '$stateParams', function(ContainerService, $state, $stateParams) {
+                    return ContainerService.inspect($stateParams.id).then(null, function(errorData) {
+                        $state.go('error');
+                    });
+                }]
+            }
+        })
+        .state('dashboard.deploy', {
+            url: '^/deploy',
+            templateUrl: 'app/containers/deploy.html',
+            controller: 'ContainerDeployController',
+            controllerAs: 'vm',
+            authenticate: true
+        });
+    }
 })();
