@@ -38,6 +38,7 @@
 
         function showDestroyContainerDialog(container) {
             vm.selectedContainerId = container.Id;
+            $('.ui.small.destroy.modal').modal('show');
         }
 
         function destroyContainer() {
