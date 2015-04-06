@@ -9,3 +9,10 @@
     text-transform: uppercase;
 }
 
+.logs {
+    font-family: Menlo, curier;
+    font-size: 12px;
+    word-break: break-word;
+    width: 100%;
+}
+

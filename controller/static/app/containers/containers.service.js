@@ -24,6 +24,14 @@
                     });
                 return promise;
             },
+            logs: function(containerId) {
+                var promise = $http
+                    .get('/containers/' + containerId + '/logs?stderr=1&stdout=1&timestamps=1')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
             destroy: function(containerId) {
                 var promise = $http
                     .delete('/containers/' + containerId)
