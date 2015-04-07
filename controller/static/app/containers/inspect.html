@@ -57,15 +57,22 @@
 
 <div class="row">
     <div class="column">
-        <div class="ui segment page">
+        <div class="ui segment page" ng-class="{'green': vm.container.State.Running, 'red': !vm.container.State.Running}">
             <div class= "ui grid">
-                <div class="row">
+                <div class="two column row">
                     <div class="column">
                         <h3 class="ui header">
-                            <i class="circle icon" ng-class="{ 'green': vm.container.State.Running, 'red': !vm.container.State.Running }"></i>
                             <div class="content">
                                 {{ vm.container.Name }}
                                 <div class="sub header">{{ vm.container.Config.Image }}</div>
+                            </div>
+                        </h3>
+                    </div>
+                    <div class="floated right aligned right column">
+                        <h3 class="ui header">
+                            <div class="content">
+                                <div class="header" ng-show="vm.container.State.Running">Started: {{ vm.container.State.StartedAt }}</div>
+                                <div class="header" ng-hide="vm.container.State.Running">Finished: {{ vm.container.State.FinishedAt }}</div>
                             </div>
                         </h3>
                     </div>
