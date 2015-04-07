@@ -24,8 +24,6 @@
         vm.deploy = deploy;
         vm.pushEnvVar = pushEnvVar;
 
-        ////
-        
         function pushEnvVar() {
             var envVar = { name: vm.variableName, value: vm.variableValue };
             vm.envVars.push(envVar);
