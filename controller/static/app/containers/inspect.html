@@ -149,13 +149,13 @@
                             <div class="item">
                                 <div class="content">
                                     <a class="header">CPUs</a>
-                                    <div class="description">{{ vm.container.Node.Cpus }}</div>
+                                    <div class="description">{{ vm.container.Node.Cpus || "&infin;" }}</div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="content">
                                     <a class="header">Memory</a>
-                                    <div class="description">{{ vm.container.Node.Memory / 1024 / 1024 | number:0 }} MB</div>
+                                    <div class="description">{{ (vm.container.Node.Memory / 1024 / 1024 | number:0) || "&infin;" }} MB</div>
                                 </div>
                             </div>
                         </div>
