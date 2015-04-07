@@ -2,6 +2,7 @@ package manager
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,6 +18,7 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	registry "github.com/shipyard/shipyard/registry/v1"
 	"github.com/shipyard/shipyard/version"
 )
 
@@ -54,6 +56,7 @@ type (
 		authenticator    *auth.Authenticator
 		store            *sessions.CookieStore
 		client           *dockerclient.DockerClient
+		registryClient   *registry.RegistryClient
 		disableUsageInfo bool
 	}
 
@@ -88,10 +91,11 @@ type (
 		SaveWebhookKey(key *dockerhub.WebhookKey) error
 		DeleteWebhookKey(id string) error
 		DockerClient() *dockerclient.DockerClient
+		Repositories() ([]registry.Repository, error)
 	}
 )
 
-func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool) (Manager, error) {
+func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, registryUrl string, registryTLSConfig *tls.Config) (Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:     addr,
 		Database:    database,
@@ -103,6 +107,12 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 		return nil, err
 	}
 	log.Info("checking database")
+
+	rClient, err := registry.NewRegistryClient(registryUrl, registryTLSConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	r.DbCreate(database).Run(session)
 	m := &DefaultManager{
 		database:         database,
@@ -111,6 +121,7 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 		authenticator:    &auth.Authenticator{},
 		store:            store,
 		client:           client,
+		registryClient:   rClient,
 		storeKey:         storeKey,
 		disableUsageInfo: disableUsageInfo,
 	}
@@ -632,4 +643,18 @@ func (m DefaultManager) DeleteWebhookKey(id string) error {
 	}
 
 	return nil
+}
+
+func (m DefaultManager) Repositories() ([]registry.Repository, error) {
+	if m.registryClient != nil {
+
+		res, err := m.registryClient.Search("", 1, 100)
+		if err != nil {
+			return nil, err
+		}
+
+		return res.Results, nil
+	}
+
+	return nil, nil
 }
