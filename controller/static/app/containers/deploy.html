@@ -41,7 +41,7 @@
                                 <li><i>namespace</i> is an optional <b>namespace</b> to help organize and avoid image name collisions</li>
                                 <li><i>image-name</i> is the <b>image name</b> that identifies the image that you wish to deploy</li>
                             </ul>
-                            <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the <a href="https://registry.hub.docker.com/" target="_blank">Official Docker Hub</a>.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the <a href="https://registry.hub.docker.com/repos/library/" target="_blank">Docker Library</a></p>
+                        <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the Official Docker Hub.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the Docker Library</p>
                         </div>
                     </label>
                     <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image Name"></input> 
