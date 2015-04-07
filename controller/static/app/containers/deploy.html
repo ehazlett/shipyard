@@ -26,7 +26,7 @@
         <div class="ui form" ng-submit="vm.deploy()">
 
             <h4 class="ui dividing header">Container Information</h4>
-            <div class="two fields">
+            <div class="three fields">
 
                 <div class="field">
                     <label>Image Name 
@@ -48,6 +48,11 @@
                 </div>
 
                 <div class="field">
+                    <label>Command</label>
+                    <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Command"></input>
+                </div>
+
+                <div class="field">
                     <label>Container Name 
                         <i class="blue help circle icon"></i>
                         <div class="ui popup" style="max-width: 450px;">
@@ -58,10 +63,10 @@
                     </label>
                     <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
                 </div>
+            </div>
                 <div class="large ui blue submit button">
                     Deploy 
                 </div>
-            </div>
         </div>
     </div>
 </div>

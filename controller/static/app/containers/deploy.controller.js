@@ -8,6 +8,7 @@
     ContainerDeployController.$inject = ['$http', '$state'];
     function ContainerDeployController($http, $state) {
         var vm = this;
+        vm.cmd = "";
         vm.deploy = deploy;
         vm.deploying = false;
         vm.containerName = "";
@@ -21,10 +22,12 @@
 
         function deploy() {
             vm.deploying = true;
+            
+            vm.request.Cmd = vm.cmd.split(" ");
+
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
                 .success(function(data, status, headers, config) {
-                    console.log(data);
                     $http
                         .post('/containers/'+ data.Id +'/start', vm.request)
                         .success(function(data, status, headers, config) {
