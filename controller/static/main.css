@@ -1,7 +1,11 @@
 #logo {
     font-family: 'Poiret One', sans-serif;
     background-color: rgba(0, 68, 91, 1) !important;
-    font-size: 16px;
+    font-size: 20px;
+    padding: 9px;
+    padding-left: 14px;
+    padding-right: 14px;
+    font-weight: 700;
     text-transform: none;
 }
 
