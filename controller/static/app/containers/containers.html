@@ -18,41 +18,41 @@
 </div>
 
 <div class="ui small restart modal transition" style="margin-top: -98px;">
-<i class="close icon"></i>
-<div class="header">
-    Restart Container: {{ vm.selectedContainerId | limitTo:12 }}
-</div>
-<div class="content">
-    <p>Are you sure you want to restart this container?</p>
-</div>
-<div class="actions">
-    <div class="ui negative button">
-        No
+    <i class="close icon"></i>
+    <div class="header">
+        Restart Container: {{ vm.selectedContainerId | limitTo:12 }}
     </div>
-    <div ng-click="vm.restartContainer()" class="ui positive right labeled icon button">
-        Yes
-        <i class="checkmark icon"></i>
+    <div class="content">
+        <p>Are you sure you want to restart this container?</p>
     </div>
-</div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.restartContainer()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
 </div>
 
 <div class="ui small stop modal transition" style="margin-top: -98px;">
-<i class="close icon"></i>
-<div class="header">
-    Stop Container: {{ vm.selectedContainerId | limitTo:12 }}
-</div>
-<div class="content">
-    <p>Are you sure you want to stop this container?</p>
-</div>
-<div class="actions">
-    <div class="ui negative button">
-        No
+    <i class="close icon"></i>
+    <div class="header">
+        Stop Container: {{ vm.selectedContainerId | limitTo:12 }}
     </div>
-    <div ng-click="vm.stopContainer()" class="ui positive right labeled icon button">
-        Yes
-        <i class="checkmark icon"></i>
+    <div class="content">
+        <p>Are you sure you want to stop this container?</p>
     </div>
-</div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.stopContainer()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
 </div>
 
 <div class="two column row">
