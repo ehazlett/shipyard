@@ -3,7 +3,7 @@
 
 	angular
 		.module('shipyard.registry', [
-            'ngResource',
+                        'ngResource',
 			'ui.router',
 		]);
 		
