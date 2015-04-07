@@ -36,7 +36,9 @@
         function deploy() {
             vm.deploying = true;
             
-            vm.request.Cmd = vm.cmd.split(" ");
+            if(vm.cmd.length > 0) {
+                vm.request.Cmd = vm.cmd.split(" ");
+            }
 
             var i;
             for(i = 0; i < vm.envVars.length; i++) {
