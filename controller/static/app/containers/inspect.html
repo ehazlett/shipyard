@@ -123,7 +123,7 @@
                         </div>
                         <div class="ui divided list" ng-show="vm.container.NetworkSettings.Ports"> 
                             <div class="item" ng-repeat="(k, values) in vm.container.NetworkSettings.Ports">
-                                <div ng-show="values.length === 0"><div class="ui horizontal label">Unmapped</div> {{ k }}</div>
+                                <div ng-show="values.length === 0 || values == null"><div class="ui horizontal label">Unmapped</div> {{ k }}</div>
                                 <div class="content" ng-repeat="v in values">
                                     <div><div class="ui blue horizontal label">Mapped</div> {{ v.HostIp }}:{{ v.HostPort }} &#8594; {{ k }}</div>
                                 </div>
