@@ -32,6 +32,22 @@
                     });
                 return promise;
             },
+            'top': function(containerId) {
+                var promise = $http
+                    .get('/containers/' + containerId + '/top')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            stats: function(containerId) {
+                var promise = $http
+                    .get('/containers/' + containerId + '/stats')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
             destroy: function(containerId) {
                 var promise = $http
                     .delete('/containers/' + containerId + '?v=1&force=1')
@@ -39,7 +55,6 @@
                         return response.data;
                     });
                 return promise;
-
             },
             stop: function(containerId) {
                 var promise = $http
