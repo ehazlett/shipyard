@@ -1,108 +1,166 @@
-<div class="column">
-<div class="row">
-    <div class="ui segment page">
-        <div class= "ui grid">
-            <div class="row">
-                <div class="column">
-                    <h3 class="ui header">
-                        <i class="circle icon" ng-class="{ 'green': vm.container.State.Running, 'red': !vm.container.State.Running }"></i>
-                        <div class="content">
-                            {{ vm.container.Name }}
-                            <div class="sub header">{{ vm.container.Config.Image }}</div>
-                        </div>
-                    </h3>
-                </div>
-            </div>
+<div class="ui small destroy modal transition">
+<i class="close icon"></i>
+<div class="header">
+    Destroy Container: {{ vm.selectedContainerId | limitTo:12 }}
+</div>
+<div class="content">
+    <p>Are you sure you want to destroy this container?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        No
+    </div>
+    <div ng-click="vm.destroyContainer()" class="ui positive right labeled icon button">
+        Yes
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
 
-            <div class="row">
-                <div class="column">
-                    <div class="ui small disabled black labeled icon button">
-                        <i class="stop icon"></i> Stop 
-                    </div>
-                    <div class="ui small disabled green labeled icon button">
-                        <i class="refresh icon"></i> Restart 
-                    </div>
-                    <div class="ui small disabled red labeled icon button">
-                        <i class="delete icon"></i> Destroy 
-                    </div>
-                    <div ui-sref="dashboard.logs({id: vm.container.Id})" class="ui small purple labeled icon button">
-                        <i class="file icon"></i> Logs 
+<div class="ui small restart modal transition" style="margin-top: -98px;">
+    <i class="close icon"></i>
+    <div class="header">
+        Restart Container: {{ vm.selectedContainerId | limitTo:12 }}
+    </div>
+    <div class="content">
+        <p>Are you sure you want to restart this container?</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.restartContainer()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="ui small stop modal transition" style="margin-top: -98px;">
+    <i class="close icon"></i>
+    <div class="header">
+        Stop Container: {{ vm.selectedContainerId | limitTo:12 }}
+    </div>
+    <div class="content">
+        <p>Are you sure you want to stop this container?</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.stopContainer()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column">
+        <div class="ui segment page">
+            <div class= "ui grid">
+                <div class="row">
+                    <div class="column">
+                        <h3 class="ui header">
+                            <i class="circle icon" ng-class="{ 'green': vm.container.State.Running, 'red': !vm.container.State.Running }"></i>
+                            <div class="content">
+                                {{ vm.container.Name }}
+                                <div class="sub header">{{ vm.container.Config.Image }}</div>
+                            </div>
+                        </h3>
                     </div>
                 </div>
-            </div>
-            <div class="three column row">
-                <div class="column">
-                    <h4 class="ui dividing header">Container Configuration</h4>
-                    <div class="ui list"> 
-                        <div class="item">
-                            <div class="content">
-                                <a class="header">Container ID</a>
-                                <div class="description">{{ vm.container.Id | limitTo:12 }}</div>
-                            </div>
+
+                <div class="row">
+                    <div class="column">
+                        <div ng-click="vm.showStopContainerDialog()" class="ui small labeled icon button">
+                            <i class="stop icon"></i> Stop 
                         </div>
-                        <div class="item">
-                            <div class="content">
-                                <a class="header">Hostname</a>
-                                <div class="description">{{ vm.container.Config.Hostname }}</div>
-                            </div>
+                        <div ng-click="vm.showRestartContainerDialog()" class="ui small green labeled icon button">
+                            <i class="refresh icon"></i> Restart 
                         </div>
-                        <div class="item">
-                            <div class="content">
-                                <a class="header">Domainname</a>
-                                <div class="description">{{ vm.container.Config.Domainname || "N/A" }}</div>
-                            </div>
+                        <div ng-click="vm.showDestroyContainerDialog()" class="ui small red labeled icon button">
+                            <i class="delete icon"></i> Destroy 
                         </div>
-                    </div>
-                    <h4 class="ui dividing header">Port Configuration</h4>
-                    <div ng-show="vm.container.NetworkSettings.Ports.length === 0">
-                        <div>No exposed ports configured</div>
-                    </div>
-                    <div class="ui divided list" ng-show="vm.container.NetworkSettings.Ports"> 
-                        <div class="item" ng-repeat="(k, values) in vm.container.NetworkSettings.Ports">
-                            <div ng-show="values.length === 0"><div class="ui horizontal label">Unmapped</div> {{ k }}</div>
-                            <div class="content" ng-repeat="v in values">
-                                <div><div class="ui blue horizontal label">Mapped</div> {{ v.HostIp }}:{{ v.HostPort }} &#8594; {{ k }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="column">
-                    <h4 class="ui dividing header">Swarm Node</h4>
-                    <div class="ui list">
-                        <div class="item">
-                            <div class="content">
-                                <a class="header">Name</a>
-                                <div class="description">{{ vm.container.Node.Name }}</div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="content">
-                                <a class="header">Host</a>
-                                <div class="description">{{ vm.container.Node.Addr }}</div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="content">
-                                <a class="header">CPUs</a>
-                                <div class="description">{{ vm.container.Node.Cpus }}</div>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="content">
-                                <a class="header">Memory</a>
-                                <div class="description">{{ vm.container.Node.Memory / 1024 / 1024 | number:0 }} MB</div>
-                            </div>
+                        <div ui-sref="dashboard.logs({id: vm.container.Id})" class="ui small purple labeled icon button">
+                            <i class="file icon"></i> Logs 
                         </div>
                     </div>
                 </div>
-                <div class="column">
-                    <h4 class="ui dividing header">Environment</h4>
-                    <div ng-show="vm.container.Config.Env.length === 0">
-                        <div>No environment variables configured</div>
+                <div class="three column row">
+                    <div class="column">
+                        <h4 class="ui dividing header">Container Configuration</h4>
+                        <div class="ui list"> 
+                            <div class="item">
+                                <div class="content">
+                                    <a class="header">Container ID</a>
+                                    <div class="description">{{ vm.container.Id | limitTo:12 }}</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="content">
+                                    <a class="header">Hostname</a>
+                                    <div class="description">{{ vm.container.Config.Hostname }}</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="content">
+                                    <a class="header">Domainname</a>
+                                    <div class="description">{{ vm.container.Config.Domainname || "N/A" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="ui dividing header">Port Configuration</h4>
+                        <div ng-show="vm.container.NetworkSettings.Ports.length === 0">
+                            <div>No exposed ports configured</div>
+                        </div>
+                        <div class="ui divided list" ng-show="vm.container.NetworkSettings.Ports"> 
+                            <div class="item" ng-repeat="(k, values) in vm.container.NetworkSettings.Ports">
+                                <div ng-show="values.length === 0"><div class="ui horizontal label">Unmapped</div> {{ k }}</div>
+                                <div class="content" ng-repeat="v in values">
+                                    <div><div class="ui blue horizontal label">Mapped</div> {{ v.HostIp }}:{{ v.HostPort }} &#8594; {{ k }}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <div class="column">
+                        <h4 class="ui dividing header">Swarm Node</h4>
+                        <div class="ui list">
+                            <div class="item">
+                                <div class="content">
+                                    <a class="header">Name</a>
+                                    <div class="description">{{ vm.container.Node.Name }}</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="content">
+                                    <a class="header">Host</a>
+                                    <div class="description">{{ vm.container.Node.Addr }}</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="content">
+                                    <a class="header">CPUs</a>
+                                    <div class="description">{{ vm.container.Node.Cpus }}</div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="content">
+                                    <a class="header">Memory</a>
+                                    <div class="description">{{ vm.container.Node.Memory / 1024 / 1024 | number:0 }} MB</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h4 class="ui dividing header">Environment</h4>
+                        <div ng-show="vm.container.Config.Env.length === 0">
+                            <div>No environment variables configured</div>
+                        </div>
                         <div class="item" ng-repeat="e in vm.container.Config.Env">
                             <pre class="logs">{{ e }}</pre>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
