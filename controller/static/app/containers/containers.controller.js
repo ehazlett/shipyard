@@ -12,13 +12,14 @@
         vm.containers = resolvedContainers;
         vm.selectedContainerId = "";
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
+        vm.showRestartContainerDialog = showRestartContainerDialog;
+        vm.showStopContainerDialog = showStopContainerDialog;
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
         vm.refresh = refresh;
 
         intervalFunction();
-        ////
 
         function refresh() {
             ContainerService.list()
@@ -43,6 +44,16 @@
             $('.ui.small.destroy.modal').modal('show');
         }
 
+        function showRestartContainerDialog(container) {
+            vm.selectedContainerId = container.Id;
+            $('.ui.small.restart.modal').modal('show');
+        }
+
+        function showStopContainerDialog(container) {
+            vm.selectedContainerId = container.Id;
+            $('.ui.small.stop.modal').modal('show');
+        }
+
         function destroyContainer() {
             ContainerService.destroy(vm.selectedContainerId)
                 .then(function(data) {
@@ -52,8 +63,8 @@
                 });
         }
 
-        function stopContainer(container) {
-            ContainerService.stop(container.Id)
+        function stopContainer() {
+            ContainerService.stop(vm.selectedContainerId)
                 .then(function(data) {
                     vm.refresh();
                 }, function(data) {
@@ -61,8 +72,8 @@
                 });
         }
 
-        function restartContainer(container) {
-            ContainerService.restart(container.Id)
+        function restartContainer() {
+            ContainerService.restart(vm.selectedContainerId)
                 .then(function(data) {
                     vm.refresh();
                 }, function(data) {
