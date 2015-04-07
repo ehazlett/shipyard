@@ -1,12 +1,21 @@
 (function(){
-	'use strict';
+    'use strict';
 
-	angular
-		.module('shipyard.registry')
-        .factory('RegistryService', RegistryService);
+    angular
+        .module('shipyard.registry')
+        .factory('RegistryService', RegistryService)
 
-	RegistryService.$inject = ['$resource'];
-	function RegistryService($resource) {
-        return $resource('/api/repositories');
-	}
+    RegistryService.$inject = ['$http'];
+    function RegistryService($http) {
+        return {
+            list: function() {
+                var promise = $http
+                    .get('/api/repositories')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+        } 
+    }
 })();
