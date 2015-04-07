@@ -64,25 +64,33 @@
                     </div>
                 </div>
                 <h4 class="ui dividing header">Environment Configuration</h4>
-                <div class="two fields">
-                    <div class="field">
+                <div class="fields">
+                    <div class="seven wide field">
                         <label>Variable Name</label>
                         <input name="variableName" class="input" type="text" ng-model="vm.variableName" placeholder="Variable Name"></input>
                     </div>
-                    <div class="field">
+                    <div class="eight wide field">
                         <label>Value</label>
                         <input name="variableValue" class="input" type="text" ng-model="vm.variableValue" placeholder="Variable Value"></input>
                     </div>
-                    <div class="ui tiny green button" ng-click="vm.pushEnvVar()">
-                        Add
+                    <div class="one wide field">
+                        <label>&nbsp;</label>
+                        <div class="ui green icon button" ng-click="vm.pushEnvVar()">
+                            <i class="add icon"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="two fields" ng-repeat="v in vm.envVars">
-                    <div class="field">
+                <div class="fields" ng-repeat="v in vm.envVars">
+                    <div class="seven wide field">
                         <input class="input" type="text" ng-model="v.name"></input>
                     </div>
-                    <div class="field">
+                    <div class="eight wide field">
                         <input class="input" type="text" ng-model="v.value"></input>
+                    </div>
+                    <div class="one wide field">
+                        <div class="ui disabled red icon button"> 
+                            <i class="delete icon"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="large ui blue submit button">
