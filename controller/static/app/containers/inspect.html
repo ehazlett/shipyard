@@ -169,6 +169,27 @@
                         </div>
                     </div>
                 </div>
+                <div class="row" ng-show="vm.top">
+                    <div class="column">
+                        <h4 class="ui dividing header">Processes</h4>
+                        <table id="toptable" class="ui sortable celled table">
+                            <thead>
+                                <tr>
+                                    <th ng-repeat="t in vm.top.Titles">{{ t }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="r in vm.top.Processes">
+                                    <td ng-repeat="c in r">
+                                        {{ c }}
+                                        <script>
+$('.ui.sortable.celled.table').tablesort();
+                                        </script>
+                                    </td>
+                                </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
