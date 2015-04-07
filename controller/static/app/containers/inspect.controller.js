@@ -16,6 +16,7 @@
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
         vm.top;
+        vm.stats;
 
         ContainerService.top(resolvedContainer.Id).then(function(data) {
             vm.top = data
