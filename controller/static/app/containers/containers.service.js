@@ -34,7 +34,7 @@
             },
             destroy: function(containerId) {
                 var promise = $http
-                    .delete('/containers/' + containerId)
+                    .delete('/containers/' + containerId + '?v=1&force=1')
                     .then(function(response) {
                         return response.data;
                     });
