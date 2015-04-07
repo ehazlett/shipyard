@@ -9,7 +9,8 @@
 			'shipyard.login',
 			'shipyard.containers',
 			'shipyard.events',
-            'angular-jwt',
+			'shipyard.registry',
+                        'angular-jwt',
 			'ui.router'
 		]);
 		

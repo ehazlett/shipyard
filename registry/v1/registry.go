@@ -116,7 +116,7 @@ func (client *RegistryClient) Search(query string, page int, numResults int) (*S
 	if numResults < 1 {
 		numResults = 100
 	}
-	uri := fmt.Sprintf("/search?q=%s&n=%s&page=%d", query, numResults, page)
+	uri := fmt.Sprintf("/search?q=%s&n=%d&page=%d", query, numResults, page)
 	data, err := client.doRequest("GET", uri, nil, nil)
 	if err != nil {
 		return nil, err
