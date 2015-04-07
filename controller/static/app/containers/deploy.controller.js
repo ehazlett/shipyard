@@ -9,21 +9,39 @@
     function ContainerDeployController($http, $state) {
         var vm = this;
         vm.cmd = "";
-        vm.deploy = deploy;
+        vm.envVars = [];
+        vm.variableName = "";
+        vm.variableValue = "";
         vm.deploying = false;
         vm.containerName = "";
         vm.error = "";
         vm.request = {
+            Env: [],
             AttachStdin: false,
             Tty: true,
         };
 
+        vm.deploy = deploy;
+        vm.pushEnvVar = pushEnvVar;
+
         ////
+        
+        function pushEnvVar() {
+            var envVar = { name: vm.variableName, value: vm.variableValue };
+            vm.envVars.push(envVar);
+            vm.variableName = "";
+            vm.variableValue = "";
+        }
 
         function deploy() {
             vm.deploying = true;
             
             vm.request.Cmd = vm.cmd.split(" ");
+
+            var i;
+            for(i = 0; i < vm.envVars.length; i++) {
+                vm.request.Env.push(vm.envVars[i].name + "=" + vm.envVars[i].value);
+            }
 
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
