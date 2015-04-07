@@ -63,6 +63,7 @@
                     <div class="column">
                         <h3 class="ui header">
                             <div class="content">
+                                <i class="ui circle icon" ng-class="{'green': vm.container.State.Running, 'red': !vm.container.State.Running}"></i>
                                 {{ vm.container.Name }}
                                 <div class="sub header">{{ vm.container.Config.Image }}</div>
                             </div>
@@ -118,14 +119,14 @@
                             </div>
                         </div>
                         <h4 class="ui dividing header">Port Configuration</h4>
-                        <div ng-show="vm.container.NetworkSettings.Ports.length === 0">
+                        <div ng-show="vm.container.NetworkSettings.Ports.length == null">
                             <div>No exposed ports configured</div>
                         </div>
                         <div class="ui divided list" ng-show="vm.container.NetworkSettings.Ports"> 
                             <div class="item" ng-repeat="(k, values) in vm.container.NetworkSettings.Ports">
-                                <div ng-show="values.length === 0 || values == null"><div class="ui horizontal label">Unmapped</div> {{ k }}</div>
+                                <div ng-show="values.length === 0 || values == null"><div class="ui horizontal label">Internal</div> {{ k }}</div>
                                 <div class="content" ng-repeat="v in values">
-                                    <div><div class="ui blue horizontal label">Mapped</div> {{ v.HostIp }}:{{ v.HostPort }} &#8594; {{ k }}</div>
+                                    <div><div class="ui blue horizontal label">Exposed</div> {{ v.HostIp }}:{{ v.HostPort }} &#8594; {{ k }}</div>
                                 </div>
                             </div>
                         </div>
@@ -148,13 +149,13 @@
                             <div class="item">
                                 <div class="content">
                                     <a class="header">CPUs</a>
-                                    <div class="description">{{ vm.container.Node.Cpus }}</div>
+                                    <div class="description">{{ vm.container.Node.Cpus || "&infin;" }}</div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="content">
                                     <a class="header">Memory</a>
-                                    <div class="description">{{ vm.container.Node.Memory / 1024 / 1024 | number:0 }} MB</div>
+                                    <div class="description">{{ (vm.container.Node.Memory / 1024 / 1024 | number:0) || "&infin;" }} MB</div>
                                 </div>
                             </div>
                         </div>
