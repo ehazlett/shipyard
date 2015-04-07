@@ -15,6 +15,11 @@
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
+        vm.top;
+
+        ContainerService.top(resolvedContainer.Id).then(function(data) {
+            vm.top = data
+        }, null);
 
         function showDestroyContainerDialog(container) {
             vm.selectedContainerId = resolvedContainer.Id;
