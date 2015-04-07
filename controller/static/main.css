@@ -10,6 +10,7 @@
 }
 
 .logs {
+    margin: 5px;
     font-family: Menlo, curier;
     font-size: 12px;
     word-break: break-word;
