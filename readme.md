@@ -23,7 +23,7 @@ docker run -it -d --name shipyard-rethinkdb-data \
 
 * Start RethinkDB with using the data volume container:
 ```
-docker run -it -P -d --name shipyard-rethinkdb \
+docker run -it -d --name shipyard-rethinkdb \
   --volumes-from shipyard-rethinkdb-data shipyard/rethinkdb
 ```
 
