@@ -9,6 +9,10 @@
     function ContainerDeployController($http, $state) {
         var vm = this;
         vm.cmd = "";
+        vm.ports = []; 
+        vm.hostPort = "";
+        vm.containerPort = "";
+        vm.protocol = "";
         vm.envVars = [];
         vm.variableName = "";
         vm.variableValue = "";
@@ -23,6 +27,14 @@
 
         vm.deploy = deploy;
         vm.pushEnvVar = pushEnvVar;
+        vm.pushPort = pushPort;
+
+        function pushPort() {
+            var port = {'ContainerPort': vm.containerPort, 'HostIp': vm.hostIp, 'HostPort': vm.hostPort};
+            vm.ports.push(port);
+            vm.hostPort = "";
+            vm.containerPort = "";
+        }
 
         function pushEnvVar() {
             var envVar = { name: vm.variableName, value: vm.variableValue };
