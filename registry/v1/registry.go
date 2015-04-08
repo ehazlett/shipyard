@@ -249,6 +249,7 @@ func (client *RegistryClient) Repository(name string) (*Repository, error) {
 	}
 
 	return &Repository{
+		Name:       path.Join(r.Namespace, r.Repository),
 		Namespace:  r.Namespace,
 		Repository: r.Repository,
 		Tags:       tags,

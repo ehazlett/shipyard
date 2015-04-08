@@ -65,7 +65,7 @@
             <td>{{r.tags.length}}</td>
             <td>{{r.layers.length}}</td>
             <td class="collapsing">
-                <div ui-sref="dashboard.inspectRepo(r)" class="compact ui icon button">
+                <div ui-sref="dashboard.inspectRepository({namespace: r.namespace, repository: r.repository})" class="compact ui icon button">
                     <i class="search icon"></i>
                 </div>
                 <div ng-click="vm.showRemoveRepositoryDialog(r)" class="compact ui icon button red">

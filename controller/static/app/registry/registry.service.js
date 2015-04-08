@@ -16,6 +16,14 @@
                     });
                 return promise;
             },
+            inspectRepository: function(namespace, repository) {
+                var promise = $http
+                    .get('/api/repositories/'+namespace+'/'+repository)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
             removeRepository: function(repo) {
                 var promise = $http
                     .delete('/api/repositories/'+repo.namespace+'/'+repo.repository)

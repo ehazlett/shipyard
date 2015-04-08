@@ -9,19 +9,33 @@
 
     function getRoutes($stateProvider, $urlRouterProvider) {
         $stateProvider
-        .state('dashboard.registry', {
-            url:'^/registry',
-            templateUrl: 'app/registry/registry.html',
-            controller: 'RegistryController', 
-            controllerAs: 'vm',
-            authenticate: 'true',
-            resolve: { 
-                resolvedRepositories: ['RegistryService', '$state', '$stateParams', function(RegistryService, $state, $stateParams) {
-                    return RegistryService.list($stateParams.id).then(null, function(errorData) {
-                        $state.go('error');
-                    });
-                }]
-            }
-        });
+            .state('dashboard.registry', {
+                url:'^/registry',
+                templateUrl: 'app/registry/registry.html',
+                controller: 'RegistryController', 
+                controllerAs: 'vm',
+                authenticate: 'true',
+                resolve: { 
+                    resolvedRepositories: ['RegistryService', '$state', '$stateParams', function(RegistryService, $state, $stateParams) {
+                        return RegistryService.list().then(null, function(errorData) {
+                            $state.go('error');
+                        });
+                    }]
+                }
+            })
+            .state('dashboard.inspectRepository', {
+                url: '^/registry/{namespace}/{repository}',
+                templateUrl: 'app/registry/repository.html',
+                controller: 'RepositoryController',
+                controllerAs: 'vm',
+                authenticate: true,
+                resolve: { 
+                    resolvedRepository: ['RepositoryService', '$state', '$stateParams', function(RepositoryService, $state, $stateParams) {
+                        return RegistryService.repository($stateParams.namespace, $stateParams.repository).then(null, function(errorData) {
+                            $state.go('error');
+                        });
+                    }]
+                }
+            });
     }
 })();
