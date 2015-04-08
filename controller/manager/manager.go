@@ -91,7 +91,9 @@ type (
 		SaveWebhookKey(key *dockerhub.WebhookKey) error
 		DeleteWebhookKey(id string) error
 		DockerClient() *dockerclient.DockerClient
-		Repositories() ([]registry.Repository, error)
+		Repositories() ([]*registry.Repository, error)
+		Repository(name string) (*registry.Repository, error)
+		DeleteRepository(name string) error
 	}
 )
 
@@ -648,9 +650,8 @@ func (m DefaultManager) DeleteWebhookKey(id string) error {
 	return nil
 }
 
-func (m DefaultManager) Repositories() ([]registry.Repository, error) {
+func (m DefaultManager) Repositories() ([]*registry.Repository, error) {
 	if m.registryClient != nil {
-
 		res, err := m.registryClient.Search("", 1, 100)
 		if err != nil {
 			return nil, err
@@ -660,4 +661,22 @@ func (m DefaultManager) Repositories() ([]registry.Repository, error) {
 	}
 
 	return nil, nil
+}
+
+func (m DefaultManager) Repository(name string) (*registry.Repository, error) {
+	if m.registryClient != nil {
+		return m.registryClient.Repository(name)
+	}
+
+	return nil, nil
+}
+
+func (m DefaultManager) DeleteRepository(name string) error {
+	if m.registryClient != nil {
+		if err := m.registryClient.DeleteRepository(name); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

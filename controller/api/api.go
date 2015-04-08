@@ -96,7 +96,7 @@ func (a *Api) removeServiceKey(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (a *Api) registry(w http.ResponseWriter, r *http.Request) {
+func (a *Api) repositories(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
 	repos, err := a.manager.Repositories()
@@ -105,6 +105,46 @@ func (a *Api) registry(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := json.NewEncoder(w).Encode(repos); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) repository(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	name := vars["name"]
+	repo, err := a.manager.Repository(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(repo); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) deleteRepository(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	if err := a.manager.DeleteRepository(name); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (a *Api) inspectRepository(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	repo, err := a.manager.Repository(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(repo); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -435,7 +475,9 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/roles", a.deleteRole).Methods("DELETE")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
-	apiRouter.HandleFunc("/api/repositories", a.registry).Methods("GET")
+	apiRouter.HandleFunc("/api/repositories", a.repositories).Methods("GET")
+	apiRouter.HandleFunc("/api/repositories/{name:.*}", a.repository).Methods("GET")
+	apiRouter.HandleFunc("/api/repositories/{name:.*}", a.deleteRepository).Methods("DELETE")
 	apiRouter.HandleFunc("/api/servicekeys", a.serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", a.addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", a.removeServiceKey).Methods("DELETE")
