@@ -125,16 +125,25 @@
                                 </div>
                             </div>
                             <div class="fields" ng-repeat="p in vm.ports">
-                                <div class="three wide field">
-                                    <select class="ui dropdown">
-                                        <option value="1">TCP</option>
-                                        <option value="0">UDP</option>
-                                    </select>
+                                <div class="four wide field">
+                                    <div class="ui selection dropdown">
+                                        <input type="hidden" name="protocol">
+                                        <i class="dropdown icon"></i>
+                                        <div class="menu">
+                                            <div class="item" data-value="tcp">TCP</div>
+                                            <div class="item" data-value="udp">UDP</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="six wide field">
+                                <script>
+$('select.dropdown')
+  .dropdown()
+    ;
+                                </script>
+                                <div class="four wide field">
                                     <input name="hostPort" class="input" type="text" ng-model="vm.hostPort" placeholder="Host Port"></input>
                                 </div>
-                                <div class="six wide field">
+                                <div class="four wide field">
                                     <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="one wide field">
