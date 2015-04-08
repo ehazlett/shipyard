@@ -31,17 +31,26 @@
             vm.variableValue = "";
         }
 
-        function deploy() {
-            vm.deploying = true;
-            
-            if(vm.cmd.length > 0) {
-                vm.request.Cmd = vm.cmd.split(" ");
-            }
-
+        function transformEnvVars() {
             var i;
+            if(vm.variableName.length > 0) {
+                vm.request.Env.push(vm.variableName + "=" + vm.variableValue);
+            }
             for(i = 0; i < vm.envVars.length; i++) {
                 vm.request.Env.push(vm.envVars[i].name + "=" + vm.envVars[i].value);
             }
+        }
+        
+        function transformCommand() {
+            if(vm.cmd.length > 0) {
+                vm.request.Cmd = vm.cmd.split(" ");
+            }
+        }
+
+        function deploy() {
+            vm.deploying = true;
+            transformEnvVars();
+            transformCommand();   
 
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)

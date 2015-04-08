@@ -107,6 +107,12 @@
                             </div>
                             <div class="item">
                                 <div class="content">
+                                    <a class="header">Command</a>
+                                    <pre class="logs">{{ vm.container.Config.Cmd.join(" ") }}</pre>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="content">
                                     <a class="header">Hostname</a>
                                     <div class="description">{{ vm.container.Config.Hostname }}</div>
                                 </div>

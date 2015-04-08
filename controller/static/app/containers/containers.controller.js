@@ -5,8 +5,8 @@
         .module('shipyard.containers')
         .controller('ContainersController', ContainersController);
 
-    ContainersController.$inject = ['resolvedContainers', 'ContainerService', '$state', '$timeout'];
-    function ContainersController(resolvedContainers, ContainerService, $state, $timeout) {
+    ContainersController.$inject = ['resolvedContainers', 'ContainerService', '$state'];
+    function ContainersController(resolvedContainers, ContainerService, $state) {
         var vm = this;
         vm.error = "";
         vm.containers = resolvedContainers;
@@ -19,8 +19,6 @@
         vm.restartContainer = restartContainer;
         vm.refresh = refresh;
 
-        intervalFunction();
-
         function refresh() {
             ContainerService.list()
                 .then(function(data) {
@@ -32,12 +30,6 @@
             vm.error = "";
         }
 
-        function intervalFunction() {
-            $timeout(function() {
-                vm.refresh();
-                intervalFunction();
-            }, 30000);
-        }
 
         function showDestroyContainerDialog(container) {
             vm.selectedContainerId = container.Id;
