@@ -125,9 +125,6 @@
                             </div>
                         </div>
                         <h4 class="ui dividing header">Port Configuration</h4>
-                        <div ng-show="vm.container.NetworkSettings.Ports == null">
-                            <div>No exposed ports configured</div>
-                        </div>
                         <div class="ui divided list" ng-show="vm.container.NetworkSettings.Ports"> 
                             <div class="item" ng-repeat="(k, values) in vm.container.NetworkSettings.Ports">
                                 <div ng-show="values.length === 0 || values == null"><div class="ui horizontal label">Internal</div> {{ k }}</div>
