@@ -729,7 +729,7 @@ func main() {
 
 	controllerManager, mErr = manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, VERSION, disableUsageInfo)
 	if mErr != nil {
-		logger.Fatal(mErr)
+		logger.Fatalf("Unable to connect with database engine, %v", mErr)
 	}
 
 	apiRouter := mux.NewRouter()
