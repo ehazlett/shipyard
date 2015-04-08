@@ -63,33 +63,86 @@
                         <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
                     </div>
                 </div>
-                <h4 class="ui dividing header">Environment Configuration</h4>
-                <div class="fields">
-                    <div class="seven wide field">
-                        <label>Variable Name</label>
-                        <input name="variableName" class="input" type="text" ng-model="vm.variableName" placeholder="Variable Name"></input>
-                    </div>
-                    <div class="eight wide field">
-                        <label>Value</label>
-                        <input name="variableValue" class="input" type="text" ng-model="vm.variableValue" placeholder="Variable Value"></input>
-                    </div>
-                    <div class="one wide field">
-                        <label>&nbsp;</label>
-                        <div class="ui green icon button" ng-click="vm.pushEnvVar()">
-                            <i class="add icon"></i>
+                <div class="ui two column grid">
+                    <div class="column">
+                        <div class="ui horizontal segment">
+                            <h4 class="ui dividing header">Environment Configuration</h4>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>Variable Name</label>
+                                    <input name="variableName" class="input" type="text" ng-model="vm.variableName" placeholder="Variable Name"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <label>Value</label>
+                                    <input name="variableValue" class="input" type="text" ng-model="vm.variableValue" placeholder="Variable Value"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushEnvVar()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="v in vm.envVars">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.name"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.value"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui disabled red icon button"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="fields" ng-repeat="v in vm.envVars">
-                    <div class="seven wide field">
-                        <input class="input" type="text" ng-model="v.name"></input>
-                    </div>
-                    <div class="eight wide field">
-                        <input class="input" type="text" ng-model="v.value"></input>
-                    </div>
-                    <div class="one wide field">
-                        <div class="ui disabled red icon button"> 
-                            <i class="delete icon"></i>
+                    <div class="column">
+                        <div class="ui horizontal segment">
+                            <h4 class="ui dividing header">Port Configuration</h4>
+                            <div class="fields">
+                                <div class="three wide field">
+                                    <label>Protocol</label>
+                                    <select class="ui fluid dropdown">
+                                        <option value="1">TCP</option>
+                                        <option value="0">UDP</option>
+                                    </select>
+                                </div>
+                                <div class="six wide field">
+                                    <label>Host Port</label>
+                                    <input name="hostPort" class="input" type="text" ng-model="vm.hostPort" placeholder="Host Port"></input>
+                                </div>
+                                <div class="six wide field">
+                                    <label>Container Port</label>
+                                    <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushPort()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="p in vm.ports">
+                                <div class="three wide field">
+                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
+                                        <option value="1">TCP</option>
+                                        <option value="0">UDP</option>
+                                    </select>
+                                </div>
+                                <div class="six wide field">
+                                    <input name="hostPort" class="input" type="text" ng-model="p.HostPort" placeholder="Host Port"></input>
+                                </div>
+                                <div class="six wide field">
+                                    <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button">
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -116,5 +169,11 @@ $(function(){
                 ]
             },
         });
+    $('select.dropdown')
+        .dropdown()
+        ;
 });
+    $('select.dropdown')
+.dropdown()
+    ;
 </script>
