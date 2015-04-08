@@ -1,6 +1,6 @@
 # Roadmap
 
-## Shipyard 2.1
+## Shipyard 3.0
 This is the next major version of Shipyard.  There is quite a bit planned and
 some of the features may get bumped to next incremental versions.
 
@@ -12,11 +12,14 @@ with Swarm.  With that will come improved scheduling, full support of Docker
 features (i.e. `docker run --rm` etc) and less maintenance enabling us to focus
 on Shipyard itself.
 
+### Docker Registry
+There has been lots of interest in managing a private Docker Registry.  Shipyard v3 will contain registry management including managing and deploying from repositories.
 
-### Container Stats
-With the release of Docker Engine 1.5, there is now a stats API.  We want to
-integrate this into Shipyard to see realtime stats for all containers.
+### Interlock
+This will bring the "composable" management to Shipyard.  Interlock has a plugin system that allows the selection of plugins including application routing and load balancing to stats and more.  These can be enabled / disabled at user discretion.
 
+### Docker Machine Integration
+This would enable provisioning of Docker Engines in all providers supported by Machine.  These nodes could then be used to create or scale a Swarm cluster.
 
 ### Docker Compose Integration
 There has been a long standing request for 
@@ -24,8 +27,3 @@ There has been a long standing request for
 (https://github.com/shipyard/shipyard/issues/172 & 
 https://github.com/shipyard/shipyard/issues/270).
 We want enable deploying containers from Docker Compose configuration definitions.
-
-
-### ClusterHQ Powerstrip
-The Shipyard extension concept was very similar to this however I think Powerstrip
-is better.  We want to take the idea of extensions and use them with Powerstrip.
