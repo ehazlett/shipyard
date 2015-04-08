@@ -127,10 +127,23 @@ func (client *RegistryClient) Search(query string, page int, numResults int) (*S
 		return nil, err
 	}
 
+	// convert the simple results to rich Repository results
+	repos := []*Repository{}
+	for _, repo := range res.Results {
+		r, err := client.Repository(repo.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		repos = append(repos, r)
+	}
+
+	res.Results = repos
+
 	return res, nil
 }
 
-func (client *RegistryClient) Delete(repo string) error {
+func (client *RegistryClient) DeleteRepository(repo string) error {
 	r := parseRepo(repo)
 	uri := fmt.Sprintf("/repositories/%s/%s/", r.Namespace, r.Repository)
 	if _, err := client.doRequest("DELETE", uri, nil, nil); err != nil {

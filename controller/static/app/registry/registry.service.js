@@ -16,6 +16,14 @@
                     });
                 return promise;
             },
+            removeRepository: function(repo) {
+                var promise = $http
+                    .delete('/api/repositories/'+repo.namespace+'/'+repo.repository)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
         } 
     }
 })();
