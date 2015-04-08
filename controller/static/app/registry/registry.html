@@ -1,3 +1,22 @@
+<div class="ui small remove modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+    Remove Repository: {{ vm.selectedRepository.namespace }}/{{ vm.selectedRepository.repository }}
+</div>
+<div class="content">
+    <p>Are you sure you want to remove this repository?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        No
+    </div>
+    <div ng-click="vm.removeRepository()" class="ui positive right labeled icon button">
+        Yes
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
+
 <div class="two column row">
     <div class="left floated column">
         <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
@@ -27,17 +46,32 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row" ng-hide="vm.registry.length === 0">
 <div class="column">
-<table class="ui sortable celled table" ng-show="vm.registry">
-    <thead>
+<table class="ui sortable celled table">
+    <thead ng-hide="">
         <tr>
-            <th>Name</th>
+            <th>Namespace</th>
+            <th>Repository</th>
+            <th>Tags</th>
+            <th>Layers</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="e in vm.registry | filter:tableFilter">
-            <td>{{e.name}}</td>
+        <tr ng-repeat="r in vm.registry | filter:tableFilter">
+            <td>{{r.namespace}}</td>
+            <td>{{r.repository}}</td>
+            <td>{{r.tags.length}}</td>
+            <td>{{r.layers.length}}</td>
+            <td class="collapsing">
+                <div ui-sref="dashboard.inspectRepository({namespace: r.namespace, repository: r.repository})" class="compact ui icon button">
+                    <i class="search icon"></i>
+                </div>
+                <div ng-click="vm.showRemoveRepositoryDialog(r)" class="compact ui icon button red">
+                    <i class="trash icon"></i>
+                </div>
+            </td>
         </tr>
     </tbody>
 </table>
