@@ -5,9 +5,10 @@
 		.module('shipyard.registry')
 		.controller('RepositoryController', RepositoryController);
 
-	RepositoryController.$inject = ['resolvedRepository', 'RepositoryService', '$state', '$timeout'];
-	function RepositoryController(namespace, repository, RepositoryService, $state, $timeout) {
+	RepositoryController.$inject = ['resolvedRepository'];
+	function RepositoryController(resolvedRepository) {
             var vm = this;
-            vm.selectedRepository = "";
+            console.log(resolvedRepository);
+            vm.selectedRepository = resolvedRepository;
 	}
 })();
