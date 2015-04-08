@@ -30,8 +30,8 @@
                 controllerAs: 'vm',
                 authenticate: true,
                 resolve: { 
-                    resolvedRepository: ['RepositoryService', '$state', '$stateParams', function(RepositoryService, $state, $stateParams) {
-                        return RegistryService.repository($stateParams.namespace, $stateParams.repository).then(null, function(errorData) {
+                    resolvedRepository: ['RegistryService', '$state', '$stateParams', function(RegistryService, $state, $stateParams) {
+                        return RegistryService.inspectRepository($stateParams.namespace, $stateParams.repository).then(null, function(errorData) {
                             $state.go('error');
                         });
                     }]
