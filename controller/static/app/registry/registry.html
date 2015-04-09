@@ -55,6 +55,7 @@
             <th>Repository</th>
             <th>Tags</th>
             <th>Layers</th>
+            <th>Size</th>
             <th></th>
         </tr>
     </thead>
@@ -64,6 +65,7 @@
             <td>{{r.repository}}</td>
             <td>{{r.tags.length}}</td>
             <td>{{r.layers.length}}</td>
+            <td>{{r.size / 1048576 | number:2}} MB</td>
             <td class="collapsing">
                 <div ui-sref="dashboard.inspectRepository({namespace: r.namespace, repository: r.repository})" class="compact ui icon button">
                     <i class="search icon"></i>

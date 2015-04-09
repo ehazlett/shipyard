@@ -3,7 +3,7 @@
         <div class="ui segment page blue">
             <h2 class="ui header">{{vm.selectedRepository.name}}</h2>
             <div class= "ui grid">
-                <div class="two column row">
+                <div class="three column row">
                     <div class="column">
                         <div class="ui statistic">
                             <div class="value">
@@ -21,6 +21,16 @@
                             </div>
                             <div class="label">
                                 Layers
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui statistic">
+                            <div class="value">
+                                <i class="disk outline icon"></i> {{vm.selectedRepository.size / 1048576 | number:2}}
+                            </div>
+                            <div class="label">
+                                MB
                             </div>
                         </div>
                     </div>
