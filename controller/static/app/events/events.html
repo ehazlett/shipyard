@@ -11,7 +11,12 @@
     </div>
 </div>
 </div>
-<div class="row">
+<div class="two column row">
+    <div class="left floated column">
+        <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+            <i class="refresh icon"></i> Refresh
+        </div>
+    </div>
     <div class="right aligned right floated column">
         <div class="ui small icon input">
             <input ng-model="tableFilter" placeholder="Search events..."/>
@@ -21,7 +26,6 @@
 </div>
 <div class="row">
     <div class="column">
-
         <table class="ui sortable celled table" ng-show="vm.events">
             <thead>
                 <tr>
