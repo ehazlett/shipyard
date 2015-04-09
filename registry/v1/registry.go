@@ -194,6 +194,7 @@ func (client *RegistryClient) Repository(name string) (*Repository, error) {
 
 	layers := []Layer{}
 	tags := []Tag{}
+	size := int64(0)
 
 	for n, id := range repoTags {
 		uri := fmt.Sprintf("/images/%s/json", id)
@@ -244,6 +245,7 @@ func (client *RegistryClient) Repository(name string) (*Repository, error) {
 			if err = json.Unmarshal(data, &l); err != nil {
 				return nil, err
 			}
+			size += l.Size
 			layers = append(layers, *l)
 		}
 	}
@@ -254,5 +256,6 @@ func (client *RegistryClient) Repository(name string) (*Repository, error) {
 		Repository: r.Repository,
 		Tags:       tags,
 		Layers:     layers,
+		Size:       size,
 	}, nil
 }

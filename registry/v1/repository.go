@@ -38,5 +38,6 @@ type (
 		Repository  string  `json:"repository,omitempty"`
 		Tags        []Tag   `json:"tags,omitempty"`
 		Layers      []Layer `json:"layers,omitempty"`
+		Size        int64   `json:"size,omitempty"`
 	}
 )
