@@ -88,7 +88,7 @@
                                     <input class="input" type="text" ng-model="v.value"></input>
                                 </div>
                                 <div class="one wide field">
-                                    <div class="ui disabled red icon button"> 
+                                    <div ng-click="vm.removeEnvVar(v)" class="ui red icon button"> 
                                         <i class="delete icon"></i>
                                     </div>
                                 </div>
@@ -112,13 +112,13 @@
                             </div>
                             <div class="fields" ng-repeat="v in vm.volumes">
                                 <div class="seven wide field">
-                                    <input class="input" type="text" ng-model="v.hostPath"></input>
+                                    <input class="input" type="text" ng-model="v.HostPath"></input>
                                 </div>
                                 <div class="seven wide field">
-                                    <input class="input" type="text" ng-model="v.containerPath"></input>
+                                    <input class="input" type="text" ng-model="v.ContainerPath"></input>
                                 </div>
                                 <div class="one wide field">
-                                    <div class="ui disabled red icon button"> 
+                                    <div class="ui red icon button" ng-click="vm.deleteVolume(v)"> 
                                         <i class="delete icon"></i>
                                     </div>
                                 </div>
@@ -142,13 +142,13 @@
                             </div>
                             <div class="fields" ng-repeat="l in vm.links">
                                 <div class="seven wide field">
-                                    <input class="input" type="text" ng-model="l.containerToLink"></input>
+                                    <input class="input" type="text" ng-model="l.ContainerToLink"></input>
                                 </div>
                                 <div class="seven wide field">
-                                    <input class="input" type="text" ng-model="l.containerToLinkAlias"></input>
+                                    <input class="input" type="text" ng-model="l.ContainerToLinkAlias"></input>
                                 </div>
                                 <div class="one wide field">
-                                    <div class="ui disabled red icon button"> 
+                                    <div class="ui red icon button" ng-click="vm.removeLink(l)"> 
                                         <i class="delete icon"></i>
                                     </div>
                                 </div>
@@ -239,6 +239,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="ui divider"></div>
                 <div class="ui blue submit button">
                     Deploy 
                 </div>
