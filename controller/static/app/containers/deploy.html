@@ -150,8 +150,9 @@
                             </div>
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="field">
-                                <select class="ui fluid dropdown" ng-model="vm.restartPolicy">
-                                    <option value="">Do not automatically restart</option>
+                                <select class="ui fluid dropdown" default="0" ng-model="vm.restartPolicy">
+                                    <option value="">Restart Policy</option>
+                                    <option value="0">Do not automatically restart</option>
                                     <option value="1">Restart only on failure</option>
                                     <option value="2">Always restart</option>
                                 </select>
@@ -159,8 +160,8 @@
                             <h5 class="ui dividing header">Automatic Port Configuration</h5>
                             <div class="field">
                                 <div class="ui toggle checkbox">
-                                    <input type="checkbox" name="exposeAllPorts" ng-model="vm.request.HostConfig.PublishAllPorts">
-                                    <label>Automatically expose all ports
+                                    <input type="checkbox" id="exposeAllPorts" ng-model="vm.request.HostConfig.PublishAllPorts">
+                                    <label for="exposeAllPorts">Automatically expose all ports
                                         <i class="blue help circle icon"></i>
                                         <div class="ui popup" style="width: 400px;">
                                             <h5>Expose all ports</h5>
@@ -221,9 +222,9 @@
                             </div>
                             <h5 class="ui dividing header">Advanced</h5>
                             <div class="field">
-                                <div class="ui toggle checkbox">
-                                    <input type="checkbox" name="privileged" ng-model="vm.request.HostConfig.Privileged">
-                                    <label>Allow container to run in privileged mode: {{vm.request.HostConfig.Privileged}}
+                                <div class="ui toggle checkbox" ng-model="vm.request.HostConfig.Privileged">
+                                    <input type="checkbox" id="privileged" ng-model="vm.request.HostConfig.Privileged">
+                                    <label for="privileged">Allow container to run in privileged mode
                                     </label>
                                 </div>
                             </div>
@@ -254,6 +255,5 @@ $(function(){
 
     $('.help.circle.icon').popup({inline: true});
     $('select.dropdown').dropdown();
-    $('.ui.checkbox').checkbox();
 });
 </script>
