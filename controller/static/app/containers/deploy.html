@@ -151,8 +151,8 @@
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="field">
                                 <select class="ui fluid dropdown" default="0" ng-model="vm.restartPolicy">
-                                    <option value="">Restart Policy</option>
-                                    <option value="0">Do not automatically restart</option>
+                                    <option value=""></option>
+                                    <option value="0" selected="selected">Do not automatically restart</option>
                                     <option value="1">Restart only on failure</option>
                                     <option value="2">Always restart</option>
                                 </select>
@@ -179,7 +179,8 @@
                                 <div class="three wide field">
                                     <label>Protocol</label>
                                     <select class="ui fluid dropdown" ng-model="vm.protocol">
-                                        <option value="0">TCP</option>
+                                        <option value=""></option>
+                                        <option value="0" selected="selected">TCP</option>
                                         <option value="1">UDP</option>
                                     </select>
                                 </div>
@@ -204,8 +205,9 @@
                                 </div>
                                 <div class="three wide field">
                                     <select class="ui fluid dropdown" ng-model="p.Protocol">
-                                        <option value="0">TCP</option>
-                                        <option value="1">UDP</option>
+                                        <option value=""></option>
+                                        <option value="0" ng-selected="p.Protocol == 0">TCP</option>
+                                        <option value="1" ng-selected="p.Protocol == 1">UDP</option>
                                     </select>
                                 </div>
                                 <div class="five wide field">
@@ -254,6 +256,8 @@ $(function(){
         });
 
     $('.help.circle.icon').popup({inline: true});
-    $('select.dropdown').dropdown();
+    $('.ui.dropdown')
+          .dropdown()
+          ;
 });
 </script>
