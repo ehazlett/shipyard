@@ -122,11 +122,15 @@
                                         <option value="0">UDP</option>
                                     </select>
                                 </div>
-                                <div class="six wide field">
+                                <div class="five wide field">
+                                    <label>Host Listen Address</label>
+                                    <input name="hostPort" class="input" type="text" ng-model="vm.hostIp" placeholder="0.0.0.0"></input>
+                                </div>
+                                <div class="three wide field">
                                     <label>Host Port</label>
                                     <input name="hostPort" class="input" type="text" ng-model="vm.hostPort" placeholder="Host Port"></input>
                                 </div>
-                                <div class="six wide field">
+                                <div class="three wide field">
                                     <label>Container Port</label>
                                     <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
                                 </div>
@@ -144,10 +148,13 @@
                                         <option value="0">UDP</option>
                                     </select>
                                 </div>
-                                <div class="six wide field">
+                                <div class="three wide field">
+                                    <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
+                                </div>
+                                <div class="three wide field">
                                     <input name="hostPort" class="input" type="text" ng-model="p.HostPort" placeholder="Host Port"></input>
                                 </div>
-                                <div class="six wide field">
+                                <div class="three wide field">
                                     <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="one wide field">
