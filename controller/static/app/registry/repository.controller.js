@@ -8,7 +8,6 @@
 	RepositoryController.$inject = ['resolvedRepository'];
 	function RepositoryController(resolvedRepository) {
             var vm = this;
-            console.log(resolvedRepository);
             vm.selectedRepository = resolvedRepository;
 	}
 })();
