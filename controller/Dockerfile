@@ -1,5 +1,5 @@
 FROM scratch
 ADD static /static
-ADD shipyard /bin/shipyard
+ADD controller /bin/controller
 EXPOSE 8080
-ENTRYPOINT ["/bin/shipyard"]
+ENTRYPOINT ["/bin/controller"]
