@@ -14,9 +14,6 @@
 </div>
 <div class="row" ng-hide="vm.deploying">
     <div class="column">
-        <div class="ui top attached tabular menu">
-            <div class="active item">Basic</div>
-        </div>
         <div class="ui bottom attached active tab segment">
             <div class="ui error message" ng-show="vm.error">
                 <div class="header">Oops...</div>
@@ -66,7 +63,7 @@
                 <div class="ui two column grid">
                     <div class="column">
                         <div class="ui horizontal segment">
-                            <h4 class="ui dividing header">Environment Configuration</h4>
+                            <h5 class="ui dividing header">Environment Variables</h5>
                             <div class="fields">
                                 <div class="seven wide field">
                                     <label>Variable Name</label>
@@ -96,10 +93,78 @@
                                     </div>
                                 </div>
                             </div>
+                            <h5 class="ui dividing header">Volumes</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>Host Path</label>
+                                    <input name="hostPath" class="input" type="text" ng-model="vm.hostPath" placeholder="Host Path"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <label>Container Path</label>
+                                    <input name="containerPath" class="input" type="text" ng-model="vm.containerPath" placeholder="Container Path"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushVolume()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="v in vm.volumes">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.hostPath"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.containerPath"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui disabled red icon button"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">Container Links</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>Container</label>
+                                    <input name="containerToLink" class="input" type="text" ng-model="vm.containerToLink" placeholder="Container Name"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <label>Alias</label>
+                                    <input name="containerToLinkAlias" class="input" type="text" ng-model="vm.containerToLinkAlias" placeholder="Link Alias"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushLink()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="l in vm.links">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="l.containerToLink"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="l.containerToLinkAlias"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui disabled red icon button"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="column">
                         <div class="ui horizontal segment">
+                            <h5 class="ui dividing header">Restart Policy</h5>
+                            <div class="field">
+                                <select class="ui fluid dropdown" ng-model="vm.restartPolicy">
+                                    <option value="">Do not automatically restart</option>
+                                    <option value="1">Restart only on failure</option>
+                                    <option value="2">Always restart</option>
+                                </select>
+                            </div>
                             <h5 class="ui dividing header">Automatic Port Configuration</h5>
                             <div class="field">
                                 <div class="ui toggle checkbox">
@@ -161,6 +226,14 @@
                                     <div class="ui red icon button">
                                         <i class="delete icon"></i>
                                     </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">Advanced</h5>
+                            <div class="field">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" name="privileged">
+                                    <label>Allow container to run in privileged mode
+                                    </label>
                                 </div>
                             </div>
                         </div>
