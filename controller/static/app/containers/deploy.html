@@ -100,7 +100,20 @@
                     </div>
                     <div class="column">
                         <div class="ui horizontal segment">
-                            <h4 class="ui dividing header">Port Configuration</h4>
+                            <h5 class="ui dividing header">Automatic Port Configuration</h5>
+                            <div class="field">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" name="exposeAllPorts">
+                                    <label>Automatically expose all ports
+                                        <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="width: 400px;">
+                                            <h5>Expose all ports</h5>
+                                            <p>If the operator chooses to automatically expose all configured ports for the image, then Docker will make the exposed port accessible on the <b>host</b> and the ports will be <b>available to any client that can reach the host</b>. When using this option, Docker will bind the exposed ports to a random port on the host between 49153 and 65535.</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">Manual Port Configuration</h5>
                             <div class="fields">
                                 <div class="three wide field">
                                     <label>Protocol</label>
@@ -155,8 +168,6 @@
 </div>
 <script>
 $(function(){
-    $('.help.circle.icon').popup({inline: true});
-
     $('.ui.form')
         .form({
             image: {
@@ -169,11 +180,9 @@ $(function(){
                 ]
             },
         });
-    $('select.dropdown')
-        .dropdown()
-        ;
+
+    $('.help.circle.icon').popup({inline: true});
+    $('select.dropdown').dropdown();
+    $('.ui.checkbox').checkbox();
 });
-    $('select.dropdown')
-.dropdown()
-    ;
 </script>
