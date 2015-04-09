@@ -3,7 +3,7 @@
 
 	angular
 		.module('shipyard.events', [
-            'ngResource',
+                        'ngResource',
 			'ui.router',
 		]);
 		
