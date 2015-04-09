@@ -168,7 +168,7 @@
                             <h5 class="ui dividing header">Automatic Port Configuration</h5>
                             <div class="field">
                                 <div class="ui toggle checkbox">
-                                    <input type="checkbox" name="exposeAllPorts">
+                                    <input type="checkbox" name="exposeAllPorts" ng-model="vm.request.HostConfig.PublishAllPorts">
                                     <label>Automatically expose all ports
                                         <i class="blue help circle icon"></i>
                                         <div class="ui popup" style="width: 400px;">
@@ -181,10 +181,14 @@
                             <h5 class="ui dividing header">Manual Port Configuration</h5>
                             <div class="fields">
                                 <div class="three wide field">
+                                    <label>Container Port</label>
+                                    <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
+                                </div>
+                                <div class="three wide field">
                                     <label>Protocol</label>
-                                    <select class="ui fluid dropdown">
-                                        <option value="1">TCP</option>
-                                        <option value="0">UDP</option>
+                                    <select class="ui fluid dropdown" ng-model="vm.protocol">
+                                        <option value="0">TCP</option>
+                                        <option value="1">UDP</option>
                                     </select>
                                 </div>
                                 <div class="five wide field">
@@ -195,10 +199,6 @@
                                     <label>Host Port</label>
                                     <input name="hostPort" class="input" type="text" ng-model="vm.hostPort" placeholder="Host Port"></input>
                                 </div>
-                                <div class="three wide field">
-                                    <label>Container Port</label>
-                                    <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
-                                </div>
                                 <div class="one wide field">
                                     <label>&nbsp;</label>
                                     <div class="ui green icon button" ng-click="vm.pushPort()">
@@ -208,19 +208,19 @@
                             </div>
                             <div class="fields" ng-repeat="p in vm.ports">
                                 <div class="three wide field">
-                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
-                                        <option value="1">TCP</option>
-                                        <option value="0">UDP</option>
-                                    </select>
+                                    <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="three wide field">
+                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
+                                        <option value="0">TCP</option>
+                                        <option value="1">UDP</option>
+                                    </select>
+                                </div>
+                                <div class="five wide field">
                                     <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
                                 </div>
                                 <div class="three wide field">
                                     <input name="hostPort" class="input" type="text" ng-model="p.HostPort" placeholder="Host Port"></input>
-                                </div>
-                                <div class="three wide field">
-                                    <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="one wide field">
                                     <div class="ui red icon button">
@@ -231,8 +231,8 @@
                             <h5 class="ui dividing header">Advanced</h5>
                             <div class="field">
                                 <div class="ui toggle checkbox">
-                                    <input type="checkbox" name="privileged">
-                                    <label>Allow container to run in privileged mode
+                                    <input type="checkbox" name="privileged" ng-true-value="true" ng-false-value="false" ng-model="vm.request.HostConfig.Privileged">
+                                    <label>Allow container to run in privileged mode: {{vm.request.HostConfig.Privileged}}
                                     </label>
                                 </div>
                             </div>

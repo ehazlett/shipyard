@@ -31,6 +31,16 @@
         vm.containerName = "";
         vm.error = "";
         vm.request = {
+            HostConfig: {
+                Links: [],
+                Binds: [],
+                Privileged: false,
+                PublishAllPorts: false,
+                PortBindings: {},
+            },
+            Links: [],
+            ExposedPorts: {},
+            Volumes: {},
             Env: [],
             AttachStdin: false,
             Tty: true,
@@ -71,9 +81,11 @@
         }
 
         function pushPort() {
-            var port = {'ContainerPort': vm.containerPort, 'HostIp': vm.hostIp, 'HostPort': vm.hostPort};
+            var port = {'Protocol': vm.protocol, 'ContainerPort': vm.containerPort, 'HostIp': vm.hostIp, 'HostPort': vm.hostPort};
             vm.ports.push(port);
             vm.hostPort = "";
+            vm.hostIp = "";
+            vm.protocol = 0;
             vm.containerPort = "";
         }
 
@@ -94,6 +106,16 @@
             vm.envVars.splice(index, 1);
         }
 
+        function transformLinks() {
+            var i;
+            if(vm.containerToLink.length > 0) {
+                vm.request.HostConfig.Links.push(vm.containerToLink + ":" + vm.containerToLinkAlias);
+            }
+            for(i = 0; i < vm.links.length; i++) {
+                vm.request.HostConfig.Links.push(vm.links[i].ContainerToLink + ":" + vm.links[i].ContainerToLinkAlias);
+            }
+        }
+
         function transformEnvVars() {
             var i;
             if(vm.variableName.length > 0) {
@@ -110,10 +132,44 @@
             }
         }
 
+        function transformVolumes() {
+            var i;
+            if(vm.hostPath.length > 0) {
+                vm.request.HostConfig.Binds.push(vm.hostPath + ":" + vm.containerPath);
+            }
+            for(i = 0; i < vm.volumes.length; i++) {
+                vm.request.HostConfig.Binds.push(vm.volumes[i].HostPath + ":" + vm.volumes[i].ContainerPath);
+            }
+        }
+
+        function translateProtocol(protocol) {
+                if(vm.protocol == 0) {
+                    return "tcp";
+                } else if(vm.protocol == 1) {
+                    return "udp";
+                } else {
+                    return null;
+                }
+        }
+            
+        function transformPorts() {
+            var i;
+            if(vm.containerPort.length > 0) {
+                vm.request.HostConfig.PortBindings[vm.containerPort + "/" + translateProtocol(vm.protocol)] = [{ HostIp: vm.hostIp, HostPort: vm.hostPort }];
+            }
+            for(i = 0; i < vm.ports.length; i++) {
+                vm.request.HostConfig.PortBindings[vm.ports[i].ContainerPort + "/" + translateProtocol(vm.ports[i].Protocol)] = [{ HostIp: vm.ports[i].HostIp, HostPort: vm.ports[i].HostPort }];
+            }
+        }
+
         function deploy() {
             vm.deploying = true;
+
+            transformVolumes();
+            transformLinks();
             transformEnvVars();
             transformCommand();   
+            transformPorts();
 
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
