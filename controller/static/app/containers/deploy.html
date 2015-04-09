@@ -14,9 +14,6 @@
 </div>
 <div class="row" ng-hide="vm.deploying">
     <div class="column">
-        <div class="ui top attached tabular menu">
-            <div class="active item">Basic</div>
-        </div>
         <div class="ui bottom attached active tab segment">
             <div class="ui error message" ng-show="vm.error">
                 <div class="header">Oops...</div>
@@ -66,7 +63,7 @@
                 <div class="ui two column grid">
                     <div class="column">
                         <div class="ui horizontal segment">
-                            <h4 class="ui dividing header">Environment Configuration</h4>
+                            <h5 class="ui dividing header">Environment Variables</h5>
                             <div class="fields">
                                 <div class="seven wide field">
                                     <label>Variable Name</label>
@@ -91,7 +88,67 @@
                                     <input class="input" type="text" ng-model="v.value"></input>
                                 </div>
                                 <div class="one wide field">
-                                    <div class="ui disabled red icon button"> 
+                                    <div ng-click="vm.removeEnvVar(v)" class="ui red icon button"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">Volumes</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>Host Path</label>
+                                    <input name="hostPath" class="input" type="text" ng-model="vm.hostPath" placeholder="Host Path"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <label>Container Path</label>
+                                    <input name="containerPath" class="input" type="text" ng-model="vm.containerPath" placeholder="Container Path"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushVolume()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="v in vm.volumes">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.HostPath"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.ContainerPath"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button" ng-click="vm.deleteVolume(v)"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">Container Links</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>Container</label>
+                                    <input name="containerToLink" class="input" type="text" ng-model="vm.containerToLink" placeholder="Container Name"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <label>Alias</label>
+                                    <input name="containerToLinkAlias" class="input" type="text" ng-model="vm.containerToLinkAlias" placeholder="Link Alias"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushLink()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="l in vm.links">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="l.ContainerToLink"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="l.ContainerToLinkAlias"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button" ng-click="vm.removeLink(l)"> 
                                         <i class="delete icon"></i>
                                     </div>
                                 </div>
@@ -100,7 +157,28 @@
                     </div>
                     <div class="column">
                         <div class="ui horizontal segment">
-                            <h4 class="ui dividing header">Port Configuration</h4>
+                            <h5 class="ui dividing header">Restart Policy</h5>
+                            <div class="field">
+                                <select class="ui fluid dropdown" ng-model="vm.restartPolicy">
+                                    <option value="">Do not automatically restart</option>
+                                    <option value="1">Restart only on failure</option>
+                                    <option value="2">Always restart</option>
+                                </select>
+                            </div>
+                            <h5 class="ui dividing header">Automatic Port Configuration</h5>
+                            <div class="field">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" name="exposeAllPorts">
+                                    <label>Automatically expose all ports
+                                        <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="width: 400px;">
+                                            <h5>Expose all ports</h5>
+                                            <p>If the operator chooses to automatically expose all configured ports for the image, then Docker will make the exposed port accessible on the <b>host</b> and the ports will be <b>available to any client that can reach the host</b>. When using this option, Docker will bind the exposed ports to a random port on the host between 49153 and 65535.</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">Manual Port Configuration</h5>
                             <div class="fields">
                                 <div class="three wide field">
                                     <label>Protocol</label>
@@ -109,11 +187,15 @@
                                         <option value="0">UDP</option>
                                     </select>
                                 </div>
-                                <div class="six wide field">
+                                <div class="five wide field">
+                                    <label>Host Listen Address</label>
+                                    <input name="hostPort" class="input" type="text" ng-model="vm.hostIp" placeholder="0.0.0.0"></input>
+                                </div>
+                                <div class="three wide field">
                                     <label>Host Port</label>
                                     <input name="hostPort" class="input" type="text" ng-model="vm.hostPort" placeholder="Host Port"></input>
                                 </div>
-                                <div class="six wide field">
+                                <div class="three wide field">
                                     <label>Container Port</label>
                                     <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
                                 </div>
@@ -131,10 +213,13 @@
                                         <option value="0">UDP</option>
                                     </select>
                                 </div>
-                                <div class="six wide field">
+                                <div class="three wide field">
+                                    <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
+                                </div>
+                                <div class="three wide field">
                                     <input name="hostPort" class="input" type="text" ng-model="p.HostPort" placeholder="Host Port"></input>
                                 </div>
-                                <div class="six wide field">
+                                <div class="three wide field">
                                     <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="one wide field">
@@ -143,10 +228,19 @@
                                     </div>
                                 </div>
                             </div>
+                            <h5 class="ui dividing header">Advanced</h5>
+                            <div class="field">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" name="privileged">
+                                    <label>Allow container to run in privileged mode
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="large ui blue submit button">
+                <div class="ui divider"></div>
+                <div class="ui blue submit button">
                     Deploy 
                 </div>
             </div>
@@ -155,8 +249,6 @@
 </div>
 <script>
 $(function(){
-    $('.help.circle.icon').popup({inline: true});
-
     $('.ui.form')
         .form({
             image: {
@@ -169,11 +261,9 @@ $(function(){
                 ]
             },
         });
-    $('select.dropdown')
-        .dropdown()
-        ;
+
+    $('.help.circle.icon').popup({inline: true});
+    $('select.dropdown').dropdown();
+    $('.ui.checkbox').checkbox();
 });
-    $('select.dropdown')
-.dropdown()
-    ;
 </script>
