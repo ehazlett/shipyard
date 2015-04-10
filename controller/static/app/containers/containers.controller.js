@@ -18,6 +18,7 @@
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
         vm.refresh = refresh;
+        vm.containerStatusText = containerStatusText;
 
         function refresh() {
             ContainerService.list()
@@ -72,5 +73,14 @@
                     vm.error = data;
                 });
         }
+        function containerStatusText(container) {
+           if(container.Status.indexOf("Up")==0){
+                return "Running";
+           }
+           else if(container.Status.indexOf("Exited")==0){
+                return "Stopped";
+           }            
+           return "Unknown";
+        }   
     }
 })();
