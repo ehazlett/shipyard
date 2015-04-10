@@ -20,4 +20,7 @@
     word-break: break-word;
     width: 100%;
 }
-
+.containerStatusText {
+    width: 1px;
+    text-align: center;
+}
