@@ -1,7 +1,7 @@
 <div class="ui breadcrumb">
     <a href="/#/containers" class="section">containers</a>
     <div class="divider"> / </div>
-    <div class="active section">{{container.id | limitTo:12}}</div>
+    <div class="active section">{{vm.container.id | limitTo:12}}</div>
 </div>
 
 <div class="ui basic small modal removeContainer">
@@ -9,11 +9,11 @@
         Destroy Container
     </div>
     <div class="content">
-        Destroy {{container.image.name}} ({{container.id|truncate}})?
+        Destroy {{vm.container.image.name}} ({{vm.container.id|truncate}})?
     </div>
     <div class="actions">
         <div class="ui button small">Cancel</div>
-        <a ng-click="destroyContainer()" class="ui button small blue">Ok</a>
+        <a ng-click="vm.destroyContainer()" class="ui button small blue">Ok</a>
     </div>
 </div>
 
@@ -22,11 +22,11 @@
         Stop Container
     </div>
     <div class="content">
-        Stop {{container.image.name}} ({{container.id|truncate}})?
+        Stop {{vm.container.image.name}} ({{vm.container.id|truncate}})?
     </div>
     <div class="actions">
         <div class="ui button small">Cancel</div>
-        <a ng-click="stopContainer()" class="ui button small blue">Ok</a>
+        <a ng-click="vm.stopContainer()" class="ui button small blue">Ok</a>
     </div>
 </div>
 
@@ -35,11 +35,11 @@
         Restart Container
     </div>
     <div class="content">
-        Restart {{container.image.name}} ({{container.id|truncate}})?
+        Restart {{vm.container.image.name}} ({{vm.container.id|truncate}})?
     </div>
     <div class="actions">
         <div class="ui button small">Cancel</div>
-        <a ng-click="restartContainer()" class="ui button small blue">Ok</a>
+        <a ng-click="vm.restartContainer()" class="ui button small blue">Ok</a>
     </div>
 </div>
 
@@ -54,7 +54,7 @@
         <div class="ui small form segment" ng-form="scaleForm" novalidate>
             <div class="field">
                 <div class="ui left labeled icon input">
-                    <input type="text" name="count" ng-model="count" value="{{containerCount}}" placeholder="total number of instances">
+                    <input type="text" name="count" ng-model="vm.count" value="{{vm.containerCount}}" placeholder="total number of instances">
                     <i class="exchange icon"></i>
                     <div class="ui corner label">
                         <i class="icon asterisk"></i>
@@ -62,7 +62,7 @@
                 </div>
             </div>
             <div class="field">
-                <div class="ui small blue button" ng-click="scale()">Scale</div>
+                <div class="ui small blue button" ng-click="vm.scale()">Scale</div>
             </div>
         </div>
     </div>
@@ -71,31 +71,31 @@
 <div></div>
 
 <div class="ui icon buttons toolbar">
-    <a ng-click="showRestartContainerDialog()" class="ui button mini green">
+    <a ng-click="vm.showRestartContainerDialog()" class="ui button mini green">
         <i class="refresh icon"></i>
         Restart
     </a>
 </div>
 <div class="ui icon buttons toolbar">
-    <a ng-click="showStopContainerDialog()" class="ui button mini black">
+    <a ng-click="vm.showStopContainerDialog()" class="ui button mini black">
         <i class="stop icon"></i>
         Stop
     </a>
 </div>
 <div class="ui icon buttons toolbar">
-    <a ng-click="showRemoveContainerDialog()" class="ui button mini red">
+    <a ng-click="vm.showRemoveContainerDialog()" class="ui button mini red">
         <i class="remove sign icon"></i>
         Destroy
     </a>
 </div>
 <div class="ui icon buttons toolbar">
-    <a ng-click="showScaleContainerDialog()" class="ui button mini blue">
+    <a ng-click="vm.showScaleContainerDialog()" class="ui button mini blue">
         <i class="exchange icon"></i>
         Scale
     </a>
 </div>
 <div class="ui icon buttons toolbar">
-    <a href="/#/containers/{{container.id}}/logs" class="ui button mini black">
+    <a href="/#/containers/{{vm.container.id}}/logs" class="ui button mini black">
         <i class="text file outline icon"></i>
         Logs
     </a>
@@ -109,22 +109,22 @@
     <div class="ui column">
         <div class="ui section">
             <h3 class="ui header">Name</h3>
-            <div>{{container.name|container_name}}</div>
+            <div>{{vm.container.name|container_name}}</div>
         </div>
         <div class="ui divider"></div>
         <div>
             <h3 class="ui header">Image</h3>
-            <div>{{container.image.name}}</div>
+            <div>{{vm.container.image.name}}</div>
         </div>
         <div class="ui divider"></div>
         <div>
             <h3 class="ui header">Type</h3>
-            <div>{{container.image.type}}</div>
+            <div>{{vm.container.image.type}}</div>
         </div>
         <div class="ui divider"></div>
         <h4 class="ui top attached block header">Environment</h4>
-        <div class="ui segment attached" ng-hide="container.image.environment">No environment variables</div>
-        <div class="ui segment attached" ng-repeat="(k,v) in container.image.environment">
+        <div class="ui segment attached" ng-hide="vm.container.image.environment">No environment variables</div>
+        <div class="ui segment attached" ng-repeat="(k,v) in vm.container.image.environment">
             <strong>{{k}}</strong> <div class="ui mini button right floated" envvar="">Show</div>
             <div class="ui hide">{{v}}</div>
         </div>
@@ -132,51 +132,51 @@
     <div class="ui column">
         <div class="ui section">
             <h3 class="ui header">Hostname</h3>
-            <div>{{container.image.hostname}}</div>
+            <div>{{vm.container.image.hostname}}</div>
         </div>
         <div class="ui divider"></div>
         <div class="ui section">
             <h3 class="ui header">Engine</h3>
-            <div>{{container.engine.id}}</div>
+            <div>{{vm.container.engine.id}}</div>
         </div>
         <div class="ui divider"></div>
         <div class="ui section">
             <h3 class="ui header">Network Mode</h3>
-            <div>{{container.image.network_mode}}</div>
+            <div>{{vm.container.image.network_mode}}</div>
         </div>
         <div class="ui divider"></div>
         <div class="ui section">
             <h3 class="ui header">Restart Policy</h3>
             <div>
-                {{container.image.restart_policy.name || "no"}}<span ng-show="container.image.restart_policy.maximum_retry">:{{container.image.restart_policy.maximum_retry}}</span>
+                {{vm.container.image.restart_policy.name || "no"}}<span ng-show="vm.container.image.restart_policy.maximum_retry">:{{vm.container.image.restart_policy.maximum_retry}}</span>
             </div>
         </div>
         <div class="ui divider"></div>
         <div class="ui section">
             <h3 class="ui header">Privileged</h3>
             <div>
-                {{container.image.privileged}}
+                {{vm.container.image.privileged}}
             </div>
         </div>
         <div class="ui divider"></div>
         <h4 class="ui top attached block header">Ports</h4>
         <div class="ui segment attached">
-            <div ng-hide="container.ports">No exposed ports</div>
-            <div ng-repeat="l in portLinks | orderBy:predicate">
-                <a href="{{l.link}}" target="_{{container.id}}">{{l.protocol}}/{{l.container_port}} -> {{l.hostname}}:{{l.port}}</a>
+            <div ng-hide="vm.container.ports">No exposed ports</div>
+            <div ng-repeat="l in vm.portLinks | orderBy:predicate">
+                <a href="{{l.link}}" target="_{{vm.container.id}}">{{l.protocol}}/{{l.container_port}} -> {{l.hostname}}:{{l.port}}</a>
             </div>
         </div>
     </div>
     <div class="ui column">
         <h3 class="ui header">CPU</h3>
         <div>
-            <canvas barchart data="containerCpuData" options="chartOptions" width="250" height="250"></canvas>
+            <canvas barchart data="vm.containerCpuData" options="chartOptions" width="250" height="250"></canvas>
         </div>
     </div>
     <div class="ui column">
         <h3 class="ui header">Memory</h3>
         <div>
-            <canvas barchart data="containerMemoryData" options="chartOptions" width="250" height="250"></canvas>
+            <canvas barchart data="vm.containerMemoryData" options="chartOptions" width="250" height="250"></canvas>
         </div>
     </div>
 </div>
