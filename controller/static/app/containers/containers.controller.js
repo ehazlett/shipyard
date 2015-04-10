@@ -74,10 +74,13 @@
                 });
         }
         function containerStatusText(container) {
-            if(container.Status.indexOf("Up")==0){
+           if(container.Status.indexOf("Up")==0){
                 return "Running";
-            }                                 
-            return "Stopped";
+           }
+           else if(container.Status.indexOf("Exited")==0){
+                return "Stopped";
+           }            
+           return "Unknown";
         }   
     }
 })();
