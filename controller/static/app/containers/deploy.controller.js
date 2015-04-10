@@ -21,7 +21,7 @@
         vm.ports = []; 
         vm.hostPort = "";
         vm.containerPort = "";
-        vm.protocol = "";
+        vm.protocol = "TCP";
         
         vm.envVars = [];
         vm.variableName = "";
@@ -32,6 +32,7 @@
         vm.error = "";
         vm.request = {
             HostConfig: {
+                RestartPolicy: { Name: 'no' },
                 Links: [],
                 Binds: [],
                 Privileged: false,
@@ -85,7 +86,7 @@
             vm.ports.push(port);
             vm.hostPort = "";
             vm.hostIp = "";
-            vm.protocol = 0;
+            vm.protocol = "TCP";
             vm.containerPort = "";
         }
 
@@ -142,23 +143,17 @@
             }
         }
 
-        function translateProtocol(protocol) {
-                if(vm.protocol == 0) {
-                    return "tcp";
-                } else if(vm.protocol == 1) {
-                    return "udp";
-                } else {
-                    return null;
-                }
+        function transformRestartPolicy() {
+            vm.request.HostConfig.RestartPolicy.Name = translateRestartPolicy(vm.restartPolicy);
         }
             
         function transformPorts() {
             var i;
             if(vm.containerPort.length > 0) {
-                vm.request.HostConfig.PortBindings[vm.containerPort + "/" + translateProtocol(vm.protocol)] = [{ HostIp: vm.hostIp, HostPort: vm.hostPort }];
+                vm.request.HostConfig.PortBindings[vm.containerPort + "/" + vm.protocol.toLowerCase()] = [{ HostIp: vm.hostIp, HostPort: vm.hostPort }];
             }
             for(i = 0; i < vm.ports.length; i++) {
-                vm.request.HostConfig.PortBindings[vm.ports[i].ContainerPort + "/" + translateProtocol(vm.ports[i].Protocol)] = [{ HostIp: vm.ports[i].HostIp, HostPort: vm.ports[i].HostPort }];
+                vm.request.HostConfig.PortBindings[vm.ports[i].ContainerPort + "/" + vm.ports[i].Protocol.toLowerCase()] = [{ HostIp: vm.ports[i].HostIp, HostPort: vm.ports[i].HostPort }];
             }
         }
 

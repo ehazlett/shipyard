@@ -53,10 +53,10 @@
                             <h5 class="ui dividing header">Environment Variables</h5>
                             <div class="fields">
                                 <div class="seven wide field">
-                                    <label>Variable Name</label>
+                                    <label>Name</label>
                                     <input name="variableName" class="input" type="text" ng-model="vm.variableName" placeholder="Variable Name"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="eight wide field">
                                     <label>Value</label>
                                     <input name="variableValue" class="input" type="text" ng-model="vm.variableValue" placeholder="Variable Value"></input>
                                 </div>
@@ -71,7 +71,7 @@
                                 <div class="seven wide field">
                                     <input class="input" type="text" ng-model="v.name"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="eight wide field">
                                     <input class="input" type="text" ng-model="v.value"></input>
                                 </div>
                                 <div class="one wide field">
@@ -86,7 +86,7 @@
                                     <label>Host Path</label>
                                     <input name="hostPath" class="input" type="text" ng-model="vm.hostPath" placeholder="Host Path"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="eight wide field">
                                     <label>Container Path</label>
                                     <input name="containerPath" class="input" type="text" ng-model="vm.containerPath" placeholder="Container Path"></input>
                                 </div>
@@ -101,7 +101,7 @@
                                 <div class="seven wide field">
                                     <input class="input" type="text" ng-model="v.HostPath"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="eight wide field">
                                     <input class="input" type="text" ng-model="v.ContainerPath"></input>
                                 </div>
                                 <div class="one wide field">
@@ -116,7 +116,7 @@
                                     <label>Container</label>
                                     <input name="containerToLink" class="input" type="text" ng-model="vm.containerToLink" placeholder="Container Name"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="eight wide field">
                                     <label>Alias</label>
                                     <input name="containerToLinkAlias" class="input" type="text" ng-model="vm.containerToLinkAlias" placeholder="Link Alias"></input>
                                 </div>
@@ -131,7 +131,7 @@
                                 <div class="seven wide field">
                                     <input class="input" type="text" ng-model="l.ContainerToLink"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="eight wide field">
                                     <input class="input" type="text" ng-model="l.ContainerToLinkAlias"></input>
                                 </div>
                                 <div class="one wide field">
@@ -149,15 +149,19 @@
                                 <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
                             </div>
                             <h5 class="ui dividing header">Restart Policy</h5>
+                            <div class="two fields">
                             <div class="field">
-                                <select class="ui fluid dropdown" default="0" ng-model="vm.restartPolicy">
-                                    <option value=""></option>
-                                    <option value="0" selected="selected">Do not automatically restart</option>
-                                    <option value="1">Restart only on failure</option>
-                                    <option value="2">Always restart</option>
+                                <select class="ui fluid dropdown" default="0" ng-model="vm.request.HostConfig.RestartPolicy.Name">
+                                    <option value="no">Do not automatically restart</option>
+                                    <option value="on-failure">Restart only on failure</option>
+                                    <option value="always">Always restart</option>
                                 </select>
                             </div>
-                            <h5 class="ui dividing header">Automatic Port Configuration</h5>
+                            <div class="field" ng-show="vm.request.HostConfig.RestartPolicy.Name == 'on-failure'">
+                                <input type="number" ng-model="vm.request.HostConfig.RestartPolicy.MaximumRetryCount" placeholder="Maximum restart count">
+                            </div>
+                            </div>
+                            <h5 class="ui dividing header">Port Configuration</h5>
                             <div class="field">
                                 <div class="ui toggle checkbox">
                                     <input type="checkbox" id="exposeAllPorts" ng-model="vm.request.HostConfig.PublishAllPorts">
@@ -168,9 +172,9 @@
                                             <p>If the operator chooses to automatically expose all configured ports for the image, then Docker will make the exposed port accessible on the <b>host</b> and the ports will be <b>available to any client that can reach the host</b>. When using this option, Docker will bind the exposed ports to a random port on the host between 49153 and 65535.</p>
                                         </div>
                                     </label>
+                                    <br/>
                                 </div>
                             </div>
-                            <h5 class="ui dividing header">Manual Port Configuration</h5>
                             <div class="fields">
                                 <div class="three wide field">
                                     <label>Container Port</label>
@@ -178,11 +182,10 @@
                                 </div>
                                 <div class="three wide field">
                                     <label>Protocol</label>
-                                    <select class="ui fluid dropdown" ng-model="vm.protocol">
-                                        <option value=""></option>
-                                        <option value="0" selected="selected">TCP</option>
-                                        <option value="1">UDP</option>
-                                    </select>
+                                    <dropdown class="fluid" ng-model="vm.protocol">
+                                        <dropdown-group>TCP</dropdown-group>
+                                        <dropdown-group>UDP</dropdown-group>
+                                    </dropdown>
                                 </div>
                                 <div class="five wide field">
                                     <label>Host Listen Address</label>
@@ -204,11 +207,10 @@
                                     <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="three wide field">
-                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
-                                        <option value=""></option>
-                                        <option value="0" ng-selected="p.Protocol == 0">TCP</option>
-                                        <option value="1" ng-selected="p.Protocol == 1">UDP</option>
-                                    </select>
+                                    <dropdown class="fluid" ng-model="p.Protocol">
+                                        <dropdown-group>TCP</dropdown-group>
+                                        <dropdown-group>UDP</dropdown-group>
+                                    </dropdown>
                                 </div>
                                 <div class="five wide field">
                                     <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
@@ -257,7 +259,7 @@ $(function(){
 
     $('.help.circle.icon').popup({inline: true});
     $('.ui.dropdown')
-          .dropdown()
-          ;
+        .dropdown()
+        ;
 });
 </script>
