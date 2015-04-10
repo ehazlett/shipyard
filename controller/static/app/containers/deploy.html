@@ -88,9 +88,61 @@
                     </div>
                 </div>
             </div>
-            <label>Ports</label> <a ng-click="addPortDefinition()"><i class="plus sign icon tiny"></i></a>
+            <label>Ports</label> 
             <div class="ui segment ports">
-                <span class="ui label ports default-label">no port bindings specified</span>
+                <div class="four fields">
+                    <div class="field">
+                        <label>Protocol</label>
+                        <div class="ui dropdown selection">
+                                <input ng-model="protocol" type="hidden" name="protocol" class="ui input notEmpty">
+                                <div class="default text">...</div><i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <div class="item" data-value="tcp">TCP</div>
+                                    <div class="item" data-value="udp">UDP</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>IP</label>
+                        <div class="ui left labeled input">
+                            <input ng-model="ip" type="text" placeholder="0.0.0.0"> 
+                        </div> 
+                    </div>
+                    <div class="field">
+                        <label>Port</label> 
+                        <div class="ui left labeled input"> 
+                            <input ng-model="port" type="text" placeholder=""> 
+                        </div> 
+                    </div>
+                    <div class="field">
+                        <label>Container Port</label> 
+                        <div class="ui left labeled input"> 
+                            <input ng-model="containerPort" id="container_port" type="text" placeholder="" name="container_port" class="ui input notEmpty">
+                        </div> 
+                   </div>
+                </div>
+                <div class="ui button blue" ng-click="addPortDefinition()">add</div>
+                <span ng-if="ports.length ==0"class="ui label ports default-label">no port bindings specified</span>
+                <table class="ui table labeled" ng-if="ports.length > 0">
+                    <thead>
+                      <tr>
+                        <th>Protocol</th>
+                        <th>Host IP</th>
+                        <th>Port</th>
+                        <th>Container Port</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody ng-repeat="p in ports">
+                      <tr>
+                        <td>{{p.protocol}}</td>
+                        <td>{{p.host_ip}}</td>
+                        <td>{{p.port}}</td>
+                        <td>{{p.container_port}}</td>
+                        <td><a ng-click="removePortDefinition($index)"><i class="minus sign icon red"></i></a>
+                      </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="field">
                 <checkbox name="publish" ng-model="publish">Publish all Exposed Ports</checkbox>

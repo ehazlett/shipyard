@@ -35,6 +35,7 @@
         $scope.privileged = false;
         $scope.args = null;
         $scope.links = null;
+        $scope.ports = [];
         $scope.volumes = null;
         $scope.pull = true;
         $scope.types = types;
@@ -75,7 +76,6 @@
             });
             $scope.labels = labels;
         });
-        $scope.addPortDefinition = addPortDefinition;
         $scope.showLoader = function() {
             $(".ui.loader").removeClass("disabled");
             $(".ui.active").addClass("dimmer");
@@ -84,6 +84,20 @@
             $(".ui.loader").addClass("disabled");
             $(".ui.active").removeClass("dimmer");
         };
+
+        $scope.addPortDefinition = function addPortDefinition() {
+            $scope.ports.push({
+                proto : $scope.protocol,
+                host_ip : $scope.ip,
+                port : parseInt($scope.port),
+                container_port : parseInt($scope.containerPort)
+            });
+        };
+
+        $scope.removePortDefinition = function(index) {
+                $scope.ports.splice(index, 1);
+        };
+
         $scope.deploy = function() {
             $scope.showLoader();
             var valid = $(".ui.form").form('validate form');
@@ -185,7 +199,7 @@
                 args: args,
                 links: links,
                 volumes: volumes,
-                bind_ports: ports,
+                bind_ports: $scope.ports,
                 labels: selectedLabels,
                 publish: $scope.publish,
                 privileged: $scope.privileged,
