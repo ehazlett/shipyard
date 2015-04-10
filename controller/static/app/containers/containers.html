@@ -101,7 +101,8 @@
         <table class="ui sortable celled table">
             <thead>
                 <tr>
-                    <th class="collapsing">Id</th>
+                    <th class="collapsing">State</th>
+                    <th>Id</th>
                     <th>Node</th>
                     <th>Name</th>
                     <th>Image</th>
@@ -112,7 +113,8 @@
             </thead>
             <tbody>
                 <tr ng-repeat="c in vm.containers | filter:tableFilter">
-                    <td class="collapsing">{{c.Id | limitTo:12 }}</td>
+                    <td class="collapsing"><i class="circle icon" ng-class="{'green': vm.containerStatusText(c) == 'Running', 'red': vm.containerStatusText(c) == 'Stopped'}"></td>
+                    <td>{{c.Id | limitTo:12 }}</td>
                     <td>{{c.Names[0].split('/')[1]}}</td>
                     <td>{{c.Names[0].split('/')[2]}}</td>
                     <td>{{c.Image}}</td>
