@@ -6,7 +6,8 @@
                         'shipyard.layout',
 			'ngResource',
 			'ngSanitize',
-			'ui.router'
+			'ui.router',
+            'angularify.semantic.dropdown'
 		]);
 		
 })();
