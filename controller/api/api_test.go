@@ -320,3 +320,110 @@ func TestApiGetWebhookKeys(t *testing.T) {
 
 	assert.Equal(t, keys[0].Key, key, "expected key %s; received %s", key, keys[0].Key)
 }
+
+func TestApiGetNodes(t *testing.T) {
+	api, err := getTestApi()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(api.nodes))
+	defer ts.Close()
+
+	res, err := http.Get(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
+	nodes := []*shipyard.Node{}
+	if err := json.NewDecoder(res.Body).Decode(&nodes); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.NotEqual(t, len(nodes), 0, "expected nodes; received none")
+
+	node := nodes[0]
+
+	assert.Equal(t, node.ID, mock_test.TestNode.ID, fmt.Sprintf("expected ID %s; got %s", mock_test.TestNode.ID, node.ID))
+}
+
+func TestApiGetNode(t *testing.T) {
+	api, err := getTestApi()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(api.node))
+	defer ts.Close()
+
+	res, err := http.Get(ts.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
+	node := &shipyard.Node{}
+	if err := json.NewDecoder(res.Body).Decode(&node); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.NotEqual(t, node.ID, nil, "expected node; received nil")
+
+	assert.Equal(t, node.ID, mock_test.TestNode.ID, fmt.Sprintf("expected ID %s; got %s", mock_test.TestNode.ID, node.ID))
+}
+
+func TestApiPostNodes(t *testing.T) {
+	api, err := getTestApi()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(api.addNode))
+	defer ts.Close()
+
+	data := []byte(`{"name": "testnode"}`)
+
+	res, err := http.Post(ts.URL, "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, res.StatusCode, 204, "expected response code 204")
+}
+
+func TestApiRemoveNode(t *testing.T) {
+	api, err := getTestApi()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	transport := &http.Transport{}
+	client := &http.Client{Transport: transport}
+
+	ts := httptest.NewServer(http.HandlerFunc(api.addNode))
+	defer ts.Close()
+
+	data := []byte(`{"name": "testnode"}`)
+
+	res, err := http.Post(ts.URL, "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, res.StatusCode, 204, "expected response code 204")
+
+	ts = httptest.NewServer(http.HandlerFunc(api.removeNode))
+
+	req, err := http.NewRequest("DELETE", ts.URL+"/testnode", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r, err := client.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, r.StatusCode, 204, "expected response code 204")
+
+}

@@ -7,12 +7,14 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	registry "github.com/shipyard/shipyard/registry/v1"
 )
 
 var (
 	TestContainerId    = "1234567890abcdefg"
 	TestContainerName  = "test-container"
 	TestContainerImage = "test-image"
+	TestRepository     = &registry.Repository{}
 	TestContainerInfo  = &dockerclient.ContainerInfo{
 		Id:      TestContainerId,
 		Created: string(time.Now().UnixNano()),
@@ -22,6 +24,11 @@ var (
 	TestRole = &auth.Role{
 		ID:   "0",
 		Name: "testrole",
+	}
+	TestNode = &shipyard.Node{
+		ID:   "0",
+		Name: "testnode",
+		Addr: "tcp://127.0.0.1:3375",
 	}
 	TestAccount = &auth.Account{
 		ID:       "0",
