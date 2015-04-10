@@ -151,14 +151,13 @@
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="two fields">
                             <div class="field">
-                                <select class="ui fluid dropdown" default="0" ng-model="vm.restartPolicy">
-                                    <option value=""></option>
-                                    <option value="1" selected="selected">Do not automatically restart</option>
-                                    <option value="2">Restart only on failure</option>
-                                    <option value="3">Always restart</option>
+                                <select class="ui fluid dropdown" default="0" ng-model="vm.request.HostConfig.RestartPolicy.Name">
+                                    <option value="no">Do not automatically restart</option>
+                                    <option value="on-failure">Restart only on failure</option>
+                                    <option value="always">Always restart</option>
                                 </select>
                             </div>
-                            <div class="field" ng-show="vm.restartPolicy == 2">
+                            <div class="field" ng-show="vm.request.HostConfig.RestartPolicy.Name == 'on-failure'">
                                 <input type="number" ng-model="vm.request.HostConfig.RestartPolicy.MaximumRetryCount" placeholder="Maximum restart count">
                             </div>
                             </div>
@@ -185,8 +184,8 @@
                                     <label>Protocol</label>
                                     <select class="ui fluid dropdown" ng-model="vm.protocol">
                                         <option value="">TCP/UDP</option>
-                                        <option value="1">TCP</option>
-                                        <option value="2">UDP</option>
+                                        <option value="tcp">TCP</option>
+                                        <option value="udp">UDP</option>
                                     </select>
                                 </div>
                                 <div class="five wide field">
@@ -209,16 +208,16 @@
                                     <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="three wide field">
+                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
+                                        <option value="">TCP/UDP</option>
+                                        <option value="tcp">TCP</option>
+                                        <option value="udp">UDP</option>
+                                    </select>
                                     <script>
 $('.ui.dropdown')
 .dropdown()
     ;
                                     </script>
-                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
-                                        <option value="">TCP/UDP</option>
-                                        <option value="1">TCP</option>
-                                        <option value="2">UDP</option>
-                                    </select>
                                 </div>
                                 <div class="five wide field">
                                     <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
