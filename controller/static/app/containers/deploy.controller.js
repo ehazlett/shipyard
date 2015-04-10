@@ -83,9 +83,10 @@
         function pushPort() {
             var port = {'Protocol': vm.protocol, 'ContainerPort': vm.containerPort, 'HostIp': vm.hostIp, 'HostPort': vm.hostPort};
             vm.ports.push(port);
+            console.log(vm);
             vm.hostPort = "";
             vm.hostIp = "";
-            vm.protocol = 0;
+            vm.protocol = "";
             vm.containerPort = "";
         }
 
