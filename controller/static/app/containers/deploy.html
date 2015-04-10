@@ -182,7 +182,7 @@
                                 </div>
                                 <div class="three wide field">
                                     <label>Protocol</label>
-                                    <select class="ui fluid dropdown" ng-model="vm.protocol">
+                                    <select ng-model="vm.protocol">
                                         <option value="tcp">TCP</option>
                                         <option value="udp">UDP</option>
                                     </select>
@@ -207,15 +207,10 @@
                                     <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="three wide field">
-                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
+                                    <select ng-model="p.Protocol">
                                         <option value="tcp">TCP</option>
                                         <option value="udp">UDP</option>
                                     </select>
-                                    <script>
-$('.ui.dropdown')
-.dropdown()
-    ;
-                                    </script>
                                 </div>
                                 <div class="five wide field">
                                     <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
