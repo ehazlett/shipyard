@@ -179,9 +179,9 @@
                                 <div class="three wide field">
                                     <label>Protocol</label>
                                     <select class="ui fluid dropdown" ng-model="vm.protocol">
-                                        <option value=""></option>
-                                        <option value="0" selected="selected">TCP</option>
-                                        <option value="1">UDP</option>
+                                        <option value="">TCP/UDP</option>
+                                        <option value="1">TCP</option>
+                                        <option value="2">UDP</option>
                                     </select>
                                 </div>
                                 <div class="five wide field">
@@ -204,11 +204,16 @@
                                     <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="three wide field">
-                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
-                                        <option value=""></option>
-                                        <option value="0" ng-selected="p.Protocol == 0">TCP</option>
-                                        <option value="1" ng-selected="p.Protocol == 1">UDP</option>
+                                    <select ng-model="p.Protocol">
+                                        <option value="">TCP/UDP</option>
+                                        <option value="1">TCP</option>
+                                        <option value="2">UDP</option>
                                     </select>
+                                    <script>
+$('.ui.dropdown')
+.dropdown()
+    ;
+                                    </script>
                                 </div>
                                 <div class="five wide field">
                                     <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
@@ -257,7 +262,7 @@ $(function(){
 
     $('.help.circle.icon').popup({inline: true});
     $('.ui.dropdown')
-          .dropdown()
-          ;
+        .dropdown()
+        ;
 });
 </script>
