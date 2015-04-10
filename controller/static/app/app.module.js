@@ -16,7 +16,8 @@
         'angular-flash.service',
         'angular-flash.flash-alert-directive',
         'angles',
-        'ansiToHtml'
+        'ansiToHtml',
+        'angular-jwt'
     ]);
 
     Chart.defaults.global.responsive = true;

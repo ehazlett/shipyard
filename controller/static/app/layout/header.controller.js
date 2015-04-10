@@ -11,6 +11,5 @@
         $scope.template = 'app/layout/header.html';
         $scope.username = authtoken.getUsername();
         $scope.isLoggedIn = authtoken.isLoggedIn();
-        $http.defaults.headers.common['X-Access-Token'] = authtoken.get();
     }
 })()
