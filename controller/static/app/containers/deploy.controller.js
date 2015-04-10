@@ -84,7 +84,6 @@
         function pushPort() {
             var port = {'Protocol': vm.protocol, 'ContainerPort': vm.containerPort, 'HostIp': vm.hostIp, 'HostPort': vm.hostPort};
             vm.ports.push(port);
-            console.log(vm);
             vm.hostPort = "";
             vm.hostIp = "";
             vm.protocol = "";
@@ -147,36 +146,14 @@
         function transformRestartPolicy() {
             vm.request.HostConfig.RestartPolicy.Name = translateRestartPolicy(vm.restartPolicy);
         }
-
-        function translateProtocol(protocol) {
-                if(protocol == 1) {
-                    return "tcp";
-                } else if(protocol == 2) {
-                    return "udp";
-                } else {
-                    return null;
-                }
-        }
-
-        function translateRestartPolicy(policyId) {
-            if(policyId == 1) {
-                return "no";
-            } else if(policyId == 2) {
-                return "on-failure";
-            } else if(policyId == 3) {
-                return "always";
-            } else {
-                return null
-            }
-        }
             
         function transformPorts() {
             var i;
             if(vm.containerPort.length > 0) {
-                vm.request.HostConfig.PortBindings[vm.containerPort + "/" + translateProtocol(vm.protocol)] = [{ HostIp: vm.hostIp, HostPort: vm.hostPort }];
+                vm.request.HostConfig.PortBindings[vm.containerPort + "/" + vm.protocol] = [{ HostIp: vm.hostIp, HostPort: vm.hostPort }];
             }
             for(i = 0; i < vm.ports.length; i++) {
-                vm.request.HostConfig.PortBindings[vm.ports[i].ContainerPort + "/" + translateProtocol(vm.ports[i].Protocol)] = [{ HostIp: vm.ports[i].HostIp, HostPort: vm.ports[i].HostPort }];
+                vm.request.HostConfig.PortBindings[vm.ports[i].ContainerPort + "/" + vm.ports[i].Protocol] = [{ HostIp: vm.ports[i].HostIp, HostPort: vm.ports[i].HostPort }];
             }
         }
 
@@ -188,7 +165,6 @@
             transformEnvVars();
             transformCommand();   
             transformPorts();
-            transformRestartPolicy();
 
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
