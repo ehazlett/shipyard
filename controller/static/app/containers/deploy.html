@@ -20,49 +20,36 @@
                 <p>{{vm.error}}</p>
             </div>
             <div class="ui form" ng-submit="vm.deploy()">
-
-                <h4 class="ui dividing header">Container Information</h4>
-                <div class="three fields">
-
-                    <div class="field">
-                        <label>Image Name 
-                            <i class="blue help circle icon"></i>
-                            <div class="ui popup" style="max-width: 450px;">
-                                <h5>Image Name</h5>
-                                <p>The full namespaced name of the image that you wish to use to deploy your container.</p> 
-                                <p>Docker image names follow the convention: <i>registry.myorganization.org:5000/namespace/image-name</i></p> 
-                                <p>Where:</p>
-                                <ul>
-                                    <li><i>registry.myorganization.org:5000</i> is the location of the <b>registry</b> that contains the image you wish to deploy</li>
-                                    <li><i>namespace</i> is an optional <b>namespace</b> to help organize and avoid image name collisions</li>
-                                    <li><i>image-name</i> is the <b>image name</b> that identifies the image that you wish to deploy</li>
-                                </ul>
-                                <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the Official Docker Hub.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the Docker Library</p>
-                            </div>
-                        </label>
-                        <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image Name"></input> 
-                    </div>
-
-                    <div class="field">
-                        <label>Command</label>
-                        <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Command"></input>
-                    </div>
-
-                    <div class="field">
-                        <label>Container Name 
-                            <i class="blue help circle icon"></i>
-                            <div class="ui popup" style="max-width: 450px;">
-                                <h5>Container Name</h5>
-                                <p>A simple name that can be used to identify the container, please note that two containers with the same name are not able to run on the same swarm node.</p>
-                                <p>If a container name is not specified, then Docker will automatically generate a name, e.g. <i>furious_brown</i></p>
-                            </div>
-                        </label>
-                        <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
-                    </div>
-                </div>
+                <h3 class="ui header">Container Deployment</h3>
                 <div class="ui two column grid">
                     <div class="column">
                         <div class="ui horizontal segment">
+                            <h5 class="ui dividing header">Image Configuration</h5>
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>Image Name 
+                                        <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="max-width: 450px;">
+                                            <h5>Image Name</h5>
+                                            <p>The full namespaced name of the image that you wish to use to deploy your container.</p> 
+                                            <p>Docker image names follow the convention: <i>registry.myorganization.org:5000/namespace/image-name</i></p> 
+                                            <p>Where:</p>
+                                            <ul>
+                                                <li><i>registry.myorganization.org:5000</i> is the location of the <b>registry</b> that contains the image you wish to deploy</li>
+                                                <li><i>namespace</i> is an optional <b>namespace</b> to help organize and avoid image name collisions</li>
+                                                <li><i>image-name</i> is the <b>image name</b> that identifies the image that you wish to deploy</li>
+                                            </ul>
+                                            <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the Official Docker Hub.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the Docker Library</p>
+                                        </div>
+                                    </label>
+                                    <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image Name"></input> 
+                                </div>
+
+                                <div class="field">
+                                    <label>Command</label>
+                                    <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Command"></input>
+                                </div>
+                            </div>
                             <h5 class="ui dividing header">Environment Variables</h5>
                             <div class="fields">
                                 <div class="seven wide field">
@@ -157,10 +144,15 @@
                     </div>
                     <div class="column">
                         <div class="ui horizontal segment">
+                            <h5 class="ui dividing header">Container Name</h5>
+                            <div class="field">
+                                <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
+                            </div>
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="field">
-                                <select class="ui fluid dropdown" ng-model="vm.restartPolicy">
-                                    <option value="">Do not automatically restart</option>
+                                <select class="ui fluid dropdown" default="0" ng-model="vm.restartPolicy">
+                                    <option value=""></option>
+                                    <option value="0" selected="selected">Do not automatically restart</option>
                                     <option value="1">Restart only on failure</option>
                                     <option value="2">Always restart</option>
                                 </select>
@@ -168,8 +160,8 @@
                             <h5 class="ui dividing header">Automatic Port Configuration</h5>
                             <div class="field">
                                 <div class="ui toggle checkbox">
-                                    <input type="checkbox" name="exposeAllPorts">
-                                    <label>Automatically expose all ports
+                                    <input type="checkbox" id="exposeAllPorts" ng-model="vm.request.HostConfig.PublishAllPorts">
+                                    <label for="exposeAllPorts">Automatically expose all ports
                                         <i class="blue help circle icon"></i>
                                         <div class="ui popup" style="width: 400px;">
                                             <h5>Expose all ports</h5>
@@ -181,10 +173,15 @@
                             <h5 class="ui dividing header">Manual Port Configuration</h5>
                             <div class="fields">
                                 <div class="three wide field">
+                                    <label>Container Port</label>
+                                    <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
+                                </div>
+                                <div class="three wide field">
                                     <label>Protocol</label>
-                                    <select class="ui fluid dropdown">
-                                        <option value="1">TCP</option>
-                                        <option value="0">UDP</option>
+                                    <select class="ui fluid dropdown" ng-model="vm.protocol">
+                                        <option value=""></option>
+                                        <option value="0" selected="selected">TCP</option>
+                                        <option value="1">UDP</option>
                                     </select>
                                 </div>
                                 <div class="five wide field">
@@ -195,10 +192,6 @@
                                     <label>Host Port</label>
                                     <input name="hostPort" class="input" type="text" ng-model="vm.hostPort" placeholder="Host Port"></input>
                                 </div>
-                                <div class="three wide field">
-                                    <label>Container Port</label>
-                                    <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
-                                </div>
                                 <div class="one wide field">
                                     <label>&nbsp;</label>
                                     <div class="ui green icon button" ng-click="vm.pushPort()">
@@ -208,19 +201,20 @@
                             </div>
                             <div class="fields" ng-repeat="p in vm.ports">
                                 <div class="three wide field">
-                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
-                                        <option value="1">TCP</option>
-                                        <option value="0">UDP</option>
-                                    </select>
+                                    <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="three wide field">
+                                    <select class="ui fluid dropdown" ng-model="p.Protocol">
+                                        <option value=""></option>
+                                        <option value="0" ng-selected="p.Protocol == 0">TCP</option>
+                                        <option value="1" ng-selected="p.Protocol == 1">UDP</option>
+                                    </select>
+                                </div>
+                                <div class="five wide field">
                                     <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
                                 </div>
                                 <div class="three wide field">
                                     <input name="hostPort" class="input" type="text" ng-model="p.HostPort" placeholder="Host Port"></input>
-                                </div>
-                                <div class="three wide field">
-                                    <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
                                 </div>
                                 <div class="one wide field">
                                     <div class="ui red icon button">
@@ -230,18 +224,17 @@
                             </div>
                             <h5 class="ui dividing header">Advanced</h5>
                             <div class="field">
-                                <div class="ui toggle checkbox">
-                                    <input type="checkbox" name="privileged">
-                                    <label>Allow container to run in privileged mode
+                                <div class="ui toggle checkbox" ng-model="vm.request.HostConfig.Privileged">
+                                    <input type="checkbox" id="privileged" ng-model="vm.request.HostConfig.Privileged">
+                                    <label for="privileged">Allow container to run in privileged mode
                                     </label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="ui divider"></div>
-                <div class="ui blue submit button">
-                    Deploy 
+                    <div class="ui blue submit button" style="margin: 0 0 20px 30px;">
+                        Deploy 
+                    </div>
                 </div>
             </div>
         </div>
@@ -263,7 +256,8 @@ $(function(){
         });
 
     $('.help.circle.icon').popup({inline: true});
-    $('select.dropdown').dropdown();
-    $('.ui.checkbox').checkbox();
+    $('.ui.dropdown')
+          .dropdown()
+          ;
 });
 </script>
