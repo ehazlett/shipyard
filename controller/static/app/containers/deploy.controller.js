@@ -21,7 +21,7 @@
         vm.ports = []; 
         vm.hostPort = "";
         vm.containerPort = "";
-        vm.protocol = "";
+        vm.protocol = "tcp";
         
         vm.envVars = [];
         vm.variableName = "";
@@ -86,7 +86,7 @@
             vm.ports.push(port);
             vm.hostPort = "";
             vm.hostIp = "";
-            vm.protocol = "";
+            vm.protocol = "tcp";
             vm.containerPort = "";
         }
 
