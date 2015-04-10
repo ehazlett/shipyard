@@ -32,6 +32,7 @@
         vm.error = "";
         vm.request = {
             HostConfig: {
+                RestartPolicy: { Name: 'no' },
                 Links: [],
                 Binds: [],
                 Privileged: false,
@@ -143,14 +144,30 @@
             }
         }
 
+        function transformRestartPolicy() {
+            vm.request.HostConfig.RestartPolicy.Name = translateRestartPolicy(vm.restartPolicy);
+        }
+
         function translateProtocol(protocol) {
-                if(vm.protocol == 0) {
+                if(protocol == 1) {
                     return "tcp";
-                } else if(vm.protocol == 1) {
+                } else if(protocol == 2) {
                     return "udp";
                 } else {
                     return null;
                 }
+        }
+
+        function translateRestartPolicy(policyId) {
+            if(policyId == 1) {
+                return "no";
+            } else if(policyId == 2) {
+                return "on-failure";
+            } else if(policyId == 3) {
+                return "always";
+            } else {
+                return null
+            }
         }
             
         function transformPorts() {
@@ -171,6 +188,7 @@
             transformEnvVars();
             transformCommand();   
             transformPorts();
+            transformRestartPolicy();
 
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
