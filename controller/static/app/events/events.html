@@ -30,18 +30,20 @@
             <thead>
                 <tr>
                     <th>Time</th>
+                    <th>Type</th>
+                    <th>Message</th>
                     <th>Container</th>
                     <th>Engine</th>
-                    <th>Type</th>
                     <th>Tags</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="e in vm.events | filter:tableFilter">
                     <td>{{e.time}}</td>
+                    <td>{{e.type}}</td>
+                    <td>{{e.message}}</td>
                     <td>{{e.container.id | limitTo:8}}</td>
                     <td>{{e.engine.id}}</td>
-                    <td>{{e.type}}</td>
                     <td>{{e.tags.join(', ')}}</td>
                 </tr>
             </tbody>
