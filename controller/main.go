@@ -90,11 +90,6 @@ func main() {
 					Usage: "whitelist CIDR to bypass auth",
 					Value: &cli.StringSlice{},
 				},
-				cli.StringFlag{
-					Name:  "registry-url, r",
-					Usage: "docker private registry url",
-					Value: "",
-				},
 			},
 		},
 	}

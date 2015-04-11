@@ -5,19 +5,20 @@
 		.module('shipyard.registry')
 		.controller('RegistryController', RegistryController);
 
-	RegistryController.$inject = ['resolvedRepositories', 'RegistryService', '$state', '$timeout'];
-	function RegistryController(resolvedRepositories, RegistryService, $state, $timeout) {
+	RegistryController.$inject = ['resolvedRepositories', 'RegistryService', '$state', '$stateParams', '$timeout'];
+	function RegistryController(resolvedRepositories, RegistryService, $state, $stateParams, $timeout) {
             var vm = this;
-            vm.registry = resolvedRepositories;
+            vm.registryName = $stateParams.name;
+            vm.repositories = resolvedRepositories;
             vm.refresh = refresh;
-            vm.selectedRepository = "";
+            vm.selectedRepository = null;
             vm.showRemoveRepositoryDialog = showRemoveRepositoryDialog;
             vm.removeRepository = removeRepository;
 
             function refresh() {
-                RegistryService.list()
+                RegistryService.listRepositories(vm.registryName)
                     .then(function(data) {
-                        vm.registry = data; 
+                        vm.repositories = data; 
                     }, function(data) {
                         vm.error = data;
                     });
@@ -30,14 +31,12 @@
             };
 
             function removeRepository() {
-                RegistryService.removeRepository(vm.selectedRepository)
+                RegistryService.removeRepository(vm.registryName, vm.selectedRepository)
                     .then(function(data) {
                         vm.refresh();
                     }, function(data) {
                         vm.error = data;
                     });
             }
-
-
 	}
 })();

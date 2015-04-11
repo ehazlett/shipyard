@@ -1,0 +1,46 @@
+<div class="row">
+    <div class="column">
+        <div class="ui segment">
+            <div class="ui form" ng-submit="vm.addRegistry()" ng-method="post">
+                <h4 class="ui dividing header">Registry Details</h4>
+                <label>Name</label>
+                <div class="field">
+                    <input type="text" name="name" ng-model="vm.name" placeholder="Name of registry (i.e. local)">
+                </div>
+                <label>Registry Address</label>
+                <div class="field">
+                    <input type="text" name="addr" ng-model="vm.addr" placeholder="Registry Addr (i.e. http://10.1.2.3:5000)">
+                </div>
+                <div class="ui hidden divider"></div>
+                <div class="ui green submit button">Add Registry</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(function(){
+    $('.ui.form')
+        .form({
+            name: {
+                identifier : 'name',
+                rules: [
+                    {
+                        type   : 'empty',
+                        prompt : 'Please enter a name'
+                    }
+                ]
+            },
+            addr: {
+                identifier : 'addr',
+                rules: [
+                    {
+                        type   : 'empty',
+                        prompt : 'Please enter an address'
+                    }
+                ]
+            }
+        });
+
+    $('.ui.checkbox').checkbox();
+});
+</script>

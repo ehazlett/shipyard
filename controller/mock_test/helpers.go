@@ -14,8 +14,13 @@ var (
 	TestContainerId    = "1234567890abcdefg"
 	TestContainerName  = "test-container"
 	TestContainerImage = "test-image"
-	TestRepository     = &registry.Repository{}
-	TestContainerInfo  = &dockerclient.ContainerInfo{
+	TestRegistry       = &shipyard.Registry{
+		ID:   "0",
+		Name: "test-registry",
+		Addr: "http://localhost:5000",
+	}
+	TestRepository    = &registry.Repository{}
+	TestContainerInfo = &dockerclient.ContainerInfo{
 		Id:      TestContainerId,
 		Created: string(time.Now().UnixNano()),
 		Name:    TestContainerName,
