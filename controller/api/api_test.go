@@ -345,7 +345,7 @@ func TestApiGetNodes(t *testing.T) {
 
 	node := nodes[0]
 
-	assert.Equal(t, node.ID, mock_test.TestNode.ID, fmt.Sprintf("expected ID %s; got %s", mock_test.TestNode.ID, node.ID))
+	assert.Equal(t, node.Name, mock_test.TestNode.Name, fmt.Sprintf("expected name %s; got %s", mock_test.TestNode.Name, node.Name))
 }
 
 func TestApiGetNode(t *testing.T) {
@@ -370,60 +370,5 @@ func TestApiGetNode(t *testing.T) {
 
 	assert.NotEqual(t, node.ID, nil, "expected node; received nil")
 
-	assert.Equal(t, node.ID, mock_test.TestNode.ID, fmt.Sprintf("expected ID %s; got %s", mock_test.TestNode.ID, node.ID))
-}
-
-func TestApiPostNodes(t *testing.T) {
-	api, err := getTestApi()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ts := httptest.NewServer(http.HandlerFunc(api.addNode))
-	defer ts.Close()
-
-	data := []byte(`{"name": "testnode"}`)
-
-	res, err := http.Post(ts.URL, "application/json", bytes.NewBuffer(data))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, res.StatusCode, 204, "expected response code 204")
-}
-
-func TestApiRemoveNode(t *testing.T) {
-	api, err := getTestApi()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	transport := &http.Transport{}
-	client := &http.Client{Transport: transport}
-
-	ts := httptest.NewServer(http.HandlerFunc(api.addNode))
-	defer ts.Close()
-
-	data := []byte(`{"name": "testnode"}`)
-
-	res, err := http.Post(ts.URL, "application/json", bytes.NewBuffer(data))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, res.StatusCode, 204, "expected response code 204")
-
-	ts = httptest.NewServer(http.HandlerFunc(api.removeNode))
-
-	req, err := http.NewRequest("DELETE", ts.URL+"/testnode", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	r, err := client.Do(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.Equal(t, r.StatusCode, 204, "expected response code 204")
-
+	assert.Equal(t, node.Name, mock_test.TestNode.Name, fmt.Sprintf("expected name %s; got %s", mock_test.TestNode.Name, node.Name))
 }

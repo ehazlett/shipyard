@@ -101,7 +101,7 @@
         <table class="ui sortable celled table">
             <thead>
                 <tr>
-                    <th class="collapsing containerStatusText"><i class="doctor icon"/></th>
+                    <th class="collapsing containerStatusText"><i class="heartbeat icon"></i></th>
                     <th class="collapsing">Id</th>
                     <th>Node</th>
                     <th>Name</th>
@@ -113,7 +113,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="c in vm.containers | filter:tableFilter">
-                    <td class="collapsing containerStatusText"><i class="circle icon" ng-class="{'green': vm.containerStatusText(c) == 'Running', 'red': vm.containerStatusText(c) == 'Stopped'}"></td>
+                    <td class="collapsing containerStatusText"><i class="circle icon" ng-class="{'green': vm.containerStatusText(c) == 'Running', 'red': vm.containerStatusText(c) == 'Stopped'}"></i></td>
                     <td>{{c.Id | limitTo:12 }}</td>
                     <td>{{c.Names[0].split('/')[1]}}</td>
                     <td>{{c.Names[0].split('/')[2]}}</td>
@@ -147,4 +147,5 @@ $('.ui.right.pointing.dropdown').dropdown();
 
 <script>
 $('.ui.sortable.celled.table').tablesort();
+$('.ui.dropdown').dropdown();
 </script>

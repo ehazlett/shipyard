@@ -58,7 +58,7 @@ func main() {
 				},
 				cli.StringFlag{
 					Name:   "docker, d",
-					Value:  "unix:///var/run/docker.sock",
+					Value:  "tcp://127.0.0.1:2375",
 					Usage:  "docker swarm addr",
 					EnvVar: "DOCKER_HOST",
 				},

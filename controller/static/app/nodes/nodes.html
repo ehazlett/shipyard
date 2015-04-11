@@ -1,29 +1,7 @@
-<div class="ui small remove modal transition" style="margin-top: -98px;">
-<i class="close icon"></i>
-<div class="header">
-    Remove Node: {{ vm.selectedNode.name }}
-</div>
-<div class="content">
-    <p>Are you sure you want to remove this node?</p>
-</div>
-<div class="actions">
-    <div class="ui negative button">
-        No
-    </div>
-    <div ng-click="vm.removeNode()" class="ui positive right labeled icon button">
-        Yes
-        <i class="checkmark icon"></i>
-    </div>
-</div>
-</div>
-
 <div class="two column row">
     <div class="left floated column">
         <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
             <i class="refresh icon"></i> Refresh
-        </div>
-        <div ui-sref="dashboard.addnode" class="ui small green labeled icon button">
-            <i class="add icon"></i> Add Node
         </div>
     </div>
     <div class="right aligned right floated column">
@@ -53,27 +31,16 @@
         <table class="ui sortable celled table" ng-show="vm.nodes">
             <thead>
                 <tr>
-                    <th></th>
                     <th>Name</th>
                     <th>Address</th>
-                    <th>TLS</th>
-                    <th></th>
+                    <th>Response Time</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="n in vm.nodes | filter:tableFilter">
-                    <td class="collapsing"><i class="icon circle" ng-class="{green: n.health.up}"></i></td>
                     <td>{{n.name}}</td>
                     <td>{{n.addr}}</td>
-                    <td class="collapsing"><i class="ui icon large" ng-class="{'lock': n.tls_ca_cert}"></i></td>
-                    <td class="collapsing">
-                        <div ui-sref="dashboard.inspectNode(n)" class="compact ui icon button">
-                            <i class="search icon"></i>
-                        </div>
-                        <div ng-click="vm.showRemoveNodeDialog(n)" class="compact ui icon button red">
-                            <i class="trash icon"></i>
-                        </div>
-                    </td>
+                    <td class="collapsing">{{n.response_time}} ms</td>
                 </tr>
             </tbody>
         </table>
