@@ -10,6 +10,22 @@
             var vm = this;
             vm.events = events;
             vm.refresh = refresh;
+            vm.showClearEventsDialog = showClearEventsDialog;
+            vm.clearEvents = clearEvents;
+
+            function showClearEventsDialog() {
+                $('.ui.small.clear.modal').modal('show');
+            };
+
+            function clearEvents() {
+                EventsService.remove().$promise
+                    .then(function(data) {
+                        refresh();
+                    }, function(data) {
+                        vm.error = data;
+                    });
+                vm.error = "";
+            }
 
             function refresh() {
                 EventsService.query().$promise

@@ -459,6 +459,15 @@ func (m DefaultManager) Authenticate(username, password string) bool {
 		log.Error(err)
 		return false
 	}
+	evt := &shipyard.Event{
+		Type:    "login",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("username=%s", acct.Username),
+		Tags:    []string{"login", "security"},
+	}
+	// do not return a fail if error happens upon saving even; still want login
+	_ = m.SaveEvent(evt)
+
 	return m.authenticator.Authenticate(password, acct.Password)
 }
 
