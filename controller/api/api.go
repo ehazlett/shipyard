@@ -110,6 +110,23 @@ func (a *Api) registries(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) addRegistry(w http.ResponseWriter, r *http.Request) {
+	var registry *shipyard.Registry
+	if err := json.NewDecoder(r.Body).Decode(&registry); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := a.manager.AddRegistry(registry); err != nil {
+		log.Errorf("error saving registry: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Infof("added registry: name=%s", registry.Name)
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (a *Api) registry(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -129,11 +146,15 @@ func (a *Api) registry(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) removeRegistry(w http.ResponseWriter, r *http.Request) {
-	var registry *shipyard.Registry
-	if err := json.NewDecoder(r.Body).Decode(&registry); err != nil {
+	vars := mux.Vars(r)
+	name := vars["name"]
+
+	registry, err := a.manager.Registry(name)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	if err := a.manager.RemoveRegistry(registry); err != nil {
 		log.Errorf("error deleting registry: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -587,11 +608,12 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/registry", a.registries).Methods("GET")
-	apiRouter.HandleFunc("/api/registry/{name:.*}", a.registry).Methods("GET")
-	apiRouter.HandleFunc("/api/registry/{name:.*}", a.removeRegistry).Methods("DELETE")
-	apiRouter.HandleFunc("/api/registry/{name:.*}/repositories", a.repositories).Methods("GET")
-	apiRouter.HandleFunc("/api/registry/{name:.*}/repositories/{repo:.*}", a.repository).Methods("GET")
-	apiRouter.HandleFunc("/api/registry/{name:.*}/repositories/{repo:.*}", a.deleteRepository).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registry", a.addRegistry).Methods("POST")
+	apiRouter.HandleFunc("/api/registry/{name}", a.registry).Methods("GET")
+	apiRouter.HandleFunc("/api/registry/{name}", a.removeRegistry).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registry/{name}/repositories", a.repositories).Methods("GET")
+	apiRouter.HandleFunc("/api/registry/{name}/repositories/{repo:.*}", a.repository).Methods("GET")
+	apiRouter.HandleFunc("/api/registry/{name}/repositories/{repo:.*}", a.deleteRepository).Methods("DELETE")
 	apiRouter.HandleFunc("/api/servicekeys", a.serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", a.addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", a.removeServiceKey).Methods("DELETE")

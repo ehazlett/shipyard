@@ -91,6 +91,7 @@ type (
 		SaveWebhookKey(key *dockerhub.WebhookKey) error
 		DeleteWebhookKey(id string) error
 		DockerClient() *dockerclient.DockerClient
+
 		Nodes() ([]*shipyard.Node, error)
 		Node(name string) (*shipyard.Node, error)
 
@@ -710,7 +711,7 @@ func (m DefaultManager) RemoveRegistry(registry *shipyard.Registry) error {
 		return ErrRoleDoesNotExist
 	}
 	evt := &shipyard.Event{
-		Type:    "delete-role",
+		Type:    "delete-registry",
 		Time:    time.Now(),
 		Message: fmt.Sprintf("name=%s addr=%s", registry.Name, registry.Addr),
 		Tags:    []string{"registry", "security"},
