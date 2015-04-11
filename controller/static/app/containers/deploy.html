@@ -42,7 +42,12 @@
                                             <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the Official Docker Hub.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the Docker Library</p>
                                         </div>
                                     </label>
-                                    <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image Name"></input> 
+                                    <div class="ui corner labeled input">
+                                        <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image Name"></input> 
+                                        <div class="ui corner label">
+                                            <i class="asterisk icon"></i>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="field">
