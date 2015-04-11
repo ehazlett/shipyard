@@ -133,6 +133,12 @@
                                 </div>
                             </div>
                         </div>
+                        <h4 class="ui dividing header">Container Linking</h4>
+                        <div class="ui divided list" ng-show="vm.container.HostConfig.Links"> 
+                            <div class="item" ng-repeat="v in vm.container.HostConfig.Links">
+                                {{v}}
+                            </div>
+                        </div>
                     </div>
                     <div class="column">
                         <h4 class="ui dividing header">Swarm Node</h4>
