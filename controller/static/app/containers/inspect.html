@@ -139,6 +139,12 @@
                                 {{v}}
                             </div>
                         </div>
+                        <h4 class="ui dividing header">Container Volumes</h4>
+                        <div class="ui divided list" ng-show="vm.container.Volumes"> 
+                            <div class="item" ng-repeat="(k, values) in vm.container.Volumes">
+                                <div class="ui blue horizontal label">Mounted</div> {{k}}
+                            </div>
+                        </div>
                     </div>
                     <div class="column">
                         <h4 class="ui dividing header">Swarm Node</h4>
