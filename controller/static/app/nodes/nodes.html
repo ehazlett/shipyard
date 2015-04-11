@@ -1,0 +1,52 @@
+<div class="two column row">
+    <div class="left floated column">
+        <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+            <i class="refresh icon"></i> Refresh
+        </div>
+    </div>
+    <div class="right aligned right floated column">
+        <div class="ui small icon input">
+            <input ng-model="tableFilter" placeholder="Search nodes..."/>
+            <i class="search icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.nodes.length === 0">
+<div class="column">
+    <div class="ui icon message">
+        <i class="info icon"></i>
+        <div class="content">
+            <div class="header">
+                Nodes
+            </div>
+            <p>There are no cluster nodes.</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row" ng-show="vm.nodes.length>0">
+    <div class="column">
+        <table class="ui sortable celled table" ng-show="vm.nodes">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Response Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="n in vm.nodes | filter:tableFilter">
+                    <td>{{n.name}}</td>
+                    <td>{{n.addr}}</td>
+                    <td class="collapsing">{{n.response_time}} ms</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+$('.ui.sortable.celled.table').tablesort();
+</script>

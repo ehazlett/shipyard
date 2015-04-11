@@ -42,6 +42,7 @@
             <h2 class="ui header">Layers</h2>
             <div class="ui segment" ng-repeat="l in vm.selectedRepository.layers">
                 <div class="ui right floated header">
+                    <div class="ui green label" ng-show="l.size">{{l.size / 1048576 | number:2}} MB</div>
                     <div class="ui orange label" ng-show="l.os">{{l.os}}</div>
                     <div class="ui blue label" ng-show="l.architecture">{{l.architecture}}</div>
                     <div class="ui label">{{l.created}}</div>

@@ -6,6 +6,7 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	registry "github.com/shipyard/shipyard/registry/v1"
 )
 
 type MockManager struct{}
@@ -139,4 +140,36 @@ func (m MockManager) Store() *sessions.CookieStore {
 
 func (m MockManager) StoreKey() string {
 	return ""
+}
+
+func (m MockManager) Nodes() ([]*shipyard.Node, error) {
+	return []*shipyard.Node{
+		TestNode,
+	}, nil
+}
+
+func (m MockManager) Repositories() ([]*registry.Repository, error) {
+	return []*registry.Repository{
+		TestRepository,
+	}, nil
+}
+
+func (m MockManager) Repository(name string) (*registry.Repository, error) {
+	return TestRepository, nil
+}
+
+func (m MockManager) DeleteRepository(name string) error {
+	return nil
+}
+
+func (m MockManager) Node(name string) (*shipyard.Node, error) {
+	return TestNode, nil
+}
+
+func (m MockManager) AddNode(node *shipyard.Node) error {
+	return nil
+}
+
+func (m MockManager) RemoveNode(node *shipyard.Node) error {
+	return nil
 }

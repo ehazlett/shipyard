@@ -32,14 +32,15 @@ const (
 	tblNameWebhookKeys = "webhook_keys"
 	storeKey           = "shipyard"
 	trackerHost        = "http://tracker.shipyard-project.com"
-	EngineHealthUp     = "up"
-	EngineHealthDown   = "down"
+	NodeHealthUp       = "up"
+	NodeHealthDown     = "down"
 )
 
 var (
 	ErrAccountExists          = errors.New("account already exists")
 	ErrAccountDoesNotExist    = errors.New("account does not exist")
 	ErrRoleDoesNotExist       = errors.New("role does not exist")
+	ErrNodeDoesNotExist       = errors.New("node does not exist")
 	ErrServiceKeyDoesNotExist = errors.New("service key does not exist")
 	ErrInvalidAuthToken       = errors.New("invalid auth token")
 	ErrExtensionDoesNotExist  = errors.New("extension does not exist")
@@ -94,6 +95,8 @@ type (
 		Repositories() ([]*registry.Repository, error)
 		Repository(name string) (*registry.Repository, error)
 		DeleteRepository(name string) error
+		Nodes() ([]*shipyard.Node, error)
+		Node(name string) (*shipyard.Node, error)
 	}
 )
 
@@ -456,6 +459,15 @@ func (m DefaultManager) Authenticate(username, password string) bool {
 		log.Error(err)
 		return false
 	}
+	evt := &shipyard.Event{
+		Type:    "login",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("username=%s", acct.Username),
+		Tags:    []string{"login", "security"},
+	}
+	// do not return a fail if error happens upon saving even; still want login
+	_ = m.SaveEvent(evt)
+
 	return m.authenticator.Authenticate(password, acct.Password)
 }
 
@@ -679,4 +691,32 @@ func (m DefaultManager) DeleteRepository(name string) error {
 	}
 
 	return nil
+}
+
+func (m DefaultManager) Nodes() ([]*shipyard.Node, error) {
+	info, err := m.client.Info()
+	if err != nil {
+		return nil, err
+	}
+
+	nodes, err := parseClusterNodes(info.DriverStatus)
+	if err != nil {
+		return nil, err
+	}
+	return nodes, nil
+}
+
+func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
+	nodes, err := m.Nodes()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, node := range nodes {
+		if node.Name == name {
+			return node, nil
+		}
+	}
+
+	return nil, nil
 }

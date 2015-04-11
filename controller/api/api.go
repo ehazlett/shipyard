@@ -424,6 +424,36 @@ func (a *Api) hubWebhook(w http.ResponseWriter, r *http.Request) {
 	// TODO @ehazlett - redeploy containers
 }
 
+func (a *Api) nodes(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	nodes, err := a.manager.Nodes()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(nodes); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) node(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	name := vars["name"]
+	node, err := a.manager.Node(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(node); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) Run() error {
 	globalMux := http.NewServeMux()
 	controllerManager := a.manager
@@ -473,6 +503,8 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/roles", a.addRole).Methods("POST")
 	apiRouter.HandleFunc("/api/roles", a.deleteRole).Methods("DELETE")
+	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
+	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/repositories", a.repositories).Methods("GET")

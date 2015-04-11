@@ -1,3 +1,38 @@
+<div class="ui small clear modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+    Clear Events
+</div>
+<div class="content">
+    <p>Are you sure you want to clear all events?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        No
+    </div>
+    <div ng-click="vm.clearEvents()" class="ui positive right labeled icon button">
+        Yes
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
+<div class="two column row">
+    <div class="left floated column">
+        <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+            <i class="refresh icon"></i> Refresh
+        </div>
+        <div ng-click="vm.showClearEventsDialog()" class="ui small red labeled icon button">
+            <i class="trash icon"></i> Clear Events
+        </div>
+    </div>
+    <div class="right aligned right floated column">
+        <div class="ui small icon input">
+            <input ng-model="tableFilter" placeholder="Search events..."/>
+            <i class="search icon"></i>
+        </div>
+    </div>
+</div>
+
 <div class="row" ng-show="vm.events.length === 0">
 <div class="column">
     <div class="ui icon message">
@@ -11,37 +46,27 @@
     </div>
 </div>
 </div>
-<div class="two column row">
-    <div class="left floated column">
-        <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
-            <i class="refresh icon"></i> Refresh
-        </div>
-    </div>
-    <div class="right aligned right floated column">
-        <div class="ui small icon input">
-            <input ng-model="tableFilter" placeholder="Search events..."/>
-            <i class="search icon"></i>
-        </div>
-    </div>
-</div>
-<div class="row">
+
+<div class="row" ng-show="vm.events.length > 0">
     <div class="column">
         <table class="ui sortable celled table" ng-show="vm.events">
             <thead>
                 <tr>
                     <th>Time</th>
+                    <th>Type</th>
+                    <th>Message</th>
                     <th>Container</th>
                     <th>Engine</th>
-                    <th>Type</th>
                     <th>Tags</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="e in vm.events | filter:tableFilter">
                     <td>{{e.time}}</td>
+                    <td>{{e.type}}</td>
+                    <td>{{e.message}}</td>
                     <td>{{e.container.id | limitTo:8}}</td>
                     <td>{{e.engine.id}}</td>
-                    <td>{{e.type}}</td>
                     <td>{{e.tags.join(', ')}}</td>
                 </tr>
             </tbody>
