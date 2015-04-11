@@ -72,8 +72,8 @@
                     <div class="floated right aligned right column">
                         <h3 class="ui header">
                             <div class="content">
-                                <div class="header" ng-show="vm.container.State.Running">Started: {{ vm.container.State.StartedAt }}</div>
-                                <div class="header" ng-hide="vm.container.State.Running">Finished: {{ vm.container.State.FinishedAt }}</div>
+                                <div class="header" ng-show="vm.container.State.Running">Started: {{vm.container.State.StartedAt | date:'medium'}}</div>
+                                <div class="header" ng-hide="vm.container.State.Running">Finished: {{vm.container.State.FinishedAt | date:'medium'}}</div>
                             </div>
                         </h3>
                     </div>
@@ -131,6 +131,18 @@
                                 <div class="content" ng-repeat="v in values">
                                     <div><div class="ui blue horizontal label">Exposed</div> {{ v.HostIp }}:{{ v.HostPort }} &#8594; {{ k }}</div>
                                 </div>
+                            </div>
+                        </div>
+                        <h4 class="ui dividing header">Container Linking</h4>
+                        <div class="ui divided list" ng-show="vm.container.HostConfig.Links"> 
+                            <div class="item" ng-repeat="v in vm.container.HostConfig.Links">
+                                {{v.split(":")[0]}} &#8594; {{v.split(":")[1]}}
+                            </div>
+                        </div>
+                        <h4 class="ui dividing header">Container Volumes</h4>
+                        <div class="ui divided list" ng-show="vm.container.Volumes"> 
+                            <div class="item" ng-repeat="(k, values) in vm.container.Volumes">
+                                <div class="ui blue horizontal label">Mounted</div> {{k}}
                             </div>
                         </div>
                     </div>
