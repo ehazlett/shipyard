@@ -4,7 +4,7 @@ GOARCH=amd64
 TAG=${TAG:-latest}
 COMMIT=`git rev-parse --short HEAD`
 
-all: deps build
+all: deps build media
 
 deps:
 	@godep restore
