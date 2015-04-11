@@ -26,7 +26,6 @@ const (
 	tblNameConfig      = "config"
 	tblNameEvents      = "events"
 	tblNameAccounts    = "accounts"
-	tblNameNodes       = "nodes"
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
 	tblNameExtensions  = "extensions"
@@ -96,8 +95,6 @@ type (
 		Repositories() ([]*registry.Repository, error)
 		Repository(name string) (*registry.Repository, error)
 		DeleteRepository(name string) error
-		AddNode(node *shipyard.Node) error
-		RemoveNode(node *shipyard.Node) error
 		Nodes() ([]*shipyard.Node, error)
 		Node(name string) (*shipyard.Node, error)
 	}
@@ -152,7 +149,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameNodes, tblNameServiceKeys, tblNameExtensions, tblNameWebhookKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameExtensions, tblNameWebhookKeys}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -685,67 +682,29 @@ func (m DefaultManager) DeleteRepository(name string) error {
 }
 
 func (m DefaultManager) Nodes() ([]*shipyard.Node, error) {
-	res, err := r.Table(tblNameNodes).OrderBy(r.Asc("name")).Run(m.session)
+	info, err := m.client.Info()
 	if err != nil {
 		return nil, err
 	}
-	nodes := []*shipyard.Node{}
-	if err := res.All(&nodes); err != nil {
+
+	nodes, err := parseClusterNodes(info.DriverStatus)
+	if err != nil {
 		return nil, err
 	}
 	return nodes, nil
 }
 
 func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
-	res, err := r.Table(tblNameNodes).Filter(map[string]string{"name": name}).Run(m.session)
+	nodes, err := m.Nodes()
 	if err != nil {
 		return nil, err
 	}
-	if res.IsNil() {
-		return nil, ErrNodeDoesNotExist
-	}
-	var node *shipyard.Node
-	if err := res.One(&node); err != nil {
-		return nil, err
-	}
-	return node, nil
-}
 
-func (m DefaultManager) AddNode(node *shipyard.Node) error {
-	if _, err := r.Table(tblNameNodes).Insert(node).RunWrite(m.session); err != nil {
-		return err
+	for _, node := range nodes {
+		if node.Name == name {
+			return node, nil
+		}
 	}
 
-	evt := &shipyard.Event{
-		Type:    "add-node",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s addr=%s", node.Name, node.Addr),
-		Tags:    []string{"cluster", "nodes"},
-	}
-
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m DefaultManager) RemoveNode(node *shipyard.Node) error {
-	res, err := r.Table(tblNameNodes).Get(node.ID).Delete().Run(m.session)
-	if err != nil {
-		return err
-	}
-	if res.IsNil() {
-		return ErrNodeDoesNotExist
-	}
-	evt := &shipyard.Event{
-		Type:    "remove-node",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s addr=%s", node.Name, node.Addr),
-		Tags:    []string{"cluster", "nodes"},
-	}
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
-	return nil
+	return nil, nil
 }

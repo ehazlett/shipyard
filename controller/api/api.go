@@ -13,7 +13,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mailgun/oxy/forward"
 	"github.com/mailgun/oxy/testutils"
-	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
@@ -455,40 +454,6 @@ func (a *Api) node(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *Api) addNode(w http.ResponseWriter, r *http.Request) {
-	var node *shipyard.Node
-	if err := json.NewDecoder(r.Body).Decode(&node); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := a.manager.AddNode(node); err != nil {
-		log.Errorf("error saving node: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	log.Infof("added node: name=%s addr=%s", node.Name, node.Addr)
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func (a *Api) removeNode(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	name := vars["name"]
-	node, err := a.manager.Node(name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := a.manager.RemoveNode(node); err != nil {
-		log.Errorf("error removing node: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	log.Infof("removed node: name=%s addr=%s", node.Name, node.Addr)
-	w.WriteHeader(http.StatusNoContent)
-}
-
 func (a *Api) Run() error {
 	globalMux := http.NewServeMux()
 	controllerManager := a.manager
@@ -540,8 +505,6 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/roles", a.deleteRole).Methods("DELETE")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
-	apiRouter.HandleFunc("/api/nodes", a.addNode).Methods("POST")
-	apiRouter.HandleFunc("/api/nodes/{name}", a.removeNode).Methods("DELETE")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/repositories", a.repositories).Methods("GET")
