@@ -136,7 +136,7 @@
                         <h4 class="ui dividing header">Container Linking</h4>
                         <div class="ui divided list" ng-show="vm.container.HostConfig.Links"> 
                             <div class="item" ng-repeat="v in vm.container.HostConfig.Links">
-                                {{v}}
+                                {{v.split(":")[0]}} &#8594; {{v.split(":")[1]}}
                             </div>
                         </div>
                         <h4 class="ui dividing header">Container Volumes</h4>
