@@ -21,7 +21,6 @@ func CmdServer(c *cli.Context) {
 	listenAddr := c.String("listen")
 	authWhitelist := c.StringSlice("auth-whitelist-cidr")
 	enableCors := c.Bool("enable-cors")
-	registryUrl := c.String("registry-url")
 
 	log.Infof("shipyard version %s", version.Version)
 
@@ -40,14 +39,12 @@ func CmdServer(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo, registryUrl, nil)
+	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Debugf("connected to docker: url=%s", dockerUrl)
-
-	log.Debugf("connected to registry: url=%s", registryUrl)
 
 	shipyardApi, err := api.NewApi(listenAddr, controllerManager, authWhitelist, enableCors)
 	if err != nil {

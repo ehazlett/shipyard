@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mailgun/oxy/forward"
 	"github.com/mailgun/oxy/testutils"
+	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
@@ -96,10 +97,63 @@ func (a *Api) removeServiceKey(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (a *Api) registries(w http.ResponseWriter, r *http.Request) {
+	registries, err := a.manager.Registries()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(registries); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) registry(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	name := vars["name"]
+
+	registry, err := a.manager.Registry(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(registry); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) removeRegistry(w http.ResponseWriter, r *http.Request) {
+	var registry *shipyard.Registry
+	if err := json.NewDecoder(r.Body).Decode(&registry); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := a.manager.RemoveRegistry(registry); err != nil {
+		log.Errorf("error deleting registry: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) repositories(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
-	repos, err := a.manager.Repositories()
+	vars := mux.Vars(r)
+	name := vars["name"]
+
+	registry, err := a.manager.Registry(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	repos, err := registry.Repositories()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -115,7 +169,15 @@ func (a *Api) repository(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	name := vars["name"]
-	repo, err := a.manager.Repository(name)
+	repoName := vars["repo"]
+
+	registry, err := a.manager.Registry(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	repo, err := registry.Repository(repoName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -129,17 +191,34 @@ func (a *Api) repository(w http.ResponseWriter, r *http.Request) {
 func (a *Api) deleteRepository(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
-	if err := a.manager.DeleteRepository(name); err != nil {
+	repoName := vars["repo"]
+
+	registry, err := a.manager.Registry(name)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if err := registry.DeleteRepository(repoName); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusNoContent)
 }
 
 func (a *Api) inspectRepository(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
-	repo, err := a.manager.Repository(name)
+	repoName := vars["repo"]
+
+	registry, err := a.manager.Registry(name)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	repo, err := registry.Repository(repoName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -507,9 +586,12 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
-	apiRouter.HandleFunc("/api/repositories", a.repositories).Methods("GET")
-	apiRouter.HandleFunc("/api/repositories/{name:.*}", a.repository).Methods("GET")
-	apiRouter.HandleFunc("/api/repositories/{name:.*}", a.deleteRepository).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registry", a.registries).Methods("GET")
+	apiRouter.HandleFunc("/api/registry/{name:.*}", a.registry).Methods("GET")
+	apiRouter.HandleFunc("/api/registry/{name:.*}", a.removeRegistry).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registry/{name:.*}/repositories", a.repositories).Methods("GET")
+	apiRouter.HandleFunc("/api/registry/{name:.*}/repositories/{repo:.*}", a.repository).Methods("GET")
+	apiRouter.HandleFunc("/api/registry/{name:.*}/repositories/{repo:.*}", a.deleteRepository).Methods("DELETE")
 	apiRouter.HandleFunc("/api/servicekeys", a.serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", a.addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", a.removeServiceKey).Methods("DELETE")

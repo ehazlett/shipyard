@@ -2,7 +2,6 @@ package manager
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -18,7 +17,6 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
-	registry "github.com/shipyard/shipyard/registry/v1"
 	"github.com/shipyard/shipyard/version"
 )
 
@@ -30,6 +28,7 @@ const (
 	tblNameServiceKeys = "service_keys"
 	tblNameExtensions  = "extensions"
 	tblNameWebhookKeys = "webhook_keys"
+	tblNameRegistries  = "registries"
 	storeKey           = "shipyard"
 	trackerHost        = "http://tracker.shipyard-project.com"
 	NodeHealthUp       = "up"
@@ -45,6 +44,7 @@ var (
 	ErrInvalidAuthToken       = errors.New("invalid auth token")
 	ErrExtensionDoesNotExist  = errors.New("extension does not exist")
 	ErrWebhookKeyDoesNotExist = errors.New("webhook key does not exist")
+	ErrRegistryDoesNotExist   = errors.New("registry does not exist")
 	store                     = sessions.NewCookieStore([]byte(storeKey))
 )
 
@@ -57,7 +57,6 @@ type (
 		authenticator    *auth.Authenticator
 		store            *sessions.CookieStore
 		client           *dockerclient.DockerClient
-		registryClient   *registry.RegistryClient
 		disableUsageInfo bool
 	}
 
@@ -92,15 +91,17 @@ type (
 		SaveWebhookKey(key *dockerhub.WebhookKey) error
 		DeleteWebhookKey(id string) error
 		DockerClient() *dockerclient.DockerClient
-		Repositories() ([]*registry.Repository, error)
-		Repository(name string) (*registry.Repository, error)
-		DeleteRepository(name string) error
 		Nodes() ([]*shipyard.Node, error)
 		Node(name string) (*shipyard.Node, error)
+
+		AddRegistry(registry *shipyard.Registry) error
+		RemoveRegistry(registry *shipyard.Registry) error
+		Registries() ([]*shipyard.Registry, error)
+		Registry(name string) (*shipyard.Registry, error)
 	}
 )
 
-func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, registryUrl string, registryTLSConfig *tls.Config) (Manager, error) {
+func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool) (Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:     addr,
 		Database:    database,
@@ -113,11 +114,6 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 	}
 	log.Info("checking database")
 
-	rClient, err := registry.NewRegistryClient(registryUrl, registryTLSConfig)
-	if err != nil {
-		return nil, err
-	}
-
 	r.DbCreate(database).Run(session)
 	m := &DefaultManager{
 		database:         database,
@@ -126,7 +122,6 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 		authenticator:    &auth.Authenticator{},
 		store:            store,
 		client:           client,
-		registryClient:   rClient,
 		storeKey:         storeKey,
 		disableUsageInfo: disableUsageInfo,
 	}
@@ -149,7 +144,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameExtensions, tblNameWebhookKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -659,37 +654,6 @@ func (m DefaultManager) DeleteWebhookKey(id string) error {
 	return nil
 }
 
-func (m DefaultManager) Repositories() ([]*registry.Repository, error) {
-	if m.registryClient != nil {
-		res, err := m.registryClient.Search("", 1, 100)
-		if err != nil {
-			return nil, err
-		}
-
-		return res.Results, nil
-	}
-
-	return nil, nil
-}
-
-func (m DefaultManager) Repository(name string) (*registry.Repository, error) {
-	if m.registryClient != nil {
-		return m.registryClient.Repository(name)
-	}
-
-	return nil, nil
-}
-
-func (m DefaultManager) DeleteRepository(name string) error {
-	if m.registryClient != nil {
-		if err := m.registryClient.DeleteRepository(name); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (m DefaultManager) Nodes() ([]*shipyard.Node, error) {
 	info, err := m.client.Info()
 	if err != nil {
@@ -716,4 +680,89 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 	}
 
 	return nil, nil
+}
+
+func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
+	if _, err := r.Table(tblNameRegistries).Insert(registry).RunWrite(m.session); err != nil {
+		return err
+	}
+
+	evt := &shipyard.Event{
+		Type:    "add-registry",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s addr=%s", registry.Name, registry.Addr),
+		Tags:    []string{"registry", "security"},
+	}
+
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m DefaultManager) RemoveRegistry(registry *shipyard.Registry) error {
+	res, err := r.Table(tblNameRegistries).Get(registry.ID).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrRoleDoesNotExist
+	}
+	evt := &shipyard.Event{
+		Type:    "delete-role",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("name=%s addr=%s", registry.Name, registry.Addr),
+		Tags:    []string{"registry", "security"},
+	}
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m DefaultManager) Registries() ([]*shipyard.Registry, error) {
+	res, err := r.Table(tblNameRegistries).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+
+	regs := []*shipyard.Registry{}
+	if err := res.All(&regs); err != nil {
+		return nil, err
+	}
+
+	registries := []*shipyard.Registry{}
+	for _, r := range regs {
+		reg, err := shipyard.NewRegistry(r.ID, r.Name, r.Addr)
+		if err != nil {
+			return nil, err
+		}
+
+		registries = append(registries, reg)
+	}
+
+	return registries, nil
+}
+
+func (m DefaultManager) Registry(name string) (*shipyard.Registry, error) {
+	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"name": name}).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrRegistryDoesNotExist
+	}
+	var reg *shipyard.Registry
+	if err := res.One(&reg); err != nil {
+		return nil, err
+	}
+
+	registry, err := shipyard.NewRegistry(reg.ID, reg.Name, reg.Addr)
+	if err != nil {
+		return nil, err
+	}
+
+	return registry, nil
 }

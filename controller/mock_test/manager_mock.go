@@ -142,6 +142,24 @@ func (m MockManager) StoreKey() string {
 	return ""
 }
 
+func (m MockManager) AddRegistry(registry *shipyard.Registry) error {
+	return nil
+}
+
+func (m MockManager) Registries() ([]*shipyard.Registry, error) {
+	return []*shipyard.Registry{
+		TestRegistry,
+	}, nil
+}
+
+func (m MockManager) Registry(name string) (*shipyard.Registry, error) {
+	return TestRegistry, nil
+}
+
+func (m MockManager) RemoveRegistry(registry *shipyard.Registry) error {
+	return nil
+}
+
 func (m MockManager) Nodes() ([]*shipyard.Node, error) {
 	return []*shipyard.Node{
 		TestNode,
@@ -164,12 +182,4 @@ func (m MockManager) DeleteRepository(name string) error {
 
 func (m MockManager) Node(name string) (*shipyard.Node, error) {
 	return TestNode, nil
-}
-
-func (m MockManager) AddNode(node *shipyard.Node) error {
-	return nil
-}
-
-func (m MockManager) RemoveNode(node *shipyard.Node) error {
-	return nil
 }
