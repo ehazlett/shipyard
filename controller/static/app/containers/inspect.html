@@ -187,23 +187,35 @@
                 </div>
                 <div class="row" ng-show="vm.top">
                     <div class="column">
-                        <h4 class="ui dividing header">Processes</h4>
-                        <table id="toptable" class="ui sortable celled table">
-                            <thead>
-                                <tr>
-                                    <th ng-repeat="t in vm.top.Titles">{{ t }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="r in vm.top.Processes">
-                                    <td ng-repeat="c in r">
-                                        {{ c }}
-                                        <script>
-$('.ui.sortable.celled.table').tablesort();
-                                        </script>
-                                    </td>
-                                </tr>
-                        </table>
+                    <h4 class="ui dividing header">Processes</h4>
+                        <div id="terminal-window">
+                        <div id="terminal-toolbar">
+                            <div class="top">
+                            <div id="lights">
+                                <div class="light red-light">
+                                    <div class="shine"></div>
+                                    <div class="glow"></div>
+                                </div>              
+                                <div class="light yellow-light">
+                                    <div class="shine"></div>
+                                    <div class="glow"></div>
+                                </div>
+                                <div class="light green-light">
+                                    <div class="shine"></div>
+                                    <div class="glow"></div>
+                                </div>
+                            </div>
+                                <div id="terminal-title">
+                                   {{ vm.container.Name.split("/")[1] }} - top
+                                </div>
+                            </div>
+                        </div>
+                        <div id="terminal-body">
+                            <div ng-repeat="r in vm.top.Processes">
+                                <span class="logs" ng-repeat="c in r">{{ c }}</span>
+                            </div> 
+                        </div>  
+                        </div>
                     </div>
                 </div>
             </div>
