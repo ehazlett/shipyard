@@ -40,7 +40,7 @@ func main() {
 				cli.StringFlag{
 					Name:  "rethinkdb-addr",
 					Usage: "RethinkDB address",
-					Value: "127.0.0.1:28015",
+					Value: "rethinkdb:28015",
 				},
 				cli.StringFlag{
 					Name:  "rethinkdb-auth-key",
