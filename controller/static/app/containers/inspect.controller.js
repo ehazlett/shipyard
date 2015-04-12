@@ -15,6 +15,7 @@
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
+        vm.parseLinkingString = parseLinkingString;
         vm.top;
         vm.stats;
 
@@ -22,6 +23,13 @@
             ContainerService.top(resolvedContainer.Id).then(function(data) {
                 vm.top = data
             }, null);
+        }
+
+        function parseLinkingString(linkingString) {
+            var linkedTo = linkingString.split(':')[0].replace('/','');
+            var alias = linkingString.split(':')[1];
+
+            return linkedTo + String.fromCharCode(8594) + alias.substring(alias.lastIndexOf('/')+1, alias.length);
         }
 
         function showDestroyContainerDialog(container) {
