@@ -13,7 +13,7 @@ clean:
 	@rm -rf Godeps/_workspace controller
 
 build:
-	@godep go build -a -tags 'netgo' -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit $(COMMIT) -linkmode external -extldflags -static" .
+	@godep go build -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit $(COMMIT)" .
 
 media:
 	@cd static && bower -s install --allow-root -p | xargs echo
