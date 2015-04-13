@@ -16,6 +16,7 @@
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
         vm.parseLinkingString = parseLinkingString;
+        vm.isEmptyObject = isEmptyObject;
         vm.top;
         vm.stats;
 
@@ -30,6 +31,14 @@
             var alias = linkingString.split(':')[1];
 
             return linkedTo + String.fromCharCode(8594) + alias.substring(alias.lastIndexOf('/')+1, alias.length);
+        }
+
+        function isEmptyObject(obj) {
+            for (var k in obj) {
+                return false;
+            }
+
+            return true;
         }
 
         function showDestroyContainerDialog(container) {

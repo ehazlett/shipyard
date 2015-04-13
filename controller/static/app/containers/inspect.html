@@ -98,28 +98,28 @@
                 <div class="three column row">
                     <div class="column">
                         <h4 class="ui dividing header">Container Configuration</h4>
-                        <div class="ui list"> 
-                            <div class="item">
+                        <div class="ui two column grid">
+                            <div class="column">
                                 <div class="content">
-                                    <a class="header">Container ID</a>
+                                    <span class="header"><b>Container ID</b></span>
                                     <div class="description">{{ vm.container.Id | limitTo:12 }}</div>
                                 </div>
                             </div>
-                            <div class="item">
+                            <div class="column">
                                 <div class="content">
-                                    <a class="header">Command</a>
+                                    <span class="header"><b>Command</b></span>
                                     <pre class="logs">{{ vm.container.Config.Cmd.join(" ") }}</pre>
                                 </div>
                             </div>
-                            <div class="item">
+                            <div class="column">
                                 <div class="content">
-                                    <a class="header">Hostname</a>
+                                    <span class="header"><b>Hostname</b></span>
                                     <div class="description">{{ vm.container.Config.Hostname }}</div>
                                 </div>
                             </div>
-                            <div class="item">
+                            <div class="column">
                                 <div class="content">
-                                    <a class="header">Domainname</a>
+                                    <span class="header"><b>Domainname</b></span>
                                     <div class="description">{{ vm.container.Config.Domainname || "N/A" }}</div>
                                 </div>
                             </div>
@@ -133,47 +133,65 @@
                                 </div>
                             </div>
                         </div>
-                        <h4 class="ui dividing header">Container Linking</h4>
-                        <div class="ui divided list" ng-show="vm.container.HostConfig.Links"> 
-                            <div class="item" ng-repeat="v in vm.container.HostConfig.Links">
-                                {{ vm.parseLinkingString(v) }}
-                            </div>
-                        </div>
-                        <h4 class="ui dividing header">Container Volumes</h4>
-                        <div class="ui divided list" ng-show="vm.container.Volumes"> 
-                            <div class="item" ng-repeat="(k, values) in vm.container.Volumes">
-                                {{ k }} &#8594; {{ values }}
-                            </div>
-                        </div>
                     </div>
                     <div class="column">
                         <h4 class="ui dividing header">Swarm Node</h4>
-                        <div class="ui list">
-                            <div class="item">
-                                <div class="content">
-                                    <a class="header">Name</a>
+                        <div class="ui two column grid">
+                            <div class="column">
+                                <div class="ui compact">
+                                    <span class="header"><b>Name</b></span>
                                     <div class="description">{{ vm.container.Node.Name }}</div>
                                 </div>
                             </div>
-                            <div class="item">
-                                <div class="content">
-                                    <a class="header">Host</a>
+                            <div class="column">
+                                <div class="ui compact">
+                                    <span class="header"><b>Host</b></span>
                                     <div class="description">{{ vm.container.Node.Addr }}</div>
                                 </div>
                             </div>
-                            <div class="item">
-                                <div class="content">
-                                    <a class="header">CPUs</a>
+                            <div class="column">
+                                <div class="ui compact">
+                                    <span class="header"><b>CPUs</b></span>
                                     <div class="description">{{ vm.container.Node.Cpus || "&infin;" }}</div>
                                 </div>
                             </div>
-                            <div class="item">
-                                <div class="content">
-                                    <a class="header">Memory</a>
+                            <div class="column">
+                                <div class="ui compact">
+                                    <span class="header"><b>Memory</b></span>
                                     <div class="description">{{ (vm.container.Node.Memory / 1024 / 1024 | number:0) || "&infin;" }} MB</div>
                                 </div>
                             </div>
                         </div>
+                        <table class="ui compact table">
+                            <thead>
+                                <tr>
+                                  <th>Container Linking</th>
+                                  <th ng-show="!vm.container.HostConfig.Links">
+                                      <div class="ui blue horizontal label">Nothing Linked</div>
+                                  </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="v in vm.container.HostConfig.Links">
+                                  <td>{{ vm.parseLinkingString(v) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="ui compact table">
+                            <thead>
+                                <tr>
+                                  <th>Container Volumes</th>
+                                  <th ng-show="vm.isEmptyObject(vm.container.Volumes)">
+                                      <div class="ui blue horizontal label">Nothing Mounted</div>
+                                  </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(k, values) in vm.container.Volumes">
+                                  <td>{{ k }} &#8594; {{ values }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                     <div class="column">
                         <h4 class="ui dividing header">Environment</h4>
