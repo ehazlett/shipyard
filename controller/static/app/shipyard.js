@@ -13,6 +13,7 @@
                         $rootScope.doingResolve = true;
                         if (toState.authenticate && !AuthService.isLoggedIn()){
                             $state.transitionTo('login');
+                            event.preventDefault(); 
                         }
                         $rootScope.username = AuthService.getUsername();
                     });
