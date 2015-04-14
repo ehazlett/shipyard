@@ -12,16 +12,16 @@
                     $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams) {
                         $rootScope.doingResolve = true;
                         if (toState.authenticate && !AuthService.isLoggedIn())  {
-                            $state.transitionTo('login');
                             event.preventDefault(); 
+                            $state.transitionTo('login');
                         }
                         $rootScope.username = AuthService.getUsername();
                     });
 
                     $rootScope.$on("$stateChangeError", function(event, toState, toParams, fromState, fromParams) {
+                        event.preventDefault(); 
                         console.log("$stateChangeError", event, toState, toParams, fromState, fromParams);
                         $state.transitionTo('error');
-                        event.preventDefault(); 
                     });
 
                     $rootScope.$on("$stateChangeSuccess", function(event, toState, toParams, fromState, fromParams) {
