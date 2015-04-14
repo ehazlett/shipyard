@@ -1,7 +1,7 @@
 <div class="ui small remove modal transition" style="margin-top: -98px;">
 <i class="close icon"></i>
 <div class="header">
-    Remove Image: {{ vm.selectedImage.Id }}
+    Remove Image: {{ vm.selectedImage.Id.substring(0,12) }}
 </div>
 <div class="content">
     <p>Are you sure you want to remove this image?</p>
@@ -61,7 +61,7 @@
             <tbody>
                 <tr ng-repeat="i in vm.images | filter:tableFilter">
                     <td>{{i.RepoTags.join(", ")}}</td>
-                    <td>{{i.Id}}</td>
+                    <td>{{i.Id.substring(0,12)}}</td>
                     <td>{{i.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
                     <td>{{i.Size / 1048576 | number:2}} MB</td>
                     <td>{{i.VirtualSize / 1048576 | number:2}} MB</td>
