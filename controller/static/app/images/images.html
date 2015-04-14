@@ -1,0 +1,81 @@
+<div class="ui small remove modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+    Remove Image: {{ vm.selectedImage.Id }}
+</div>
+<div class="content">
+    <p>Are you sure you want to remove this image?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        No
+    </div>
+    <div ng-click="vm.removeImage()" class="ui positive right labeled icon button">
+        Yes
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
+
+<div class="two column row">
+    <div class="left floated column">
+        <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+            <i class="refresh icon"></i> Refresh
+        </div>
+    </div>
+    <div class="right aligned right floated column">
+        <div class="ui small icon input">
+            <input ng-model="tableFilter" placeholder="Search images..."/>
+            <i class="search icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.images.length === 0">
+<div class="column">
+    <div class="ui icon message">
+        <i class="info icon"></i>
+        <div class="content">
+            <div class="header">
+                Images
+            </div>
+            <p>There are no images in the cluster.</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row" ng-show="vm.images.length>0">
+    <div class="column">
+        <table class="ui sortable celled table">
+            <thead>
+                <tr>
+                    <th>Names</th>
+                    <th>ID</th>
+                    <th>Created</th>
+                    <th>Size</th>
+                    <th>Virtual Size</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="i in vm.images | filter:tableFilter">
+                    <td>{{i.RepoTags.join(", ")}}</td>
+                    <td>{{i.Id}}</td>
+                    <td>{{i.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+                    <td>{{i.Size / 1048576 | number:2}} MB</td>
+                    <td>{{i.VirtualSize / 1048576 | number:2}} MB</td>
+                    <td class="collapsing">
+                        <div ng-click="vm.showRemoveImageDialog(i)" class="compact ui icon button red">
+                            <i class="trash icon"></i>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+$('.ui.sortable.celled.table').tablesort();
+</script>

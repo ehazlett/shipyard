@@ -11,6 +11,7 @@
 			'shipyard.events',
 			'shipyard.registry',
 			'shipyard.nodes',
+			'shipyard.images',
                         'angular-jwt',
                         'base64',
 			'ui.router'
