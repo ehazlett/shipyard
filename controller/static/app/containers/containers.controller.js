@@ -5,11 +5,11 @@
         .module('shipyard.containers')
         .controller('ContainersController', ContainersController);
 
-    ContainersController.$inject = ['resolvedContainers', 'ContainerService', '$state'];
-    function ContainersController(resolvedContainers, ContainerService, $state) {
+    ContainersController.$inject = ['ContainerService', '$state'];
+    function ContainersController(ContainerService, $state) {
         var vm = this;
         vm.error = "";
-        vm.containers = resolvedContainers;
+        vm.containers = [];
         vm.selectedContainerId = "";
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.showRestartContainerDialog = showRestartContainerDialog;
@@ -19,6 +19,8 @@
         vm.restartContainer = restartContainer;
         vm.refresh = refresh;
         vm.containerStatusText = containerStatusText;
+        
+        refresh();
 
         function refresh() {
             ContainerService.list()
@@ -74,13 +76,13 @@
                 });
         }
         function containerStatusText(container) {
-           if(container.Status.indexOf("Up")==0){
+            if(container.Status.indexOf("Up")==0){
                 return "Running";
-           }
-           else if(container.Status.indexOf("Exited")==0){
+            }
+            else if(container.Status.indexOf("Exited")==0){
                 return "Stopped";
-           }            
-           return "Unknown";
+            }            
+            return "Unknown";
         }   
     }
 })();
