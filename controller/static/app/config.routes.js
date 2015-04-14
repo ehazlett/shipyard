@@ -15,6 +15,9 @@
                 authenticate: false
             });
 
-        $urlRouterProvider.otherwise('/containers');
+        $urlRouterProvider.otherwise(function ($injector) {
+            var $state = $injector.get('$state');
+            $state.go('dashboard.containers');
+        });
     }
 })();
