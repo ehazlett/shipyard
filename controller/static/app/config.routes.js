@@ -10,11 +10,13 @@
     function getRoutes($stateProvider, $urlRouterProvider) {	
         $stateProvider
             .state('error', {
-                url: '/error',
                 templateUrl: 'app/error/error.html',
                 authenticate: false
             });
 
-        $urlRouterProvider.otherwise('/containers');
+        $urlRouterProvider.otherwise(function ($injector) {
+            var $state = $injector.get('$state');
+            $state.go('dashboard.containers');
+        });
     }
 })();

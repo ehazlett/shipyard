@@ -40,7 +40,7 @@ $('.ui.dropdown')
 </div>
 
 <div class="ui padded grid">
-    <div class="row" ng-show="doingResolve" style="text-align: center;">
+    <div class="row" ng-show="isLoadingView" style="text-align: center;">
         <div class="five wide column">
             <div class="ui icon message">
                 <i class="notched circle loading icon"></i>
@@ -53,7 +53,7 @@ $('.ui.dropdown')
             </div>
         </div>
     </div>
-    <div class="row" ng-hide="doingResolve">
+    <div class="row" ng-hide="isLoadingView">
         <div class="column">
             <div ui-view class="ui grid">
             </div>
