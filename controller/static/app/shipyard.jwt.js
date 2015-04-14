@@ -3,6 +3,15 @@
 
     angular
         .module('shipyard')
+        .service('401interceptor', function($rootScope) {
+            var service = this;
+            service.responseError = function(response) {
+                if(response.status === 401) {
+                    $rootScope.$state.go('login');
+                }
+                return response;
+            };
+        })
         .config([
                 '$httpProvider',
                 'jwtInterceptorProvider', 
@@ -16,6 +25,7 @@
                     };
 
                     $httpProvider.interceptors.push('jwtInterceptor');
+                    $httpProvider.interceptors.push('401interceptor');
                 }
         ]);
 })();
