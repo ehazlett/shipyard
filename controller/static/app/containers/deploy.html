@@ -55,6 +55,10 @@
                                     <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Command"></input>
                                 </div>
                             </div>
+                            <div class="field">
+                                <label>Hostname</label>
+                                <input name="hostname" class="input" type="text" ng-model="vm.request.Hostname" placeholders="Hostname"></input>
+                            </div>
                             <h5 class="ui dividing header">Environment Variables</h5>
                             <div class="fields">
                                 <div class="seven wide field">
@@ -155,16 +159,16 @@
                             </div>
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="two fields">
-                            <div class="field">
-                                <select class="ui fluid dropdown" default="0" ng-model="vm.request.HostConfig.RestartPolicy.Name">
-                                    <option value="no">Do not automatically restart</option>
-                                    <option value="on-failure">Restart only on failure</option>
-                                    <option value="always">Always restart</option>
-                                </select>
-                            </div>
-                            <div class="field" ng-show="vm.request.HostConfig.RestartPolicy.Name == 'on-failure'">
-                                <input type="number" ng-model="vm.request.HostConfig.RestartPolicy.MaximumRetryCount" placeholder="Maximum restart count">
-                            </div>
+                                <div class="field">
+                                    <select class="ui fluid dropdown" default="0" ng-model="vm.request.HostConfig.RestartPolicy.Name">
+                                        <option value="no">Do not automatically restart</option>
+                                        <option value="on-failure">Restart only on failure</option>
+                                        <option value="always">Always restart</option>
+                                    </select>
+                                </div>
+                                <div class="field" ng-show="vm.request.HostConfig.RestartPolicy.Name == 'on-failure'">
+                                    <input type="number" ng-model="vm.request.HostConfig.RestartPolicy.MaximumRetryCount" placeholder="Maximum restart count">
+                                </div>
                             </div>
                             <h5 class="ui dividing header">Port Configuration</h5>
                             <div class="field">
@@ -188,8 +192,8 @@
                                 <div class="three wide field">
                                     <label>Protocol</label>
                                     <dropdown class="fluid" ng-model="vm.protocol">
-                                        <dropdown-group>TCP</dropdown-group>
-                                        <dropdown-group>UDP</dropdown-group>
+                                    <dropdown-group>TCP</dropdown-group>
+                                    <dropdown-group>UDP</dropdown-group>
                                     </dropdown>
                                 </div>
                                 <div class="five wide field">
@@ -213,8 +217,8 @@
                                 </div>
                                 <div class="three wide field">
                                     <dropdown class="fluid" ng-model="p.Protocol">
-                                        <dropdown-group>TCP</dropdown-group>
-                                        <dropdown-group>UDP</dropdown-group>
+                                    <dropdown-group>TCP</dropdown-group>
+                                    <dropdown-group>UDP</dropdown-group>
                                     </dropdown>
                                 </div>
                                 <div class="five wide field">
