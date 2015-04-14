@@ -24,3 +24,17 @@
     width: 1px;
     text-align: center;
 }
+.healthcolumn {
+    width: 1px;
+}
+td.healthcolumn  {
+    text-align: center;
+}
+.ui.sortable.table thead th.healthcolumn:after { 
+    width: 0; 
+    margin: 0;  
+}
+.hidden {
+    display: none;
+    visability:hidden;
+}
