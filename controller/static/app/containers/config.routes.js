@@ -15,13 +15,6 @@
                 controller: 'ContainersController',
                 controllerAs: 'vm',
                 authenticate: true,
-                resolve: {
-                    resolvedContainers: ['ContainerService', '$state', function (ContainerService, $state) {
-                        return ContainerService.list().then(null, function(errorData) {	                            
-                            $state.go('error');
-                        }); 
-                    }] 
-                }
             })
         .state('dashboard.inspect', {
             url: '^/containers/{id}',
