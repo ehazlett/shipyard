@@ -113,7 +113,10 @@
             </thead>
             <tbody>
                 <tr ng-repeat="c in vm.containers | filter:tableFilter">
-                    <td class="collapsing containerStatusText"><i class="circle icon" ng-class="{'green': vm.containerStatusText(c) == 'Running', 'red': vm.containerStatusText(c) == 'Stopped'}"></i></td>
+                    <td class="healthcolumn">
+                           <i class="circle icon ng-class:{'green': vm.containerStatusText(c) == 'Running', 'disabled': vm.containerStatusText(c) == 'Stopped'}"/>
+                                  <span class="hidden">{{vm.containerStatusText(c)}}</span>
+                    </td>
                     <td>{{c.Id | limitTo:12 }}</td>
                     <td>{{c.Names[0].split('/')[1]}}</td>
                     <td>{{c.Names[0].split('/')[2]}}</td>
