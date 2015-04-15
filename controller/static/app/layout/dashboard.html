@@ -52,6 +52,9 @@ $('.ui.dropdown')
                         One moment...
                     </div>
                     <p>Fetching content...</p>
+                    <div class="status">
+                        <div ng-repeat="m in vm.messages">{{m}}</div>
+                    </div>
                 </div>
             </div>
         </div>

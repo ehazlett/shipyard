@@ -17,10 +17,37 @@
 </div>
 </div>
 
+<div class="ui small pull modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+    Pull Image
+</div>
+<div class="content">
+    <div class="ui form">
+        <div class="field">
+            <label>Name</label>
+            <input type="text" ng-model="vm.pullImageName">
+        </div>
+    </div>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        No
+    </div>
+    <div ng-click="vm.pullImage()" class="ui positive right labeled icon button">
+        Yes
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
+
 <div class="two column row">
     <div class="left floated column">
         <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
             <i class="refresh icon"></i> Refresh
+        </div>
+        <div ng-click="vm.showPullImageDialog()" class="ui small green labeled icon button">
+            <i class="download icon"></i> Pull Image
         </div>
     </div>
     <div class="right aligned right floated column">
@@ -29,6 +56,21 @@
             <i class="search icon"></i>
         </div>
     </div>
+</div>
+
+<div class="row" ng-show="vm.pulling" style="text-align: center;">
+<div class="six wide column">
+    <div class="ui icon message">
+        <i class="notched circle loading icon"></i>
+        <div class="content">
+            <div class="header">
+                Pulling Image: {{vm.pullImageName}}
+            </div>
+            <p>We're pulling the image to the Swarm cluster now.</p>
+            <p>Please note that this could take a few minutes, depending on availability and size of the image.</p>
+        </div>
+    </div>
+</div>
 </div>
 
 <div class="row" ng-show="vm.images.length === 0">
@@ -45,7 +87,7 @@
 </div>
 </div>
 
-<div class="row" ng-show="vm.images.length>0">
+<div class="row" ng-show="vm.images.length>0 && !vm.pulling">
     <div class="column">
         <table class="ui sortable celled table">
             <thead>
