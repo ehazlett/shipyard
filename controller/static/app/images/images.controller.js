@@ -34,17 +34,18 @@
                     }, function(data) {
                         vm.error = data;
                     });
-                vm.error = "";
+                    vm.error = "";
             }
 
             function removeImage() {
                 ImagesService.remove(vm.selectedImage)
                     .then(function(data) {
                         vm.refresh();
+                        vm.error = "";
                     }, function(data) {
+                        console.log(data);
                         vm.error = data;
                     });
-                vm.error = "";
             }
 
             function pullImage() {

@@ -73,6 +73,15 @@
 </div>
 </div>
 
+<div class="row" ng-show="vm.error">
+    <div class="sixteen wide column">
+        <div class="ui error message">
+            <div class="header">Error...</div>
+            <p>{{vm.error}}</p>
+        </div>
+    </div>
+</div>
+
 <div class="row" ng-show="vm.images.length === 0">
 <div class="column">
     <div class="ui icon message">
