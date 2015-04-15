@@ -30,7 +30,6 @@
             function refresh() {
                 ImagesService.list()
                     .then(function(data) {
-                        console.log(data.length);
                         vm.images = data; 
                     }, function(data) {
                         vm.error = data;
@@ -41,7 +40,7 @@
             function removeImage() {
                 ImagesService.remove(vm.selectedImage)
                     .then(function(data) {
-                        vm.refresh(); 
+                        vm.refresh();
                     }, function(data) {
                         vm.error = data;
                     });
@@ -57,7 +56,7 @@
                     method: "POST"
                 })
                 .done(function() {
-                    vm.refresh();
+                    setTimeout(vm.refresh, 2000)
                     vm.pulling = false;
                     vm.pullImageName = "";
                 })
