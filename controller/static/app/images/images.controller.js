@@ -43,7 +43,6 @@
                         vm.refresh();
                         vm.error = "";
                     }, function(data) {
-                        console.log(data);
                         vm.error = data;
                     });
             }
@@ -54,7 +53,11 @@
                 // get a stream like response back
                 oboe({
                     url: '/images/create?fromImage=' + vm.pullImageName,
-                    method: "POST"
+                    method: "POST",
+                    withCredentials: true,
+                    headers: {
+                        'X-Access-Token': localStorage.getItem("X-Access-Token")
+                    }
                 })
                 .done(function() {
                     setTimeout(vm.refresh, 2000)
@@ -62,6 +65,8 @@
                     vm.pullImageName = "";
                 })
                 .fail(function(err) {
+                    vm.pulling = false;
+                    vm.pullImageName = "";
                     vm.error = err;
                 });
             }
