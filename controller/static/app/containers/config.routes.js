@@ -44,6 +44,13 @@
             controllerAs: 'vm',
             authenticate: true
         })
+        .state('dashboard.stats', {
+            url:'^/containers/{id}/stats',
+            templateUrl: 'app/containers/stats.html',
+            controller: 'ContainerStatsController',
+            controllerAs: 'vm',
+            authenticate: true
+        })
         .state('dashboard.logs', {
             url:'^/containers/{id}/logs',
             templateUrl: 'app/containers/logs.html',

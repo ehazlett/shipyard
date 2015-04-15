@@ -46,6 +46,10 @@ i.terminal {
     opacity: 0.8;
 }
 
-input.command {
-    color: #a4a4a4;
+div.chart, ui.chart {
+    height: 300px;
+}
+
+.ui.chart svg {
+    height: 250px;
 }
