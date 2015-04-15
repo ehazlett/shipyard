@@ -18,11 +18,6 @@
 			"Rev": "f92b7950b372b1db80bd3527e4d40e42555fe6c2"
 		},
 		{
-			"ImportPath": "github.com/citadel/citadel",
-			"Comment": "beta4-79-g55418e9",
-			"Rev": "55418e9e8d61b680b751b25048b5b27482cd1543"
-		},
-		{
 			"ImportPath": "github.com/codegangsta/cli",
 			"Comment": "1.2.0-26-gf7ebb76",
 			"Rev": "f7ebb761e83e21225d1d8954fde853bf8edd46c4"
@@ -55,10 +50,6 @@
 		},
 		{
 			"ImportPath": "github.com/mailgun/oxy/forward",
-			"Rev": "3a83e7768506e599e700052e260d443496f4bb94"
-		},
-		{
-			"ImportPath": "github.com/mailgun/oxy/testutils",
 			"Rev": "3a83e7768506e599e700052e260d443496f4bb94"
 		},
 		{
