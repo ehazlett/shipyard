@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/mailgun/oxy/forward"
-	"github.com/mailgun/oxy/testutils"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
@@ -591,7 +591,11 @@ func (a *Api) Run() error {
 	log.Debugf("configured docker proxy target: %s", dUrl)
 
 	swarmRedirect := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		req.URL = testutils.ParseURI(dUrl)
+		req.URL, err = url.ParseRequestURI(dUrl)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		fwd.ServeHTTP(w, req)
 	})
 
