@@ -135,7 +135,8 @@
                                 <a ng-click="vm.showRestartContainerDialog(c)" class="item"><i class="green refresh icon"></i> Restart</a>
                                 <a ng-click="vm.showStopContainerDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
                                 <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
-                                <a ui-sref="dashboard.exec({id: c.Id})" class="item"><i class="terminal outline icon"></i> Terminal</a>
+                                <a ui-sref="dashboard.stats({id: c.Id})" class="item"><i class="bar chart icon"></i> Stats</a>
+                                <a ui-sref="dashboard.exec({id: c.Id})" class="item"><i class="terminal outline icon"></i> Console</a>
                                 <a ui-sref="dashboard.logs({id: c.Id})" class="item"><i class="text file outline icon"></i> Logs</a>
                             </div>
                         </div>
