@@ -60,7 +60,7 @@
             </thead>
             <tbody>
                 <tr ng-repeat="i in vm.images | filter:tableFilter">
-                    <td>{{i.RepoTags.join(", ")}}</td>
+                    <td><div class="ui label" ng-repeat="t in i.RepoTags">{{t}}</div></td>
                     <td>{{i.Id.substring(0,12)}}</td>
                     <td>{{i.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
                     <td>{{i.Size / 1048576 | number:2}} MB</td>
