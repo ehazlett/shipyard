@@ -37,6 +37,13 @@
             controllerAs: 'vm',
             authenticate: true
         })
+        .state('dashboard.exec', {
+            url: '^/exec/{id}',
+            templateUrl: 'app/containers/exec.html',
+            controller: 'ExecController',
+            controllerAs: 'vm',
+            authenticate: true
+        })
         .state('dashboard.logs', {
             url:'^/containers/{id}/logs',
             templateUrl: 'app/containers/logs.html',
