@@ -183,3 +183,19 @@ func (m MockManager) DeleteRepository(name string) error {
 func (m MockManager) Node(name string) (*shipyard.Node, error) {
 	return TestNode, nil
 }
+
+func (m MockManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {
+	return nil
+}
+
+func (m MockManager) RemoveConsoleSession(c *shipyard.ConsoleSession) error {
+	return nil
+}
+
+func (m MockManager) ConsoleSession(token string) (*shipyard.ConsoleSession, error) {
+	return TestConsoleSession, nil
+}
+
+func (m MockManager) ValidateConsoleSessionToken(containerId, token string) bool {
+	return true
+}

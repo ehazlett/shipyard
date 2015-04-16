@@ -57,12 +57,20 @@
 			"Rev": "3a83e7768506e599e700052e260d443496f4bb94"
 		},
 		{
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+		},
+		{
 			"ImportPath": "github.com/samalba/dockerclient",
 			"Rev": "8ee44c0342d57b7daece793afb6c2bdd13220e8f"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
 			"Rev": "1fbbd62cfec66bd39d91e97749579579d4d3037e"
+		},
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Rev": "97d8e4e174133a4d1d2171380e510eb4dea8f5ea"
 		},
 		{
 			"ImportPath": "gopkg.in/fatih/pool.v2",

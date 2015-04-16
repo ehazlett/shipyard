@@ -56,6 +56,11 @@ var (
 		Image: "ehazlett/test",
 		Key:   "abcdefg",
 	}
+	TestConsoleSession = &shipyard.ConsoleSession{
+		ID:          "0",
+		ContainerID: "abcdefg",
+		Token:       "1234567890",
+	}
 )
 
 func getTestContainerInfo(id string, name string, image string) *dockerclient.ContainerInfo {

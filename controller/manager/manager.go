@@ -29,6 +29,7 @@ const (
 	tblNameExtensions  = "extensions"
 	tblNameWebhookKeys = "webhook_keys"
 	tblNameRegistries  = "registries"
+	tblNameConsole     = "console"
 	storeKey           = "shipyard"
 	trackerHost        = "http://tracker.shipyard-project.com"
 	NodeHealthUp       = "up"
@@ -36,16 +37,17 @@ const (
 )
 
 var (
-	ErrAccountExists          = errors.New("account already exists")
-	ErrAccountDoesNotExist    = errors.New("account does not exist")
-	ErrRoleDoesNotExist       = errors.New("role does not exist")
-	ErrNodeDoesNotExist       = errors.New("node does not exist")
-	ErrServiceKeyDoesNotExist = errors.New("service key does not exist")
-	ErrInvalidAuthToken       = errors.New("invalid auth token")
-	ErrExtensionDoesNotExist  = errors.New("extension does not exist")
-	ErrWebhookKeyDoesNotExist = errors.New("webhook key does not exist")
-	ErrRegistryDoesNotExist   = errors.New("registry does not exist")
-	store                     = sessions.NewCookieStore([]byte(storeKey))
+	ErrAccountExists              = errors.New("account already exists")
+	ErrAccountDoesNotExist        = errors.New("account does not exist")
+	ErrRoleDoesNotExist           = errors.New("role does not exist")
+	ErrNodeDoesNotExist           = errors.New("node does not exist")
+	ErrServiceKeyDoesNotExist     = errors.New("service key does not exist")
+	ErrInvalidAuthToken           = errors.New("invalid auth token")
+	ErrExtensionDoesNotExist      = errors.New("extension does not exist")
+	ErrWebhookKeyDoesNotExist     = errors.New("webhook key does not exist")
+	ErrRegistryDoesNotExist       = errors.New("registry does not exist")
+	ErrConsoleSessionDoesNotExist = errors.New("console session does not exist")
+	store                         = sessions.NewCookieStore([]byte(storeKey))
 )
 
 type (
@@ -99,6 +101,11 @@ type (
 		RemoveRegistry(registry *shipyard.Registry) error
 		Registries() ([]*shipyard.Registry, error)
 		Registry(name string) (*shipyard.Registry, error)
+
+		CreateConsoleSession(c *shipyard.ConsoleSession) error
+		RemoveConsoleSession(c *shipyard.ConsoleSession) error
+		ConsoleSession(token string) (*shipyard.ConsoleSession, error)
+		ValidateConsoleSessionToken(containerId, token string) bool
 	}
 )
 
@@ -145,7 +152,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -766,4 +773,84 @@ func (m DefaultManager) Registry(name string) (*shipyard.Registry, error) {
 	}
 
 	return registry, nil
+}
+
+func (m DefaultManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {
+	if _, err := r.Table(tblNameConsole).Insert(c).RunWrite(m.session); err != nil {
+		return err
+	}
+
+	evt := &shipyard.Event{
+		Type:    "add-console-session",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("container=%s token=%s", c.ContainerID, c.Token),
+		Tags:    []string{"console", "cluster"},
+	}
+
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m DefaultManager) RemoveConsoleSession(c *shipyard.ConsoleSession) error {
+	res, err := r.Table(tblNameConsole).Get(c.ID).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrConsoleSessionDoesNotExist
+	}
+
+	evt := &shipyard.Event{
+		Type:    "remove-console-session",
+		Time:    time.Now(),
+		Message: fmt.Sprintf("container=%s token=%s", c.ContainerID, c.Token),
+		Tags:    []string{"console", "cluster"},
+	}
+
+	if err := m.SaveEvent(evt); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m DefaultManager) ConsoleSession(token string) (*shipyard.ConsoleSession, error) {
+	res, err := r.Table(tblNameConsole).Filter(map[string]string{"token": token}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.IsNil() {
+		return nil, ErrConsoleSessionDoesNotExist
+	}
+
+	var c *shipyard.ConsoleSession
+	if err := res.One(&c); err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (m DefaultManager) ValidateConsoleSessionToken(containerId string, token string) bool {
+	cs, err := m.ConsoleSession(token)
+	if err != nil {
+		log.Errorf("error validating console session token: %s", err)
+		return false
+	}
+
+	if cs == nil || cs.ContainerID != containerId {
+		log.Warnf("unauthorized token request: %s", token)
+		return false
+	}
+
+	if err := m.RemoveConsoleSession(cs); err != nil {
+		log.Error(err)
+		return false
+	}
+
+	return true
 }

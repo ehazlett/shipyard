@@ -20,6 +20,7 @@ import (
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/mailgun/oxy/forward"
+	"github.com/nu7hatch/gouuid"
 	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
@@ -564,13 +565,89 @@ func (a *Api) node(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) createConsoleSession(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	containerId := vars["container"]
+	// generate token
+	u4, err := uuid.NewV4()
+	if err != nil {
+		log.Errorf("error generating console session token: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	token := u4.String()
+
+	cs := &shipyard.ConsoleSession{
+		ContainerID: containerId,
+		Token:       token,
+	}
+
+	if err := a.manager.CreateConsoleSession(cs); err != nil {
+		log.Errorf("error creating console session: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(cs); err != nil {
+		log.Errorf("error encoding console session: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Debugf("created console session: container=%s", cs.ContainerID)
+}
+
+func (a *Api) consoleSession(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	vars := mux.Vars(r)
+	token := vars["token"]
+
+	cs, err := a.manager.ConsoleSession(token)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(cs); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) removeConsoleSession(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	token := vars["token"]
+
+	cs, err := a.manager.ConsoleSession(token)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := a.manager.RemoveConsoleSession(cs); err != nil {
+		log.Errorf("error removing console session: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) execContainer(ws *websocket.Conn) {
 	qry := ws.Request().URL.Query()
 	containerId := qry.Get("id")
 	command := qry.Get("cmd")
 	ttyWidth := qry.Get("w")
 	ttyHeight := qry.Get("h")
+	token := qry.Get("token")
 	cmd := strings.Split(command, ",")
+
+	if !a.manager.ValidateConsoleSessionToken(containerId, token) {
+		ws.Write([]byte("unauthorized"))
+		ws.Close()
+		return
+	}
 
 	log.Debugf("starting exec session: container=%s cmd=%s", containerId, command)
 	clientUrl := a.manager.DockerClient().URL
@@ -800,8 +877,9 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/webhookkeys/{id}", a.webhookKey).Methods("GET")
 	apiRouter.HandleFunc("/api/webhookkeys", a.addWebhookKey).Methods("POST")
 	apiRouter.HandleFunc("/api/webhookkeys/{id}", a.deleteWebhookKey).Methods("DELETE")
-	//apiRouter.HandleFunc("/api/exec/{id}/{cmd:.*}", a.execContainer)
-	apiRouter.Handle("/api/exec", websocket.Handler(a.execContainer))
+	apiRouter.HandleFunc("/api/consolesession/{container}", a.createConsoleSession).Methods("GET")
+	apiRouter.HandleFunc("/api/consolesession/{token}", a.consoleSession).Methods("GET")
+	apiRouter.HandleFunc("/api/consolesession/{token}", a.removeConsoleSession).Methods("DELETE")
 
 	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
@@ -828,6 +906,7 @@ func (a *Api) Run() error {
 	loginRouter := mux.NewRouter()
 	loginRouter.HandleFunc("/auth/login", a.login).Methods("POST")
 	globalMux.Handle("/auth/", loginRouter)
+	globalMux.Handle("/exec", websocket.Handler(a.execContainer))
 
 	// hub handler; public
 	hubRouter := mux.NewRouter()
