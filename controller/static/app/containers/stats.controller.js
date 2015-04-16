@@ -6,7 +6,7 @@
 		.controller('ContainerStatsController', ContainerStatsController);
 
 	ContainerStatsController.$inject = ['$stateParams'];
-	function ContainerStatsController($stateParams, $scope) {
+	function ContainerStatsController($stateParams) {
             var vm = this;
             var graphCpuStats;
             var graphMemoryStats;
@@ -38,12 +38,33 @@
 
             vm.x = 0;
 
-            function addCpuUsage(date, usage) {
-                var stat = { x: date, y: usage };
+
+            var previousCpuUsage = 0;
+            var previousSystemCpuUsage = 0;
+            function addCpuUsage(date, systemUsage, usage, cpuCores) {
+                if(previousCpuUsage == 0 || previousSystemCpuUsage == 0) {
+                    previousCpuUsage = usage;
+                    previousSystemCpuUsage = systemUsage;
+                    return;
+                }
+
+                var usageSample = usage - previousCpuUsage
+                previousCpuUsage = usage;
+
+                var systemUsageSample = systemUsage - previousSystemCpuUsage;
+                previousSystemCpuUsage = systemUsage;
+
+                var cpuPercent = 0.0;
+                if(usageSample > 0.0 && systemUsageSample > 0.0) {
+                    cpuPercent = (usageSample / systemUsageSample) * cpuCores * 100.0;
+                }                
+
+                var stat = { x: date, y: cpuPercent };
                 vm.cpuStats[0].values.push(stat);
                 if (vm.cpuStats[0].values.length > 20) {
                     vm.cpuStats[0].values.shift();
                 }
+
             }
 
             function addMemoryUsage(date, usage) {
@@ -158,10 +179,9 @@
                 // stats come every 1 second; only update every 5
                 if (vm.x % vm.refreshInterval === 0) {
                     var timestamp = Date.parse(node.read);
-                    addCpuUsage(timestamp, node.cpu_stats.system_cpu_usage);
+                    addCpuUsage(timestamp, node.cpu_stats.system_cpu_usage, node.cpu_stats.cpu_usage.total_usage, node.cpu_stats.cpu_usage.percpu_usage.length);
                     addMemoryUsage(timestamp, node.memory_stats.usage);
                     addNetworkUsage(timestamp, node.network.rx_bytes, node.network.tx_bytes);
-                    //console.log(node);
                     refreshGraphs();
                 }
                 vm.x++;
