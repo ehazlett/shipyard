@@ -38,3 +38,14 @@ td.healthcolumn  {
     display: none;
     visability:hidden;
 }
+
+i.terminal {
+    border: none;
+    background: none;
+    color: #000000;
+    opacity: 0.8;
+}
+
+input.command {
+    color: #a4a4a4;
+}
