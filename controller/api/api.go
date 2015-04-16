@@ -1,24 +1,33 @@
 package api
 
 import (
+	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"github.com/mailgun/oxy/forward"
+	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
 	mAuth "github.com/shipyard/shipyard/controller/middleware/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	"golang.org/x/net/websocket"
 )
 
 type (
@@ -27,6 +36,7 @@ type (
 		manager            manager.Manager
 		authWhitelistCIDRs []string
 		enableCors         bool
+		serverVersion      string
 	}
 
 	Credentials struct {
@@ -554,6 +564,171 @@ func (a *Api) node(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) execContainer(ws *websocket.Conn) {
+	qry := ws.Request().URL.Query()
+	containerId := qry.Get("id")
+	command := qry.Get("cmd")
+	ttyWidth := qry.Get("w")
+	ttyHeight := qry.Get("h")
+	cmd := strings.Split(command, ",")
+
+	log.Debugf("starting exec session: container=%s cmd=%s", containerId, command)
+	clientUrl := a.manager.DockerClient().URL
+	host := fmt.Sprintf("%s://%s",
+		clientUrl.Scheme,
+		clientUrl.Host)
+
+	execConfig := &dockerclient.ExecConfig{
+		AttachStdin:  true,
+		AttachStdout: true,
+		AttachStderr: true,
+		Tty:          true,
+		Cmd:          cmd,
+	}
+
+	buf, err := json.Marshal(execConfig)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	rdr := bytes.NewReader(buf)
+
+	u := fmt.Sprintf("%s/containers/%s/exec", host, containerId)
+
+	resp, err := http.Post(u, "application/json", rdr)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	var info dockerclient.ContainerInfo
+	json.Unmarshal([]byte(data), &info)
+
+	if err := a.hijack(clientUrl.Host, "POST", "/exec/"+info.Id+"/start", true, ws, ws, ws, nil, nil); err != nil {
+		log.Errorf("error during hijack: %s", err)
+		return
+	}
+
+	// resize
+	u = fmt.Sprintf("%s/exec/%s/resize?w=%s&h=%s", host, info.Id, ttyWidth, ttyHeight)
+
+	resp, err = http.Post(u, "application/json", nil)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+}
+
+func (a *Api) hijack(addr, method, path string, setRawTerminal bool, in io.ReadCloser, stdout, stderr io.Writer, started chan io.Closer, data interface{}) error {
+	execConfig := &dockerclient.ExecConfig{
+		Tty:    true,
+		Detach: false,
+	}
+
+	buf, err := json.Marshal(execConfig)
+	if err != nil {
+		return err
+	}
+
+	rdr := bytes.NewReader(buf)
+
+	req, err := http.NewRequest(method, path, rdr)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("User-Agent", "Docker-Client")
+	req.Header.Set("Content-Type", "text/plain")
+	req.Header.Set("Connection", "Upgrade")
+	req.Header.Set("Upgrade", "tcp")
+	req.Host = addr
+
+	var (
+		dial      net.Conn
+		dialErr   error
+		tlsConfig = a.manager.DockerClient().TLSConfig
+	)
+
+	if tlsConfig == nil {
+		dial, dialErr = net.Dial("tcp", addr)
+	} else {
+		dial, dialErr = tls.Dial("tcp", addr, tlsConfig)
+	}
+
+	if dialErr != nil {
+		return dialErr
+	}
+
+	// When we set up a TCP connection for hijack, there could be long periods
+	// of inactivity (a long running command with no output) that in certain
+	// network setups may cause ECONNTIMEOUT, leaving the client in an unknown
+	// state. Setting TCP KeepAlive on the socket connection will prohibit
+	// ECONNTIMEOUT unless the socket connection truly is broken
+	if tcpConn, ok := dial.(*net.TCPConn); ok {
+		tcpConn.SetKeepAlive(true)
+		tcpConn.SetKeepAlivePeriod(30 * time.Second)
+	}
+	if err != nil {
+		return err
+	}
+	clientconn := httputil.NewClientConn(dial, nil)
+	defer clientconn.Close()
+
+	// Server hijacks the connection, error 'connection closed' expected
+	clientconn.Do(req)
+
+	rwc, br := clientconn.Hijack()
+	defer rwc.Close()
+
+	if started != nil {
+		started <- rwc
+	}
+
+	var receiveStdout chan error
+
+	if stdout != nil || stderr != nil {
+		go func() (err error) {
+			if setRawTerminal && stdout != nil {
+				_, err = io.Copy(stdout, br)
+			}
+			return err
+		}()
+	}
+
+	go func() error {
+		if in != nil {
+			io.Copy(rwc, in)
+		}
+
+		if conn, ok := rwc.(interface {
+			CloseWrite() error
+		}); ok {
+			if err := conn.CloseWrite(); err != nil {
+			}
+		}
+		return nil
+	}()
+
+	if stdout != nil || stderr != nil {
+		if err := <-receiveStdout; err != nil {
+			return err
+		}
+	}
+	go func() {
+		for {
+			fmt.Println(br)
+		}
+	}()
+
+	return nil
+}
+
 func (a *Api) Run() error {
 	globalMux := http.NewServeMux()
 	controllerManager := a.manager
@@ -625,6 +800,8 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/webhookkeys/{id}", a.webhookKey).Methods("GET")
 	apiRouter.HandleFunc("/api/webhookkeys", a.addWebhookKey).Methods("POST")
 	apiRouter.HandleFunc("/api/webhookkeys/{id}", a.deleteWebhookKey).Methods("DELETE")
+	//apiRouter.HandleFunc("/api/exec/{id}/{cmd:.*}", a.execContainer)
+	apiRouter.Handle("/api/exec", websocket.Handler(a.execContainer))
 
 	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
