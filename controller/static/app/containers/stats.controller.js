@@ -100,11 +100,11 @@
                 .x(function(d,i) { return d.x });
             graphCpuStats.xAxis // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
                 .tickFormat(function(d) { return d3.time.format('%H:%M:%S')(new Date(d));  })
-                .axisLabel("")
+                .axisLabel('')
                 ;
             graphCpuStats
                 graphCpuStats.yAxis
-                .axisLabel('')
+                .axisLabel('%')
                 .tickFormat(d3.format(',.4f'));
             graphCpuStats.showXAxis(true).showYAxis(true).rightAlignYAxis(true).margin({right: 90});
             d3.select('#graphCpuStats svg')
@@ -127,12 +127,12 @@
                 .x(function(d,i) { return d.x });
             graphMemoryStats.xAxis // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
                 .tickFormat(function(d) { return d3.time.format('%H:%M:%S')(new Date(d));  })
-                .axisLabel("")
+                .axisLabel('')
                 ;
             graphMemoryStats
                 graphMemoryStats.yAxis
-                .axisLabel('')
-                .tickFormat(d3.format(',.4f'));
+                .axisLabel('MB')
+                .tickFormat(d3.format(',.2f'));
             graphMemoryStats.showXAxis(true).showYAxis(true).rightAlignYAxis(true).margin({right: 90});
             d3.select('#graphMemoryStats svg')
                 .datum(vm.memoryStats)
@@ -153,11 +153,11 @@
                 .x(function(d,i) { return d.x });
             graphNetStats.xAxis // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
                 .tickFormat(function(d) { return d3.time.format('%H:%M:%S')(new Date(d));  })
-                .axisLabel("")
+                .axisLabel('')
                 ;
             graphNetStats
                 graphNetStats.yAxis
-                .axisLabel('')
+                .axisLabel('MB')
                 .tickFormat(d3.format(',.4f'));
             graphNetStats.showXAxis(true).showYAxis(true).rightAlignYAxis(true).margin({right: 90});
             d3.select('#graphNetStats svg')
@@ -180,8 +180,10 @@
             if (vm.x % vm.refreshInterval === 0) {
                 var timestamp = Date.parse(node.read);
                 addCpuUsage(timestamp, node.cpu_stats.system_cpu_usage, node.cpu_stats.cpu_usage.total_usage, node.cpu_stats.cpu_usage.percpu_usage.length);
-                addMemoryUsage(timestamp, node.memory_stats.usage);
-                addNetworkUsage(timestamp, node.network.rx_bytes, node.network.tx_bytes);
+                // convert to MB
+                addMemoryUsage(timestamp, node.memory_stats.usage / 1048576);
+                // convert to MB
+                addNetworkUsage(timestamp, node.network.rx_bytes / 1048576, node.network.tx_bytes / 1048576);
                 refreshGraphs();
             }
             vm.x++;

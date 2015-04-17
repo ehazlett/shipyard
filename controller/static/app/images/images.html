@@ -104,7 +104,7 @@
                     <th>Names</th>
                     <th>ID</th>
                     <th>Created</th>
-                    <th>Size</th>
+                    <th>Node</th>
                     <th>Virtual Size</th>
                     <th></th>
                 </tr>
@@ -114,7 +114,7 @@
                     <td><div class="ui label" ng-repeat="t in i.RepoTags">{{t}}</div></td>
                     <td>{{i.Id.substring(0,12)}}</td>
                     <td>{{i.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
-                    <td>{{i.Size / 1048576 | number:2}} MB</td>
+                    <td>{{i.Engine.Name}}</td>
                     <td>{{i.VirtualSize / 1048576 | number:2}} MB</td>
                     <td class="collapsing">
                         <div ng-click="vm.showRemoveImageDialog(i)" class="compact ui icon button red">
