@@ -74,6 +74,18 @@ func TestListContainers(t *testing.T) {
 	assertEqual(t, cnt.SizeRw, int64(0), "")
 }
 
+func TestContainerChanges(t *testing.T) {
+	client := testDockerClient(t)
+	changes, err := client.ContainerChanges("foobar")
+	if err != nil {
+		t.Fatal("cannot get container changes: %s", err)
+	}
+	assertEqual(t, len(changes), 3, "unexpected number of changes")
+	c := changes[0]
+	assertEqual(t, c.Path, "/dev", "unexpected")
+	assertEqual(t, c.Kind, 0, "unexpected")
+}
+
 func TestListContainersWithSize(t *testing.T) {
 	client := testDockerClient(t)
 	containers, err := client.ListContainers(true, true, "")

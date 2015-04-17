@@ -27,6 +27,7 @@ func init() {
 	r.HandleFunc(baseURL+"/info", handlerGetInfo).Methods("GET")
 	r.HandleFunc(baseURL+"/containers/json", handlerGetContainers).Methods("GET")
 	r.HandleFunc(baseURL+"/containers/{id}/logs", handleContainerLogs).Methods("GET")
+	r.HandleFunc(baseURL+"/containers/{id}/changes", handleContainerChanges).Methods("GET")
 	r.HandleFunc(baseURL+"/containers/{id}/kill", handleContainerKill).Methods("POST")
 	r.HandleFunc(baseURL+"/images/create", handleImagePull).Methods("POST")
 	testHTTPServer = httptest.NewServer(handlerAccessLog(r))
@@ -105,6 +106,25 @@ func handleContainerLogs(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(outStream, line)
 		}
 	}
+}
+
+func handleContainerChanges(w http.ResponseWriter, r *http.Request) {
+	writeHeaders(w, 200, "changes")
+	body := `[
+          {
+            "Path": "/dev",
+            "Kind": 0
+          },
+          {
+            "Path": "/dev/kmsg",
+            "Kind": 1
+          },
+          {
+            "Path": "/test",
+            "Kind": 1
+          }
+        ]`
+	w.Write([]byte(body))
 }
 
 func getBoolValue(boolString string) bool {
