@@ -40,6 +40,11 @@ func (client *MockClient) ContainerLogs(id string, options *dockerclient.LogOpti
 	return args.Get(0).(io.ReadCloser), args.Error(1)
 }
 
+func (client *MockClient) ContainerChanges(id string) ([]*dockerclient.ContainerChanges, error) {
+	args := client.Mock.Called(id)
+	return args.Get(0).([]*dockerclient.ContainerChanges), args.Error(1)
+}
+
 func (client *MockClient) StartContainer(id string, config *dockerclient.HostConfig) error {
 	args := client.Mock.Called(id, config)
 	return args.Error(0)
@@ -68,6 +73,14 @@ func (client *MockClient) StopAllMonitorEvents() {
 	client.Mock.Called()
 }
 
+func (client *MockClient) StartMonitorStats(id string, cb dockerclient.StatCallback, ec chan error, args ...interface{}) {
+	client.Mock.Called(id, cb, ec, args)
+}
+
+func (client *MockClient) StopAllMonitorStats() {
+	client.Mock.Called()
+}
+
 func (client *MockClient) Version() (*dockerclient.Version, error) {
 	args := client.Mock.Called()
 	return args.Get(0).(*dockerclient.Version), args.Error(1)
@@ -75,6 +88,11 @@ func (client *MockClient) Version() (*dockerclient.Version, error) {
 
 func (client *MockClient) PullImage(name string, auth *dockerclient.AuthConfig) error {
 	args := client.Mock.Called(name, auth)
+	return args.Error(0)
+}
+
+func (client *MockClient) LoadImage(reader io.Reader) error {
+	args := client.Mock.Called(reader)
 	return args.Error(0)
 }
 
@@ -88,9 +106,9 @@ func (client *MockClient) ListImages() ([]*dockerclient.Image, error) {
 	return args.Get(0).([]*dockerclient.Image), args.Error(1)
 }
 
-func (client *MockClient) RemoveImage(name string) error {
+func (client *MockClient) RemoveImage(name string) ([]*dockerclient.ImageDelete, error) {
 	args := client.Mock.Called(name)
-	return args.Error(0)
+	return args.Get(0).([]*dockerclient.ImageDelete), args.Error(1)
 }
 
 func (client *MockClient) PauseContainer(name string) error {

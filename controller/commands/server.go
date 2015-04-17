@@ -46,7 +46,7 @@ func CmdServer(c *cli.Context) {
 
 	log.Debugf("connected to docker: url=%s", dockerUrl)
 
-	shipyardApi, err := api.NewApi(listenAddr, controllerManager, authWhitelist, enableCors)
+	shipyardApi, err := api.NewApi(listenAddr, controllerManager, authWhitelist, enableCors, allowInsecure)
 	if err != nil {
 		log.Fatal(err)
 	}

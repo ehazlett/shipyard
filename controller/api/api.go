@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -38,6 +37,7 @@ type (
 		authWhitelistCIDRs []string
 		enableCors         bool
 		serverVersion      string
+		allowInsecure      bool
 	}
 
 	Credentials struct {
@@ -52,12 +52,13 @@ func writeCorsHeaders(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
 }
 
-func NewApi(listenAddr string, manager manager.Manager, authWhitelistCIDRs []string, enableCors bool) (*Api, error) {
+func NewApi(listenAddr string, manager manager.Manager, authWhitelistCIDRs []string, enableCors bool, allowInsecure bool) (*Api, error) {
 	return &Api{
 		listenAddr:         listenAddr,
 		manager:            manager,
 		authWhitelistCIDRs: authWhitelistCIDRs,
 		enableCors:         enableCors,
+		allowInsecure:      allowInsecure,
 	}, nil
 }
 
@@ -651,9 +652,6 @@ func (a *Api) execContainer(ws *websocket.Conn) {
 
 	log.Debugf("starting exec session: container=%s cmd=%s", containerId, command)
 	clientUrl := a.manager.DockerClient().URL
-	host := fmt.Sprintf("%s://%s",
-		clientUrl.Scheme,
-		clientUrl.Host)
 
 	execConfig := &dockerclient.ExecConfig{
 		AttachStdin:  true,
@@ -661,45 +659,39 @@ func (a *Api) execContainer(ws *websocket.Conn) {
 		AttachStderr: true,
 		Tty:          true,
 		Cmd:          cmd,
+		Container:    containerId,
+		Detach:       true,
 	}
 
-	buf, err := json.Marshal(execConfig)
+	execId, err := a.manager.DockerClient().Exec(execConfig)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("error calling exec: %s", err)
 		return
 	}
 
-	rdr := bytes.NewReader(buf)
-
-	u := fmt.Sprintf("%s/containers/%s/exec", host, containerId)
-
-	resp, err := http.Post(u, "application/json", rdr)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	var info dockerclient.ContainerInfo
-	json.Unmarshal([]byte(data), &info)
-
-	if err := a.hijack(clientUrl.Host, "POST", "/exec/"+info.Id+"/start", true, ws, ws, ws, nil, nil); err != nil {
+	if err := a.hijack(clientUrl.Host, "POST", "/exec/"+execId+"/start", true, ws, ws, ws, nil, nil); err != nil {
 		log.Errorf("error during hijack: %s", err)
 		return
 	}
 
 	// resize
-	u = fmt.Sprintf("%s/exec/%s/resize?w=%s&h=%s", host, info.Id, ttyWidth, ttyHeight)
-
-	resp, err = http.Post(u, "application/json", nil)
+	w, err := strconv.Atoi(ttyWidth)
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
+	h, err := strconv.Atoi(ttyHeight)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	if err := a.manager.DockerClient().ExecResize(execId, w, h); err != nil {
+		log.Errorf("error resizing exec tty: %s", err)
+		return
+	}
+
 }
 
 func (a *Api) hijack(addr, method, path string, setRawTerminal bool, in io.ReadCloser, stdout, stderr io.Writer, started chan io.Closer, data interface{}) error {
@@ -710,14 +702,14 @@ func (a *Api) hijack(addr, method, path string, setRawTerminal bool, in io.ReadC
 
 	buf, err := json.Marshal(execConfig)
 	if err != nil {
-		return err
+		return fmt.Errorf("error marshaling exec config: %s", err)
 	}
 
 	rdr := bytes.NewReader(buf)
 
 	req, err := http.NewRequest(method, path, rdr)
 	if err != nil {
-		return err
+		return fmt.Errorf("error during hijack request: %s", err)
 	}
 
 	req.Header.Set("User-Agent", "Docker-Client")
@@ -727,15 +719,20 @@ func (a *Api) hijack(addr, method, path string, setRawTerminal bool, in io.ReadC
 	req.Host = addr
 
 	var (
-		dial      net.Conn
-		dialErr   error
-		tlsConfig = a.manager.DockerClient().TLSConfig
+		dial          net.Conn
+		dialErr       error
+		execTLSConfig = a.manager.DockerClient().TLSConfig
 	)
 
-	if tlsConfig == nil {
+	if a.allowInsecure {
+		execTLSConfig.InsecureSkipVerify = true
+	}
+
+	if execTLSConfig == nil {
 		dial, dialErr = net.Dial("tcp", addr)
 	} else {
-		dial, dialErr = tls.Dial("tcp", addr, tlsConfig)
+		log.Debug("using tls for exec hijack")
+		dial, dialErr = tls.Dial("tcp", addr, execTLSConfig)
 	}
 
 	if dialErr != nil {
