@@ -69,7 +69,7 @@
                             }
                             websocket.onerror = function(evt) {
                                 if (typeof console.log == "function") {
-                                    console.log(evt)
+                                    //console.log(evt)
                                 }
                             }
                         }
