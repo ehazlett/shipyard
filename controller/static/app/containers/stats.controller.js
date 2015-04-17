@@ -105,7 +105,7 @@
             graphCpuStats
                 graphCpuStats.yAxis
                 .axisLabel('%')
-                .tickFormat(d3.format(',.4f'));
+                .tickFormat(d3.format(',.2f'));
             graphCpuStats.showXAxis(true).showYAxis(true).rightAlignYAxis(true).margin({right: 90});
             d3.select('#graphCpuStats svg')
                 .datum(vm.cpuStats)
@@ -158,7 +158,7 @@
             graphNetStats
                 graphNetStats.yAxis
                 .axisLabel('MB')
-                .tickFormat(d3.format(',.4f'));
+                .tickFormat(d3.format(',.2f'));
             graphNetStats.showXAxis(true).showYAxis(true).rightAlignYAxis(true).margin({right: 90});
             d3.select('#graphNetStats svg')
                 .datum(vm.netStats)
