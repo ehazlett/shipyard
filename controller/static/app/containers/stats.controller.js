@@ -11,7 +11,7 @@
         var graphCpuStats;
         var graphMemoryStats;
         var graphNetStats;
-        vm.refreshInterval = 5;
+        vm.refreshInterval = 2;
         vm.id = $stateParams.id;
 
         vm.cpuStats = [{
