@@ -14,7 +14,14 @@
         vm.addr = "";
         vm.request = null;
 
+        function isValid() {
+            return $('.ui.form').form('validate form');
+        }
+
         function addRegistry() {
+            if (!isValid()) {
+                return;
+            }
             vm.request = {
                 name: vm.name,
                 addr: vm.addr,

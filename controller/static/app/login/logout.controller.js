@@ -7,9 +7,9 @@
 
     LogoutController.$inject = ['AuthService', '$state'];
 	function LogoutController(AuthService, $state) {
-        var vm = this;
-        AuthService.logout();
-        $state.transitionTo('login');
-    }
+            var vm = this;
+            AuthService.logout();
+            $state.transitionTo('login');
+        }
 })();
 

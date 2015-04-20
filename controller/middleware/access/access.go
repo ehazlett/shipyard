@@ -28,10 +28,8 @@ func defaultAccessLevels() map[string][]string {
 	acl := make(map[string][]string)
 	acl["admin"] = []string{"*"}
 	acl["user"] = []string{
-		"/api/containers",
-		"/api/cluster/info",
-		"/api/events",
-		"/api/engines",
+		"/containers/json",
+		"/images/json",
 	}
 	return acl
 }
