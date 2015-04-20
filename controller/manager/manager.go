@@ -337,31 +337,52 @@ func (m DefaultManager) Account(username string) (*auth.Account, error) {
 }
 
 func (m DefaultManager) SaveAccount(account *auth.Account) error {
-	pass := account.Password
-	hash, err := m.authenticator.Hash(pass)
-	if err != nil {
-		return err
+	var (
+		hash      string
+		eventType string
+	)
+	if account.Password != "" {
+		h, err := m.authenticator.Hash(account.Password)
+		if err != nil {
+			return err
+		}
+
+		hash = h
 	}
 	// check if exists; if so, update
 	acct, err := m.Account(account.Username)
 	if err != nil && err != ErrAccountDoesNotExist {
 		return err
 	}
-	account.Password = hash
+
+	// update
 	if acct != nil {
-		if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": account.Username}).Update(map[string]string{"password": hash}).RunWrite(m.session); err != nil {
+		updates := map[string]string{
+			"first_name": account.FirstName,
+			"last_name":  account.LastName,
+		}
+		if account.Password != "" {
+			updates["password"] = hash
+		}
+
+		if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": account.Username}).Update(updates).RunWrite(m.session); err != nil {
 			return err
 		}
-		return nil
+
+		eventType = "update-account"
+	} else {
+		account.Password = hash
+		if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
+			return err
+		}
+		eventType = "add-account"
 	}
-	if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
-		return err
-	}
+
 	evt := &shipyard.Event{
-		Type:    "add-account",
+		Type:    eventType,
 		Time:    time.Now(),
 		Message: fmt.Sprintf("username=%s", account.Username),
-		Tags:    []string{"cluster", "security"},
+		Tags:    []string{"security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
@@ -381,7 +402,7 @@ func (m DefaultManager) DeleteAccount(account *auth.Account) error {
 		Type:    "delete-account",
 		Time:    time.Now(),
 		Message: fmt.Sprintf("username=%s", account.Username),
-		Tags:    []string{"cluster", "security"},
+		Tags:    []string{"security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
