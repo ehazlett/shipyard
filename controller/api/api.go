@@ -318,24 +318,6 @@ func (a *Api) saveAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountRoles := []*auth.Role{}
-
-	for _, role := range account.Roles {
-		if role != nil && role.Name != "" {
-			role, err := a.manager.Role(role.Name)
-			if err != nil {
-				log.Errorf("error getting role: %s", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			accountRoles = append(accountRoles, role)
-		}
-	}
-
-	if len(accountRoles) > 0 {
-		account.Roles = accountRoles
-	}
-
 	if err := a.manager.SaveAccount(account); err != nil {
 		log.Errorf("error saving account: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -407,36 +389,6 @@ func (a *Api) role(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := json.NewEncoder(w).Encode(role); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (a *Api) addRole(w http.ResponseWriter, r *http.Request) {
-	var role *auth.Role
-	if err := json.NewDecoder(r.Body).Decode(&role); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := a.manager.SaveRole(role); err != nil {
-		log.Errorf("error saving role: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	log.Infof("saved role %s", role.Name)
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func (a *Api) deleteRole(w http.ResponseWriter, r *http.Request) {
-	var role *auth.Role
-	if err := json.NewDecoder(r.Body).Decode(&role); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := a.manager.DeleteRole(role); err != nil {
-		log.Errorf("error deleting role: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -887,8 +839,6 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/accounts/{username}", a.deleteAccount).Methods("DELETE")
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
-	apiRouter.HandleFunc("/api/roles", a.addRole).Methods("POST")
-	apiRouter.HandleFunc("/api/roles", a.deleteRole).Methods("DELETE")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
@@ -1042,30 +992,12 @@ func (a *Api) Run() error {
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
 		// create roles
-		r := &auth.Role{
-			Name: "admin",
-		}
-		ru := &auth.Role{
-			Name: "user",
-		}
-		if err := controllerManager.SaveRole(r); err != nil {
-			log.Fatal(err)
-		}
-		if err := controllerManager.SaveRole(ru); err != nil {
-			log.Fatal(err)
-		}
-		role, err := controllerManager.Role(r.Name)
-		if err != nil {
-			log.Fatal(err)
-		}
 		acct := &auth.Account{
 			Username:  "admin",
 			Password:  "shipyard",
 			FirstName: "Shipyard",
 			LastName:  "Admin",
-			Roles: []*auth.Role{
-				role,
-			},
+			Roles:     []string{"admin"},
 		}
 		if err := controllerManager.SaveAccount(acct); err != nil {
 			log.Fatal(err)

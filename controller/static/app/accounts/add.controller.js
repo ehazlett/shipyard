@@ -5,8 +5,8 @@
         .module('shipyard.accounts')
         .controller('AccountsAddController', AccountsAddController);
 
-    AccountsAddController.$inject = ['$http', '$state'];
-    function AccountsAddController($http, $state) {
+    AccountsAddController.$inject = ['roles', '$http', '$state'];
+    function AccountsAddController(roles, $http, $state) {
         var vm = this;
         vm.request = {};
         vm.addAccount = addAccount;
@@ -16,6 +16,18 @@
         vm.lastName = "";
         vm.roleName = "user";
         vm.request = null;
+        vm.roles = roles;
+        vm.userRoles = null;
+        vm.roleOptions = roles;
+        vm.roleConfig = {
+            create: false,
+            valueField: 'role_name',
+            labelField: 'description',
+            delimiter: ',',
+            placeholder: 'Select Roles',
+            onInitialize: function(selectize){
+            },
+        };
 
         function isValid() {
             return $('.ui.form').form('validate form');
@@ -30,9 +42,7 @@
                 password: vm.password,
                 first_name: vm.firstName,
                 last_name: vm.lastName,
-                role: {
-                    "name": vm.role_name
-                }
+                roles: vm.userRoles
             }
             $http
                 .post('/api/accounts', vm.request)

@@ -15,11 +15,7 @@ var (
 func TestAccessControlAdminRole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "admin",
-			},
-		},
+		Roles:    []string{"admin"},
 	}
 
 	testPath := "/containers"
@@ -38,11 +34,7 @@ func TestAccessControlAdminRole(t *testing.T) {
 func TestAccessControlContainersRORole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "containers:ro",
-			},
-		},
+		Roles:    []string{"containers:ro"},
 	}
 
 	testPath := "/containers"
@@ -70,11 +62,7 @@ func TestAccessControlContainersRORole(t *testing.T) {
 func TestAccessControlContainersRWRole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "containers:rw",
-			},
-		},
+		Roles:    []string{"containers:rw"},
 	}
 
 	testPath := "/containers"
@@ -102,11 +90,7 @@ func TestAccessControlContainersRWRole(t *testing.T) {
 func TestAccessControlImagesRORole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "images:ro",
-			},
-		},
+		Roles:    []string{"images:ro"},
 	}
 
 	testPath := "/images"
@@ -134,11 +118,7 @@ func TestAccessControlImagesRORole(t *testing.T) {
 func TestAccessControlImagesRWRole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "images:rw",
-			},
-		},
+		Roles:    []string{"images:rw"},
 	}
 
 	testPath := "/containers"
@@ -172,11 +152,7 @@ func TestAccessControlImagesRWRole(t *testing.T) {
 func TestAccessControlRegistriesRORole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "registries:ro",
-			},
-		},
+		Roles:    []string{"registries:ro"},
 	}
 
 	testPath := "/api/registries"
@@ -204,11 +180,7 @@ func TestAccessControlRegistriesRORole(t *testing.T) {
 func TestAccessControlRegistriesRWRole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "registries:rw",
-			},
-		},
+		Roles:    []string{"registries:rw"},
 	}
 
 	testPath := "/api/registries"
@@ -243,11 +215,7 @@ func TestAccessControlRegistriesRWRole(t *testing.T) {
 func TestAccessControlEventsRORole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "events:ro",
-			},
-		},
+		Roles:    []string{"events:ro"},
 	}
 
 	testPath := "/api/events"
@@ -275,11 +243,7 @@ func TestAccessControlEventsRORole(t *testing.T) {
 func TestAccessControlEventsRWRole(t *testing.T) {
 	testAcct := &auth.Account{
 		Username: "testuser",
-		Roles: []*auth.Role{
-			{
-				Name: "events:rw",
-			},
-		},
+		Roles:    []string{"events:rw"},
 	}
 
 	testPath := "/api/events"

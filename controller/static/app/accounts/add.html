@@ -19,12 +19,9 @@
                 <div class="field">
                     <input type="password" name="password" ng-model="vm.password">
                 </div>
-                <label>Role</label>
+                <label>Roles</label>
                 <div class="field">
-                        <select class="ui compact dropdown" ng-model="vm.roleName">
-                            <option value="admin">Admin</option>
-                            <option value="user" selected="true">User</option>
-                        </select>
+                    <selectize options="vm.roleOptions" ng-model="vm.userRoles" config="vm.roleConfig"></selectize>
                 </div>
                 <div class="ui hidden divider"></div>
                 <div class="ui green submit button">Add Account</div>
