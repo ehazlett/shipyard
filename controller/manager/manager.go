@@ -68,10 +68,8 @@ type (
 		Authenticate(username, password string) bool
 		SaveAccount(account *auth.Account) error
 		DeleteAccount(account *auth.Account) error
-		Roles() ([]*auth.Role, error)
-		Role(name string) (*auth.Role, error)
-		SaveRole(role *auth.Role) error
-		DeleteRole(role *auth.Role) error
+		Roles() ([]*auth.ACL, error)
+		Role(name string) (*auth.ACL, error)
 		Store() *sessions.CookieStore
 		StoreKey() string
 		Container(id string) (*dockerclient.ContainerInfo, error)
@@ -337,31 +335,53 @@ func (m DefaultManager) Account(username string) (*auth.Account, error) {
 }
 
 func (m DefaultManager) SaveAccount(account *auth.Account) error {
-	pass := account.Password
-	hash, err := m.authenticator.Hash(pass)
-	if err != nil {
-		return err
+	var (
+		hash      string
+		eventType string
+	)
+	if account.Password != "" {
+		h, err := m.authenticator.Hash(account.Password)
+		if err != nil {
+			return err
+		}
+
+		hash = h
 	}
 	// check if exists; if so, update
 	acct, err := m.Account(account.Username)
 	if err != nil && err != ErrAccountDoesNotExist {
 		return err
 	}
-	account.Password = hash
+
+	// update
 	if acct != nil {
-		if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": account.Username}).Update(map[string]string{"password": hash}).RunWrite(m.session); err != nil {
+		updates := map[string]interface{}{
+			"first_name": account.FirstName,
+			"last_name":  account.LastName,
+			"roles":      account.Roles,
+		}
+		if account.Password != "" {
+			updates["password"] = hash
+		}
+
+		if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": account.Username}).Update(updates).RunWrite(m.session); err != nil {
 			return err
 		}
-		return nil
+
+		eventType = "update-account"
+	} else {
+		account.Password = hash
+		if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
+			return err
+		}
+		eventType = "add-account"
 	}
-	if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
-		return err
-	}
+
 	evt := &shipyard.Event{
-		Type:    "add-account",
+		Type:    eventType,
 		Time:    time.Now(),
 		Message: fmt.Sprintf("username=%s", account.Username),
-		Tags:    []string{"cluster", "security"},
+		Tags:    []string{"security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
@@ -381,7 +401,7 @@ func (m DefaultManager) DeleteAccount(account *auth.Account) error {
 		Type:    "delete-account",
 		Time:    time.Now(),
 		Message: fmt.Sprintf("username=%s", account.Username),
-		Tags:    []string{"cluster", "security"},
+		Tags:    []string{"security"},
 	}
 	if err := m.SaveEvent(evt); err != nil {
 		return err
@@ -389,71 +409,24 @@ func (m DefaultManager) DeleteAccount(account *auth.Account) error {
 	return nil
 }
 
-func (m DefaultManager) Roles() ([]*auth.Role, error) {
-	res, err := r.Table(tblNameRoles).OrderBy(r.Asc("name")).Run(m.session)
-	if err != nil {
-		return nil, err
-	}
-	roles := []*auth.Role{}
-	if err := res.All(&roles); err != nil {
-		return nil, err
-	}
+func (m DefaultManager) Roles() ([]*auth.ACL, error) {
+	roles := auth.DefaultACLs()
 	return roles, nil
 }
 
-func (m DefaultManager) Role(name string) (*auth.Role, error) {
-	res, err := r.Table(tblNameRoles).Filter(map[string]string{"name": name}).Run(m.session)
+func (m DefaultManager) Role(name string) (*auth.ACL, error) {
+	acls, err := m.Roles()
 	if err != nil {
 		return nil, err
-
-	}
-	if res.IsNil() {
-		return nil, ErrRoleDoesNotExist
-	}
-	var role *auth.Role
-	if err := res.One(&role); err != nil {
-		return nil, err
-	}
-	return role, nil
-}
-
-func (m DefaultManager) SaveRole(role *auth.Role) error {
-	if _, err := r.Table(tblNameRoles).Insert(role).RunWrite(m.session); err != nil {
-		return err
 	}
 
-	evt := &shipyard.Event{
-		Type:    "add-role",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s", role.Name),
-		Tags:    []string{"cluster", "security"},
+	for _, r := range acls {
+		if r.RoleName == name {
+			return r, nil
+		}
 	}
 
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m DefaultManager) DeleteRole(role *auth.Role) error {
-	res, err := r.Table(tblNameRoles).Get(role.ID).Delete().Run(m.session)
-	if err != nil {
-		return err
-	}
-	if res.IsNil() {
-		return ErrRoleDoesNotExist
-	}
-	evt := &shipyard.Event{
-		Type:    "delete-role",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s", role.Name),
-		Tags:    []string{"cluster", "security"},
-	}
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
-	return nil
+	return nil, nil
 }
 
 func (m DefaultManager) Authenticate(username, password string) bool {

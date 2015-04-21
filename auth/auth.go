@@ -13,15 +13,13 @@ var (
 
 type (
 	Account struct {
-		ID       string       `json:"id,omitempty" gorethink:"id,omitempty"`
-		Username string       `json:"username,omitempty" gorethink:"username"`
-		Password string       `json:"password,omitempty" gorethink:"password"`
-		Tokens   []*AuthToken `json:"-" gorethink:"tokens"`
-		Role     *Role        `json:"role,omitempty" gorethink:"role"`
-	}
-	Role struct {
-		ID   string `json:"id,omitempty" gorethink:"id,omitempty"`
-		Name string `json:"name,omitempty" gorethink:"name"`
+		ID        string       `json:"id,omitempty" gorethink:"id,omitempty"`
+		FirstName string       `json:"first_name,omitempty" gorethink:"first_name,omitempty"`
+		LastName  string       `json:"last_name,omitempty" gorethink:"last_name,omitempty"`
+		Username  string       `json:"username,omitempty" gorethink:"username"`
+		Password  string       `json:"password,omitempty" gorethink:"password"`
+		Tokens    []*AuthToken `json:"-" gorethink:"tokens"`
+		Roles     []string     `json:"roles,omitempty" gorethink:"roles"`
 	}
 	AuthToken struct {
 		Token     string `json:"auth_token,omitempty" gorethink:"auth_token"`

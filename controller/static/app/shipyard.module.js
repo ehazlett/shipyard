@@ -3,6 +3,7 @@
 
 	angular
 		.module('shipyard', [
+			'shipyard.accounts',
 			'shipyard.services',
 			'shipyard.layout',
 			'shipyard.help',
@@ -12,8 +13,10 @@
 			'shipyard.registry',
 			'shipyard.nodes',
 			'shipyard.images',
+                        'shipyard.filters',
                         'angular-jwt',
                         'base64',
+                        'selectize',
 			'ui.router'
 		]);
 		

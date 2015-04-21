@@ -67,25 +67,13 @@ func (m MockManager) DeleteAccount(account *auth.Account) error {
 	return nil
 }
 
-func (m MockManager) Roles() ([]*auth.Role, error) {
-	return []*auth.Role{
-		TestRole,
-	}, nil
+func (m MockManager) Roles() ([]*auth.ACL, error) {
+	return auth.DefaultACLs(), nil
 }
 
-func (m MockManager) Role(name string) (*auth.Role, error) {
-	return &auth.Role{
-		ID:   "0",
-		Name: name,
-	}, nil
-}
-
-func (m MockManager) SaveRole(role *auth.Role) error {
-	return nil
-}
-
-func (m MockManager) DeleteRole(role *auth.Role) error {
-	return nil
+func (m MockManager) Role(name string) (*auth.ACL, error) {
+	roles, err := m.Roles()
+	return roles[0], err
 }
 
 func (m MockManager) Authenticate(username, password string) bool {

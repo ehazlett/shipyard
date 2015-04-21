@@ -311,7 +311,7 @@ func (a *Api) accounts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *Api) addAccount(w http.ResponseWriter, r *http.Request) {
+func (a *Api) saveAccount(w http.ResponseWriter, r *http.Request) {
 	var account *auth.Account
 	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -324,17 +324,31 @@ func (a *Api) addAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof("saved account %s", account.Username)
+	log.Debugf("updated account: name=%s", account.Username)
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (a *Api) deleteAccount(w http.ResponseWriter, r *http.Request) {
-	var acct *auth.Account
-	if err := json.NewDecoder(r.Body).Decode(&acct); err != nil {
+func (a *Api) account(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	username := vars["username"]
+
+	account, err := a.manager.Account(username)
+	if err != nil {
+		log.Errorf("error deleting account: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	account, err := a.manager.Account(acct.Username)
+
+	if err := json.NewEncoder(w).Encode(account); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+func (a *Api) deleteAccount(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	username := vars["username"]
+
+	account, err := a.manager.Account(username)
 	if err != nil {
 		log.Errorf("error deleting account: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -346,7 +360,7 @@ func (a *Api) deleteAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof("deleted account %s (%s)", account.Username, account.ID)
+	log.Infof("deleted account: username=%s id=%s", account.Username, account.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -375,36 +389,6 @@ func (a *Api) role(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := json.NewEncoder(w).Encode(role); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (a *Api) addRole(w http.ResponseWriter, r *http.Request) {
-	var role *auth.Role
-	if err := json.NewDecoder(r.Body).Decode(&role); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := a.manager.SaveRole(role); err != nil {
-		log.Errorf("error saving role: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	log.Infof("saved role %s", role.Name)
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func (a *Api) deleteRole(w http.ResponseWriter, r *http.Request) {
-	var role *auth.Role
-	if err := json.NewDecoder(r.Body).Decode(&role); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := a.manager.DeleteRole(role); err != nil {
-		log.Errorf("error deleting role: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -478,7 +462,7 @@ func (a *Api) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !a.manager.Authenticate(creds.Username, creds.Password) {
-		log.Errorf("invalid login for %s from %s", creds.Username, r.RemoteAddr)
+		log.Warnf("invalid login for %s from %s", creds.Username, r.RemoteAddr)
 		http.Error(w, "invalid username/password", http.StatusForbidden)
 		return
 	}
@@ -850,12 +834,11 @@ func (a *Api) Run() error {
 
 	apiRouter := mux.NewRouter()
 	apiRouter.HandleFunc("/api/accounts", a.accounts).Methods("GET")
-	apiRouter.HandleFunc("/api/accounts", a.addAccount).Methods("POST")
-	apiRouter.HandleFunc("/api/accounts", a.deleteAccount).Methods("DELETE")
+	apiRouter.HandleFunc("/api/accounts", a.saveAccount).Methods("POST")
+	apiRouter.HandleFunc("/api/accounts/{username}", a.account).Methods("GET")
+	apiRouter.HandleFunc("/api/accounts/{username}", a.deleteAccount).Methods("DELETE")
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
-	apiRouter.HandleFunc("/api/roles", a.addRole).Methods("POST")
-	apiRouter.HandleFunc("/api/roles", a.deleteRole).Methods("DELETE")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
@@ -1009,26 +992,12 @@ func (a *Api) Run() error {
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
 		// create roles
-		r := &auth.Role{
-			Name: "admin",
-		}
-		ru := &auth.Role{
-			Name: "user",
-		}
-		if err := controllerManager.SaveRole(r); err != nil {
-			log.Fatal(err)
-		}
-		if err := controllerManager.SaveRole(ru); err != nil {
-			log.Fatal(err)
-		}
-		role, err := controllerManager.Role(r.Name)
-		if err != nil {
-			log.Fatal(err)
-		}
 		acct := &auth.Account{
-			Username: "admin",
-			Password: "shipyard",
-			Role:     role,
+			Username:  "admin",
+			Password:  "shipyard",
+			FirstName: "Shipyard",
+			LastName:  "Admin",
+			Roles:     []string{"admin"},
 		}
 		if err := controllerManager.SaveAccount(acct); err != nil {
 			log.Fatal(err)
