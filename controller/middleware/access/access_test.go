@@ -1,0 +1,318 @@
+package access
+
+import (
+	"testing"
+
+	"github.com/shipyard/shipyard/auth"
+	"github.com/shipyard/shipyard/controller/mock_test"
+)
+
+var (
+	mockManager    = &mock_test.MockManager{}
+	accessRequired = NewAccessRequired(mockManager)
+)
+
+func TestAccessControlAdminRole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "admin",
+			},
+		},
+	}
+
+	testPath := "/containers"
+
+	if !accessRequired.checkAccess(testAcct, testPath, "POST") {
+		t.Fatalf("expected valid access for %s", testPath)
+	}
+
+	testPath = "/images"
+
+	if !accessRequired.checkAccess(testAcct, testPath, "POST") {
+		t.Fatalf("expected valid access for %s", testPath)
+	}
+}
+
+func TestAccessControlContainersRORole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "containers:ro",
+			},
+		},
+	}
+
+	testPath := "/containers"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/containers"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlContainersRWRole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "containers:rw",
+			},
+		},
+	}
+
+	testPath := "/containers"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/containers"
+	testMethod = "POST"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlImagesRORole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "images:ro",
+			},
+		},
+	}
+
+	testPath := "/images"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/containers"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlImagesRWRole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "images:rw",
+			},
+		},
+	}
+
+	testPath := "/containers"
+	testMethod := "GET"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/containers"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+	testPath = "/images"
+	testMethod = "POST"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlRegistriesRORole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "registries:ro",
+			},
+		},
+	}
+
+	testPath := "/api/registries"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/registries"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/containers"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlRegistriesRWRole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "registries:rw",
+			},
+		},
+	}
+
+	testPath := "/api/registries"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/registries"
+	testMethod = "POST"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "GET"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlEventsRORole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "events:ro",
+			},
+		},
+	}
+
+	testPath := "/api/events"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/events"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/containers"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlEventsRWRole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles: []*auth.Role{
+			{
+				Name: "events:rw",
+			},
+		},
+	}
+
+	testPath := "/api/events"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/events"
+	testMethod = "POST"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/events"
+	testMethod = "DELETE"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "GET"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+	testPath = "/images"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}

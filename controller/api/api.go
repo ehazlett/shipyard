@@ -318,12 +318,22 @@ func (a *Api) saveAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if account.Role != nil && account.Role.Name != "" {
-		role, err := a.manager.Role(account.Role.Name)
-		log.Errorf("error saving account: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-		account.Role = role
+	accountRoles := []*auth.Role{}
+
+	for _, role := range account.Roles {
+		if role != nil && role.Name != "" {
+			role, err := a.manager.Role(role.Name)
+			if err != nil {
+				log.Errorf("error getting role: %s", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			accountRoles = append(accountRoles, role)
+		}
+	}
+
+	if len(accountRoles) > 0 {
+		account.Roles = accountRoles
 	}
 
 	if err := a.manager.SaveAccount(account); err != nil {
@@ -1053,7 +1063,9 @@ func (a *Api) Run() error {
 			Password:  "shipyard",
 			FirstName: "Shipyard",
 			LastName:  "Admin",
-			Role:      role,
+			Roles: []*auth.Role{
+				role,
+			},
 		}
 		if err := controllerManager.SaveAccount(acct); err != nil {
 			log.Fatal(err)

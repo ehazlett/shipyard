@@ -26,9 +26,11 @@ var (
 		Name:    TestContainerName,
 		Image:   TestContainerImage,
 	}
-	TestRole = &auth.Role{
-		ID:   "0",
-		Name: "testrole",
+	TestRoles = []*auth.Role{
+		{
+			ID:   "0",
+			Name: "testrole",
+		},
 	}
 	TestNode = &shipyard.Node{
 		ID:   "0",
@@ -39,7 +41,7 @@ var (
 		ID:       "0",
 		Username: "testuser",
 		Password: "test",
-		Role:     TestRole,
+		Roles:    TestRoles,
 	}
 	TestEvent = &shipyard.Event{
 		Type:          "test-event",

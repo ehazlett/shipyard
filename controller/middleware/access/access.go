@@ -21,25 +21,15 @@ func defaultDeniedHandler(w http.ResponseWriter, r *http.Request) {
 type AccessRequired struct {
 	deniedHandler http.Handler
 	manager       manager.Manager
-	acl           map[string][]string
-}
-
-func defaultAccessLevels() map[string][]string {
-	acl := make(map[string][]string)
-	acl["admin"] = []string{"*"}
-	acl["user"] = []string{
-		"/containers/json",
-		"/images/json",
-	}
-	return acl
+	acls          []*ACL
 }
 
 func NewAccessRequired(m manager.Manager) *AccessRequired {
-	acl := defaultAccessLevels()
+	acls := defaultAccessLevels()
 	a := &AccessRequired{
 		deniedHandler: http.HandlerFunc(defaultDeniedHandler),
 		manager:       m,
-		acl:           acl,
+		acls:          acls,
 	}
 	return a
 }
@@ -68,9 +58,8 @@ func (a *AccessRequired) handleRequest(w http.ResponseWriter, r *http.Request) e
 			if err != nil {
 				return err
 			}
-			role := acct.Role
 			// check role
-			valid = a.checkAccess(r.URL.Path, role)
+			valid = a.checkAccess(acct, r.URL.Path, r.Method)
 		}
 	} else { // only check access for users; not service keys
 		valid = true
@@ -84,15 +73,49 @@ func (a *AccessRequired) handleRequest(w http.ResponseWriter, r *http.Request) e
 	return nil
 }
 
-func (a *AccessRequired) checkAccess(path string, role *auth.Role) bool {
-	valid := false
-	for _, v := range a.acl[role.Name] {
-		if v == "*" || strings.HasPrefix(path, v) {
-			valid = true
-			break
+func (a *AccessRequired) checkRule(rule *AccessRule, path, method string) bool {
+	// check wildcard
+	if rule.Path == "*" {
+		return true
+	}
+
+	// check path
+	if strings.HasPrefix(path, rule.Path) {
+		// check method
+		for _, m := range rule.Methods {
+			if m == method {
+				return true
+			}
 		}
 	}
-	return valid
+
+	return false
+}
+
+func (a *AccessRequired) checkRole(role *auth.Role, path, method string) bool {
+	for _, acl := range a.acls {
+		// find role
+		if acl.RoleName == role.Name {
+			for _, rule := range acl.Rules {
+				if a.checkRule(rule, path, method) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+func (a *AccessRequired) checkAccess(acct *auth.Account, path string, method string) bool {
+	// check roles
+	for _, role := range acct.Roles {
+		// check acls
+		if a.checkRole(role, path, method) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (a *AccessRequired) HandlerFuncWithNext(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
