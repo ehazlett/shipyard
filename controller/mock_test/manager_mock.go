@@ -68,9 +68,7 @@ func (m MockManager) DeleteAccount(account *auth.Account) error {
 }
 
 func (m MockManager) Roles() ([]*auth.Role, error) {
-	return []*auth.Role{
-		TestRole,
-	}, nil
+	return TestRoles, nil
 }
 
 func (m MockManager) Role(name string) (*auth.Role, error) {
