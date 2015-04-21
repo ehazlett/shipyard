@@ -35,6 +35,15 @@
             return response;
         };
     })
+    .service('403interceptor', function($rootScope) {
+        var service = this;
+        service.responseError = function(response) {
+            if(response.status === 403) {
+                $rootScope.$state.go('403');
+            }
+            return response;
+        };
+    })
     .config([
             '$httpProvider',
             'jwtInterceptorProvider', 
@@ -50,6 +59,7 @@
                 $httpProvider.interceptors.push('jwtInterceptor');
                 $httpProvider.interceptors.push('spinnerInterceptor');
                 $httpProvider.interceptors.push('401interceptor');
+                $httpProvider.interceptors.push('403interceptor');
             }
     ]);
 })();
