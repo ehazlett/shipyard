@@ -13,7 +13,6 @@
                 templateUrl: 'app/error/error.html',
                 authenticate: false
             });
-
         $urlRouterProvider.otherwise(function ($injector) {
             var $state = $injector.get('$state');
             $state.go('dashboard.containers');
