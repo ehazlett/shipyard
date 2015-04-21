@@ -21,11 +21,11 @@ func defaultDeniedHandler(w http.ResponseWriter, r *http.Request) {
 type AccessRequired struct {
 	deniedHandler http.Handler
 	manager       manager.Manager
-	acls          []*ACL
+	acls          []*auth.ACL
 }
 
 func NewAccessRequired(m manager.Manager) *AccessRequired {
-	acls := defaultAccessLevels()
+	acls := auth.DefaultACLs()
 	a := &AccessRequired{
 		deniedHandler: http.HandlerFunc(defaultDeniedHandler),
 		manager:       m,
@@ -73,7 +73,7 @@ func (a *AccessRequired) handleRequest(w http.ResponseWriter, r *http.Request) e
 	return nil
 }
 
-func (a *AccessRequired) checkRule(rule *AccessRule, path, method string) bool {
+func (a *AccessRequired) checkRule(rule *auth.AccessRule, path, method string) bool {
 	// check wildcard
 	if rule.Path == "*" {
 		return true
@@ -92,10 +92,10 @@ func (a *AccessRequired) checkRule(rule *AccessRule, path, method string) bool {
 	return false
 }
 
-func (a *AccessRequired) checkRole(role *auth.Role, path, method string) bool {
+func (a *AccessRequired) checkRole(role string, path, method string) bool {
 	for _, acl := range a.acls {
 		// find role
-		if acl.RoleName == role.Name {
+		if acl.RoleName == role {
 			for _, rule := range acl.Rules {
 				if a.checkRule(rule, path, method) {
 					return true

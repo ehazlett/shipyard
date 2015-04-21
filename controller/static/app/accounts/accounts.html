@@ -65,7 +65,7 @@
                     <td>{{a.username}}</td>
                     <td>{{a.first_name}}</td>
                     <td>{{a.last_name}}</td>
-                    <td><div ng-repeat="r in a.roles" class="ui horizontal label">{{r.name}}</div></td>
+                    <td><div ng-repeat="r in a.roles" class="ui horizontal label">{{r|roleDisplay}}</div></td>
                     <td class="collapsing">
                         <div ui-sref="dashboard.editAccount({username: a.username})" class="compact ui icon button">
                             <i class="search icon"></i>

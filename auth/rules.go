@@ -1,19 +1,19 @@
-package access
+package auth
 
 type (
 	ACL struct {
-		RoleName    string
-		Description string
-		Rules       []*AccessRule
+		RoleName    string        `json:"role_name,omitempty"`
+		Description string        `json:"description,omitempty"`
+		Rules       []*AccessRule `json:"rules,omitempty"`
 	}
 
 	AccessRule struct {
-		Path    string
-		Methods []string
+		Path    string   `json:"path,omitempty"`
+		Methods []string `json:"methods,omitempty"`
 	}
 )
 
-func defaultAccessLevels() []*ACL {
+func DefaultACLs() []*ACL {
 	acls := []*ACL{}
 	adminACL := &ACL{
 		RoleName:    "admin",

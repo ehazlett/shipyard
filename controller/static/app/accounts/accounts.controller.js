@@ -5,8 +5,8 @@
 		.module('shipyard.accounts')
 		.controller('AccountsController', AccountsController);
 
-	AccountsController.$inject = ['accounts', 'AccountsService', '$state', '$timeout'];
-	function AccountsController(accounts, AccountsService, $state, $timeout) {
+	AccountsController.$inject = ['accounts', 'roles', 'AccountsService', '$state', '$timeout'];
+	function AccountsController(accounts, roles, AccountsService, $state, $timeout) {
             var vm = this;
             vm.accounts = accounts;
             vm.refresh = refresh;

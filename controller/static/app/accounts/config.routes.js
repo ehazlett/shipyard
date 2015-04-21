@@ -20,6 +20,11 @@
                                     return AccountsService.list().then(null, function(errorData) {	                            
                                         $state.go('error');
                                     }); 
+                                }],
+                                roles: ['AccountsService', '$state', '$stateParams', function (AccountsService, $state, $stateParams) {
+                                    return AccountsService.roles().then(null, function(errorData) {
+                                        $state.go('error');
+                                    });
                                 }] 
                             }
 			})
@@ -28,7 +33,14 @@
                             templateUrl: 'app/accounts/add.html',
                             controller: 'AccountsAddController',
                             controllerAs: 'vm',
-                            authenticate: true
+                            authenticate: true,
+                            resolve: {
+                                roles: ['AccountsService', '$state', '$stateParams', function (AccountsService, $state, $stateParams) {
+                                    return AccountsService.roles().then(null, function(errorData) {
+                                        $state.go('error');
+                                    });
+                                }] 
+                            }
                         })
                         .state('dashboard.editAccount', {
                             url: '^/accounts/edit/{username}',
@@ -39,6 +51,11 @@
                             resolve: {
                                 account: ['AccountsService', '$state', '$stateParams', function (AccountsService, $state, $stateParams) {
                                     return AccountsService.getAccount($stateParams.username).then(null, function(errorData) {
+                                        $state.go('error');
+                                    });
+                                }],
+                                roles: ['AccountsService', '$state', '$stateParams', function (AccountsService, $state, $stateParams) {
+                                    return AccountsService.roles().then(null, function(errorData) {
                                         $state.go('error');
                                     });
                                 }] 

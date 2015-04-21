@@ -16,6 +16,22 @@
                         });
                     return promise;
                 },
+                roles: function() {
+                    var promise = $http
+                        .get('/api/roles')
+                        .then(function(response) {
+                            return response.data;
+                        });
+                    return promise;
+                },
+                role: function(name) {
+                    var promise = $http
+                        .get('/api/roles/'+name)
+                        .then(function(response) {
+                            return response.data;
+                        });
+                    return promise;
+                },
                 getAccount: function(username) {
                     var promise = $http
                         .get('/api/accounts/' + username)
