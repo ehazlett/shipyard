@@ -51,6 +51,30 @@ func DefaultACLs() []*ACL {
 	}
 	acls = append(acls, containersACLRW)
 
+	eventsACLRO := &ACL{
+		RoleName:    "events:ro",
+		Description: "Events Read Only",
+		Rules: []*AccessRule{
+			{
+				Path:    "/api/events",
+				Methods: []string{"GET"},
+			},
+		},
+	}
+	acls = append(acls, eventsACLRO)
+
+	eventsACLRW := &ACL{
+		RoleName:    "events:rw",
+		Description: "Events",
+		Rules: []*AccessRule{
+			{
+				Path:    "/api/events",
+				Methods: []string{"GET", "POST", "DELETE"},
+			},
+		},
+	}
+	acls = append(acls, eventsACLRW)
+
 	imagesACLRO := &ACL{
 		RoleName:    "images:ro",
 		Description: "Images Read Only",
@@ -75,12 +99,36 @@ func DefaultACLs() []*ACL {
 	}
 	acls = append(acls, imagesACLRW)
 
+	nodesACLRO := &ACL{
+		RoleName:    "nodes:ro",
+		Description: "Nodes Read Only",
+		Rules: []*AccessRule{
+			{
+				Path:    "/api/nodes",
+				Methods: []string{"GET"},
+			},
+		},
+	}
+	acls = append(acls, nodesACLRO)
+
+	nodesACLRW := &ACL{
+		RoleName:    "nodes:rw",
+		Description: "Nodes",
+		Rules: []*AccessRule{
+			{
+				Path:    "/api/nodes",
+				Methods: []string{"GET", "POST", "DELETE"},
+			},
+		},
+	}
+	acls = append(acls, nodesACLRW)
+
 	registriesACLRO := &ACL{
 		RoleName:    "registries:ro",
 		Description: "Registries Read Only",
 		Rules: []*AccessRule{
 			{
-				Path:    "/api/registries",
+				Path:    "/api/registry",
 				Methods: []string{"GET"},
 			},
 		},
@@ -92,36 +140,12 @@ func DefaultACLs() []*ACL {
 		Description: "Registries",
 		Rules: []*AccessRule{
 			{
-				Path:    "/api/registries",
+				Path:    "/api/registry",
 				Methods: []string{"GET", "POST", "DELETE"},
 			},
 		},
 	}
 	acls = append(acls, registriesACLRW)
-
-	eventsACLRO := &ACL{
-		RoleName:    "events:ro",
-		Description: "Events Read Only",
-		Rules: []*AccessRule{
-			{
-				Path:    "/api/events",
-				Methods: []string{"GET"},
-			},
-		},
-	}
-	acls = append(acls, eventsACLRO)
-
-	eventsACLRW := &ACL{
-		RoleName:    "events:rw",
-		Description: "Events",
-		Rules: []*AccessRule{
-			{
-				Path:    "/api/events",
-				Methods: []string{"GET", "POST", "DELETE"},
-			},
-		},
-	}
-	acls = append(acls, eventsACLRW)
 
 	return acls
 }
