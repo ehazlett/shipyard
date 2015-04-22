@@ -3,6 +3,7 @@ package commands
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	"github.com/shipyard/shipyard/auth/builtin"
 	"github.com/shipyard/shipyard/controller/api"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/utils"
@@ -39,7 +40,9 @@ func CmdServer(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo)
+	authenticator := builtin.NewAuthenticator("defaultshipyard")
+
+	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo, authenticator)
 	if err != nil {
 		log.Fatal(err)
 	}
