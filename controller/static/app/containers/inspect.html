@@ -139,6 +139,16 @@
                                 </div>
                             </div>
                         </div>
+                        <h4 class="ui dividing header">Container Links</h4>
+                        <div class="ui divided list" ng-hide="!vm.container.NetworkSettings.Ports"> 
+                            <div ng-repeat="v in vm.container.HostConfig.Links">{{ vm.parseLinkingString(v) }}</div>
+                        </div>
+                        <h4 class="ui dividing header">Volumes</h4>
+                        <div class="ui divided list" ng-hide="vm.isEmptyObject(vm.container.Volumes)"> 
+                            <div ng-repeat="(k, values) in vm.container.Volumes">
+                              {{ k }} &#8594; {{ values }}
+                            </div>
+                        </div>
                     </div>
                     <div class="column">
                         <h4 class="ui dividing header">Swarm Node</h4>
@@ -168,36 +178,6 @@
                                 </div>
                             </div>
                         </div>
-                        <table class="ui compact table">
-                            <thead>
-                                <tr>
-                                  <th>Container Linking</th>
-                                  <th ng-show="!vm.container.HostConfig.Links">
-                                      <div class="ui blue horizontal label">Nothing Linked</div>
-                                  </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="v in vm.container.HostConfig.Links">
-                                  <td>{{ vm.parseLinkingString(v) }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table class="ui compact table">
-                            <thead>
-                                <tr>
-                                  <th>Container Volumes</th>
-                                  <th ng-show="vm.isEmptyObject(vm.container.Volumes)">
-                                      <div class="ui blue horizontal label">Nothing Mounted</div>
-                                  </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="(k, values) in vm.container.Volumes">
-                                  <td>{{ k }} &#8594; {{ values }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                     <div class="column">
                         <h4 class="ui dividing header">Environment</h4>
