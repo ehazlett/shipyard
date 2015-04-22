@@ -139,16 +139,6 @@
                                 </div>
                             </div>
                         </div>
-                        <h4 class="ui dividing header">Container Links</h4>
-                        <div class="ui divided list" ng-hide="!vm.container.NetworkSettings.Ports"> 
-                            <div ng-repeat="v in vm.container.HostConfig.Links">{{ vm.parseLinkingString(v) }}</div>
-                        </div>
-                        <h4 class="ui dividing header">Volumes</h4>
-                        <div class="ui divided list" ng-hide="vm.isEmptyObject(vm.container.Volumes)"> 
-                            <div ng-repeat="(k, values) in vm.container.Volumes">
-                              {{ k }} &#8594; {{ values }}
-                            </div>
-                        </div>
                     </div>
                     <div class="column">
                         <h4 class="ui dividing header">Swarm Node</h4>
@@ -187,6 +177,43 @@
                         <div class="item" ng-repeat="e in vm.container.Config.Env">
                             <pre class="logs">{{ e }}</pre>
                         </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="vm.links.length>0">
+                    <div class="column">
+                        <h4 class="ui dividing header">Container Links</h4>
+                        <table class="ui sortable celled table">
+                            <thead>
+                                <tr>
+                                    <th>Container Name</th>
+                                    <th>Link Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="v in vm.links">
+                                    <td>{{v.container}}</td>
+                                    <td>{{v.link}}</td>
+                                </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row" ng-hide="vm.isEmptyObject(vm.container.Volumes)">
+                    <div class="column">
+                        <h4 class="ui dividing header">Volume</h4>
+                        <table class="ui sortable celled table">
+                            <thead>
+                                <tr>
+                                    <th>Volume</th>
+                                    <th>Host Path</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(k, v) in vm.container.Volumes">
+                                    <td>{{k}}</td>
+                                    <td>{{v}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="row" ng-show="vm.top">
