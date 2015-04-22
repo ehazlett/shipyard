@@ -42,6 +42,10 @@
         vm.hostPort = "";
         vm.containerPort = "";
         vm.protocol = "TCP";
+
+        vm.constraints =[]
+        vm.constraintName = "";
+        vm.constraintValue = "";
         
         vm.envVars = [];
         vm.variableName = "";
@@ -68,6 +72,8 @@
         };
 
         vm.deploy = deploy;
+        vm.pushConstraint = pushConstraint;
+        vm.removeConstraint = removeConstraint;
         vm.pushVolume = pushVolume;
         vm.deleteVolume = deleteVolume;
         vm.pushLink = pushLink;
@@ -76,6 +82,18 @@
         vm.removeEnvVar = removeEnvVar;
         vm.pushPort = pushPort;
         vm.removePort = removePort;
+
+        function pushConstraint() {
+            var constraint = {'ConstraintName': vm.constraintName, 'ConstraintValue': vm.constraintValue};
+            vm.constraints.push(constraint);
+            vm.constraintName = "";
+            vm.constraintValue = "";
+        }
+
+        function removeConstraint(constraint) {
+            var index = vm.constraints.indexOf(removeConstraint);
+            vm.constraints.splice(index, 1);
+        }
 
         function pushVolume() {
             var volume = {'HostPath': vm.hostPath, 'ContainerPath': vm.containerPath};
@@ -146,6 +164,16 @@
                 vm.request.Env.push(vm.envVars[i].name + "=" + vm.envVars[i].value);
             }
         }
+
+        function transformConstraints() {
+            var i;
+            if(vm.constraintName.length > 0) {
+                vm.request.Env.push("constraint:" + vm.constraintName + "==" + vm.constraintValue);
+            }
+            for(i = 0; i < vm.constraints.lenght; i++) {
+                vm.request.Env.push("constraint:" + vm.constraints[i].ConstraintName + "==" + vm.constraints[i].ConstraintValue);
+            }
+        }
         
         function transformCommand() {
             if(vm.cmd.length > 0) {
@@ -195,6 +223,7 @@
             transformVolumes();
             transformLinks();
             transformEnvVars();
+            transformConstraints();
             transformCommand();   
             transformPorts();
             transformResourceLimits();
