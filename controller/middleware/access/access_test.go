@@ -155,14 +155,14 @@ func TestAccessControlRegistriesRORole(t *testing.T) {
 		Roles:    []string{"registries:ro"},
 	}
 
-	testPath := "/api/registries"
+	testPath := "/api/registry"
 	testMethod := "GET"
 
 	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
 		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
 	}
 
-	testPath = "/api/registries"
+	testPath = "/api/registry"
 	testMethod = "POST"
 
 	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
@@ -183,14 +183,14 @@ func TestAccessControlRegistriesRWRole(t *testing.T) {
 		Roles:    []string{"registries:rw"},
 	}
 
-	testPath := "/api/registries"
+	testPath := "/api/registry"
 	testMethod := "GET"
 
 	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
 		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
 	}
 
-	testPath = "/api/registries"
+	testPath = "/api/registry"
 	testMethod = "POST"
 
 	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
@@ -261,6 +261,75 @@ func TestAccessControlEventsRWRole(t *testing.T) {
 	}
 
 	testPath = "/api/events"
+	testMethod = "DELETE"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/images"
+	testMethod = "GET"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+	testPath = "/images"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlNodesRORole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles:    []string{"nodes:ro"},
+	}
+
+	testPath := "/api/nodes"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/nodes"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/containers"
+	testMethod = "POST"
+
+	if accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected denied access for %s %s", testMethod, testPath)
+	}
+}
+
+func TestAccessControlNodesRWRole(t *testing.T) {
+	testAcct := &auth.Account{
+		Username: "testuser",
+		Roles:    []string{"nodes:rw"},
+	}
+
+	testPath := "/api/nodes"
+	testMethod := "GET"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/nodes"
+	testMethod = "POST"
+
+	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
+		t.Fatalf("expected valid access for %s %s", testMethod, testPath)
+	}
+
+	testPath = "/api/nodes"
 	testMethod = "DELETE"
 
 	if !accessRequired.checkAccess(testAcct, testPath, testMethod) {
