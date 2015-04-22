@@ -56,7 +56,7 @@ type (
 		database         string
 		authKey          string
 		session          *r.Session
-		authenticator    *auth.Authenticator
+		authenticator    auth.Authenticator
 		store            *sessions.CookieStore
 		client           *dockerclient.DockerClient
 		disableUsageInfo bool
@@ -107,7 +107,7 @@ type (
 	}
 )
 
-func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool) (Manager, error) {
+func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, authenticator auth.Authenticator) (Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:     addr,
 		Database:    database,
@@ -125,7 +125,7 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 		database:         database,
 		authKey:          authKey,
 		session:          session,
-		authenticator:    &auth.Authenticator{},
+		authenticator:    authenticator,
 		store:            store,
 		client:           client,
 		storeKey:         storeKey,
@@ -340,7 +340,7 @@ func (m DefaultManager) SaveAccount(account *auth.Account) error {
 		eventType string
 	)
 	if account.Password != "" {
-		h, err := m.authenticator.Hash(account.Password)
+		h, err := auth.Hash(account.Password)
 		if err != nil {
 			return err
 		}
@@ -529,7 +529,11 @@ func (m DefaultManager) NewServiceKey(description string) (*auth.ServiceKey, err
 }
 
 func (m DefaultManager) ChangePassword(username, password string) error {
-	hash, err := m.authenticator.Hash(password)
+	if !m.authenticator.IsUpdateSupported() {
+		return fmt.Errorf("not supported for authenticator: %s", m.authenticator.Name())
+	}
+
+	hash, err := auth.Hash(password)
 	if err != nil {
 		return err
 	}
