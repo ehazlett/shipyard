@@ -19,11 +19,29 @@
         vm.isEmptyObject = isEmptyObject;
         vm.top;
         vm.stats;
+        vm.links = parseContainerLinks(vm.container.HostConfig.Links);
 
         if(resolvedContainer.State.Running) {
             ContainerService.top(resolvedContainer.Id).then(function(data) {
                 vm.top = data
             }, null);
+        }
+
+        function parseContainerLinks(links) {
+            var l = [];
+            if (links == null) {
+                return l;
+            }
+            for (var i=0; i<links.length; i++) {
+                var parts = links[i].split(':');
+                var link = {
+                    container: parts[0].slice(1),
+                    link: parts[1].split('/')[2]
+                }
+                l.push(link)
+            }
+
+            return l;
         }
 
         function parseLinkingString(linkingString) {
