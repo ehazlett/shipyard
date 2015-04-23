@@ -5,8 +5,8 @@
 		.module('shipyard.images')
 		.controller('ImagesController', ImagesController);
 
-	ImagesController.$inject = ['images', 'ImagesService', '$state', '$timeout'];
-	function ImagesController(images, ImagesService, $state, $timeout) {
+	ImagesController.$inject = ['images', 'ImagesService', '$state', '$timeout', '$scope'];
+	function ImagesController(images, ImagesService, $state, $timeout, $scope) {
             var vm = this;
             vm.images = images;
             vm.pulling = false;
@@ -17,6 +17,7 @@
             vm.pullImageName = "";
             vm.showRemoveImageDialog = showRemoveImageDialog;
             vm.showPullImageDialog = showPullImageDialog;
+            vm.error = "";
 
             function showRemoveImageDialog(image) {
                 vm.selectedImage = image;
@@ -48,6 +49,7 @@
             }
 
             function pullImage() {
+                vm.error = "";
                 vm.pulling = true;
                 // this is to prevent errors in the console since we
                 // get a stream like response back
@@ -59,10 +61,20 @@
                         'X-Access-Token': localStorage.getItem("X-Access-Token")
                     }
                 })
-                .done(function() {
-                    setTimeout(vm.refresh, 2000)
-                    vm.pulling = false;
+                .done(function(node) {
+                    // We expect two nodes, e.g.
+                    // 1) Pulling busybox...
+                    // 2) Pulling busybox... : downloaded
+                    if(node.status && node.status.indexOf(":") > -1) {
+                        if(node.status.indexOf("downloaded") == -1) {
+                            vm.error = node.status;
+                            $scope.$apply();
+                        } else {
+                            setTimeout(vm.refresh, 1000);
+                        }
+                    }
                     vm.pullImageName = "";
+                    vm.pulling = false;
                 })
                 .fail(function(err) {
                     vm.pulling = false;
