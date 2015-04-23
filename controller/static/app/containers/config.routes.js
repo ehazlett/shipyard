@@ -22,7 +22,7 @@
             controller: 'ContainerController',
             controllerAs: 'vm',
             authenticate: true,
-            resolve: { 
+            resolve: {
                 resolvedContainer: ['ContainerService', '$state', '$stateParams', function(ContainerService, $state, $stateParams) {
                     return ContainerService.inspect($stateParams.id).then(null, function(errorData) {
                         $state.go('error');
@@ -35,7 +35,19 @@
             templateUrl: 'app/containers/deploy.html',
             controller: 'ContainerDeployController',
             controllerAs: 'vm',
-            authenticate: true
+            authenticate: true,
+            resolve: {
+                containers: ['ContainerService', '$state', '$stateParams', function(ContainerService, $state, $stateParams) {
+                    return ContainerService.list().then(null, function(errorData) {
+                        $state.go('error');
+                    });
+                }],
+                images: ['ImagesService', '$state', '$stateParams', function(ImagesService, $state, $stateParams) {
+                    return ImagesService.list().then(null, function(errorData) {
+                        $state.go('error');
+                    });
+                }]
+            }
         })
         .state('dashboard.exec', {
             url: '^/exec/{id}',
@@ -57,7 +69,7 @@
             controller: 'LogsController', 
             controllerAs: 'vm',
             authenticate: 'true',
-            resolve: { 
+            resolve: {
                 resolvedLogs: ['ContainerService', '$state', '$stateParams', function(ContainerService, $state, $stateParams) {
                     return ContainerService.logs($stateParams.id).then(null, function(errorData) {
                         $state.go('error');

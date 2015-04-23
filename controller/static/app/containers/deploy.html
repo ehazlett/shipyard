@@ -43,7 +43,7 @@
                                         </div>
                                     </label>
                                     <div class="ui corner labeled input">
-                                        <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image Name"></input> 
+                                        <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image"></input>
                                         <div class="ui corner label">
                                             <i class="asterisk icon"></i>
                                         </div>
@@ -55,19 +55,25 @@
                                     <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Command"></input>
                                 </div>
                             </div>
-                            <div class="field">
-                                <label>Hostname</label>
-                                <input name="hostname" class="input" type="text" ng-model="vm.request.Hostname" placeholders="Hostname"></input>
+                            <div class="fields">
+                                <div class="eight wide field">
+                                    <label>Hostname</label>
+                                    <input name="hostname" class="input" type="text" ng-model="vm.request.Hostname" placeholder="Hostname"></input>
+                                </div>
+                                <div class="eight wide field">
+                                    <label>Domain</label>
+                                    <input name="domainname" class="input" type="text" ng-model="vm.request.Domainname" placeholder="Domain"></input>
+                                </div>
                             </div>
                             <h5 class="ui dividing header">Environment Variables</h5>
                             <div class="fields">
                                 <div class="seven wide field">
                                     <label>Name</label>
-                                    <input name="variableName" class="input" type="text" ng-model="vm.variableName" placeholder="Variable Name"></input>
+                                    <input name="variableName" class="input" type="text" ng-model="vm.variableName" placeholder="Environment Variable Name"></input>
                                 </div>
                                 <div class="eight wide field">
                                     <label>Value</label>
-                                    <input name="variableValue" class="input" type="text" ng-model="vm.variableValue" placeholder="Variable Value"></input>
+                                    <input name="variableValue" class="input" type="text" ng-model="vm.variableValue" placeholder="Environment Variable Value"></input>
                                 </div>
                                 <div class="one wide field">
                                     <label>&nbsp;</label>
@@ -123,7 +129,10 @@
                             <div class="fields">
                                 <div class="seven wide field">
                                     <label>Container</label>
-                                    <input name="containerToLink" class="input" type="text" ng-model="vm.containerToLink" placeholder="Container Name"></input>
+                                        <select name="containerToLink" ng-model="vm.containerToLink" class="ui search fluid dropdown">
+                                            <option value="">Container Name</option>
+                                            <option ng-repeat="c in vm.containerLinkNames" value="{{c}}">{{c}}</option>
+                                        </select>
                                 </div>
                                 <div class="eight wide field">
                                     <label>Alias</label>
@@ -160,7 +169,7 @@
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="two fields">
                                 <div class="field">
-                                    <select class="ui fluid dropdown" default="0" ng-model="vm.request.HostConfig.RestartPolicy.Name">
+                                    <select class="ui fluid dropdown restart-policy" default="0" ng-model="vm.request.HostConfig.RestartPolicy.Name">
                                         <option value="no">Do not automatically restart</option>
                                         <option value="on-failure">Restart only on failure</option>
                                         <option value="always">Always restart</option>
@@ -267,8 +276,6 @@ $(function(){
         });
 
     $('.help.circle.icon').popup({inline: true});
-    $('.ui.dropdown')
-        .dropdown()
-        ;
+    $('.ui.dropdown').dropdown();
 });
 </script>

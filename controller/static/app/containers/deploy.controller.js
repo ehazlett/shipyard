@@ -5,9 +5,45 @@
         .module('shipyard.containers')
         .controller('ContainerDeployController', ContainerDeployController);
 
-    ContainerDeployController.$inject = ['$http', '$state'];
-    function ContainerDeployController($http, $state) {
+    ContainerDeployController.$inject = ['containers', 'images', '$http', '$state'];
+    function ContainerDeployController(containers, images, $http, $state) {
         var vm = this;
+        vm.containers = containers;
+        vm.images = images;
+        vm.deployImages = [];
+        vm.containerLinkNames = [];
+
+        // parse out deployable images
+        if (vm.images != null) {
+            for (var i=0; i<vm.images.length; i++) {
+                var img = vm.images[i];
+                for (var x=0; x<img.RepoTags.length; x++) {
+                    var tag = img.RepoTags[x];
+                    if (tag !== "<none>:<none>") {
+                        if (vm.deployImages.indexOf(tag) == -1) {
+                            vm.deployImages.push(tag);
+                        }
+                    }
+                }
+            }
+
+            vm.deployImages.sort();
+        }
+
+        if (vm.containers != null) {
+            for (var i=0; i<vm.containers.length; i++) {
+                var c = vm.containers[i];
+                var name = c.Names[0].split('/')[2];
+
+                if (vm.containerLinkNames.indexOf(name) == -1) {
+                    vm.containerLinkNames.push(name);
+                }
+
+            }
+
+            vm.containerLinkNames.sort();
+        }
+
         vm.cmd = "";
         
         vm.volumes = [];
@@ -158,6 +194,9 @@
         }
 
         function deploy() {
+            var img = $('.input.image').val();
+            console.log(img);
+            return;
             vm.deploying = true;
 
             transformVolumes();
