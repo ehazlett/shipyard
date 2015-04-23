@@ -193,10 +193,14 @@
             }
         }
 
+        function isFormValid() {
+            return $('.ui.form').form('validate form');
+        }
+
         function deploy() {
-            var img = $('.input.image').val();
-            console.log(img);
-            return;
+            if (!isFormValid()) {
+                return;
+            }
             vm.deploying = true;
 
             transformVolumes();
