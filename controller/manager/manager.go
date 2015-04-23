@@ -65,7 +65,8 @@ type (
 	Manager interface {
 		Accounts() ([]*auth.Account, error)
 		Account(username string) (*auth.Account, error)
-		Authenticate(username, password string) bool
+		Authenticate(username, password string) (bool, error)
+		GetAuthenticator() auth.Authenticator
 		SaveAccount(account *auth.Account) error
 		DeleteAccount(account *auth.Account) error
 		Roles() ([]*auth.ACL, error)
@@ -429,22 +430,32 @@ func (m DefaultManager) Role(name string) (*auth.ACL, error) {
 	return nil, nil
 }
 
-func (m DefaultManager) Authenticate(username, password string) bool {
-	acct, err := m.Account(username)
-	if err != nil {
-		log.Error(err)
-		return false
+func (m DefaultManager) GetAuthenticator() auth.Authenticator {
+	return m.authenticator
+}
+
+func (m DefaultManager) Authenticate(username, password string) (bool, error) {
+	// only get the account to get the hashed password if using the builtin auth
+	passwordHash := ""
+	if m.authenticator.Name() == "builtin" {
+		acct, err := m.Account(username)
+		if err != nil {
+			log.Error(err)
+			return false, err
+		}
+
+		passwordHash = acct.Password
 	}
 	evt := &shipyard.Event{
 		Type:    "login",
 		Time:    time.Now(),
-		Message: fmt.Sprintf("username=%s", acct.Username),
+		Message: fmt.Sprintf("username=%s", username),
 		Tags:    []string{"login", "security"},
 	}
 	// do not return a fail if error happens upon saving even; still want login
 	_ = m.SaveEvent(evt)
 
-	return m.authenticator.Authenticate(password, acct.Password)
+	return m.authenticator.Authenticate(username, password, passwordHash)
 }
 
 func (m DefaultManager) NewAuthToken(username string, userAgent string) (*auth.AuthToken, error) {
