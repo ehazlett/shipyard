@@ -193,10 +193,14 @@
             }
         }
 
+        function isFormValid() {
+            return $('.ui.form').form('validate form');
+        }
+
         function deploy() {
-            var img = $('.input.image').val();
-            console.log(img);
-            return;
+            if (!isFormValid()) {
+                return;
+            }
             vm.deploying = true;
 
             transformVolumes();
@@ -208,20 +212,25 @@
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
                 .success(function(data, status, headers, config) {
+                    if(status != 200) {
+                        vm.error = data;
+                        vm.deploying = false;
+                        return;
+                    }
                     $http
                         .post('/containers/'+ data.Id +'/start', vm.request)
                         .success(function(data, status, headers, config) {
                             $state.transitionTo('dashboard.containers');
                         })
-                    .error(function(data, status, headers, config) {
-                        vm.error = data;
-                        vm.deploying = false;
-                    });
+                        .error(function(data, status, headers, config) {
+                            vm.error = data;
+                            vm.deploying = false;
+                        });
                 })
-            .error(function(data, status, headers, config) {
-                vm.error = data;
-                vm.deploying = false;
-            });
+                .error(function(data, status, headers, config) {
+                    vm.error = data;
+                    vm.deploying = false;
+                });
         }
 
     }
