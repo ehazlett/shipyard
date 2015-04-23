@@ -21,37 +21,30 @@ type (
 		Tokens    []*AuthToken `json:"-" gorethink:"tokens"`
 		Roles     []string     `json:"roles,omitempty" gorethink:"roles"`
 	}
+
 	AuthToken struct {
 		Token     string `json:"auth_token,omitempty" gorethink:"auth_token"`
 		UserAgent string `json:"user_agent,omitempty" gorethink:"user_agent"`
 	}
-	Authenticator struct {
-		salt []byte
-	}
+
 	ServiceKey struct {
 		Key         string `json:"key,omitempty" gorethink:"key"`
 		Description string `json:"description,omitempty" gorethink:"description"`
 	}
+
+	Authenticator interface {
+		Authenticate(username, password, hash string) (bool, error)
+		GenerateToken() (string, error)
+		IsUpdateSupported() bool
+		Name() string
+	}
 )
 
-func NewAuthenticator(salt string) *Authenticator {
-	return &Authenticator{
-		salt: []byte(salt),
-	}
-}
-
-func (a *Authenticator) Hash(password string) (string, error) {
-	h, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func Hash(data string) (string, error) {
+	h, err := bcrypt.GenerateFromPassword([]byte(data), bcrypt.DefaultCost)
 	return string(h[:]), err
 }
 
-func (a *Authenticator) Authenticate(password, hash string) bool {
-	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err == nil {
-		return true
-	}
-	return false
-}
-
-func (a *Authenticator) GenerateToken() (string, error) {
-	return a.Hash(time.Now().String())
+func GenerateToken() (string, error) {
+	return Hash(time.Now().String())
 }

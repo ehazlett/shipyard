@@ -85,6 +85,23 @@ func main() {
 					Name:  "enable-cors",
 					Usage: "enable cors with swarm",
 				},
+				cli.StringFlag{
+					Name:  "ldap-server",
+					Usage: "LDAP server address",
+				},
+				cli.IntFlag{
+					Name:  "ldap-port",
+					Usage: "LDAP server port",
+					Value: 389,
+				},
+				cli.StringFlag{
+					Name:  "ldap-base-dn",
+					Usage: "LDAP server base DN",
+				},
+				cli.BoolFlag{
+					Name:  "ldap-autocreate-users",
+					Usage: "Automatically create a corresponding Shipyard account if missing upon authenticating",
+				},
 				cli.StringSliceFlag{
 					Name:  "auth-whitelist-cidr",
 					Usage: "whitelist CIDR to bypass auth",

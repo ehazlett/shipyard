@@ -3,6 +3,8 @@ package commands
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	"github.com/shipyard/shipyard/auth/builtin"
+	"github.com/shipyard/shipyard/auth/ldap"
 	"github.com/shipyard/shipyard/controller/api"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/utils"
@@ -21,6 +23,10 @@ func CmdServer(c *cli.Context) {
 	listenAddr := c.String("listen")
 	authWhitelist := c.StringSlice("auth-whitelist-cidr")
 	enableCors := c.Bool("enable-cors")
+	ldapServer := c.String("ldap-server")
+	ldapPort := c.Int("ldap-port")
+	ldapBaseDn := c.String("ldap-base-dn")
+	ldapAutocreateUsers := c.Bool("ldap-autocreate-users")
 
 	log.Infof("shipyard version %s", version.Version)
 
@@ -39,7 +45,15 @@ func CmdServer(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo)
+	// default to builtin auth
+	authenticator := builtin.NewAuthenticator("defaultshipyard")
+
+	// use ldap auth if specified
+	if ldapServer != "" {
+		authenticator = ldap.NewAuthenticator(ldapServer, ldapPort, ldapBaseDn, ldapAutocreateUsers)
+	}
+
+	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo, authenticator)
 	if err != nil {
 		log.Fatal(err)
 	}

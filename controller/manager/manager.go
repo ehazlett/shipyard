@@ -56,7 +56,7 @@ type (
 		database         string
 		authKey          string
 		session          *r.Session
-		authenticator    *auth.Authenticator
+		authenticator    auth.Authenticator
 		store            *sessions.CookieStore
 		client           *dockerclient.DockerClient
 		disableUsageInfo bool
@@ -65,7 +65,8 @@ type (
 	Manager interface {
 		Accounts() ([]*auth.Account, error)
 		Account(username string) (*auth.Account, error)
-		Authenticate(username, password string) bool
+		Authenticate(username, password string) (bool, error)
+		GetAuthenticator() auth.Authenticator
 		SaveAccount(account *auth.Account) error
 		DeleteAccount(account *auth.Account) error
 		Roles() ([]*auth.ACL, error)
@@ -107,7 +108,7 @@ type (
 	}
 )
 
-func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool) (Manager, error) {
+func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, authenticator auth.Authenticator) (Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
 		Address:     addr,
 		Database:    database,
@@ -125,7 +126,7 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 		database:         database,
 		authKey:          authKey,
 		session:          session,
-		authenticator:    &auth.Authenticator{},
+		authenticator:    authenticator,
 		store:            store,
 		client:           client,
 		storeKey:         storeKey,
@@ -340,7 +341,7 @@ func (m DefaultManager) SaveAccount(account *auth.Account) error {
 		eventType string
 	)
 	if account.Password != "" {
-		h, err := m.authenticator.Hash(account.Password)
+		h, err := auth.Hash(account.Password)
 		if err != nil {
 			return err
 		}
@@ -429,22 +430,32 @@ func (m DefaultManager) Role(name string) (*auth.ACL, error) {
 	return nil, nil
 }
 
-func (m DefaultManager) Authenticate(username, password string) bool {
-	acct, err := m.Account(username)
-	if err != nil {
-		log.Error(err)
-		return false
+func (m DefaultManager) GetAuthenticator() auth.Authenticator {
+	return m.authenticator
+}
+
+func (m DefaultManager) Authenticate(username, password string) (bool, error) {
+	// only get the account to get the hashed password if using the builtin auth
+	passwordHash := ""
+	if m.authenticator.Name() == "builtin" {
+		acct, err := m.Account(username)
+		if err != nil {
+			log.Error(err)
+			return false, err
+		}
+
+		passwordHash = acct.Password
 	}
 	evt := &shipyard.Event{
 		Type:    "login",
 		Time:    time.Now(),
-		Message: fmt.Sprintf("username=%s", acct.Username),
+		Message: fmt.Sprintf("username=%s", username),
 		Tags:    []string{"login", "security"},
 	}
 	// do not return a fail if error happens upon saving even; still want login
 	_ = m.SaveEvent(evt)
 
-	return m.authenticator.Authenticate(password, acct.Password)
+	return m.authenticator.Authenticate(username, password, passwordHash)
 }
 
 func (m DefaultManager) NewAuthToken(username string, userAgent string) (*auth.AuthToken, error) {
@@ -529,7 +540,11 @@ func (m DefaultManager) NewServiceKey(description string) (*auth.ServiceKey, err
 }
 
 func (m DefaultManager) ChangePassword(username, password string) error {
-	hash, err := m.authenticator.Hash(password)
+	if !m.authenticator.IsUpdateSupported() {
+		return fmt.Errorf("not supported for authenticator: %s", m.authenticator.Name())
+	}
+
+	hash, err := auth.Hash(password)
 	if err != nil {
 		return err
 	}

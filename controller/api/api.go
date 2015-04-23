@@ -23,6 +23,7 @@ import (
 	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
+	"github.com/shipyard/shipyard/auth/ldap"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
 	mAuth "github.com/shipyard/shipyard/controller/middleware/auth"
@@ -461,11 +462,47 @@ func (a *Api) login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if !a.manager.Authenticate(creds.Username, creds.Password) {
+
+	loginSuccessful, err := a.manager.Authenticate(creds.Username, creds.Password)
+	if err != nil {
+		log.Errorf("error during login for %s from %s: %s", creds.Username, r.RemoteAddr, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if !loginSuccessful {
 		log.Warnf("invalid login for %s from %s", creds.Username, r.RemoteAddr)
 		http.Error(w, "invalid username/password", http.StatusForbidden)
 		return
 	}
+
+	// check for ldap and autocreate for users
+	if a.manager.GetAuthenticator().Name() == "ldap" {
+		if a.manager.GetAuthenticator().(*ldap.LdapAuthenticator).AutocreateUsers {
+			log.Debug("ldap: checking for existing user account and creating if necessary")
+			acct := &auth.Account{
+				Username: creds.Username,
+			}
+
+			// check for existing account
+			if _, err := a.manager.Account(creds.Username); err != nil {
+				if err == manager.ErrAccountDoesNotExist {
+					log.Debugf("autocreating user for ldap: username=%s", creds.Username)
+					if err := a.manager.SaveAccount(acct); err != nil {
+						log.Errorf("error autocreating ldap user %s: %s", creds.Username, err)
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+				} else {
+					log.Errorf("error checking user for autocreate: %s", err)
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
+
+		}
+	}
+
 	// return token
 	token, err := a.manager.NewAuthToken(creds.Username, r.UserAgent())
 	if err != nil {
