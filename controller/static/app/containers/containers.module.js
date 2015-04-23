@@ -7,7 +7,7 @@
 			'ngResource',
 			'ngSanitize',
 			'ui.router',
-            'angularify.semantic.dropdown'
+                        'angularify.semantic.dropdown'
 		]);
 		
 })();
