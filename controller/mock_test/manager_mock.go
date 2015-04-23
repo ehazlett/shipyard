@@ -76,8 +76,8 @@ func (m MockManager) Role(name string) (*auth.ACL, error) {
 	return roles[0], err
 }
 
-func (m MockManager) Authenticate(username, password string) bool {
-	return false
+func (m MockManager) Authenticate(username, password string) (bool, error) {
+	return false, nil
 }
 
 func (m MockManager) NewAuthToken(username, userAgent string) (*auth.AuthToken, error) {

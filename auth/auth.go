@@ -33,7 +33,7 @@ type (
 	}
 
 	Authenticator interface {
-		Authenticate(username, password string) bool
+		Authenticate(username, password, hash string) (bool, error)
 		GenerateToken() (string, error)
 		IsUpdateSupported() bool
 		Name() string
