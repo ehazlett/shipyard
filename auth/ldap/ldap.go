@@ -18,7 +18,7 @@ type (
 )
 
 func NewAuthenticator(server string, port int, baseDN string, autocreateUsers bool) auth.Authenticator {
-	log.Debugf("Using LDAP authentication: server=%s port=%d baseDN=%s",
+	log.Infof("Using LDAP authentication: server=%s port=%d baseDN=%s",
 		server, port, baseDN)
 	return &LdapAuthenticator{
 		Server:          server,
