@@ -92,6 +92,7 @@ func main() {
 				cli.IntFlag{
 					Name:  "ldap-port",
 					Usage: "LDAP server port",
+					Value: 389,
 				},
 				cli.StringFlag{
 					Name:  "ldap-base-dn",
