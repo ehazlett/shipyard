@@ -27,6 +27,7 @@ func CmdServer(c *cli.Context) {
 	ldapPort := c.Int("ldap-port")
 	ldapBaseDn := c.String("ldap-base-dn")
 	ldapAutocreateUsers := c.Bool("ldap-autocreate-users")
+	ldapDefaultAccessLevel := c.String("ldap-default-access-level")
 
 	log.Infof("shipyard version %s", version.Version)
 
@@ -50,7 +51,7 @@ func CmdServer(c *cli.Context) {
 
 	// use ldap auth if specified
 	if ldapServer != "" {
-		authenticator = ldap.NewAuthenticator(ldapServer, ldapPort, ldapBaseDn, ldapAutocreateUsers)
+		authenticator = ldap.NewAuthenticator(ldapServer, ldapPort, ldapBaseDn, ldapAutocreateUsers, ldapDefaultAccessLevel)
 	}
 
 	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo, authenticator)

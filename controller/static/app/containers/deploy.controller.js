@@ -5,30 +5,12 @@
         .module('shipyard.containers')
         .controller('ContainerDeployController', ContainerDeployController);
 
-    ContainerDeployController.$inject = ['containers', 'images', '$http', '$state'];
-    function ContainerDeployController(containers, images, $http, $state) {
+    ContainerDeployController.$inject = ['containers', '$http', '$state'];
+    function ContainerDeployController(containers, $http, $state) {
         var vm = this;
         vm.containers = containers;
-        vm.images = images;
         vm.deployImages = [];
         vm.containerLinkNames = [];
-
-        // parse out deployable images
-        if (vm.images != null) {
-            for (var i=0; i<vm.images.length; i++) {
-                var img = vm.images[i];
-                for (var x=0; x<img.RepoTags.length; x++) {
-                    var tag = img.RepoTags[x];
-                    if (tag !== "<none>:<none>") {
-                        if (vm.deployImages.indexOf(tag) == -1) {
-                            vm.deployImages.push(tag);
-                        }
-                    }
-                }
-            }
-
-            vm.deployImages.sort();
-        }
 
         if (vm.containers != null) {
             for (var i=0; i<vm.containers.length; i++) {
