@@ -41,11 +41,6 @@
                     return ContainerService.list().then(null, function(errorData) {
                         $state.go('error');
                     });
-                }],
-                images: ['ImagesService', '$state', '$stateParams', function(ImagesService, $state, $stateParams) {
-                    return ImagesService.list().then(null, function(errorData) {
-                        $state.go('error');
-                    });
                 }]
             }
         })

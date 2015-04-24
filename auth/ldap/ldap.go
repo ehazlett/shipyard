@@ -10,21 +10,23 @@ import (
 
 type (
 	LdapAuthenticator struct {
-		Server          string
-		Port            int
-		BaseDN          string
-		AutocreateUsers bool
+		Server             string
+		Port               int
+		BaseDN             string
+		DefaultAccessLevel string
+		AutocreateUsers    bool
 	}
 )
 
-func NewAuthenticator(server string, port int, baseDN string, autocreateUsers bool) auth.Authenticator {
+func NewAuthenticator(server string, port int, baseDN string, autocreateUsers bool, defaultAccessLevel string) auth.Authenticator {
 	log.Infof("Using LDAP authentication: server=%s port=%d basedn=%s",
 		server, port, baseDN)
 	return &LdapAuthenticator{
-		Server:          server,
-		Port:            port,
-		BaseDN:          baseDN,
-		AutocreateUsers: autocreateUsers,
+		Server:             server,
+		Port:               port,
+		BaseDN:             baseDN,
+		AutocreateUsers:    autocreateUsers,
+		DefaultAccessLevel: defaultAccessLevel,
 	}
 }
 

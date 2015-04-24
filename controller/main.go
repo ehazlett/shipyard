@@ -102,6 +102,11 @@ func main() {
 					Name:  "ldap-autocreate-users",
 					Usage: "Automatically create a corresponding Shipyard account if missing upon authenticating",
 				},
+				cli.StringFlag{
+					Name:  "ldap-default-access-level",
+					Usage: "Default access level for auto-created accounts (default: container read-only)",
+					Value: "containers:ro",
+				},
 				cli.StringSliceFlag{
 					Name:  "auth-whitelist-cidr",
 					Usage: "whitelist CIDR to bypass auth",
