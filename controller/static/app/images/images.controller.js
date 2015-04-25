@@ -41,14 +41,10 @@
             function removeImage() {
                 ImagesService.remove(vm.selectedImage)
                     .then(function(data) {
-                        if(data && data.indexOf("cannot delete") > -1) {
-                            vm.error = data;
-                        } else {
-                            setTimeout(vm.refresh, 500);
-                            vm.error = "";
-                        }
+                        vm.error = "";
+                        vm.refresh();
                     }, function(data) {
-                        vm.error = data;
+                        vm.error = data.status + ": " + data.data;
                     });
             }
 
