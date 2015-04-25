@@ -479,15 +479,18 @@ func (a *Api) login(w http.ResponseWriter, r *http.Request) {
 	// check for ldap and autocreate for users
 	if a.manager.GetAuthenticator().Name() == "ldap" {
 		if a.manager.GetAuthenticator().(*ldap.LdapAuthenticator).AutocreateUsers {
+			defaultAccessLevel := a.manager.GetAuthenticator().(*ldap.LdapAuthenticator).DefaultAccessLevel
 			log.Debug("ldap: checking for existing user account and creating if necessary")
+			// give default users readonly access to containers
 			acct := &auth.Account{
 				Username: creds.Username,
+				Roles:    []string{defaultAccessLevel},
 			}
 
 			// check for existing account
 			if _, err := a.manager.Account(creds.Username); err != nil {
 				if err == manager.ErrAccountDoesNotExist {
-					log.Debugf("autocreating user for ldap: username=%s", creds.Username)
+					log.Debugf("autocreating user for ldap: username=%s access=%s", creds.Username, defaultAccessLevel)
 					if err := a.manager.SaveAccount(acct); err != nil {
 						log.Errorf("error autocreating ldap user %s: %s", creds.Username, err)
 						http.Error(w, err.Error(), http.StatusInternalServerError)

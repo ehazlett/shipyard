@@ -73,8 +73,18 @@
 			"Rev": "97d8e4e174133a4d1d2171380e510eb4dea8f5ea"
 		},
 		{
+			"ImportPath": "gopkg.in/asn1-ber.v1",
+			"Comment": "v1",
+			"Rev": "9eae18c3681ae3d3c677ac2b80a8fe57de45fc09"
+		},
+		{
 			"ImportPath": "gopkg.in/fatih/pool.v2",
 			"Rev": "46cfd0bbfb747fd0c3333d221ba4e3c932cfd6dd"
+		},
+		{
+			"ImportPath": "gopkg.in/ldap.v1",
+			"Comment": "v1",
+			"Rev": "0041a412703908abb6602d225f874508dcfddd74"
 		}
 	]
 }
