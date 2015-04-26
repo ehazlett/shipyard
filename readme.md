@@ -2,7 +2,6 @@
 
 Composable Docker Management
 
-
 Shipyard enables multi-host, Docker cluster management.  It uses [Docker Swarm](https://docs.docker.com/swarm) for cluster resourcing and scheduling.
 
 # Quick Start
@@ -12,7 +11,9 @@ This will launch an entire stack.  It uses [Docker Machine](https://docs.docker.
 a Docker Swarm.  It will then deploy Shipyard to manage the Swarm.  When it is finished,
 Shipyard will be configured to manage the Swarm and be ready to go.
 
-### Quick Deploy using VirtualBox
+> Shipyard Deploy can use any provider supported by Docker Machine
+
+### Deploy using the VirtualBox Provider
 
   Note: you must have VirtualBox installed.
 
