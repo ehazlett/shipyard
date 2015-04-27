@@ -172,6 +172,10 @@ func (m MockManager) Node(name string) (*shipyard.Node, error) {
 	return TestNode, nil
 }
 
+func (m MockManager) DeployNode(config *shipyard.NodeDeployConfig) error {
+	return nil
+}
+
 func (m MockManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {
 	return nil
 }

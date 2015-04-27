@@ -1,0 +1,20 @@
+<div class="row">
+<div class="column">
+    <div class="ui cards">
+        <div class="ui card" ng-repeat="p in vm.providers">
+            <div class="content">
+              <a class="header">{{p.name}}</a>
+              <div class="meta">
+                  <a href="{{p.url}}" target="_blank">{{p.url}}</a>
+              </div>
+              <div class="description">
+                  {{p.description}}
+              </div>
+            </div>
+            <div class="extra content">
+                <div ui-sref="dashboard.launchNode({provider: p.driver_name})" class="ui button tiny green fluid">Launch</div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

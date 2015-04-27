@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -95,6 +96,7 @@ type (
 
 		Nodes() ([]*shipyard.Node, error)
 		Node(name string) (*shipyard.Node, error)
+		DeployNode(config *shipyard.NodeDeployConfig) (*exec.Cmd, error)
 
 		AddRegistry(registry *shipyard.Registry) error
 		RemoveRegistry(registry *shipyard.Registry) error
@@ -643,6 +645,45 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 	}
 
 	return nil, nil
+}
+
+func (m DefaultManager) DeployNode(config *shipyard.NodeDeployConfig) (*exec.Cmd, error) {
+	// until libmachine gets more mature, use shell out
+
+	// get the swarm token
+	swarmTokenArg := ""
+	containerInfo, err := m.client.InspectContainer("swarm-agent-master")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, arg := range containerInfo.Args {
+		if strings.Index(arg, "token://") > -1 {
+			swarmTokenArg = arg
+			break
+		}
+	}
+
+	if swarmTokenArg == "" {
+		return nil, fmt.Errorf("unable to get swarm token")
+	}
+
+	params := []string{
+		"create",
+		"-d",
+		config.DriverName,
+		"--swarm",
+		"--swarm-discovery",
+		swarmTokenArg,
+	}
+
+	// machine create params
+	params = append(params, config.Params...)
+	// machine name
+	params = append(params, config.Name)
+	cmd := exec.Command("docker-machine", params...)
+
+	return cmd, nil
 }
 
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {

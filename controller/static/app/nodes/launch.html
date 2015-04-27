@@ -1,0 +1,36 @@
+<div class="row">
+    <div class="column">
+        <div class="ui segment">
+            <h2 class="ui header">{{vm.provider.name}}</h2>
+            <div class="ui form" ng-submit="vm.launchNode()" ng-method="post">
+                <h4 class="ui dividing header">Node Name</h4>
+                <div class="field">
+                    <div class="ui corner labeled input">
+                        <input name="name" type="text" ng-model="vm.nodeName" placeholder="Name of swarm node">
+                        <div class="ui corner label">
+                            <i class="asterisk icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="ui dividing header">Provider Parameters</h4>
+                <div class="field" ng-repeat="p in vm.provider.params">
+                    <div class="ui corner labeled input">
+                        <input name="{{p.key}}" type="text" ng-model="vm.params[p.key]" placeholder="{{p.description}}">
+                        <div class="ui corner label" ng-if="p.required">
+                            <i class="asterisk icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ui hidden divider"></div>
+                <div class="ui green submit button">Launch Node</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(function(){
+    $('.ui.checkbox').checkbox();
+});
+</script>

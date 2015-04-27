@@ -591,6 +591,82 @@ func (a *Api) node(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) deployNode(w http.ResponseWriter, r *http.Request) {
+	var config *shipyard.NodeDeployConfig
+
+	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Debugf("deploying node: name=%s driver=%s params=%v", config.Name, config.DriverName, config.Params)
+
+	cmd, err := a.manager.DeployNode(config)
+	if err != nil {
+		log.Errorf("error deploying node: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Errorf("error getting stdout: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		log.Errorf("error getting stderr: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := cmd.Start(); err != nil {
+		log.Errorf("error running docker machine: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	go io.Copy(w, stdout)
+	go io.Copy(w, stderr)
+
+	if err := cmd.Wait(); err != nil {
+		log.Error(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) nodeProviders(w http.ResponseWriter, r *http.Request) {
+	defaultNodeProviders := shipyard.DefaultNodeProviders()
+
+	if err := json.NewEncoder(w).Encode(defaultNodeProviders); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *Api) nodeProvider(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+
+	defaultNodeProviders := shipyard.DefaultNodeProviders()
+
+	var nodeProvider *shipyard.NodeProvider
+	for _, p := range defaultNodeProviders {
+		if p.DriverName == name {
+			nodeProvider = p
+			break
+		}
+	}
+
+	if err := json.NewEncoder(w).Encode(nodeProvider); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) createConsoleSession(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -881,7 +957,10 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
+	apiRouter.HandleFunc("/api/nodes", a.deployNode).Methods("POST")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
+	apiRouter.HandleFunc("/api/providers/node", a.nodeProviders).Methods("GET")
+	apiRouter.HandleFunc("/api/providers/node/{name:.*}", a.nodeProvider).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/registry", a.registries).Methods("GET")

@@ -24,6 +24,22 @@
                         });
                     return promise;
                 },
+                providers: function() {
+                    var promise = $http
+                        .get('/api/providers/node')
+                        .then(function(response) {
+                            return response.data;
+                        });
+                    return promise;
+                },
+                provider: function(name) {
+                    var promise = $http
+                        .get('/api/providers/node/' + name)
+                        .then(function(response) {
+                            return response.data;
+                        });
+                    return promise;
+                },
             } 
         } 
 })();
