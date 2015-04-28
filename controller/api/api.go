@@ -26,6 +26,7 @@ import (
 	"github.com/shipyard/shipyard/auth/ldap"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
+	"github.com/shipyard/shipyard/controller/middleware/audit"
 	mAuth "github.com/shipyard/shipyard/controller/middleware/auth"
 	"github.com/shipyard/shipyard/dockerhub"
 	"golang.org/x/net/websocket"
@@ -904,12 +905,20 @@ func (a *Api) Run() error {
 	// global handler
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
 
+	auditExcludes := []string{
+		"^/containers/json",
+		"^/images/json",
+		"^/api/events",
+	}
+	apiAuditor := audit.NewAuditor(controllerManager, auditExcludes)
+
 	// api router; protected by auth
 	apiAuthRouter := negroni.New()
 	apiAuthRequired := mAuth.NewAuthRequired(controllerManager, a.authWhitelistCIDRs)
 	apiAccessRequired := access.NewAccessRequired(controllerManager)
 	apiAuthRouter.Use(negroni.HandlerFunc(apiAuthRequired.HandlerFuncWithNext))
 	apiAuthRouter.Use(negroni.HandlerFunc(apiAccessRequired.HandlerFuncWithNext))
+	apiAuthRouter.Use(negroni.HandlerFunc(apiAuditor.HandlerFuncWithNext))
 	apiAuthRouter.UseHandler(apiRouter)
 	globalMux.Handle("/api/", apiAuthRouter)
 
@@ -919,6 +928,7 @@ func (a *Api) Run() error {
 	accountAuthRouter := negroni.New()
 	accountAuthRequired := mAuth.NewAuthRequired(controllerManager, a.authWhitelistCIDRs)
 	accountAuthRouter.Use(negroni.HandlerFunc(accountAuthRequired.HandlerFuncWithNext))
+	accountAuthRouter.Use(negroni.HandlerFunc(apiAuditor.HandlerFuncWithNext))
 	accountAuthRouter.UseHandler(accountRouter)
 	globalMux.Handle("/account/", accountAuthRouter)
 
@@ -1017,6 +1027,7 @@ func (a *Api) Run() error {
 	swarmAccessRequired := access.NewAccessRequired(controllerManager)
 	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAuthRequired.HandlerFuncWithNext))
 	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAccessRequired.HandlerFuncWithNext))
+	swarmAuthRouter.Use(negroni.HandlerFunc(apiAuditor.HandlerFuncWithNext))
 	swarmAuthRouter.UseHandler(swarmRouter)
 	globalMux.Handle("/containers/", swarmAuthRouter)
 	globalMux.Handle("/_ping", swarmAuthRouter)

@@ -11,5 +11,6 @@ type Event struct {
 	ContainerInfo *dockerclient.ContainerInfo `json:"container_info,omitempty"`
 	Time          time.Time                   `json:"time,omitempty"`
 	Message       string                      `json:"message,omitempty"`
+	Username      string                      `json:"username,omitempty"`
 	Tags          []string                    `json:"tags,omitempty"`
 }
