@@ -168,6 +168,19 @@ func (m DefaultManager) init() error {
 	return nil
 }
 
+func (m DefaultManager) logEvent(eventType, message string, tags []string) {
+	evt := &shipyard.Event{
+		Type:    eventType,
+		Time:    time.Now(),
+		Message: message,
+		Tags:    tags,
+	}
+
+	if err := m.SaveEvent(evt); err != nil {
+		log.Errorf("error logging event: %s", err)
+	}
+}
+
 func (m DefaultManager) usageReport() {
 	if m.disableUsageInfo {
 		return
@@ -216,36 +229,19 @@ func (m DefaultManager) SaveServiceKey(key *auth.ServiceKey) error {
 	if _, err := r.Table(tblNameServiceKeys).Insert(key).RunWrite(m.session); err != nil {
 		return err
 	}
-	m.init()
-	evt := &shipyard.Event{
-		Type:    "add-service-key",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("description=%s", key.Description),
-		Tags:    []string{"cluster", "security"},
-	}
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
+
+	m.logEvent("add-service-key", fmt.Sprintf("description=%s", key.Description), []string{"security"})
+
 	return nil
 }
 
 func (m DefaultManager) RemoveServiceKey(key string) error {
-	k, err := m.ServiceKey(key)
-	if err != nil {
-		return err
-	}
-	evt := &shipyard.Event{
-		Type:    "remove-service-key",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("description=%s", k.Description),
-		Tags:    []string{"cluster", "security"},
-	}
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
 	if _, err := r.Table(tblNameServiceKeys).Filter(map[string]string{"key": key}).Delete().RunWrite(m.session); err != nil {
 		return err
 	}
+
+	m.logEvent("delete-service-key", fmt.Sprintf("key=%s", key), []string{"security"})
+
 	return nil
 }
 
@@ -253,6 +249,7 @@ func (m DefaultManager) SaveEvent(event *shipyard.Event) error {
 	if _, err := r.Table(tblNameEvents).Insert(event).RunWrite(m.session); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -375,18 +372,12 @@ func (m DefaultManager) SaveAccount(account *auth.Account) error {
 		if _, err := r.Table(tblNameAccounts).Insert(account).RunWrite(m.session); err != nil {
 			return err
 		}
+
 		eventType = "add-account"
 	}
 
-	evt := &shipyard.Event{
-		Type:    eventType,
-		Time:    time.Now(),
-		Message: fmt.Sprintf("username=%s", account.Username),
-		Tags:    []string{"security"},
-	}
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
+	m.logEvent(eventType, fmt.Sprintf("username=%s", account.Username), []string{"security"})
+
 	return nil
 }
 
@@ -395,18 +386,13 @@ func (m DefaultManager) DeleteAccount(account *auth.Account) error {
 	if err != nil {
 		return err
 	}
+
 	if res.IsNil() {
 		return ErrAccountDoesNotExist
 	}
-	evt := &shipyard.Event{
-		Type:    "delete-account",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("username=%s", account.Username),
-		Tags:    []string{"security"},
-	}
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
+
+	m.logEvent("delete-account", fmt.Sprintf("username=%s", account.Username), []string{"security"})
+
 	return nil
 }
 
@@ -446,14 +432,6 @@ func (m DefaultManager) Authenticate(username, password string) (bool, error) {
 
 		passwordHash = acct.Password
 	}
-	evt := &shipyard.Event{
-		Type:    "login",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("username=%s", username),
-		Tags:    []string{"login", "security"},
-	}
-	// do not return a fail if error happens upon saving even; still want login
-	_ = m.SaveEvent(evt)
 
 	return m.authenticator.Authenticate(username, password, passwordHash)
 }
@@ -548,9 +526,13 @@ func (m DefaultManager) ChangePassword(username, password string) error {
 	if err != nil {
 		return err
 	}
+
 	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]string{"password": hash}).Run(m.session); err != nil {
 		return err
 	}
+
+	m.logEvent("change-password", username, []string{"security"})
+
 	return nil
 }
 
@@ -607,16 +589,7 @@ func (m DefaultManager) SaveWebhookKey(key *dockerhub.WebhookKey) error {
 
 	}
 
-	evt := &shipyard.Event{
-		Type:    "add-webhook-key",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("image=%s", key.Image),
-		Tags:    []string{"docker", "webhook"},
-	}
-
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
+	m.logEvent("add-webhook-key", fmt.Sprintf("image=%s", key.Image), []string{"webhook"})
 
 	return nil
 }
@@ -638,17 +611,7 @@ func (m DefaultManager) DeleteWebhookKey(id string) error {
 
 	}
 
-	evt := &shipyard.Event{
-		Type:    "delete-webhook-key",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("image=%s key=%s", key.Image, key.Key),
-		Tags:    []string{"docker", "webhook"},
-	}
-
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-
-	}
+	m.logEvent("delete-webhook-key", fmt.Sprintf("image=%s", key.Image), []string{"webhook"})
 
 	return nil
 }
@@ -663,6 +626,7 @@ func (m DefaultManager) Nodes() ([]*shipyard.Node, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return nodes, nil
 }
 
@@ -686,16 +650,7 @@ func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 		return err
 	}
 
-	evt := &shipyard.Event{
-		Type:    "add-registry",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s addr=%s", registry.Name, registry.Addr),
-		Tags:    []string{"registry", "security"},
-	}
-
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
+	m.logEvent("add-registry", fmt.Sprintf("name=%s endpoint=%s", registry.Name, registry.Addr), []string{"registry"})
 
 	return nil
 }
@@ -705,18 +660,13 @@ func (m DefaultManager) RemoveRegistry(registry *shipyard.Registry) error {
 	if err != nil {
 		return err
 	}
+
 	if res.IsNil() {
-		return ErrRoleDoesNotExist
+		return ErrRegistryDoesNotExist
 	}
-	evt := &shipyard.Event{
-		Type:    "delete-registry",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("name=%s addr=%s", registry.Name, registry.Addr),
-		Tags:    []string{"registry", "security"},
-	}
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
+
+	m.logEvent("delete-registry", fmt.Sprintf("name=%s endpoint=%s", registry.Name, registry.Addr), []string{"registry"})
+
 	return nil
 }
 
@@ -771,16 +721,7 @@ func (m DefaultManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {
 		return err
 	}
 
-	evt := &shipyard.Event{
-		Type:    "add-console-session",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("container=%s token=%s", c.ContainerID, c.Token),
-		Tags:    []string{"console", "cluster"},
-	}
-
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
+	m.logEvent("create-console-session", fmt.Sprintf("container=%s", c.ContainerID), []string{"console"})
 
 	return nil
 }
@@ -795,16 +736,6 @@ func (m DefaultManager) RemoveConsoleSession(c *shipyard.ConsoleSession) error {
 		return ErrConsoleSessionDoesNotExist
 	}
 
-	evt := &shipyard.Event{
-		Type:    "remove-console-session",
-		Time:    time.Now(),
-		Message: fmt.Sprintf("container=%s token=%s", c.ContainerID, c.Token),
-		Tags:    []string{"console", "cluster"},
-	}
-
-	if err := m.SaveEvent(evt); err != nil {
-		return err
-	}
 	return nil
 }
 
