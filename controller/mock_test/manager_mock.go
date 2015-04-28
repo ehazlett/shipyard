@@ -187,3 +187,7 @@ func (m MockManager) ConsoleSession(token string) (*shipyard.ConsoleSession, err
 func (m MockManager) ValidateConsoleSessionToken(containerId, token string) bool {
 	return true
 }
+
+func (m MockManager) GetAuthenticator() auth.Authenticator {
+	return nil
+}
