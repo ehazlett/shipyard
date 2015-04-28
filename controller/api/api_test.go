@@ -19,7 +19,7 @@ import (
 func getTestApi() (*Api, error) {
 	log.SetLevel(log.ErrorLevel)
 	m := mock_test.MockManager{}
-	return NewApi("", m, nil, false)
+	return NewApi("", m, nil, false, true)
 }
 
 func TestApiGetAccounts(t *testing.T) {
@@ -55,7 +55,7 @@ func TestApiPostAccounts(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ts := httptest.NewServer(http.HandlerFunc(api.addAccount))
+	ts := httptest.NewServer(http.HandlerFunc(api.saveAccount))
 	defer ts.Close()
 
 	data := []byte(`{"username": "testuser", "password": "foo"}`)
@@ -77,108 +77,10 @@ func TestApiDeleteAccount(t *testing.T) {
 	transport := &http.Transport{}
 	client := &http.Client{Transport: transport}
 
-	ts := httptest.NewServer(http.HandlerFunc(api.addAccount))
+	ts := httptest.NewServer(http.HandlerFunc(api.saveAccount))
 	defer ts.Close()
 
 	data := []byte(`{"username": "testuser", "password": "foo"}`)
-
-	req, err := http.NewRequest("DELETE", ts.URL, bytes.NewBuffer(data))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, res.StatusCode, 204, "expected response code 204")
-}
-
-func TestApiGetRoles(t *testing.T) {
-	api, err := getTestApi()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ts := httptest.NewServer(http.HandlerFunc(api.roles))
-	defer ts.Close()
-
-	res, err := http.Get(ts.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	roles := []*auth.Role{}
-	if err := json.NewDecoder(res.Body).Decode(&roles); err != nil {
-		t.Fatal(err)
-	}
-
-	assert.NotEqual(t, len(roles), 0, "expected roles; received none")
-
-	role := roles[0]
-
-	assert.Equal(t, role.ID, mock_test.TestRole.ID, fmt.Sprintf("expected ID %s; got %s", mock_test.TestRole.ID, role.ID))
-}
-
-func TestApiGetRole(t *testing.T) {
-	api, err := getTestApi()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ts := httptest.NewServer(http.HandlerFunc(api.role))
-	defer ts.Close()
-
-	res, err := http.Get(ts.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	role := &auth.Role{}
-	if err := json.NewDecoder(res.Body).Decode(&role); err != nil {
-		t.Fatal(err)
-	}
-
-	assert.NotEqual(t, role.ID, nil, "expected role; received nil")
-
-	assert.Equal(t, role.ID, mock_test.TestRole.ID, fmt.Sprintf("expected ID %s; got %s", mock_test.TestRole.ID, role.ID))
-}
-
-func TestApiPostRoles(t *testing.T) {
-	api, err := getTestApi()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ts := httptest.NewServer(http.HandlerFunc(api.addRole))
-	defer ts.Close()
-
-	data := []byte(`{"name": "testrole"}`)
-
-	res, err := http.Post(ts.URL, "application/json", bytes.NewBuffer(data))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, res.StatusCode, 204, "expected response code 204")
-}
-
-func TestApiDeleteRole(t *testing.T) {
-	api, err := getTestApi()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	transport := &http.Transport{}
-	client := &http.Client{Transport: transport}
-
-	ts := httptest.NewServer(http.HandlerFunc(api.addAccount))
-	defer ts.Close()
-
-	data := []byte(`{"name": "testrole"}`)
 
 	req, err := http.NewRequest("DELETE", ts.URL, bytes.NewBuffer(data))
 	if err != nil {
