@@ -651,17 +651,16 @@ func (m DefaultManager) DeployNode(config *shipyard.NodeDeployConfig) (*exec.Cmd
 	// until libmachine gets more mature, use shell out
 
 	// get the swarm token
-	swarmTokenArg := ""
-	containerInfo, err := m.client.InspectContainer("swarm-agent-master")
-	if err != nil {
-		return nil, err
-	}
+	swarmTokenArg := config.SwarmToken
 
-	for _, arg := range containerInfo.Args {
-		if strings.Index(arg, "token://") > -1 {
-			swarmTokenArg = arg
-			break
+	// not passed; attempt to discovery from swarm master
+	if swarmTokenArg == "" {
+		containerInfo, err := m.client.InspectContainer("swarm-agent-master")
+		if err != nil {
+			return nil, err
 		}
+
+		swarmTokenArg = containerInfo.Args[len(containerInfo.Args)-1]
 	}
 
 	if swarmTokenArg == "" {
@@ -679,6 +678,7 @@ func (m DefaultManager) DeployNode(config *shipyard.NodeDeployConfig) (*exec.Cmd
 
 	// machine create params
 	params = append(params, config.Params...)
+
 	// machine name
 	params = append(params, config.Name)
 	cmd := exec.Command("docker-machine", params...)

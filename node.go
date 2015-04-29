@@ -10,6 +10,7 @@ type Node struct {
 type NodeDeployConfig struct {
 	Name       string   `json:"name,omitempty"`
 	DriverName string   `json:"driver_name,omitempty"`
+	SwarmToken string   `json:"swarm_token,omitempty"`
 	Params     []string `json:"params,omitempty"`
 }
 
@@ -46,6 +47,11 @@ func DefaultNodeProviders() []*NodeProvider {
 				Description: "AWS Secret Access Key",
 				Required:    true,
 			},
+			{
+				Key:         "amazonec2-vpc-id",
+				Description: "AWS VPC ID",
+				Required:    true,
+			},
 		},
 	}
 
@@ -62,11 +68,6 @@ func DefaultNodeProviders() []*NodeProvider {
 				Description: "DigialOcean Access Token",
 				Required:    true,
 			},
-			{
-				Key:         "digitalocean-size",
-				Description: "DigialOcean Droplet Size",
-				Required:    false,
-			},
 		},
 	}
 
@@ -81,6 +82,16 @@ func DefaultNodeProviders() []*NodeProvider {
 			{
 				Key:         "rackspace-api-key",
 				Description: "Rackspace API Key",
+				Required:    true,
+			},
+			{
+				Key:         "rackspace-region",
+				Description: "Rackspace Region",
+				Required:    true,
+			},
+			{
+				Key:         "rackspace-username",
+				Description: "Rackspace Username",
 				Required:    true,
 			},
 		},

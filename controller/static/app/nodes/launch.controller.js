@@ -13,9 +13,11 @@
             vm.nodeName = "";
             vm.request = {};
             vm.params = {};
+            vm.extraCreateArgs = "";
+            vm.swarmToken = "";
 
             vm.formValidationRules = {
-                foo: {
+                name: {
                     identifier: 'name',
                     rules: [
                         {
@@ -26,6 +28,7 @@
                 }
             };
             
+            // TODO: not validating dynamic fields
             for (var i=0; i<vm.provider.params.length; i++) {
                 var key = vm.provider.params[i].key;
                 var required = vm.provider.params[i].required;
@@ -39,8 +42,6 @@
                     ]
                 }
             }
-
-            // TODO: validation -- not working
             $('.ui.form').form(vm.formValidationRules);
 
             function isFormValid() {
@@ -59,12 +60,20 @@
                     params.push(arg);
                 }
 
+                if (vm.extraParams != null) {
+                    var extraParams = vm.extraParams.split(" ");
+                    for (var i=0; i<extraParams.length; i++) {
+                        params.push(extraParams[i]);
+                    }
+                }
+
                 vm.request = {
                     name: vm.nodeName,
                     driver_name: provider.driver_name,
+                    swarm_token: vm.swarmToken,
                     params: params
                 }
-                
+
                 $http
                     .post('/api/nodes', vm.request)
                     .success(function(data, status, headers, config) {

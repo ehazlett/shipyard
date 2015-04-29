@@ -23,7 +23,21 @@
                     </div>
                 </div>
 
-                <div class="ui hidden divider"></div>
+                <div class="ui accordion field">
+                    <div class="title">
+                        <i class="icon dropdown"></i>
+                        Advanced Configuration
+                    </div>
+                    <div class="content field">
+                        <label>Swarm Token</label>
+                        <input type="text" ng-model="vm.swarmToken" placeholder="swarm discovery token (i.e. token://12345 or zk://1.2.3.4)">
+
+                        <label>Extra Create Arguments</label>
+                        <input type="text" ng-model="vm.extra_create_args" placeholder="extra create args (i.e. --eng-label=foo --eng-label=bar)">
+                    </div>
+                </div>
+
+                <div class="ui divider"></div>
                 <div class="ui green submit button">Launch Node</div>
             </div>
         </div>
@@ -32,5 +46,6 @@
 <script>
 $(function(){
     $('.ui.checkbox').checkbox();
+    $('.ui.accordion').accordion();
 });
 </script>
