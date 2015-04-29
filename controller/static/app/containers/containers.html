@@ -114,7 +114,7 @@
             <tbody>
                 <tr ng-repeat="c in vm.containers | filter:tableFilter">
                     <td class="healthcolumn">
-                           <i class="circle icon ng-class:{'green': vm.containerStatusText(c) == 'Running', 'disabled': vm.containerStatusText(c) == 'Stopped'}"/>
+                        <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : 'disabled'"></i>
                                   <span class="hidden">{{vm.containerStatusText(c)}}</span>
                     </td>
                     <td>{{c.Id | limitTo:12 }}</td>
