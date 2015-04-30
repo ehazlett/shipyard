@@ -166,6 +166,17 @@
                             <div class="field">
                                 <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
                             </div>
+                            <h5 class="ui dividing header">Resource Limits</h5>
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>CPUs</label>
+                                    <input name="cpus" class="input" type="text" ng-model="vm.cpuShares" placeholder="1024"></input>
+                                </div>
+                                <div class="field">
+                                    <label>Memory (MB)</label>
+                                    <input name="memory" class="input" type="text" ng-model="vm.memory" placeholder="&infin;"></input>
+                                </div>
+                            </div>
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="two fields">
                                 <div class="field">
