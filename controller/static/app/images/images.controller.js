@@ -61,6 +61,9 @@
                         'X-Access-Token': localStorage.getItem("X-Access-Token")
                     }
                 })
+                .node('[*]', function(node) {
+                    console.log(node);
+                })
                 .done(function(node) {
                     // We expect two nodes, e.g.
                     // 1) Pulling busybox...
