@@ -27,6 +27,8 @@
         }
 
         vm.cmd = "";
+        vm.cpuShares = "";
+        vm.memory = "";
         
         vm.volumes = [];
         vm.hostPath = "";
@@ -175,6 +177,11 @@
             }
         }
 
+        function transformResourceLimits() {
+            vm.request.CpuShares = parseInt(vm.cpuShares);
+            vm.request.Memory = parseInt(vm.memory) * 1024 * 1024;
+        }
+
         function isFormValid() {
             return $('.ui.form').form('validate form');
         }
@@ -190,6 +197,7 @@
             transformEnvVars();
             transformCommand();   
             transformPorts();
+            transformResourceLimits();
 
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
