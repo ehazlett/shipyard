@@ -591,6 +591,33 @@ func (a *Api) node(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) scaleContainer(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	containerId := vars["id"]
+	n := r.URL.Query()["n"]
+
+	if len(n) == 0 {
+		http.Error(w, "you must enter a number of instances (param: n)", http.StatusBadRequest)
+		return
+	}
+
+	numInstances, err := strconv.Atoi(n[0])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if numInstances <= 0 {
+		http.Error(w, "you must enter a positive value", http.StatusBadRequest)
+		return
+	}
+
+	if err := a.manager.ScaleContainer(containerId, numInstances); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) createConsoleSession(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -882,6 +909,7 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
+	apiRouter.HandleFunc("/api/containers/{id}/scale", a.scaleContainer).Methods("POST")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/registry", a.registries).Methods("GET")
