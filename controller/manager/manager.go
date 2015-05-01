@@ -256,6 +256,8 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) error {
 			log.Debugf("scaling: id=%s #=%d", containerInfo.Id, instance)
 
 			config := containerInfo.Config
+			// clear hostname to get a newly generated
+			config.Hostname = ""
 			hostConfig := containerInfo.HostConfig
 
 			id, err := m.client.CreateContainer(config, "")
