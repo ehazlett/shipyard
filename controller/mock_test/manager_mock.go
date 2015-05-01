@@ -5,6 +5,7 @@ import (
 	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
+	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/dockerhub"
 	registry "github.com/shipyard/shipyard/registry/v1"
 )
@@ -192,6 +193,6 @@ func (m MockManager) GetAuthenticator() auth.Authenticator {
 	return nil
 }
 
-func (m MockManager) ScaleContainer(id string, numInstances int) error {
-	return nil
+func (m MockManager) ScaleContainer(id string, numInstances int) manager.ScaleResult {
+	return manager.ScaleResult{Scaled: []string{"9c3c7dd2199a95cce29950b612ecf918ae278a42e53e10f6cccb752b6fbcd8b3"}, Errors: []string{"500 Internal Server Error: no resources available to schedule container"}}
 }

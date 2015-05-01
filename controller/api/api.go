@@ -592,6 +592,8 @@ func (a *Api) node(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) scaleContainer(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
 	vars := mux.Vars(r)
 	containerId := vars["id"]
 	n := r.URL.Query()["n"]
@@ -612,10 +614,16 @@ func (a *Api) scaleContainer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.manager.ScaleContainer(containerId, numInstances); err != nil {
+	result := a.manager.ScaleContainer(containerId, numInstances)
+	// If we received any errors, continue to write result to the writer, but return a 500
+	if len(result.Errors) > 0 {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	if err := json.NewEncoder(w).Encode(result); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 }
 
 func (a *Api) createConsoleSession(w http.ResponseWriter, r *http.Request) {
