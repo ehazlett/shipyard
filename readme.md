@@ -18,13 +18,13 @@ Shipyard will be configured to manage the Swarm and be ready to go.
   Note: you must have VirtualBox installed.
 
 ```
-curl -s https://shipyard-project.com/shipyard-deploy | bash -s
+curl -s https://shipyard-project.com/deploy | bash -s
 ```
 
 For full options:
 
 ```
-curl -s https://shipyard-project.com/shipyard-deploy | bash -s -- -h
+curl -s https://shipyard-project.com/deploy | bash -s -- -h
 ```
 
 ## Option 2: Manual Deployment (advanced users)
