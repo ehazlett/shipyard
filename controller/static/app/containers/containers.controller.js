@@ -14,10 +14,13 @@
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.showRestartContainerDialog = showRestartContainerDialog;
         vm.showStopContainerDialog = showStopContainerDialog;
+        vm.showScaleContainerDialog = showScaleContainerDialog;
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
+        vm.scaleContainer = scaleContainer;
         vm.refresh = refresh;
+        vm.numOfInstances = 1;
         vm.containerStatusText = containerStatusText;
         
         refresh();
@@ -49,6 +52,11 @@
             $('.ui.small.stop.modal').modal('show');
         }
 
+        function showScaleContainerDialog(container) {
+            vm.selectedContainerId = container.Id;
+            $('.ui.small.scale.modal').modal('show');
+        }
+
         function destroyContainer() {
             ContainerService.destroy(vm.selectedContainerId)
                 .then(function(data) {
@@ -75,6 +83,16 @@
                     vm.error = data;
                 });
         }
+
+        function scaleContainer() {
+            ContainerService.scale(vm.selectedContainerId, vm.numOfInstances)
+                .then(function(data) {
+                    vm.refresh();
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
         function containerStatusText(container) {
             if(container.Status.indexOf("Up")==0){
                 return "Running";

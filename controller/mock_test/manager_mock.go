@@ -191,3 +191,7 @@ func (m MockManager) ValidateConsoleSessionToken(containerId, token string) bool
 func (m MockManager) GetAuthenticator() auth.Authenticator {
 	return nil
 }
+
+func (m MockManager) ScaleContainer(id string, numInstances int) error {
+	return nil
+}
