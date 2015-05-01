@@ -55,6 +55,32 @@
     </div>
 </div>
 
+<div class="ui small scale modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+    Scale Container: {{ vm.selectedContainerId | limitTo:12 }}
+</div>
+<div class="content">
+    <div class="ui form">
+        <div class="fields">
+            <div class="eight wide field">
+                <label>Total Number of Instances</label>
+                <input class="input" ng-model="vm.numOfInstances" type="text">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        Cancel
+    </div>
+    <div ng-click="vm.scaleContainer()" class="ui positive right labeled icon button">
+        Scale
+        <i class="exchange icon"></i>
+    </div>
+</div>
+</div>
+
 <div class="two column row">
     <div class="left floated column">
         <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
@@ -135,6 +161,7 @@
                                 <a ng-click="vm.showRestartContainerDialog(c)" class="item"><i class="green refresh icon"></i> Restart</a>
                                 <a ng-click="vm.showStopContainerDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
                                 <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
+                                <a ng-click="vm.showScaleContainerDialog(c)" class="item"><i class="exchange icon"></i> Scale</a>
                                 <a ui-sref="dashboard.stats({id: c.Id})" class="item"><i class="bar chart icon"></i> Stats</a>
                                 <a ui-sref="dashboard.exec({id: c.Id})" class="item"><i class="terminal outline icon"></i> Console</a>
                                 <a ui-sref="dashboard.logs({id: c.Id})" class="item"><i class="text file outline icon"></i> Logs</a>

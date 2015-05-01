@@ -74,6 +74,7 @@ type (
 		Store() *sessions.CookieStore
 		StoreKey() string
 		Container(id string) (*dockerclient.ContainerInfo, error)
+		ScaleContainer(id string, numInstances int) error
 		SaveServiceKey(key *auth.ServiceKey) error
 		RemoveServiceKey(key string) error
 		SaveEvent(event *shipyard.Event) error
@@ -223,6 +224,64 @@ func (m DefaultManager) uploadUsage() {
 
 func (m DefaultManager) Container(id string) (*dockerclient.ContainerInfo, error) {
 	return m.client.InspectContainer(id)
+}
+
+func (m DefaultManager) ScaleContainer(id string, numInstances int) error {
+	var (
+		instances = make(chan (int), numInstances)
+		errChan   = make(chan (error))
+		done      = make(chan (bool))
+	)
+
+	containerInfo, err := m.Container(id)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		for {
+			err := <-errChan
+			log.Errorf("error scaling container: err=%s", err)
+		}
+	}()
+
+	go func() {
+		for {
+			instance, scaling := <-instances
+			if !scaling {
+				done <- true
+				return
+			}
+
+			log.Debugf("scaling: id=%s #=%d", containerInfo.Id, instance)
+
+			config := containerInfo.Config
+			// clear hostname to get a newly generated
+			config.Hostname = ""
+			hostConfig := containerInfo.HostConfig
+
+			id, err := m.client.CreateContainer(config, "")
+			if err != nil {
+				errChan <- err
+				return
+			}
+
+			if err := m.client.StartContainer(id, hostConfig); err != nil {
+				errChan <- err
+				return
+			}
+		}
+	}()
+
+	for i := 0; i < numInstances; i++ {
+		instances <- i
+	}
+
+	close(instances)
+
+	<-done
+
+	return nil
 }
 
 func (m DefaultManager) SaveServiceKey(key *auth.ServiceKey) error {

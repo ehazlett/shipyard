@@ -72,6 +72,14 @@
                     });
                 return promise;
             },
+            scale: function(containerId, numOfInstances) {
+                var promise = $http
+                    .post('/api/containers/' + containerId + '/scale?n=' + numOfInstances)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
         } 
     }
 
