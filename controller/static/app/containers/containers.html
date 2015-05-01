@@ -62,8 +62,8 @@
 </div>
 <div class="content">
     <div class="ui form">
-        <div class="fields">
-            <div class="eight wide field">
+        <div class="two fields">
+            <div class="twelve wide field">
                 <label>Total Number of Instances</label>
                 <input class="input" ng-model="vm.numOfInstances" type="text">
             </div>
@@ -99,11 +99,21 @@
     </div>
 </div>
 
+
 <div class="row" ng-show="vm.error">
     <div class="sixteen wide column">
         <div class="ui error message">
             <div class="header">Error...</div>
             <p>{{vm.error}}</p>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.errors.length > 0">
+    <div class="sixteen wide column">
+        <div class="ui error message">
+            <div class="header">Error...</div>
+            <p ng-repeat="e in vm.errors">{{e}}</p>
         </div>
     </div>
 </div>

@@ -9,6 +9,7 @@
     function ContainersController(ContainerService, $state) {
         var vm = this;
         vm.error = "";
+        vm.errors = [];
         vm.containers = [];
         vm.selectedContainerId = "";
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
@@ -86,10 +87,13 @@
 
         function scaleContainer() {
             ContainerService.scale(vm.selectedContainerId, vm.numOfInstances)
-                .then(function(data) {
+                .then(function(response) {
                     vm.refresh();
-                }, function(data) {
-                    vm.error = data;
+                }, function(response) {
+                    // Add unique errors to vm.errors
+                    $.each(response.data.Errors, function(i, el){
+                            if($.inArray(el, vm.errors) === -1) vm.errors.push(el);
+                    });
                 });
         }
 
