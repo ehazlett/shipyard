@@ -177,6 +177,36 @@
                                     <input name="memory" class="input" type="text" ng-model="vm.memory" placeholder="&infin;"></input>
                                 </div>
                             </div>
+                            <h5 class="ui dividing header">Swarm Constraint</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>Constraint</label>
+                                    <input name="constraint" class="input" type="text" ng-model="vm.constraintName" placeholder="storage"></input>
+                                </div>
+                                <div class="seven wide field">
+                                <label>Value</label>
+                                <input name="constraintValue" class="input" type="text" ng-model="vm.constraintValue" placeholder="ssd"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushConstraint()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="fields" ng-repeat="c in vm.constraints">
+                                <div class="seven wide field">
+                                    <input name="constraint" class="input" type="text" ng-model="c.ConstraintName" placeholder="storage"></input>
+                                </div>
+                                <div class="seven wide field">
+                                    <input name="constraintValue" class="input" type="text" ng-model="c.ConstraintValue" placeholder="ssd"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button" ng-click="vm.removeConstraint(c)"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
                             <h5 class="ui dividing header">Restart Policy</h5>
                             <div class="two fields">
                                 <div class="field">
@@ -249,36 +279,6 @@
                                 </div>
                                 <div class="one wide field">
                                     <div class="ui red icon button" ng-click="vm.removePort(p)">
-                                        <i class="delete icon"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <h5 class="ui dividing header">Swarm Constraint</h5>
-                            <div class="fields">
-                                <div class="seven wide field">
-                                    <label>Constraint</label>
-                                    <input name="constraint" class="input" type="text" ng-model="vm.constraintName" placeholder="storage"></input>
-                                </div>
-                                <div class="seven wide field">
-                                <label>Value</label>
-                                <input name="constraintValue" class="input" type="text" ng-model="vm.constraintValue" placeholder="ssd"></input>
-                                </div>
-                                <div class="one wide field">
-                                    <label>&nbsp;</label>
-                                    <div class="ui green icon button" ng-click="vm.pushConstraint()">
-                                        <i class="add icon"></i>
-                                    </div>
-                                </div>
-                            </div>  
-                            <div class="fields" ng-repeat="c in vm.constraints">
-                                <div class="seven wide field">
-                                    <input name="constraint" class="input" type="text" ng-model="c.ConstraintName" placeholder="storage"></input>
-                                </div>
-                                <div class="seven wide field">
-                                    <input name="constraintValue" class="input" type="text" ng-model="c.ConstraintValue" placeholder="ssd"></input>
-                                </div>
-                                <div class="one wide field">
-                                    <div class="ui red icon button" ng-click="vm.removeConstraint(c)"> 
                                         <i class="delete icon"></i>
                                     </div>
                                 </div>
