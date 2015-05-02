@@ -38,6 +38,14 @@ func generateId(n int) string {
 
 func parseClusterNodes(driverStatus [][]string) ([]*shipyard.Node, error) {
 	nodes := []*shipyard.Node{}
+	var node *shipyard.Node
+	nodeComplete := false
+	name := ""
+	addr := ""
+	containers := ""
+	reservedCPUs := ""
+	reservedMemory := ""
+	labels := []string{}
 	for _, l := range driverStatus {
 		if len(l) != 2 {
 			continue
@@ -50,19 +58,47 @@ func parseClusterNodes(driverStatus [][]string) ([]*shipyard.Node, error) {
 			continue
 		}
 
-		// cluster info like "Containers"
-		if strings.Index(label, " └") > -1 {
+		if strings.Index(label, " └") == -1 {
+			name = label
+			addr = data
+		}
+
+		// node info like "Containers"
+		switch label {
+		case " └ Containers":
+			containers = data
+		case " └ Reserved CPUs":
+			reservedCPUs = data
+		case " └ Reserved Memory":
+			reservedMemory = data
+		case " └ Labels":
+			lbls := strings.Split(data, ",")
+			labels = lbls
+			nodeComplete = true
+		default:
 			continue
 		}
 
-		// parse node
-		node := &shipyard.Node{
-			Name: label,
-			Addr: data,
-		}
+		if nodeComplete {
+			node = &shipyard.Node{
+				Name:           name,
+				Addr:           addr,
+				Containers:     containers,
+				ReservedCPUs:   reservedCPUs,
+				ReservedMemory: reservedMemory,
+				Labels:         labels,
+			}
+			nodes = append(nodes, node)
 
-		// TODO: get response time
-		nodes = append(nodes, node)
+			// reset info
+			name = ""
+			addr = ""
+			containers = ""
+			reservedCPUs = ""
+			reservedMemory = ""
+			labels = []string{}
+			nodeComplete = false
+		}
 	}
 
 	return nodes, nil
