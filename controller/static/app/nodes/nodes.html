@@ -12,6 +12,15 @@
     </div>
 </div>
 
+<div class="row" ng-show="vm.error">
+    <div class="sixteen wide column">
+        <div class="ui error message">
+            <div class="header">Error...</div>
+            <p>{{vm.error}}</p>
+        </div>
+    </div>
+</div>
+
 <div class="row" ng-show="vm.nodes.length === 0">
 <div class="column">
     <div class="ui icon message">
@@ -33,14 +42,20 @@
                 <tr>
                     <th>Name</th>
                     <th>Address</th>
-                    <th>Response Time</th>
+                    <th>Containers</th>
+                    <th>Reserved CPUs</th>
+                    <th>Reserved Memory</th>
+                    <th>Labels</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="n in vm.nodes | filter:tableFilter">
                     <td>{{n.name}}</td>
                     <td>{{n.addr}}</td>
-                    <td class="collapsing">{{n.response_time}} ms</td>
+                    <td>{{n.containers}}</td>
+                    <td>{{n.reserved_cpus}}</td>
+                    <td>{{n.reserved_memory}}</td>
+                    <td>{{n.labels.join(', ')}}</td>
                 </tr>
             </tbody>
         </table>
