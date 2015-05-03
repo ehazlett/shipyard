@@ -179,11 +179,18 @@
                             </div>
                             <h5 class="ui dividing header">Swarm Constraint</h5>
                             <div class="fields">
-                                <div class="seven wide field">
+                                <div class="five wide field">
                                     <label>Constraint</label>
                                     <input name="constraint" class="input" type="text" ng-model="vm.constraintName" placeholder="storage"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="four wide field">
+                                    <label>Rule</label>
+                                    <dropdown class="fluid" ng-model="vm.constraintRule">
+                                    <dropdown-group>==</dropdown-group>
+                                    <dropdown-group>!=</dropdown-group>
+                                    </dropdown>
+                                </div>
+                                <div class="five wide field">
                                 <label>Value</label>
                                 <input name="constraintValue" class="input" type="text" ng-model="vm.constraintValue" placeholder="ssd"></input>
                                 </div>
@@ -195,10 +202,16 @@
                                 </div>
                             </div>  
                             <div class="fields" ng-repeat="c in vm.constraints">
-                                <div class="seven wide field">
+                                <div class="five wide field">
                                     <input name="constraint" class="input" type="text" ng-model="c.ConstraintName" placeholder="storage"></input>
                                 </div>
-                                <div class="seven wide field">
+                                <div class="four wide field">
+                                    <dropdown class="fluid" ng-model="c.ConstraintRule">
+                                    <dropdown-group>==</dropdown-group>
+                                    <dropdown-group>!=</dropdown-group>
+                                    </dropdown>
+                                </div>
+                                <div class="five wide field">
                                     <input name="constraintValue" class="input" type="text" ng-model="c.ConstraintValue" placeholder="ssd"></input>
                                 </div>
                                 <div class="one wide field">
