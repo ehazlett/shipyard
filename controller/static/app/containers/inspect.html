@@ -72,8 +72,8 @@
                     <div class="floated right aligned right column">
                         <h3 class="ui header">
                             <div class="content">
-                                <div class="header" ng-show="vm.container.State.Running">Started: {{ vm.container.State.StartedAt | date:'medium' }}</div>
-                                <div class="header" ng-hide="vm.container.State.Running">Finished: {{ vm.container.State.FinishedAt | date:'medium' }}</div>
+                                <div class="header" ng-show="vm.container.State.Running">Started {{ vm.container.State.StartedAt | fromCalendar }}</div>
+                                <div class="header" ng-hide="vm.container.State.Running">Finished {{ vm.container.State.FinishedAt | fromCalendar }}</div>
                             </div>
                         </h3>
                     </div>

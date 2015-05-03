@@ -26,7 +26,8 @@
     "angular-base64": "~2.0.4",
     "oboe": "~2.1.1",
     "nvd3": "v1.1.15-beta",
-    "angular-selectize2": "~1.2.1"
+    "angular-selectize2": "~1.2.1",
+    "moment": "~2.10.2"
   },
   "resolutions": {
     "angular": "~1.3.15"
