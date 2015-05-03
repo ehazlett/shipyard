@@ -45,6 +45,7 @@
 
         vm.constraints =[]
         vm.constraintName = "";
+        vm.constraintRule = "==";
         vm.constraintValue = "";
         
         vm.envVars = [];
@@ -84,10 +85,11 @@
         vm.removePort = removePort;
 
         function pushConstraint() {
-            var constraint = {'ConstraintName': vm.constraintName, 'ConstraintValue': vm.constraintValue};
+            var constraint = {'ConstraintName': vm.constraintName, 'ConstraintValue': vm.constraintValue, 'ConstraintRule': vm.constraintRule};
             vm.constraints.push(constraint);
             vm.constraintName = "";
             vm.constraintValue = "";
+            vm.constraintRule = "==";
         }
 
         function removeConstraint(constraint) {
@@ -166,12 +168,14 @@
         }
 
         function transformConstraints() {
+
             var i;
             if(vm.constraintName.length > 0) {
-                vm.request.Env.push("constraint:" + vm.constraintName + "==" + vm.constraintValue);
+                vm.request.Env.push("constraint:" + vm.constraintName + vm.constraintRule + vm.constraintValue);
             }
-            for(i = 0; i < vm.constraints.lenght; i++) {
-                vm.request.Env.push("constraint:" + vm.constraints[i].ConstraintName + "==" + vm.constraints[i].ConstraintValue);
+
+            for(i = 0; i < vm.constraints.length; i++) {
+                vm.request.Env.push("constraint:" + vm.constraints[i].ConstraintName + vm.constraints[i].ConstraintRule + vm.constraints[i].ConstraintValue);
             }
         }
         
