@@ -56,29 +56,29 @@
 </div>
 
 <div id="scale-modal" class="ui small modal transition">
-<i class="close icon"></i>
-<div class="header">
-    Scale Container: {{ vm.selectedContainerId | limitTo:12 }}
-</div>
-<div class="content">
-    <div class="ui form">
-        <div class="two fields">
-            <div class="twelve wide field">
-                <label>Number of Instances</label>
-                <input class="input" ng-model="vm.numOfInstances" type="text">
+    <i class="close icon"></i>
+    <div class="header">
+        Scale Container: {{ vm.selectedContainerId | limitTo:12 }}
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="fields">
+                <div class="twelve wide field">
+                    <label>Number of Instances</label>
+                    <input class="input" ng-model="vm.numOfInstances" type="text">
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="actions">
-    <div class="ui negative button">
-        Cancel
+    <div class="actions">
+        <div class="ui negative button">
+            Cancel
+        </div>
+        <div ng-click="vm.scaleContainer()" class="ui positive right labeled icon button">
+            Scale
+            <i class="exchange icon"></i>
+        </div>
     </div>
-    <div ng-click="vm.scaleContainer()" class="ui positive right labeled icon button">
-        Scale
-        <i class="exchange icon"></i>
-    </div>
-</div>
 </div>
 
 <div class="two column row">
@@ -137,7 +137,7 @@
         <table class="ui sortable celled table">
             <thead>
                 <tr>
-                    <th class="collapsing containerStatusText"><i class="heartbeat icon"></i></th>
+                    <th id="container-health-table-header" class="collapsing"><i class="heartbeat icon"></i></th>
                     <th class="collapsing">Id</th>
                     <th>Node</th>
                     <th>Name</th>
@@ -149,9 +149,9 @@
             </thead>
             <tbody>
                 <tr ng-repeat="c in vm.containers | filter:tableFilter">
-                    <td class="healthcolumn">
+                    <td>
                         <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : 'disabled'"></i>
-                                  <span class="hidden">{{vm.containerStatusText(c)}}</span>
+                        <span class="hidden">{{vm.containerStatusText(c)}}</span>
                     </td>
                     <td>{{c.Id | limitTo:12 }}</td>
                     <td>{{c.Names[0].split('/')[1]}}</td>
