@@ -9,6 +9,10 @@
     text-transform: none;
 }
 
+.ui.small.model.transition {
+    margin-top: -98px;
+}
+
 .ui.fixed.inverted.main.menu {
     text-transform: uppercase;
 }

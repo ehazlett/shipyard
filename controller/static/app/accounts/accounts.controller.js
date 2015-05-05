@@ -16,7 +16,7 @@
 
             function showRemoveAccountDialog(account) {
                 vm.selectedAccount = account;
-                $('.ui.small.remove.modal').modal('show');
+                $('#remove-modal').modal('show');
             }
 
             function refresh() {

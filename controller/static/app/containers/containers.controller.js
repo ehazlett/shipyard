@@ -40,22 +40,22 @@
 
         function showDestroyContainerDialog(container) {
             vm.selectedContainerId = container.Id;
-            $('.ui.small.destroy.modal').modal('show');
+            $('#destroy-modal').modal('show');
         }
 
         function showRestartContainerDialog(container) {
             vm.selectedContainerId = container.Id;
-            $('.ui.small.restart.modal').modal('show');
+            $('#restart-modal').modal('show');
         }
 
         function showStopContainerDialog(container) {
             vm.selectedContainerId = container.Id;
-            $('.ui.small.stop.modal').modal('show');
+            $('#stop-modal').modal('show');
         }
 
         function showScaleContainerDialog(container) {
             vm.selectedContainerId = container.Id;
-            $('.ui.small.scale.modal').modal('show');
+            $('#scale-modal').modal('show');
         }
 
         function destroyContainer() {

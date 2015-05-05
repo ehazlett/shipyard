@@ -1,4 +1,4 @@
-<div class="ui small destroy modal transition" style="margin-top: -98px;">
+<div id="destroy-modal" class="ui small modal transition">
 <i class="close icon"></i>
 <div class="header">
     Destroy Container: {{ vm.selectedContainerId | limitTo:12 }}
@@ -17,7 +17,7 @@
 </div>
 </div>
 
-<div class="ui small restart modal transition" style="margin-top: -98px;">
+<div id="restart-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
         Restart Container: {{ vm.selectedContainerId | limitTo:12 }}
@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<div class="ui small stop modal transition" style="margin-top: -98px;">
+<div id="stop-modal" class="ui small stop modal transition">
     <i class="close icon"></i>
     <div class="header">
         Stop Container: {{ vm.selectedContainerId | limitTo:12 }}
@@ -55,7 +55,7 @@
     </div>
 </div>
 
-<div class="ui small scale modal transition" style="margin-top: -98px;">
+<div id="scale-modal" class="ui small modal transition">
 <i class="close icon"></i>
 <div class="header">
     Scale Container: {{ vm.selectedContainerId | limitTo:12 }}
