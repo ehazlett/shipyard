@@ -1,3 +1,4 @@
+/* Menu Bar Styles */
 #logo {
     font-family: 'Poiret One', sans-serif;
     background-color: rgba(0, 68, 91, 1) !important;
@@ -17,37 +18,14 @@
     text-transform: uppercase;
 }
 
-.logs {
-    margin: 5px;
-    font-family: 'Droid Sans Mono';
-    font-size: 12px;
-    word-break: break-word;
-    width: 100%;
-}
-.containerStatusText {
-    width: 1px;
-    text-align: center;
-}
-.healthcolumn {
-    width: 1px;
-}
-td.healthcolumn  {
-    text-align: center;
-}
-.ui.sortable.table thead th.healthcolumn:after { 
+#container-health-table-header:after { 
     width: 0; 
     margin: 0;  
 }
+
 .hidden {
     display: none;
-    visability:hidden;
-}
-
-i.terminal {
-    border: none;
-    background: none;
-    color: #000000;
-    opacity: 0.8;
+    visibility: hidden;
 }
 
 div.chart, ui.chart {
@@ -56,4 +34,18 @@ div.chart, ui.chart {
 
 .ui.chart svg {
     height: 250px;
+}
+
+.logs {
+    margin: 5px;
+    font-family: 'Droid Sans Mono';
+    font-size: 12px;
+    word-break: break-word;
+    width: 100%;
+}
+i.terminal {
+    border: none;
+    background: none;
+    color: #000000;
+    opacity: 0.8;
 }
