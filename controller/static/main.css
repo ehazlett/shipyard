@@ -18,6 +18,14 @@
     text-transform: uppercase;
 }
 
+#select-all-table-header { 
+    cursor: auto;
+}
+#select-all-table-header:after { 
+    width: 0; 
+    margin: 0;  
+}
+
 #container-health-table-header:after { 
     width: 0; 
     margin: 0;  
