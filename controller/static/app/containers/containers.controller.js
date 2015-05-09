@@ -5,8 +5,8 @@
         .module('shipyard.containers')
         .controller('ContainersController', ContainersController);
 
-    ContainersController.$inject = ['ContainerService', '$state'];
-    function ContainersController(ContainerService, $state) {
+    ContainersController.$inject = ['$scope', 'ContainerService', '$state'];
+    function ContainersController($scope, ContainerService, $state) {
         var vm = this;
         vm.error = "";
         vm.errors = [];
@@ -26,6 +26,11 @@
         
         refresh();
 
+        // Apply jQuery to dropdowns in table once ngRepeat has finished rendering
+        $scope.$on('ngRepeatFinished', function() {
+            $('.ui.right.pointing.dropdown').dropdown();
+        });
+
         function refresh() {
             ContainerService.list()
                 .then(function(data) {
@@ -36,7 +41,6 @@
 
             vm.error = "";
         }
-
 
         function showDestroyContainerDialog(container) {
             vm.selectedContainerId = container.Id;

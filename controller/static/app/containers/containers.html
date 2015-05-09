@@ -147,7 +147,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="c in vm.containers | filter:tableFilter">
+                <tr ng-repeat="c in vm.containers | filter:tableFilter" jquery>
                     <td>
                         <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : 'disabled'"></i>
                         <span class="hidden">{{vm.containerStatusText(c)}}</span>
@@ -177,7 +177,6 @@
                             </div>
                         </div>
                         <script>
-$('.ui.right.pointing.dropdown').dropdown();
                         </script>
                     </td>
                 </tr>
