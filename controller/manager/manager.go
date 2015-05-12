@@ -62,6 +62,11 @@ type (
 		disableUsageInfo bool
 	}
 
+	ScaleResult struct {
+		Scaled []string
+		Errors []string
+	}
+
 	Manager interface {
 		Accounts() ([]*auth.Account, error)
 		Account(username string) (*auth.Account, error)
@@ -74,7 +79,7 @@ type (
 		Store() *sessions.CookieStore
 		StoreKey() string
 		Container(id string) (*dockerclient.ContainerInfo, error)
-		ScaleContainer(id string, numInstances int) error
+		ScaleContainer(id string, numInstances int) ScaleResult
 		SaveServiceKey(key *auth.ServiceKey) error
 		RemoveServiceKey(key string) error
 		SaveEvent(event *shipyard.Event) error
@@ -226,62 +231,52 @@ func (m DefaultManager) Container(id string) (*dockerclient.ContainerInfo, error
 	return m.client.InspectContainer(id)
 }
 
-func (m DefaultManager) ScaleContainer(id string, numInstances int) error {
+func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult {
 	var (
-		instances = make(chan (int), numInstances)
-		errChan   = make(chan (error))
-		done      = make(chan (bool))
+		errChan = make(chan (error))
+		resChan = make(chan (string))
+		result  = ScaleResult{Scaled: make([]string, 0), Errors: make([]string, 0)}
 	)
 
 	containerInfo, err := m.Container(id)
 	if err != nil {
-		return err
+		result.Errors = append(result.Errors, err.Error())
+		return result
 	}
 
-	go func() {
-		for {
-			err := <-errChan
-			log.Errorf("error scaling container: err=%s", err)
-		}
-	}()
-
-	go func() {
-		for {
-			instance, scaling := <-instances
-			if !scaling {
-				done <- true
-				return
+	for i := 1; i < numInstances; i++ {
+		go func(instance int) {
+			for {
+				log.Debugf("scaling: id=%s #=%d", containerInfo.Id, instance)
+				config := containerInfo.Config
+				// clear hostname to get a newly generated
+				config.Hostname = ""
+				hostConfig := containerInfo.HostConfig
+				id, err := m.client.CreateContainer(config, "")
+				if err != nil {
+					errChan <- err
+					return
+				}
+				if err := m.client.StartContainer(id, hostConfig); err != nil {
+					errChan <- err
+					return
+				}
+				resChan <- id
 			}
-
-			log.Debugf("scaling: id=%s #=%d", containerInfo.Id, instance)
-
-			config := containerInfo.Config
-			// clear hostname to get a newly generated
-			config.Hostname = ""
-			hostConfig := containerInfo.HostConfig
-
-			id, err := m.client.CreateContainer(config, "")
-			if err != nil {
-				errChan <- err
-				return
-			}
-
-			if err := m.client.StartContainer(id, hostConfig); err != nil {
-				errChan <- err
-				return
-			}
-		}
-	}()
-
-	for i := 0; i < numInstances; i++ {
-		instances <- i
+		}(i)
 	}
 
-	close(instances)
+	for i := 1; i < numInstances; i++ {
+		select {
+		case id := <-resChan:
+			result.Scaled = append(result.Scaled, id)
+		case err := <-errChan:
+			log.Errorf("error scaling container: err=%s", strings.TrimSpace(err.Error()))
+			result.Errors = append(result.Errors, strings.TrimSpace(err.Error()))
+		}
+	}
 
-	<-done
-
-	return nil
+	return result
 }
 
 func (m DefaultManager) SaveServiceKey(key *auth.ServiceKey) error {
