@@ -5,7 +5,7 @@
         .module('shipyard.containers')
         .factory('ContainerService', ContainerService)
 
-    ContainerService.$inject = ['$http'];
+        ContainerService.$inject = ['$http'];
     function ContainerService($http) {
         return {
             list: function() {

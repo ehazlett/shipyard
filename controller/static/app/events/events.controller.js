@@ -14,7 +14,7 @@
             vm.clearEvents = clearEvents;
 
             function showClearEventsDialog() {
-                $('.ui.small.clear.modal').modal('show');
+                $('#clear-modal').modal('show');
             };
 
             function clearEvents() {

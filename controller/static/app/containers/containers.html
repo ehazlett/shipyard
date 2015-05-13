@@ -1,4 +1,4 @@
-<div class="ui small destroy modal transition" style="margin-top: -98px;">
+<div id="destroy-modal" class="ui small modal transition">
 <i class="close icon"></i>
 <div class="header">
     Destroy Container: {{ vm.selectedContainerId | limitTo:12 }}
@@ -17,7 +17,7 @@
 </div>
 </div>
 
-<div class="ui small restart modal transition" style="margin-top: -98px;">
+<div id="restart-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
         Restart Container: {{ vm.selectedContainerId | limitTo:12 }}
@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<div class="ui small stop modal transition" style="margin-top: -98px;">
+<div id="stop-modal" class="ui small stop modal transition">
     <i class="close icon"></i>
     <div class="header">
         Stop Container: {{ vm.selectedContainerId | limitTo:12 }}
@@ -55,30 +55,30 @@
     </div>
 </div>
 
-<div class="ui small scale modal transition" style="margin-top: -98px;">
-<i class="close icon"></i>
-<div class="header">
-    Scale Container: {{ vm.selectedContainerId | limitTo:12 }}
-</div>
-<div class="content">
-    <div class="ui form">
-        <div class="two fields">
-            <div class="twelve wide field">
-                <label>Number of Instances</label>
-                <input class="input" ng-model="vm.numOfInstances" type="text">
+<div id="scale-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        Scale Container: {{ vm.selectedContainerId | limitTo:12 }}
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="fields">
+                <div class="twelve wide field">
+                    <label>Number of Instances</label>
+                    <input class="input" ng-model="vm.numOfInstances" type="text">
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="actions">
-    <div class="ui negative button">
-        Cancel
+    <div class="actions">
+        <div class="ui negative button">
+            Cancel
+        </div>
+        <div ng-click="vm.scaleContainer()" class="ui positive right labeled icon button">
+            Scale
+            <i class="exchange icon"></i>
+        </div>
     </div>
-    <div ng-click="vm.scaleContainer()" class="ui positive right labeled icon button">
-        Scale
-        <i class="exchange icon"></i>
-    </div>
-</div>
 </div>
 
 <div class="two column row">
@@ -93,8 +93,7 @@
 
     <div class="right aligned right floated column">
         <div class="ui small icon input">
-            <input ng-model="tableFilter" placeholder="Search containers..."/>
-            <i class="search icon"></i>
+            <input ng-model="tableFilter" placeholder="Search containers..." reset-field/>
         </div>
     </div>
 </div>
@@ -137,7 +136,13 @@
         <table class="ui sortable celled table">
             <thead>
                 <tr>
-                    <th class="collapsing containerStatusText"><i class="heartbeat icon"></i></th>
+                    <th id="select-all-table-header" class="collapsing">
+                        <div class="ui fitted checkbox" ng-click="vm.checkAll()">
+                            <input type="checkbox" id="all-cb" ng-model="vm.selectedAll">
+                            <label for="all-cb"></label>
+                        </div>
+                    </th>
+                    <th id="container-health-table-header" class="collapsing"><i class="heartbeat icon"></i></th>
                     <th class="collapsing">Id</th>
                     <th>Node</th>
                     <th>Name</th>
@@ -148,10 +153,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="c in vm.containers | filter:tableFilter">
-                    <td class="healthcolumn">
+                <tr ng-class="{'active': vm.selected[c.Id].Selected}" ng-repeat="c in vm.containers | filter:tableFilter" jquery>
+                    <td class="collapsing">
+                        <div class="positive ui fitted checkbox">
+                            <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[c.Id].Selected">
+                            <label for="{{$index}}-cb"></label>
+                        </div>
+                    </td>
+                    <td>
                         <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : 'disabled'"></i>
-                                  <span class="hidden">{{vm.containerStatusText(c)}}</span>
+                        <span class="hidden">{{vm.containerStatusText(c)}}</span>
                     </td>
                     <td>{{c.Id | limitTo:12 }}</td>
                     <td>{{c.Names[0].split('/')[1]}}</td>
@@ -177,9 +188,6 @@
                                 <a ui-sref="dashboard.logs({id: c.Id})" class="item"><i class="text file outline icon"></i> Logs</a>
                             </div>
                         </div>
-                        <script>
-$('.ui.right.pointing.dropdown').dropdown();
-                        </script>
                     </td>
                 </tr>
             </tbody>
@@ -187,7 +195,28 @@ $('.ui.right.pointing.dropdown').dropdown();
     </div>
 </div>
 
+<div id="multi-action-menu" class="ui bottom horizontal inverted labeled icon overlay sidebar menu" ng-class="{'visible': vm.selectedItemCount > 0}">
+    <a class="header item">
+        <i class="grid layout icon"></i>{{ vm.selectedItemCount }} Selected
+    </a>
+    <a class="item" ng-click="vm.clearAll()">
+        <i class="ban icon"></i>
+        Clear 
+    </a>
+    <a class="item" ng-click="vm.restartAll()">
+        <i class="refresh icon"></i>
+        Restart 
+    </a>
+    <a class="item" ng-click="vm.stopAll()">
+        <i class="stop icon"></i>
+        Stop 
+    </a>
+    <a class="item" ng-click="vm.destroyAll()">
+        <i class="delete icon"></i>
+        Destroy 
+    </a>
+</div>
+
 <script>
-$('.ui.sortable.celled.table').tablesort();
 $('.ui.dropdown').dropdown();
 </script>

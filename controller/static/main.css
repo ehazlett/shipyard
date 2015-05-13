@@ -1,3 +1,4 @@
+/* Menu Bar Styles */
 #logo {
     font-family: 'Poiret One', sans-serif;
     background-color: rgba(0, 68, 91, 1) !important;
@@ -9,8 +10,38 @@
     text-transform: none;
 }
 
+.ui.small.model.transition {
+    margin-top: -98px;
+}
+
 .ui.fixed.inverted.main.menu {
     text-transform: uppercase;
+}
+
+#select-all-table-header { 
+    cursor: auto;
+}
+#select-all-table-header:after { 
+    width: 0; 
+    margin: 0;  
+}
+
+#container-health-table-header:after { 
+    width: 0; 
+    margin: 0;  
+}
+
+.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+div.chart, ui.chart {
+    height: 300px;
+}
+
+.ui.chart svg {
+    height: 250px;
 }
 
 .logs {
@@ -20,36 +51,9 @@
     word-break: break-word;
     width: 100%;
 }
-.containerStatusText {
-    width: 1px;
-    text-align: center;
-}
-.healthcolumn {
-    width: 1px;
-}
-td.healthcolumn  {
-    text-align: center;
-}
-.ui.sortable.table thead th.healthcolumn:after { 
-    width: 0; 
-    margin: 0;  
-}
-.hidden {
-    display: none;
-    visability:hidden;
-}
-
 i.terminal {
     border: none;
     background: none;
     color: #000000;
     opacity: 0.8;
-}
-
-div.chart, ui.chart {
-    height: 300px;
-}
-
-.ui.chart svg {
-    height: 250px;
 }

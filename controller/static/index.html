@@ -33,6 +33,9 @@
         <script src="./app/services/services.module.js"></script>
         <script src="./app/services/auth.service.js"></script>
 
+        <script src="./app/core/core.module.js"></script>
+        <script src="./app/core/core.directives.js"></script>
+
         <script src="./app/layout/layout.module.js"></script>
         <script src="./app/layout/config.routes.js"></script>
 
@@ -92,12 +95,12 @@
         <script src="./app/config.routes.js"></script>
         <script src="./app/term.js"></script>
 
+        <link rel="stylesheet" type="text/css" href="main.css">
+
         <link href="//fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css">
         <link href="//fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet" type="text/css">
     </head>
 
-    <body>
-        <link rel="stylesheet" type="text/css" href="main.css">
-        <div ui-view></div>
+    <body ui-view>
     </body>
 </html>

@@ -21,11 +21,11 @@
 
             function showRemoveImageDialog(image) {
                 vm.selectedImage = image;
-                $('.ui.small.remove.modal').modal('show');
+                $('#remove-modal').modal('show');
             }
 
             function showPullImageDialog(image) {
-                $('.ui.small.pull.modal').modal('show');
+                $('#pull-modal').modal('show');
             }
 
             function refresh() {
