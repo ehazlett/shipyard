@@ -244,29 +244,27 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 		return result
 	}
 
-	for i := 1; i < numInstances; i++ {
+	for i := 0; i < numInstances; i++ {
 		go func(instance int) {
-			for {
-				log.Debugf("scaling: id=%s #=%d", containerInfo.Id, instance)
-				config := containerInfo.Config
-				// clear hostname to get a newly generated
-				config.Hostname = ""
-				hostConfig := containerInfo.HostConfig
-				id, err := m.client.CreateContainer(config, "")
-				if err != nil {
-					errChan <- err
-					return
-				}
-				if err := m.client.StartContainer(id, hostConfig); err != nil {
-					errChan <- err
-					return
-				}
-				resChan <- id
+			log.Debugf("scaling: id=%s #=%d", containerInfo.Id, instance)
+			config := containerInfo.Config
+			// clear hostname to get a newly generated
+			config.Hostname = ""
+			hostConfig := containerInfo.HostConfig
+			id, err := m.client.CreateContainer(config, "")
+			if err != nil {
+				errChan <- err
+				return
 			}
+			if err := m.client.StartContainer(id, hostConfig); err != nil {
+				errChan <- err
+				return
+			}
+			resChan <- id
 		}(i)
 	}
 
-	for i := 1; i < numInstances; i++ {
+	for i := 0; i < numInstances; i++ {
 		select {
 		case id := <-resChan:
 			result.Scaled = append(result.Scaled, id)
