@@ -131,7 +131,7 @@
     </div>
 </div>
 
-<div class="row" ng-show="vm.containers.length > 0">
+<div class="row" ng-show="filteredContainers.length > 0">
     <div class="column">
         <table class="ui sortable celled table">
             <thead>
@@ -153,7 +153,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-class="{'active': vm.selected[c.Id].Selected}" ng-repeat="c in vm.containers | filter:tableFilter" jquery>
+                <tr ng-class="{'active': vm.selected[c.Id].Selected}" ng-repeat="c in filteredContainers = (vm.containers | filter:tableFilter)" jquery>
                     <td class="collapsing">
                         <div class="positive ui fitted checkbox">
                             <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[c.Id].Selected">
@@ -192,6 +192,20 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="row" ng-show="filteredContainers.length === 0">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    Containers
+                </div>
+                <p>No containers matched your filter query</p>
+            </div>
+        </div>
     </div>
 </div>
 
