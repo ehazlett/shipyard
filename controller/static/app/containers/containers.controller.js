@@ -8,11 +8,16 @@
     ContainersController.$inject = ['$scope', 'ContainerService', '$state'];
     function ContainersController($scope, ContainerService, $state) {
         var vm = this;
+        
         vm.error = "";
         vm.errors = [];
         vm.containers = [];
         vm.selected = {};
+        vm.selectedItemCount = 0;
+        vm.selectedAll = false;
+        vm.numOfInstances = 1;
         vm.selectedContainerId = "";
+
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.showRestartContainerDialog = showRestartContainerDialog;
         vm.showStopContainerDialog = showStopContainerDialog;
@@ -22,15 +27,12 @@
         vm.restartContainer = restartContainer;
         vm.scaleContainer = scaleContainer;
         vm.refresh = refresh;
-        vm.numOfInstances = 1;
         vm.containerStatusText = containerStatusText;
-        vm.selectedAll = false;
         vm.checkAll = checkAll;
         vm.clearAll = clearAll;
         vm.destroyAll = destroyAll;
         vm.stopAll = stopAll;
         vm.restartAll = restartAll;
-        vm.selectedItemCount = 0;
 
         refresh();
 
@@ -119,6 +121,13 @@
                 });
 
             vm.error = "";
+            vm.errors = [];
+            vm.containers = [];
+            vm.selected = {};
+            vm.selectedItemCount = 0;
+            vm.selectedAll = false;
+            vm.numOfInstances = 1;
+            vm.selectedContainerId = "";
         }
 
         function showDestroyContainerDialog(container) {
