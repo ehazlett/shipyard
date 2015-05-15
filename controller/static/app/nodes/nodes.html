@@ -34,7 +34,7 @@
 </div>
 </div>
 
-<div class="row" ng-show="vm.nodes.length>0">
+<div class="row" ng-show="filteredNodes.length>0">
     <div class="column">
         <table class="ui sortable celled table" ng-show="vm.nodes">
             <thead>
@@ -48,7 +48,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="n in vm.nodes | filter:tableFilter">
+                <tr ng-repeat="n in filteredNodes = (vm.nodes | filter:tableFilter)">
                     <td>{{n.name}}</td>
                     <td>{{n.addr}}</td>
                     <td>{{n.containers}}</td>
@@ -58,6 +58,20 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.nodes.length > 0 && filteredNodes.length === 0">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    Nodes
+                </div>
+                <p>No nodes matched your filter query</p>
+            </div>
+        </div>
     </div>
 </div>
 

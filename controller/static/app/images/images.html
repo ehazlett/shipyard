@@ -95,7 +95,7 @@
 </div>
 </div>
 
-<div class="row" ng-show="vm.images.length>0 && !vm.pulling">
+<div class="row" ng-show="filteredImages.length>0 && !vm.pulling">
     <div class="column">
         <table class="ui sortable celled table">
             <thead>
@@ -109,7 +109,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="i in vm.images | filter:tableFilter">
+                <tr ng-repeat="i in filteredImages = (vm.images | filter:tableFilter)">
                     <td><div class="ui label" ng-repeat="t in i.RepoTags">{{t}}</div></td>
                     <td>{{i.Id.substring(0,12)}}</td>
                     <td>{{i.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
@@ -123,6 +123,20 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.images.length > 0 && filteredImages.length === 0">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    Images
+                </div>
+                <p>No images matched your filter query</p>
+            </div>
+        </div>
     </div>
 </div>
 
