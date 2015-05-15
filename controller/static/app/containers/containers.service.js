@@ -80,6 +80,14 @@
                     });
                 return promise;
             },
+            rename: function(old, newName) {
+                var promise = $http
+                    .post('/containers/' + old + '/rename?name=' + newName)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
         } 
     }
 
