@@ -235,7 +235,6 @@
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
                 .success(function(data, status, headers, config) {
-                    console.log(status);
                     if(status >= 400) {
                         vm.error = data;
                         vm.deploying = false;
