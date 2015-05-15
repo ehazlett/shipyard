@@ -46,7 +46,7 @@
 </div>
 </div>
 
-<div class="row" ng-show="vm.events.length > 0">
+<div class="row" ng-show="filteredEvents.length > 0">
     <div class="column">
         <table class="ui sortable celled table" ng-show="vm.events">
             <thead>
@@ -61,7 +61,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="e in vm.events | filter:tableFilter">
+                <tr ng-repeat="e in filteredEvents = (vm.events | filter:tableFilter)">
                     <td>{{e.time}}</td>
                     <td>{{e.username}}</td>
                     <td>{{e.type}}</td>
@@ -72,6 +72,20 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.events.length > 0 && filteredEvents.length === 0">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    Events
+                </div>
+                <p>No events matched your filter query</p>
+            </div>
+        </div>
     </div>
 </div>
 

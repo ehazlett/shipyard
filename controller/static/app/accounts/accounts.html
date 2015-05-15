@@ -47,7 +47,7 @@
 </div>
 </div>
 
-<div class="row" ng-show="vm.accounts.length>0">
+<div class="row" ng-show="filteredAccounts.length>0">
     <div class="column">
         <table class="ui sortable celled table" ng-show="vm.accounts">
             <thead>
@@ -60,7 +60,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="a in vm.accounts | filter:tableFilter">
+                <tr ng-repeat="a in filteredAccounts = (vm.accounts | filter:tableFilter)">
                     <td>{{a.username}}</td>
                     <td>{{a.first_name}}</td>
                     <td>{{a.last_name}}</td>
@@ -76,6 +76,20 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.accounts.length > 0 && filteredAccounts.length === 0">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    Accounts
+                </div>
+                <p>No accounts matched your filter query</p>
+            </div>
+        </div>
     </div>
 </div>
 
