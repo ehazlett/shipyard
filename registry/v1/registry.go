@@ -256,6 +256,6 @@ func (client *RegistryClient) Repository(name string) (*Repository, error) {
 		Repository: r.Repository,
 		Tags:       tags,
 		Layers:     layers,
-		Size:       size,
+		Size:       int64(size) / int64(len(tags)),
 	}, nil
 }
