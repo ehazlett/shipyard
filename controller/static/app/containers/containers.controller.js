@@ -17,15 +17,18 @@
         vm.selectedAll = false;
         vm.numOfInstances = 1;
         vm.selectedContainerId = "";
+        vm.newName = "";
 
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.showRestartContainerDialog = showRestartContainerDialog;
         vm.showStopContainerDialog = showStopContainerDialog;
         vm.showScaleContainerDialog = showScaleContainerDialog;
+        vm.showRenameContainerDialog = showRenameContainerDialog;
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
         vm.restartContainer = restartContainer;
         vm.scaleContainer = scaleContainer;
+        vm.renameContainer = renameContainer;
         vm.refresh = refresh;
         vm.containerStatusText = containerStatusText;
         vm.checkAll = checkAll;
@@ -128,6 +131,7 @@
             vm.selectedAll = false;
             vm.numOfInstances = 1;
             vm.selectedContainerId = "";
+            vm.newName = "";
         }
 
         function showDestroyContainerDialog(container) {
@@ -148,6 +152,11 @@
         function showScaleContainerDialog(container) {
             vm.selectedContainerId = container.Id;
             $('#scale-modal').modal('show');
+        }
+
+        function showRenameContainerDialog(container) {
+            vm.selectedContainerId = container.Id;
+            $('#rename-modal').modal('show');
         }
 
         function destroyContainer() {
@@ -186,6 +195,15 @@
                     $.each(response.data.Errors, function(i, el){
                             if($.inArray(el, vm.errors) === -1) vm.errors.push(el);
                     });
+                });
+        }
+
+        function renameContainer() {
+            ContainerService.rename(vm.selectedContainerId, vm.newName)
+                .then(function(data) {
+                    vm.refresh();
+                }, function(data) {
+                    vm.error = data;
                 });
         }
 
