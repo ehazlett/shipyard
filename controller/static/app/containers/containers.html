@@ -84,7 +84,7 @@
 <div id="rename-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
-        Rename Container: {{ vm.selectedContainerId | limitTo:12 }}
+        Rename Container: {{ vm.selectedContainer.Names[0].split('/')[2] }}
     </div>
     <div class="content">
         <div class="ui form">

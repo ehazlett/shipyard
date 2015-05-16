@@ -16,6 +16,7 @@
         vm.selectedItemCount = 0;
         vm.selectedAll = false;
         vm.numOfInstances = 1;
+        vm.selectedContainer = null;
         vm.selectedContainerId = "";
         vm.newName = "";
 
@@ -155,7 +156,7 @@
         }
 
         function showRenameContainerDialog(container) {
-            vm.selectedContainerId = container.Id;
+            vm.selectedContainer = container;
             $('#rename-modal').modal('show');
         }
 
@@ -199,7 +200,7 @@
         }
 
         function renameContainer() {
-            ContainerService.rename(vm.selectedContainerId, vm.newName)
+            ContainerService.rename(vm.selectedContainer.Id, vm.newName)
                 .then(function(data) {
                     vm.refresh();
                 }, function(data) {
