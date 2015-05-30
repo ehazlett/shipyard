@@ -1,3 +1,4 @@
+<div class="ui padded grid">
 <div class="row" ng-hide="vm.logs">
     <div class="column">
         <div class="ui icon message">
@@ -12,12 +13,12 @@
     </div>
 </div>
 <div class="row" ng-show="vm.logs">
-<div class="column">
-    <div class="ui segment page" > 
-        <h4 class="dividing header">Container: {{ vm.id | limitTo:12 }}</h2>
-        <pre ng-bind-html="vm.logs" class="logs"> 
-        </pre>
+    <div class="column">
+        <div class="ui segment page" > 
+            <h4 class="dividing header">Container: {{ vm.id | limitTo:12 }}</h2>
+            <pre ng-bind-html="vm.logs" class="logs"> 
+            </pre>
+        </div>
     </div>
 </div>
 </div>
-

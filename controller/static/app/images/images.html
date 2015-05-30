@@ -1,46 +1,47 @@
 <div id="remove-modal" class="ui small modal transition">
-<i class="close icon"></i>
-<div class="header">
-    Remove Image: {{ vm.selectedImage.Id.substring(0,12) }}
-</div>
-<div class="content">
-    <p>Are you sure you want to remove this image?</p>
-</div>
-<div class="actions">
-    <div class="ui negative button">
-        No
+    <i class="close icon"></i>
+    <div class="header">
+        Remove Image: {{ vm.selectedImage.Id.substring(0,12) }}
     </div>
-    <div ng-click="vm.removeImage()" class="ui positive right labeled icon button">
-        Yes
-        <i class="checkmark icon"></i>
+    <div class="content">
+        <p>Are you sure you want to remove this image?</p>
     </div>
-</div>
-</div>
-
-<div id="pull-modal" class="ui small modal transition">
-<i class="close icon"></i>
-<div class="header">
-    Pull Image
-</div>
-<div class="content">
-    <div class="ui form">
-        <div class="field">
-            <label>Name</label>
-            <input type="text" ng-model="vm.pullImageName">
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.removeImage()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
         </div>
     </div>
 </div>
-<div class="actions">
-    <div class="ui negative button">
-        No
+
+<div id="pull-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        Pull Image
     </div>
-    <div ng-click="vm.pullImage()" class="ui positive right labeled icon button">
-        Yes
-        <i class="checkmark icon"></i>
+    <div class="content">
+        <div class="ui form">
+            <div class="field">
+                <label>Name</label>
+                <input type="text" ng-model="vm.pullImageName">
+            </div>
+        </div>
     </div>
-</div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.pullImage()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
 </div>
 
+<div class="ui padded grid">
 <div class="two column row" ng-hide="vm.pulling">
     <div class="left floated column">
         <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
@@ -58,18 +59,18 @@
 </div>
 
 <div class="row" ng-show="vm.pulling" style="text-align: center;">
-<div class="six wide column">
-    <div class="ui icon message">
-        <i class="notched circle loading icon"></i>
-        <div class="content">
-            <div class="header">
-                Pulling Image: {{vm.pullImageName}}
+    <div class="six wide column">
+        <div class="ui icon message">
+            <i class="notched circle loading icon"></i>
+            <div class="content">
+                <div class="header">
+                    Pulling Image: {{vm.pullImageName}}
+                </div>
+                <p>We're pulling the image to the Swarm cluster now.</p>
+                <p>Please note that this could take a few minutes, depending on availability and size of the image.</p>
             </div>
-            <p>We're pulling the image to the Swarm cluster now.</p>
-            <p>Please note that this could take a few minutes, depending on availability and size of the image.</p>
         </div>
     </div>
-</div>
 </div>
 
 <div class="row" ng-show="vm.error">
@@ -82,17 +83,17 @@
 </div>
 
 <div class="row" ng-show="vm.images.length === 0">
-<div class="column">
-    <div class="ui icon message">
-        <i class="info icon"></i>
-        <div class="content">
-            <div class="header">
-                Images
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    Images
+                </div>
+                <p>There are no images in the cluster.</p>
             </div>
-            <p>There are no images in the cluster.</p>
         </div>
     </div>
-</div>
 </div>
 
 <div class="row" ng-show="filteredImages.length>0 && !vm.pulling">
@@ -138,6 +139,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script>
