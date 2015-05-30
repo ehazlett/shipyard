@@ -10,6 +10,10 @@
     text-transform: none;
 }
 
+#menu-bar-spacer {
+    padding: 20px;
+}
+
 .ui.small.model.transition {
     margin-top: -98px;
 }
