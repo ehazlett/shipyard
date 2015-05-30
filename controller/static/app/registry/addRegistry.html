@@ -1,3 +1,4 @@
+<div class="ui padded grid">
 <div class="row">
     <div class="column">
         <div class="ui segment">
@@ -17,6 +18,7 @@
         </div>
     </div>
 </div>
+</div>
 <script>
 $(function(){
     $('.ui.form')
@@ -24,19 +26,19 @@ $(function(){
             name: {
                 identifier : 'name',
                 rules: [
-                    {
-                        type   : 'empty',
-                        prompt : 'Please enter a name'
-                    }
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter a name'
+                }
                 ]
             },
             addr: {
                 identifier : 'addr',
                 rules: [
-                    {
-                        type   : 'empty',
-                        prompt : 'Please enter an address'
-                    }
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter an address'
+                }
                 ]
             }
         });

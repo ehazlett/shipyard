@@ -44,15 +44,7 @@
     <div class="ui active inverted dimmer" ng-show="isLoadingView">
         <div class="ui text loader">{{ loadingMessage || "Loading" }}</div>
     </div>
-    <div id="content">
-        <div class="ui padded grid">
-            <div class="row" ng-hide="isLoadingView">
-                <div class="column">
-                    <div ui-view class="ui grid">
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="content" ng-hide="isLoadingView" ui-view>
     </div>
 </div>
 

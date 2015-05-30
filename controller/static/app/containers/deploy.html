@@ -1,16 +1,17 @@
+<div class="ui padded grid">
 <div class="row" ng-show="vm.deploying" style="text-align: center;">
-<div class="six wide column">
-    <div class="ui icon message">
-        <i class="notched circle loading icon"></i>
-        <div class="content">
-            <div class="header">
-                Launching Container
+    <div class="six wide column">
+        <div class="ui icon message">
+            <i class="notched circle loading icon"></i>
+            <div class="content">
+                <div class="header">
+                    Launching Container
+                </div>
+                <p>We're deploying the image to the Swarm cluster now.</p>
+                <p>Please note that this could take a few minutes, depending on availability and size of the image.</p>
             </div>
-            <p>We're deploying the image to the Swarm cluster now.</p>
-            <p>Please note that this could take a few minutes, depending on availability and size of the image.</p>
         </div>
     </div>
-</div>
 </div>
 <div class="row" ng-hide="vm.deploying">
     <div class="column">
@@ -129,10 +130,10 @@
                             <div class="fields">
                                 <div class="seven wide field">
                                     <label>Container</label>
-                                        <select name="containerToLink" ng-model="vm.containerToLink" class="ui search fluid dropdown">
-                                            <option value="">Container Name</option>
-                                            <option ng-repeat="c in vm.containerLinkNames" value="{{c}}">{{c}}</option>
-                                        </select>
+                                    <select name="containerToLink" ng-model="vm.containerToLink" class="ui search fluid dropdown">
+                                        <option value="">Container Name</option>
+                                        <option ng-repeat="c in vm.containerLinkNames" value="{{c}}">{{c}}</option>
+                                    </select>
                                 </div>
                                 <div class="eight wide field">
                                     <label>Alias</label>
@@ -191,8 +192,8 @@
                                     </dropdown>
                                 </div>
                                 <div class="five wide field">
-                                <label>Value</label>
-                                <input name="constraintValue" class="input" type="text" ng-model="vm.constraintValue" placeholder="ssd"></input>
+                                    <label>Value</label>
+                                    <input name="constraintValue" class="input" type="text" ng-model="vm.constraintValue" placeholder="ssd"></input>
                                 </div>
                                 <div class="one wide field">
                                     <label>&nbsp;</label>
@@ -313,6 +314,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 <script>
 $(function(){
