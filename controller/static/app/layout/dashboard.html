@@ -1,5 +1,3 @@
-<div class="pusher">
-
 <div class="ui fixed inverted main menu">
     <div class="container">
         <a ui-sref="dashboard.containers" class="title item" id="logo">
@@ -41,37 +39,39 @@
     </div>
 </div>
 
-<div class="ui padded grid">
-    <div class="row" ng-show="isLoadingView" style="text-align: center;">
-        <div class="five wide column">
-            <div class="ui icon message">
-                <i class="notched circle loading icon"></i>
-                <div class="content">
-                    <div class="header">
-                        One moment...
-                    </div>
-                    <p>Fetching content...</p>
-                    <div class="status">
-                        <div ng-repeat="m in vm.messages">{{m}}</div>
+<div class="pusher">
+    <div id="menu-bar-spacer"></div>
+    <div class="ui padded grid">
+        <div class="row" ng-show="isLoadingView" style="text-align: center;">
+            <div class="five wide column">
+                <div class="ui icon message">
+                    <i class="notched circle loading icon"></i>
+                    <div class="content">
+                        <div class="header">
+                            One moment...
+                        </div>
+                        <p>Fetching content...</p>
+                        <div class="status">
+                            <div ng-repeat="m in vm.messages">{{m}}</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row" ng-hide="isLoadingView">
-        <div class="column">
-            <div ui-view class="ui grid">
+        <div class="row" ng-hide="isLoadingView">
+            <div class="column">
+                <div ui-view class="ui grid">
+                </div>
+            </div>
+        </div>
+        <div class="ui divider"></div>
+        <div class="row">
+            <div class="center aligned column">
+                <p><a href="//shipyard-project.com">shipyard</a> © 2015</p>
+                <a href="//github.com/shipyard"><i class="big black github icon"></i></a>
             </div>
         </div>
     </div>
-    <div class="ui divider"></div>
-    <div class="row">
-        <div class="center aligned column">
-            <p><a href="//shipyard-project.com">shipyard</a> © 2015</p>
-            <a href="//github.com/shipyard"><i class="big black github icon"></i></a>
-        </div>
-    </div>
-</div>
 </div>
 
 <script>
