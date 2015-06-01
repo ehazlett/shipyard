@@ -1,18 +1,7 @@
-<div class="ui padded grid">
-<div class="row" ng-show="vm.deploying" style="text-align: center;">
-    <div class="six wide column">
-        <div class="ui icon message">
-            <i class="notched circle loading icon"></i>
-            <div class="content">
-                <div class="header">
-                    Launching Container
-                </div>
-                <p>We're deploying the image to the Swarm cluster now.</p>
-                <p>Please note that this could take a few minutes, depending on availability and size of the image.</p>
-            </div>
-        </div>
-    </div>
+<div class="ui active inverted dimmer" ng-show="vm.deploying">
+    <div class="ui text loader">Launching Container</div>
 </div>
+<div class="ui padded grid">
 <div class="row" ng-hide="vm.deploying">
     <div class="column">
         <div class="ui bottom attached active tab segment">

@@ -41,10 +41,7 @@
 
 <div class="pusher">
     <div id="menu-bar-spacer"></div>
-    <div class="ui active inverted dimmer" ng-show="isLoadingView">
-        <div class="ui text loader">{{ loadingMessage || "Loading" }}</div>
-    </div>
-    <div id="content" ng-hide="isLoadingView" ui-view>
+    <div id="content" ui-view>
     </div>
 </div>
 
