@@ -14,7 +14,7 @@
                 templateUrl: 'app/containers/containers.html',
                 controller: 'ContainersController',
                 controllerAs: 'vm',
-                authenticate: true,
+                authenticate: true
             })
         .state('dashboard.inspect', {
             url: '^/containers/{id}',
