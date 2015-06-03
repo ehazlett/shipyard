@@ -67,7 +67,6 @@
                     // 2) Pulling busybox... : downloaded
                     if(node.status && node.status.indexOf(":") > -1) {
                         if(node.status.indexOf("downloaded") == -1) {
-                            vm.error = node.status;
                             $scope.$apply();
                         } else {
                             setTimeout(vm.refresh, 1000);
@@ -77,6 +76,7 @@
                     vm.pulling = false;
                 })
                 .fail(function(err) {
+                    console.log(err);
                     vm.pulling = false;
                     vm.pullImageName = "";
                     vm.error = err;
