@@ -59,6 +59,23 @@
             vm.selectedItemCount = count;
         });
 
+        // Remove selected items that are no longer visible 
+        $scope.$watchCollection('filteredContainers', function () {
+            angular.forEach(vm.selected, function(s) {
+                if(vm.selected[s.Id].Selected == true) {
+                    var isVisible = false
+                    angular.forEach($scope.filteredContainers, function(c) {
+                        if(c.Id == s.Id) {
+                            isVisible = true;
+                            return;
+                        }
+                    });
+                    vm.selected[s.Id].Selected = isVisible;
+                }
+            });
+            return;
+        });
+
         function clearAll() {
             angular.forEach(vm.selected, function (s) {
                 vm.selected[s.Id].Selected = false;
@@ -108,7 +125,7 @@
         }
 
         function checkAll() {
-            angular.forEach(vm.containers, function (container) {
+            angular.forEach($scope.filteredContainers, function (container) {
                 vm.selected[container.Id].Selected = vm.selectedAll;
             });
         }
