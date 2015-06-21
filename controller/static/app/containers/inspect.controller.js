@@ -61,17 +61,17 @@
 
         function showDestroyContainerDialog(container) {
             vm.selectedContainerId = resolvedContainer.Id;
-            $('.ui.small.destroy.modal').modal('show');
+            $('#destroy-modal').modal('show');
         }
 
         function showRestartContainerDialog(container) {
             vm.selectedContainerId = resolvedContainer.Id;
-            $('.ui.small.restart.modal').modal('show');
+            $('#restart-modal').modal('show');
         }
 
         function showStopContainerDialog(container) {
             vm.selectedContainerId = resolvedContainer.Id;
-            $('.ui.small.stop.modal').modal('show');
+            $('#stop-modal').modal('show');
         }
 
         function destroyContainer() {

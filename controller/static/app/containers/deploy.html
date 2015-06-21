@@ -19,17 +19,19 @@
                                 <div class="field">
                                     <label>Image Name 
                                         <i class="blue help circle icon"></i>
-                                        <div class="ui popup" style="max-width: 450px;">
-                                            <h5>Image Name</h5>
-                                            <p>The full namespaced name of the image that you wish to use to deploy your container.</p> 
-                                            <p>Docker image names follow the convention: <i>registry.myorganization.org:5000/namespace/image-name</i></p> 
-                                            <p>Where:</p>
-                                            <ul>
-                                                <li><i>registry.myorganization.org:5000</i> is the location of the <b>registry</b> that contains the image you wish to deploy</li>
-                                                <li><i>namespace</i> is an optional <b>namespace</b> to help organize and avoid image name collisions</li>
-                                                <li><i>image-name</i> is the <b>image name</b> that identifies the image that you wish to deploy</li>
-                                            </ul>
-                                            <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the <a href="https://registry.hub.docker.com/" target="_blank">Official Docker Hub</a>.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the Docker Library</p>
+                                        <div class="ui popup">
+                                            <div class="tooltip">
+                                                <h5>Image Name</h5>
+                                                <p>The full namespaced name of the image that you wish to use to deploy your container.</p> 
+                                                <p>Docker image names follow the convention: <i>registry.myorganization.org:5000/namespace/image-name</i></p> 
+                                                <p>Where:</p>
+                                                <ul>
+                                                    <li><i>registry.myorganization.org:5000</i> is the location of the <b>registry</b> that contains the image you wish to deploy</li>
+                                                    <li><i>namespace</i> is an optional <b>namespace</b> to help organize and avoid image name collisions</li>
+                                                    <li><i>image-name</i> is the <b>image name</b> that identifies the image that you wish to deploy</li>
+                                                </ul>
+                                                <p>When the registry is omitted, Docker will make the assumption that you wish to deploy an image from the <a href="https://registry.hub.docker.com/" target="_blank">Official Docker Hub</a>.  If both the registry and the namespace are omitted, then Docker will assume that you wish to deploy an image from the selection of official Docker images in the Docker Library</p>
+                                            </div>
                                         </div>
                                     </label>
                                     <div class="ui corner labeled input">
@@ -229,9 +231,11 @@
                                     <input type="checkbox" id="exposeAllPorts" ng-model="vm.request.HostConfig.PublishAllPorts">
                                     <label for="exposeAllPorts">Automatically expose all ports
                                         <i class="blue help circle icon"></i>
-                                        <div class="ui popup" style="width: 400px;">
-                                            <h5>Expose all ports</h5>
-                                            <p>If the operator chooses to automatically expose all configured ports for the image, then Docker will make the exposed port accessible on the <b>host</b> and the ports will be <b>available to any client that can reach the host</b>. When using this option, Docker will bind the exposed ports to a random port on the host between 49153 and 65535.</p>
+                                        <div class="ui popup">
+                                            <div class="tooltip">
+                                                <h5>Expose all ports</h5>
+                                                <p>If the operator chooses to automatically expose all configured ports for the image, then Docker will make the exposed port accessible on the <b>host</b> and the ports will be <b>available to any client that can reach the host</b>. When using this option, Docker will bind the exposed ports to a random port on the host between 49153 and 65535.</p>
+                                            </div>
                                         </div>
                                     </label>
                                     <br/>
@@ -296,8 +300,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="ui blue submit button" style="margin: 0 0 20px 30px;">
-                        Deploy 
+                </div>
+                <div class="fields>
+                    <div class="field">
+                        <div class="ui blue large submit button">
+                            Deploy 
+                        </div>
                     </div>
                 </div>
             </div>

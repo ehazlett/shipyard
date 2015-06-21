@@ -41,10 +41,10 @@
 
 <div class="pusher">
     <div class="ui active inverted dimmer" ng-show="isLoadingView">
-        <div class="ui loader"></div>
+        <div class="ui text loader">Loading</div>
     </div>
     <div id="menu-bar-spacer"></div>
-    <div id="content" ui-view>
+    <div id="content" ng-hide="isLoadingView" ui-view>
     </div>
 </div>
 

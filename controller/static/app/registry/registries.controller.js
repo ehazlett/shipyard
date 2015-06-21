@@ -26,7 +26,7 @@
 
             function showRemoveRegistryDialog(registry) {
                 vm.selectedRegistry = registry;
-                $('.ui.small.remove.modal').modal('show');
+                $('#remove-modal').modal('show');
             };
 
             function removeRegistry() {
