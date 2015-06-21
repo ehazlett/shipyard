@@ -27,7 +27,7 @@
 
             function showRemoveRepositoryDialog(repo) {
                 vm.selectedRepository = repo;
-                $('.ui.small.remove.modal').modal('show');
+                $('#remove-modal').modal('show');
             };
 
             function removeRepository() {
