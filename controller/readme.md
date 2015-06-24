@@ -5,6 +5,6 @@ This is the core component for Shipyard.
 The only thing Shipyard needs to run is RethinkDB.
 
 * Run RethinkDB: `docker run -it -d --name rethinkdb -P shipyard/rethinkdb`
-* Run Shipyard: `docker run -it --name -P --link rethinkdb:rethinkdb shipyard/shipyard`
+* Run Shipyard: `docker run -it --name shipyard -P --link rethinkdb:rethinkdb shipyard/shipyard`
 
 You can then use the [Shipyard CLI](../cli/readme.md) to manage.
