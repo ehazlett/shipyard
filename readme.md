@@ -15,23 +15,9 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock shipyard/deploy sta
 ```
 
 ## Manual
-* Start a data volume instance of RethinkDB:
-```
-docker run -it -d --name shipyard-rethinkdb-data \
-  --entrypoint /bin/bash shipyard/rethinkdb -l
-```
+Create server on port 8080
 
-* Start RethinkDB with using the data volume container:
-```
-docker run -it -d --name shipyard-rethinkdb \
-  --volumes-from shipyard-rethinkdb-data shipyard/rethinkdb
-```
-
-* Start the Shipyard controller:
-```
-docker run -it -p 8080:8080 -d --name shipyard \
-  --link shipyard-rethinkdb:rethinkdb shipyard/shipyard
-```
+* `./server.sh create 8080`
 
 You can then use the Shipyard CLI to interact:
 
