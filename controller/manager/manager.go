@@ -705,9 +705,6 @@ func (m *Manager) NewAuthToken(username string, userAgent string) (*shipyard.Aut
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	acct, err := m.Account(username)
 	if err != nil {
 		return nil, err
