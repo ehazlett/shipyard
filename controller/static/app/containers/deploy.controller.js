@@ -36,7 +36,7 @@
         $scope.args = null;
         $scope.links = null;
         $scope.volumes = null;
-        $scope.pull = true;
+        $scope.pull = false;
         $scope.types = types;
         $scope.selectType = function(type) {
             $scope.selectedType = type;
