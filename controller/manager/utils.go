@@ -42,6 +42,10 @@ func setEngineClient(docker *citadel.Engine, tlsConfig *tls.Config) error {
 	return docker.Connect(tc)
 }
 
+func setEngineClientAuth(docker *citadel.Engine, username, password, email string) {
+	docker.SetClientAuth(username, password, email)
+}
+
 func generateId(n int) string {
 	hash := sha256.New()
 	hash.Write([]byte(time.Now().String()))

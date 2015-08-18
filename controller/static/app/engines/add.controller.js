@@ -16,6 +16,9 @@
         $scope.ssl_cert = "";
         $scope.ssl_key = "";
         $scope.ca_cert = "";
+        $scope.registry_username = "";
+        $scope.registry_password = "";
+        $scope.registry_email = "";
         $scope.addEngine = function() {
             var valid = $(".ui.form").form('validate form');
             if (!valid) {
@@ -30,6 +33,9 @@
                     labels: $scope.labels.split(" ")
                 },
                 ssl_cert: $scope.ssl_cert,
+                registry_username: $scope.registry_username,
+                registry_password: $scope.registry_password,
+                registry_email: $scope.registry_email,
                 ssl_key: $scope.ssl_key,
                 ca_cert: $scope.ca_cert
             };
