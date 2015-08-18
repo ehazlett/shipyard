@@ -143,7 +143,13 @@ func (m *Manager) init() []*shipyard.Engine {
 		}
 		engs = append(engs, d.Engine)
 		logger.Infof("loaded engine id=%s addr=%s", d.Engine.ID, d.Engine.Addr)
+
+		if d.RegistryUserName != "" && d.RegistryPassword != "" && d.RegistryEmail != "" {
+			setEngineClientAuth(d.Engine, d.RegistryUserName, d.RegistryPassword, d.RegistryEmail)
+		}
+
 	}
+
 	clusterManager, err := cluster.New(scheduler.NewResourceManager(), engs...)
 	if err != nil {
 		logger.Fatal(err)

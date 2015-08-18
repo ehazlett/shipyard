@@ -30,6 +30,10 @@ type (
 		Engine         *citadel.Engine `json:"engine,omitempty" gorethink:"engine,omitempty"`
 		Health         *Health         `json:"health,omitempty" gorethink:"health,omitempty"`
 		DockerVersion  string          `json:"docker_version,omitempty"`
+
+		RegistryUserName string `json:"registry_username,omitempty" gorethink:"registry_username,omitempty"`
+		RegistryPassword string `json:"registry_password,omitempty" gorethink:"registry_password,omitempty"`
+		RegistryEmail    string `json:"registry_email,omitempty" gorethink:"registry_email,omitempty"`
 	}
 )
 

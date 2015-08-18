@@ -52,6 +52,32 @@
                     </div>
                 </div>
             </div>
+
+            <div class="field">
+                <checkbox name="privateRegistry" ng-model="privateRegistry">Private Registry</checkbox>
+            </div>
+
+            <div class="ui three fields" ng-show="privateRegistry">
+                <div class="field">
+                    <label>RegistryUserName</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="username" ng-model="registry_username">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>RegistryPassword</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="password" ng-model="registry_password">
+                    </div>
+                </div>
+                <div class="field">
+                    <label>RegistryEmail</label>
+                    <div class="ui left labeled input">
+                        <input type="text" name="email" ng-model="registry_email">
+                    </div>
+                </div>
+            </div>
+
             <div class="field">
                 <label>SSL Certificate</label>
                 <div class="ui left labeled input">

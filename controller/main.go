@@ -249,6 +249,21 @@ func inspectEngine(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func images(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", "application/json")
+
+	out := []string{}
+
+	for _, e := range controllerManager.ClusterManager().Engines() {
+		images, _ := e.ListImages()
+		out = append(out, images...)
+	}
+
+	if err := json.NewEncoder(w).Encode(out); err != nil {
+		logger.Error(err)
+	}
+}
+
 func containers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
@@ -741,6 +756,7 @@ func main() {
 	apiRouter.HandleFunc("/api/roles", addRole).Methods("POST")
 	apiRouter.HandleFunc("/api/roles", deleteRole).Methods("DELETE")
 	apiRouter.HandleFunc("/api/cluster/info", clusterInfo).Methods("GET")
+	apiRouter.HandleFunc("/api/images", images).Methods("GET")
 	apiRouter.HandleFunc("/api/containers", containers).Methods("GET")
 	apiRouter.HandleFunc("/api/containers", run).Methods("POST")
 	apiRouter.HandleFunc("/api/containers/{id}", inspectContainer).Methods("GET")
