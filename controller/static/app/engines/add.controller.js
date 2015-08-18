@@ -16,6 +16,7 @@
         $scope.ssl_cert = "";
         $scope.ssl_key = "";
         $scope.ca_cert = "";
+        $scope.privateRegistry = false;
         $scope.registry_username = "";
         $scope.registry_password = "";
         $scope.registry_email = "";
@@ -24,6 +25,13 @@
             if (!valid) {
                 return false;
             }
+            
+            if (!$scope.privateRegistry) {
+                $scope.registry_username = "";
+                $scope.registry_password = "";
+                $scope.registry_email = "";
+            }
+            
             var params = {
                 engine: {
                     id: $scope.id,
