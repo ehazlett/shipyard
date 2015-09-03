@@ -182,20 +182,22 @@ func (a *Api) repositories(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]
 
-	registry, err := a.manager.Registry(name)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	if name != "" {
+		registry, err := a.manager.Registry(name)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	repos, err := registry.Repositories()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err := json.NewEncoder(w).Encode(repos); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		repos, err := registry.Repositories()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if err := json.NewEncoder(w).Encode(repos); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
@@ -1073,8 +1075,13 @@ func (a *Api) Run() error {
 	globalMux.Handle("/version", swarmAuthRouter)
 	globalMux.Handle("/images/", swarmAuthRouter)
 	globalMux.Handle("/exec/", swarmAuthRouter)
+	globalMux.Handle("/v1.14/", swarmAuthRouter)
+	globalMux.Handle("/v1.15/", swarmAuthRouter)
+	globalMux.Handle("/v1.16/", swarmAuthRouter)
 	globalMux.Handle("/v1.17/", swarmAuthRouter)
 	globalMux.Handle("/v1.18/", swarmAuthRouter)
+	globalMux.Handle("/v1.19/", swarmAuthRouter)
+	globalMux.Handle("/v1.20/", swarmAuthRouter)
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {

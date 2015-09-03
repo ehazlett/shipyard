@@ -23,6 +23,13 @@
                     }]
                 }
             })
+            .state('dashboard.addRegistry', {
+                url:'^/registry/add',
+                templateUrl: 'app/registry/addRegistry.html',
+                controller: 'RegistryAddController', 
+                controllerAs: 'vm',
+                authenticate: 'true'
+            })
             .state('dashboard.inspectRegistry', {
                 url:'^/registry/{name}',
                 templateUrl: 'app/registry/registry.html',
@@ -36,13 +43,6 @@
                         });
                     }]
                 }
-            })
-            .state('dashboard.addRegistry', {
-                url:'^/registry/add',
-                templateUrl: 'app/registry/addRegistry.html',
-                controller: 'RegistryAddController', 
-                controllerAs: 'vm',
-                authenticate: 'true'
             })
             .state('dashboard.inspectRepository', {
                 url: '^/registry/{name}/{namespace}/{repository}',

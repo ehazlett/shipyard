@@ -94,6 +94,8 @@ func (a *Auditor) HandlerFuncWithNext(w http.ResponseWriter, r *http.Request, ne
 		}
 	}
 
+	log.Debugf("%s: %s", r.Method, r.RequestURI)
+
 	// next must be called or middleware chain will break
 	if next != nil {
 		next(w, r)
