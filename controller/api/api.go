@@ -723,7 +723,7 @@ func (a *Api) execContainer(ws *websocket.Conn) {
 		Detach:       true,
 	}
 
-	execId, err := a.manager.DockerClient().Exec(execConfig)
+	execId, err := a.manager.DockerClient().ExecCreate(execConfig)
 	if err != nil {
 		log.Errorf("error calling exec: %s", err)
 		return

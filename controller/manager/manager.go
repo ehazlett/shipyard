@@ -116,18 +116,17 @@ type (
 
 func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, authenticator auth.Authenticator) (Manager, error) {
 	session, err := r.Connect(r.ConnectOpts{
-		Address:     addr,
-		Database:    database,
-		AuthKey:     authKey,
-		MaxIdle:     10,
-		IdleTimeout: time.Second * 30,
+		Address:  addr,
+		Database: database,
+		AuthKey:  authKey,
+		MaxIdle:  10,
 	})
 	if err != nil {
 		return nil, err
 	}
 	log.Info("checking database")
 
-	r.DbCreate(database).Run(session)
+	r.DBCreate(database).Run(session)
 	m := &DefaultManager{
 		database:         database,
 		authKey:          authKey,
@@ -161,7 +160,7 @@ func (m DefaultManager) initdb() {
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
-			if _, err := r.Db(m.database).TableCreate(tbl).Run(m.session); err != nil {
+			if _, err := r.DB(m.database).TableCreate(tbl).Run(m.session); err != nil {
 				log.Fatalf("error creating table: %s", err)
 			}
 		}
