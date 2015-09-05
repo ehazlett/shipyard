@@ -61,7 +61,22 @@ func CmdServer(c *cli.Context) {
 
 	log.Debugf("connected to docker: url=%s", dockerUrl)
 
-	shipyardApi, err := api.NewApi(listenAddr, controllerManager, authWhitelist, enableCors, allowInsecure)
+	shipyardTlsCert := c.String("shipyard-tls-cert")
+	shipyardTlsKey := c.String("shipyard-tls-key")
+	shipyardTlsCACert := c.String("shipyard-tls-ca-cert")
+
+	apiConfig := api.ApiConfig{
+		ListenAddr:         listenAddr,
+		Manager:            controllerManager,
+		AuthWhiteListCIDRs: authWhitelist,
+		EnableCORS:         enableCors,
+		AllowInsecure:      allowInsecure,
+		TLSCACertPath:      shipyardTlsCACert,
+		TLSCertPath:        shipyardTlsCert,
+		TLSKeyPath:         shipyardTlsKey,
+	}
+
+	shipyardApi, err := api.NewApi(apiConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

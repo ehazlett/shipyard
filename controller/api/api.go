@@ -1,18 +1,12 @@
 package api
 
 import (
-	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net"
+	"io/ioutil"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
@@ -29,6 +23,7 @@ import (
 	"github.com/shipyard/shipyard/controller/middleware/audit"
 	mAuth "github.com/shipyard/shipyard/controller/middleware/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	"github.com/shipyard/shipyard/tlsutils"
 	"golang.org/x/net/websocket"
 )
 
@@ -40,6 +35,22 @@ type (
 		enableCors         bool
 		serverVersion      string
 		allowInsecure      bool
+		tlsCACertPath      string
+		tlsCertPath        string
+		tlsKeyPath         string
+		dUrl               string
+		fwd                *forward.Forwarder
+	}
+
+	ApiConfig struct {
+		ListenAddr         string
+		Manager            manager.Manager
+		AuthWhiteListCIDRs []string
+		EnableCORS         bool
+		AllowInsecure      bool
+		TLSCACertPath      string
+		TLSCertPath        string
+		TLSKeyPath         string
 	}
 
 	Credentials struct {
@@ -54,13 +65,16 @@ func writeCorsHeaders(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
 }
 
-func NewApi(listenAddr string, manager manager.Manager, authWhitelistCIDRs []string, enableCors bool, allowInsecure bool) (*Api, error) {
+func NewApi(config ApiConfig) (*Api, error) {
 	return &Api{
-		listenAddr:         listenAddr,
-		manager:            manager,
-		authWhitelistCIDRs: authWhitelistCIDRs,
-		enableCors:         enableCors,
-		allowInsecure:      allowInsecure,
+		listenAddr:         config.ListenAddr,
+		manager:            config.Manager,
+		authWhitelistCIDRs: config.AuthWhiteListCIDRs,
+		enableCors:         config.EnableCORS,
+		allowInsecure:      config.AllowInsecure,
+		tlsCertPath:        config.TLSCertPath,
+		tlsKeyPath:         config.TLSKeyPath,
+		tlsCACertPath:      config.TLSCACertPath,
 	}, nil
 }
 
@@ -756,122 +770,14 @@ func (a *Api) execContainer(ws *websocket.Conn) {
 
 }
 
-func (a *Api) hijack(addr, method, path string, setRawTerminal bool, in io.ReadCloser, stdout, stderr io.Writer, started chan io.Closer, data interface{}) error {
-	execConfig := &dockerclient.ExecConfig{
-		Tty:    true,
-		Detach: false,
-	}
-
-	buf, err := json.Marshal(execConfig)
-	if err != nil {
-		return fmt.Errorf("error marshaling exec config: %s", err)
-	}
-
-	rdr := bytes.NewReader(buf)
-
-	req, err := http.NewRequest(method, path, rdr)
-	if err != nil {
-		return fmt.Errorf("error during hijack request: %s", err)
-	}
-
-	req.Header.Set("User-Agent", "Docker-Client")
-	req.Header.Set("Content-Type", "text/plain")
-	req.Header.Set("Connection", "Upgrade")
-	req.Header.Set("Upgrade", "tcp")
-	req.Host = addr
-
-	var (
-		dial          net.Conn
-		dialErr       error
-		execTLSConfig = a.manager.DockerClient().TLSConfig
-	)
-
-	if a.allowInsecure {
-		execTLSConfig.InsecureSkipVerify = true
-	}
-
-	if execTLSConfig == nil {
-		dial, dialErr = net.Dial("tcp", addr)
-	} else {
-		log.Debug("using tls for exec hijack")
-		dial, dialErr = tls.Dial("tcp", addr, execTLSConfig)
-	}
-
-	if dialErr != nil {
-		return dialErr
-	}
-
-	// When we set up a TCP connection for hijack, there could be long periods
-	// of inactivity (a long running command with no output) that in certain
-	// network setups may cause ECONNTIMEOUT, leaving the client in an unknown
-	// state. Setting TCP KeepAlive on the socket connection will prohibit
-	// ECONNTIMEOUT unless the socket connection truly is broken
-	if tcpConn, ok := dial.(*net.TCPConn); ok {
-		tcpConn.SetKeepAlive(true)
-		tcpConn.SetKeepAlivePeriod(30 * time.Second)
-	}
-	if err != nil {
-		return err
-	}
-	clientconn := httputil.NewClientConn(dial, nil)
-	defer clientconn.Close()
-
-	// Server hijacks the connection, error 'connection closed' expected
-	clientconn.Do(req)
-
-	rwc, br := clientconn.Hijack()
-	defer rwc.Close()
-
-	if started != nil {
-		started <- rwc
-	}
-
-	var receiveStdout chan error
-
-	if stdout != nil || stderr != nil {
-		go func() (err error) {
-			if setRawTerminal && stdout != nil {
-				_, err = io.Copy(stdout, br)
-			}
-			return err
-		}()
-	}
-
-	go func() error {
-		if in != nil {
-			io.Copy(rwc, in)
-		}
-
-		if conn, ok := rwc.(interface {
-			CloseWrite() error
-		}); ok {
-			if err := conn.CloseWrite(); err != nil {
-			}
-		}
-		return nil
-	}()
-
-	if stdout != nil || stderr != nil {
-		if err := <-receiveStdout; err != nil {
-			return err
-		}
-	}
-	go func() {
-		for {
-			fmt.Println(br)
-		}
-	}()
-
-	return nil
-}
-
 func (a *Api) Run() error {
 	globalMux := http.NewServeMux()
 	controllerManager := a.manager
 	client := a.manager.DockerClient()
 
 	// forwarder for swarm
-	fwd, err := forward.New()
+	var err error
+	a.fwd, err = forward.New()
 	if err != nil {
 		return err
 	}
@@ -894,20 +800,17 @@ func (a *Api) Run() error {
 			log.Fatal(err)
 		}
 
-		fwd = f
+		a.fwd = f
 	}
 
-	dUrl := fmt.Sprintf("%s%s", scheme, u.Host)
+	a.dUrl = fmt.Sprintf("%s%s", scheme, u.Host)
 
-	log.Debugf("configured docker proxy target: %s", dUrl)
+	log.Debugf("configured docker proxy target: %s", a.dUrl)
 
-	swarmRedirect := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		req.URL, err = url.ParseRequestURI(dUrl)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		fwd.ServeHTTP(w, req)
+	swarmRedirect := http.HandlerFunc(a.swarmRedirect)
+
+	swarmHijack := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		a.swarmHijack(client.TLSConfig, a.dUrl, w, req)
 	})
 
 	apiRouter := mux.NewRouter()
@@ -1006,7 +909,7 @@ func (a *Api) Run() error {
 			"/containers/{name:.*}/top":       swarmRedirect,
 			"/containers/{name:.*}/logs":      swarmRedirect,
 			"/containers/{name:.*}/stats":     swarmRedirect,
-			"/containers/{name:.*}/attach/ws": swarmRedirect,
+			"/containers/{name:.*}/attach/ws": swarmHijack,
 			"/exec/{execid:.*}/json":          swarmRedirect,
 		},
 		"POST": {
@@ -1027,10 +930,10 @@ func (a *Api) Run() error {
 			"/containers/{name:.*}/stop":    swarmRedirect,
 			"/containers/{name:.*}/wait":    swarmRedirect,
 			"/containers/{name:.*}/resize":  swarmRedirect,
-			"/containers/{name:.*}/attach":  swarmRedirect,
+			"/containers/{name:.*}/attach":  swarmHijack,
 			"/containers/{name:.*}/copy":    swarmRedirect,
 			"/containers/{name:.*}/exec":    swarmRedirect,
-			"/exec/{execid:.*}/start":       swarmRedirect,
+			"/exec/{execid:.*}/start":       swarmHijack,
 			"/exec/{execid:.*}/resize":      swarmRedirect,
 		},
 		"DELETE": {
@@ -1106,9 +1009,46 @@ func (a *Api) Run() error {
 		Handler: context.ClearHandler(globalMux),
 	}
 
-	if err := s.ListenAndServe(); err != nil {
-		log.Fatal(err)
+	var runErr error
+
+	if a.tlsCertPath != "" && a.tlsKeyPath != "" {
+		log.Infof("using TLS for communication: cert=%s key=%s",
+			a.tlsCertPath,
+			a.tlsKeyPath,
+		)
+
+		// setup TLS config
+		var caCert []byte
+		if a.tlsCACertPath != "" {
+			ca, err := ioutil.ReadFile(a.tlsCACertPath)
+			if err != nil {
+				return err
+			}
+
+			caCert = ca
+		}
+
+		serverCert, err := ioutil.ReadFile(a.tlsCertPath)
+		if err != nil {
+			return err
+		}
+
+		serverKey, err := ioutil.ReadFile(a.tlsKeyPath)
+		if err != nil {
+			return err
+		}
+
+		tlsConfig, err := tlsutils.GetServerTLSConfig(caCert, serverCert, serverKey, a.allowInsecure)
+		if err != nil {
+			return err
+		}
+
+		s.TLSConfig = tlsConfig
+
+		runErr = s.ListenAndServeTLS(a.tlsCertPath, a.tlsKeyPath)
+	} else {
+		runErr = s.ListenAndServe()
 	}
 
-	return http.ListenAndServe(a.listenAddr, context.ClearHandler(globalMux))
+	return runErr
 }

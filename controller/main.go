@@ -77,6 +77,21 @@ func main() {
 					Value: "",
 					Usage: "tls key",
 				},
+				cli.StringFlag{
+					Name:  "shipyard-tls-ca-cert",
+					Usage: "Shipyard TLS CA Cert",
+					Value: "",
+				},
+				cli.StringFlag{
+					Name:  "shipyard-tls-cert",
+					Usage: "Shipyard TLS Cert",
+					Value: "",
+				},
+				cli.StringFlag{
+					Name:  "shipyard-tls-key",
+					Usage: "Shipyard TLS Key",
+					Value: "",
+				},
 				cli.BoolFlag{
 					Name:  "allow-insecure",
 					Usage: "enable insecure tls communication",
