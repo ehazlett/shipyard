@@ -5,41 +5,38 @@ import (
 )
 
 const (
-	TEST_PASS = "FOOPASS.+&^"
-)
-
-var (
-	auth = &Authenticator{salt: nil}
+	testPass  = "FOOPASS.+&^"
+	testUser  = "admin"
+	testToken = "12345"
 )
 
 func TestHash(t *testing.T) {
-	h, err := auth.Hash(TEST_PASS)
+	h, err := Hash(testPass)
 	if err != nil {
 		t.Error(err)
 	}
+
 	if len(h) == 0 {
 		t.Errorf("expected a hashed password; go a zero length string")
 	}
 }
-func TestAuthenticate(t *testing.T) {
-	h, err := auth.Hash(TEST_PASS)
-	if err != nil {
-		t.Error(err)
-	}
-	if !auth.Authenticate(TEST_PASS, h) {
-		t.Error("expected password FOO")
-	}
-	if auth.Authenticate("BADpass", h) {
-		t.Error("expected passwords to not match")
-	}
-}
 
-func TestAuthenticateFailIfNoPass(t *testing.T) {
-	h, err := auth.Hash(TEST_PASS)
+func TestGetAccessToken(t *testing.T) {
+	h := testUser + ":" + testToken
+	tk, err := GetAccessToken(h)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
+
 	}
-	if auth.Authenticate("", h) {
-		t.Error("empty password should not match")
+
+	if tk.Username != testUser {
+		t.Fatalf("expected username %s; received %s", testUser, tk.Username)
+
 	}
+
+	if tk.Token != testToken {
+		t.Fatalf("expected token %s; received %s", testToken, tk.Token)
+
+	}
+
 }

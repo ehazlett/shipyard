@@ -2,13 +2,15 @@ package auth
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"code.google.com/p/go.crypto/bcrypt"
 )
 
 var (
-	ErrUnauthorized = errors.New("unauthorized")
+	ErrUnauthorized  = errors.New("unauthorized")
+	ErrNoUserInToken = errors.New("no user sent in token")
 )
 
 type (
@@ -25,6 +27,11 @@ type (
 	AuthToken struct {
 		Token     string `json:"auth_token,omitempty" gorethink:"auth_token"`
 		UserAgent string `json:"user_agent,omitempty" gorethink:"user_agent"`
+	}
+
+	AccessToken struct {
+		Token    string
+		Username string
 	}
 
 	ServiceKey struct {
@@ -47,4 +54,20 @@ func Hash(data string) (string, error) {
 
 func GenerateToken() (string, error) {
 	return Hash(time.Now().String())
+}
+
+// GetAccessToken returns an AccessToken from the access header
+func GetAccessToken(authToken string) (*AccessToken, error) {
+	parts := strings.Split(authToken, ":")
+
+	if len(parts) != 2 {
+		return nil, ErrNoUserInToken
+
+	}
+
+	return &AccessToken{
+		Username: parts[0],
+		Token:    parts[1],
+	}, nil
+
 }
