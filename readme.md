@@ -5,8 +5,6 @@ Composable Docker Management
 Shipyard enables multi-host, Docker cluster management.  It uses [Docker Swarm](https://docs.docker.com/swarm) for cluster resourcing and scheduling.
 
 # Quick Start
-
-## Option 1: Shipyard Deploy
 There is a deploy script provided on the Shipyard website for quick
 installation.
 
