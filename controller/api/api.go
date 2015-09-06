@@ -789,6 +789,7 @@ func (a *Api) Run() error {
 
 	// check if TLS is enabled and configure if so
 	if client.TLSConfig != nil {
+		log.Debug("configuring ssl for swarm redirect")
 		scheme = "https://"
 		// setup custom roundtripper with TLS transport
 		r := forward.RoundTripper(
@@ -797,7 +798,7 @@ func (a *Api) Run() error {
 			})
 		f, err := forward.New(r)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		a.fwd = f
@@ -825,13 +826,13 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/containers/{id}/scale", a.scaleContainer).Methods("POST")
 	apiRouter.HandleFunc("/api/events", a.events).Methods("GET")
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
-	apiRouter.HandleFunc("/api/registry", a.registries).Methods("GET")
-	apiRouter.HandleFunc("/api/registry", a.addRegistry).Methods("POST")
-	apiRouter.HandleFunc("/api/registry/{name}", a.registry).Methods("GET")
-	apiRouter.HandleFunc("/api/registry/{name}", a.removeRegistry).Methods("DELETE")
-	apiRouter.HandleFunc("/api/registry/{name}/repositories", a.repositories).Methods("GET")
-	apiRouter.HandleFunc("/api/registry/{name}/repositories/{repo:.*}", a.repository).Methods("GET")
-	apiRouter.HandleFunc("/api/registry/{name}/repositories/{repo:.*}", a.deleteRepository).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registries", a.registries).Methods("GET")
+	apiRouter.HandleFunc("/api/registries", a.addRegistry).Methods("POST")
+	apiRouter.HandleFunc("/api/registries/{name}", a.registry).Methods("GET")
+	apiRouter.HandleFunc("/api/registries/{name}", a.removeRegistry).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registries/{name}/repositories", a.repositories).Methods("GET")
+	apiRouter.HandleFunc("/api/registries/{name}/repositories/{repo:.*}", a.repository).Methods("GET")
+	apiRouter.HandleFunc("/api/registries/{name}/repositories/{repo:.*}", a.deleteRepository).Methods("DELETE")
 	apiRouter.HandleFunc("/api/servicekeys", a.serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", a.addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", a.removeServiceKey).Methods("DELETE")
