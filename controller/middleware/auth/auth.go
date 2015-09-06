@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 
@@ -19,13 +20,15 @@ func defaultDeniedHostHandler(w http.ResponseWriter, r *http.Request) {
 
 type AuthRequired struct {
 	deniedHostHandler http.Handler
-	manager           *manager.Manager
+	manager           manager.Manager
+	whitelistCIDRs    []string
 }
 
-func NewAuthRequired(m *manager.Manager) *AuthRequired {
+func NewAuthRequired(m manager.Manager, whitelistCIDRs []string) *AuthRequired {
 	return &AuthRequired{
 		deniedHostHandler: http.HandlerFunc(defaultDeniedHostHandler),
 		manager:           m,
+		whitelistCIDRs:    whitelistCIDRs,
 	}
 }
 
@@ -40,7 +43,37 @@ func (a *AuthRequired) Handler(h http.Handler) http.Handler {
 	})
 }
 
+func (a *AuthRequired) isWhitelisted(addr string) (bool, error) {
+	parts := strings.Split(addr, ":")
+	src := parts[0]
+
+	srcIp := net.ParseIP(src)
+
+	// check each whitelisted ip
+	for _, c := range a.whitelistCIDRs {
+		_, ipNet, err := net.ParseCIDR(c)
+		if err != nil {
+			return false, err
+		}
+
+		if ipNet.Contains(srcIp) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (a *AuthRequired) handleRequest(w http.ResponseWriter, r *http.Request) error {
+	whitelisted, err := a.isWhitelisted(r.RemoteAddr)
+	if err != nil {
+		return err
+	}
+
+	if whitelisted {
+		return nil
+	}
+
 	valid := false
 	// service key takes priority
 	serviceKey := r.Header.Get("X-Service-Key")
@@ -58,7 +91,7 @@ func (a *AuthRequired) handleRequest(w http.ResponseWriter, r *http.Request) err
 			if err := a.manager.VerifyAuthToken(user, token); err == nil {
 				valid = true
 				// set current user
-				session, _ := a.manager.Store().Get(r, a.manager.StoreKey)
+				session, _ := a.manager.Store().Get(r, a.manager.StoreKey())
 				session.Values["username"] = user
 				session.Save(r, w)
 			}

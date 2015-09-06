@@ -3,15 +3,93 @@
 
     angular
         .module('shipyard.containers')
-        .factory('Containers', function($resource) {
-            return $resource('/api/containers');
-        })
-        .factory('Container', function($resource) {
-            return $resource('/api/containers/:id/:action', {id: '@id' }, {
-                destroy: { method: 'DELETE' },
-                'save': { isArray: true, method: 'POST' },
-                'control': { isArray: false, method: 'GET' },
-                query: { isArray: false }
-            });
-        });
-})()
+        .factory('ContainerService', ContainerService)
+
+        ContainerService.$inject = ['$http'];
+    function ContainerService($http) {
+        return {
+            list: function() {
+                var promise = $http
+                    .get('/containers/json?all=1')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            inspect: function(containerId) {
+                var promise = $http
+                    .get('/containers/' + containerId + '/json')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            logs: function(containerId) {
+                var promise = $http
+                    .get('/containers/' + containerId + '/logs?stderr=1&stdout=1&timestamps=1')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            'top': function(containerId) {
+                var promise = $http
+                    .get('/containers/' + containerId + '/top')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            stats: function(containerId) {
+                var promise = $http
+                    .get('/containers/' + containerId + '/stats')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            destroy: function(containerId) {
+                var promise = $http
+                    .delete('/containers/' + containerId + '?v=1&force=1')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            stop: function(containerId) {
+                var promise = $http
+                    .post('/containers/' + containerId + '/stop')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            restart: function(containerId) {
+                var promise = $http
+                    .post('/containers/' + containerId + '/restart')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            scale: function(containerId, numOfInstances) {
+                var promise = $http
+                    .post('/api/containers/' + containerId + '/scale?n=' + numOfInstances)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            rename: function(old, newName) {
+                var promise = $http
+                    .post('/containers/' + old + '/rename?name=' + newName)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+        } 
+    }
+
+
+})();

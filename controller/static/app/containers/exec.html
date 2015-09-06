@@ -1,0 +1,24 @@
+<div class="ui padded grid">
+<!-- this needs to be inlined so it does not conflict with the semantic "terminal" names -->
+<div class="two column row">
+    <div class="left floated column">
+        <div class="ui small icon input">
+            <input id="command" ng-model="vm.command" />
+            <i class="terminal icon"></i>
+        </div>
+        <div ng-click="vm.connect()" class="ui small green labeled button">Run</div>
+        <div ng-click="vm.disconnect()" class="ui small labeled button">Disconnect</div>
+    </div>
+
+    <div class="right aligned right floated column">
+    </div>
+</div>
+
+<div class="row">
+    <div class="column">
+        <div class="ui segment">
+            <div id="container-terminal"></div>
+        </div>
+    </div>
+</div>
+</div>

@@ -3,203 +3,259 @@
 
     angular
         .module('shipyard.containers')
-        .controller('DeployController', DeployController);
+        .controller('ContainerDeployController', ContainerDeployController);
 
-    DeployController.$inject = ['$scope', '$location', 'Engines', 'Container'];
+    ContainerDeployController.$inject = ['containers', '$http', '$state'];
+    function ContainerDeployController(containers, $http, $state) {
+        var vm = this;
+        vm.containers = containers;
+        vm.deployImages = [];
+        vm.containerLinkNames = [];
 
-    function DeployController($scope, $location, Engines, Container) {
-        var types = [
-            "service",
-            //"engine", // removed until we get the UI to show engines to select
-            "unique"
-        ];
-        var networkModes = [
-            "bridge",
-            "none",
-            "container",
-                "host"
-        ]
-        var restartPolicies = [
-        "no",
-        "on-failure",
-        "always"
-        ]
-        $scope.cpus = 0.1;
-        $scope.memory = 256;
-        $scope.maxRestarts = "";
-        $scope.environment = "";
-        $scope.hostname = "";
-        $scope.domain = "";
-        $scope.count = 1;
-        $scope.publish = false;
-        $scope.privileged = false;
-        $scope.args = null;
-        $scope.links = null;
-        $scope.volumes = null;
-        $scope.pull = false;
-        $scope.types = types;
-        $scope.selectType = function(type) {
-            $scope.selectedType = type;
-            $(".ui.dropdown").dropdown('hide');
-        };
-        $scope.selectedNetworkMode = 'bridge';
-        $scope.networkModes = networkModes;
-        $scope.selectNetworkMode = function(mode) {
-            $scope.selectedNetworkMode = mode;
-            if (mode === 'container') {
-                $scope.showNetworkModeContainer = true;
-            } else {
-                $scope.showNetworkModeContainer = false;
+        if (vm.containers != null) {
+            for (var i=0; i<vm.containers.length; i++) {
+                var c = vm.containers[i];
+                var name = c.Names[0].split('/')[2];
+
+                if (vm.containerLinkNames.indexOf(name) == -1) {
+                    vm.containerLinkNames.push(name);
+                }
+
             }
-            $(".ui.dropdown").dropdown('hide');
-        };
-        $scope.selectedRestartPolicy = 'no';
-        $scope.restartPolicies = restartPolicies;
-        $scope.selectRestartPolicy = function(policy) {
-            $scope.selectedRestartPolicy = policy;
-            if (policy == 'on-failure') {
-                $scope.showMaxRestarts = true;
-            } else {
-                $scope.showMaxRestarts = false;
-            }
-            $(".ui.dropdown").dropdown('hide');
+
+            vm.containerLinkNames.sort();
         }
-        var labels = [];
-        Engines.query(function(engines){
-            angular.forEach(engines, function(e) {
-                angular.forEach(e.engine.labels, function(l){
-                    if (labels.indexOf(l) == -1) {
-                        this.push(l);
-                    }
-                }, labels);
-            });
-            $scope.labels = labels;
-        });
-        $scope.addPortDefinition = addPortDefinition;
-        $scope.showLoader = function() {
-            $(".ui.loader").removeClass("disabled");
-            $(".ui.active").addClass("dimmer");
+
+        vm.cmd = "";
+        vm.cpuShares = "";
+        vm.memory = "";
+        
+        vm.volumes = [];
+        vm.hostPath = "";
+        vm.containerPath = "";
+
+        vm.links = [];
+        vm.containerToLink = "";
+        vm.containerToLinkAlias = "";
+
+        vm.ports = []; 
+        vm.hostPort = "";
+        vm.containerPort = "";
+        vm.protocol = "TCP";
+
+        vm.constraints =[]
+        vm.constraintName = "";
+        vm.constraintRule = "==";
+        vm.constraintValue = "";
+        
+        vm.envVars = [];
+        vm.variableName = "";
+        vm.variableValue = "";
+        
+        vm.deploying = false;
+        vm.containerName = "";
+        vm.error = "";
+        vm.request = {
+            HostConfig: {
+                RestartPolicy: { Name: 'no' },
+                Links: [],
+                Binds: [],
+                Privileged: false,
+                PublishAllPorts: false,
+                PortBindings: {},
+            },
+            Links: [],
+            ExposedPorts: {},
+            Volumes: {},
+            Env: [],
+            AttachStdin: false,
+            Tty: true,
         };
-        $scope.hideLoader = function() {
-            $(".ui.loader").addClass("disabled");
-            $(".ui.active").removeClass("dimmer");
-        };
-        $scope.deploy = function() {
-            $scope.showLoader();
-            var valid = $(".ui.form").form('validate form');
-            if (!valid) {
-                $scope.hideLoader();
-                return false;
+
+        vm.deploy = deploy;
+        vm.pushConstraint = pushConstraint;
+        vm.removeConstraint = removeConstraint;
+        vm.pushVolume = pushVolume;
+        vm.deleteVolume = deleteVolume;
+        vm.pushLink = pushLink;
+        vm.removeLink = removeLink;
+        vm.pushEnvVar = pushEnvVar;
+        vm.removeEnvVar = removeEnvVar;
+        vm.pushPort = pushPort;
+        vm.removePort = removePort;
+
+        function pushConstraint() {
+            var constraint = {'ConstraintName': vm.constraintName, 'ConstraintValue': vm.constraintValue, 'ConstraintRule': vm.constraintRule};
+            vm.constraints.push(constraint);
+            vm.constraintName = "";
+            vm.constraintValue = "";
+            vm.constraintRule = "==";
+        }
+
+        function removeConstraint(constraint) {
+            var index = vm.constraints.indexOf(removeConstraint);
+            vm.constraints.splice(index, 1);
+        }
+
+        function pushVolume() {
+            var volume = {'HostPath': vm.hostPath, 'ContainerPath': vm.containerPath};
+            vm.volumes.push(volume);
+            vm.hostPath = "";
+            vm.containerPath = "";
+        }
+
+        function deleteVolume(volume) {
+            var index = vm.volumes.indexOf(volume);
+            vm.volumes.splice(index, 1);
+        }
+
+        function pushLink() {
+            var link = {'ContainerToLink': vm.containerToLink, 'ContainerToLinkAlias': vm.containerToLinkAlias};
+            vm.links.push(link);
+            vm.containerToLink = "";
+            vm.containerToLinkAlias = "";
+        }
+
+        function removeLink(link) {
+            var index = vm.links.indexOf(link);
+            vm.links.splice(index, 1);
+        }
+
+        function pushPort() {
+            var port = {'Protocol': vm.protocol, 'ContainerPort': vm.containerPort, 'HostIp': vm.hostIp, 'HostPort': vm.hostPort};
+            vm.ports.push(port);
+            vm.hostPort = "";
+            vm.hostIp = "";
+            vm.protocol = "TCP";
+            vm.containerPort = "";
+        }
+
+        function removePort(port) {
+            var index = vm.ports.indexOf(port);
+            vm.ports.splice(index, 1);
+        }
+
+        function pushEnvVar() {
+            var envVar = { name: vm.variableName, value: vm.variableValue };
+            vm.envVars.push(envVar);
+            vm.variableName = "";
+            vm.variableValue = "";
+        }
+
+        function removeEnvVar(envVar) {
+            var index = vm.envVars.indexOf(envVar);
+            vm.envVars.splice(index, 1);
+        }
+
+        function transformLinks() {
+            var i;
+            if(vm.containerToLink.length > 0) {
+                vm.request.HostConfig.Links.push(vm.containerToLink + ":" + vm.containerToLinkAlias);
             }
-            var selectedLabels = [];
-            $(".ui.checkbox.engine-label").children(":checked").each(function(i, sel){
-                // HACK: use the label text to set the value
-                selectedLabels.push($(sel).next().text());
-            });
-            // format environment
-            var envParts = $scope.environment.match(/(?:['"].+?['"])|\S+/g);
-            var environment = {};
-            if (envParts != null) {
-                for (var i=0; i<envParts.length; i++) {
-                    var env = envParts[i].split(/=(.+)?/)
-                        environment[env[0]] = env[1];
-                }
+            for(i = 0; i < vm.links.length; i++) {
+                vm.request.HostConfig.Links.push(vm.links[i].ContainerToLink + ":" + vm.links[i].ContainerToLinkAlias);
             }
-            if ($scope.args != null) {
-                var args = $scope.args.split(" ");
+        }
+
+        function transformEnvVars() {
+            var i;
+            if(vm.variableName.length > 0) {
+                vm.request.Env.push(vm.variableName + "=" + vm.variableValue);
             }
-            // network mode
-            var networkMode = $scope.selectedNetworkMode;
-            if ($scope.selectedNetworkMode == 'container') {
-                var containerName = $scope.networkModeContainerName;
-                networkMode = 'container:' + containerName;
-                if (containerName == undefined || containerName == "") {
-                    $("div#networkMode").addClass("error");
-                    $scope.error = "you must specify a container name for the container network mode";
-                    $scope.hideLoader();
-                    valid = false;
-                    return false;
-                }
+            for(i = 0; i < vm.envVars.length; i++) {
+                vm.request.Env.push(vm.envVars[i].name + "=" + vm.envVars[i].value);
             }
-            // links
-            var links = {};
-            if ($scope.links != null) {
-                var linkParts = $scope.links.split(" ");
-                if (linkParts != "") {
-                    for (var i=0; i<linkParts.length; i++) {
-                        var l = linkParts[i].split(":");
-                        links[l[0]] = l[1];
+        }
+
+        function transformConstraints() {
+
+            var i;
+            if(vm.constraintName.length > 0) {
+                vm.request.Env.push("constraint:" + vm.constraintName + vm.constraintRule + vm.constraintValue);
+            }
+
+            for(i = 0; i < vm.constraints.length; i++) {
+                vm.request.Env.push("constraint:" + vm.constraints[i].ConstraintName + vm.constraints[i].ConstraintRule + vm.constraints[i].ConstraintValue);
+            }
+        }
+        
+        function transformCommand() {
+            if(vm.cmd.length > 0) {
+                vm.request.Cmd = vm.cmd.split(" ");
+            }
+        }
+
+        function transformVolumes() {
+            var i;
+            if(vm.hostPath.length > 0) {
+                vm.request.HostConfig.Binds.push(vm.hostPath + ":" + vm.containerPath);
+            }
+            for(i = 0; i < vm.volumes.length; i++) {
+                vm.request.HostConfig.Binds.push(vm.volumes[i].HostPath + ":" + vm.volumes[i].ContainerPath);
+            }
+        }
+
+        function transformRestartPolicy() {
+            vm.request.HostConfig.RestartPolicy.Name = translateRestartPolicy(vm.restartPolicy);
+        }
+            
+        function transformPorts() {
+            var i;
+            if(vm.containerPort.length > 0) {
+                vm.request.HostConfig.PortBindings[vm.containerPort + "/" + vm.protocol.toLowerCase()] = [{ HostIp: vm.hostIp, HostPort: vm.hostPort }];
+            }
+            for(i = 0; i < vm.ports.length; i++) {
+                vm.request.HostConfig.PortBindings[vm.ports[i].ContainerPort + "/" + vm.ports[i].Protocol.toLowerCase()] = [{ HostIp: vm.ports[i].HostIp, HostPort: vm.ports[i].HostPort }];
+            }
+        }
+
+        function transformResourceLimits() {
+            vm.request.CpuShares = parseInt(vm.cpuShares);
+            vm.request.Memory = parseInt(vm.memory) * 1024 * 1024;
+        }
+
+        function isFormValid() {
+            return $('.ui.form').form('validate form');
+        }
+
+        function deploy() {
+            if (!isFormValid()) {
+                return;
+            }
+            vm.deploying = true;
+
+            transformVolumes();
+            transformLinks();
+            transformEnvVars();
+            transformConstraints();
+            transformCommand();   
+            transformPorts();
+            transformResourceLimits();
+
+            $http
+                .post('/containers/create?name='+vm.containerName, vm.request)
+                .success(function(data, status, headers, config) {
+                    if(status >= 400) {
+                        vm.error = data;
+                        vm.deploying = false;
+                        return;
                     }
-                }
-            }
-            // volumes
-            var volumes = [];
-            if ($scope.volumes != null) {
-                var volParts = $scope.volumes.split(" ");
-                if (volParts != "") {
-                    for (var i=0; i<volParts.length; i++) {
-                        volumes.push(volParts[i]);
-                    }
-                }
-            }
-            // ports
-            var ports = [];
-            $(".ui.segment.ports").children("div.four.fields").each(function(i, el){
-                var portSpecs = $(el).children("div").children("div");
-                var portDef = {};
-                var proto = $(portSpecs[0]).children(":input")[0].value;
-                var ip = $(portSpecs[1]).children(":input")[0].value;
-                var port = $(portSpecs[2]).children(":input")[0].value;
-                var container_port = $(portSpecs[3]).children(":input")[0].value;
-                portDef["proto"] = proto;
-                portDef["host_ip"] = ip || null;
-                portDef["port"] = parseInt(port);
-                portDef["container_port"] = parseInt(container_port) || null;
-                ports.push(portDef);
-                if (portDef["proto"] == "" || portDef["container_port"] == null) {
-                    $(portSpecs[0]).addClass("error");
-                    $(portSpecs[3]).addClass("error");
-                    $scope.error = "you must specify a protocol and container port for port bindings";
-                    $scope.hideLoader();
-                    valid = false;
-                    return false;
-                }
-            });
-            var restartPolicy = {
-                name: $scope.selectedRestartPolicy,
-            }
-            var maxRestarts = parseInt($scope.maxRestarts);
-            if(maxRestarts > 0) {
-                restartPolicy.maximum_retry = maxRestarts;
-            }
-            var params = {
-                name: $scope.name,
-                container_name: $scope.containerName,
-                cpus: parseFloat($scope.cpus),
-                memory: parseFloat($scope.memory),
-                environment: environment,
-                hostname: $scope.hostname,
-                domain: $scope.domain,
-                type: $scope.selectedType,
-                network_mode: networkMode,
-                args: args,
-                links: links,
-                volumes: volumes,
-                bind_ports: ports,
-                labels: selectedLabels,
-                publish: $scope.publish,
-                privileged: $scope.privileged,
-                restart_policy: restartPolicy,
-            };
-            if (valid) {
-                Container.save({count: $scope.count, pull: $scope.pull}, params).$promise.then(function(c){
-                    $location.path("/containers");
-                }, function(err){
-                    $scope.hideLoader();
-                    $scope.error = err.data;
-                    return false;
+                    $http
+                        .post('/containers/'+ data.Id +'/start', vm.request)
+                        .success(function(data, status, headers, config) {
+                            $state.transitionTo('dashboard.containers');
+                        })
+                        .error(function(data, status, headers, config) {
+                            vm.error = data;
+                            vm.deploying = false;
+                        });
+                })
+                .error(function(data, status, headers, config) {
+                    vm.error = data;
+                    vm.deploying = false;
                 });
-            }
-        };
+        }
+
     }
-})()
+})();
+

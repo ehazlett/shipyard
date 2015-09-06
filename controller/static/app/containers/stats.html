@@ -1,0 +1,49 @@
+<div class="ui padded grid">
+<div class="two column row">
+    <div class="left floated column">
+        <h2 class="ui header">
+            <div class="content">
+                Stats
+                <div class="sub header">Container: {{ vm.id | limitTo:12 }}</div>
+            </div>
+        </h2>
+    </div>
+
+    <div class="right aligned right floated column">
+        <select class="ui compact dropdown" ng-model="vm.refreshInterval">
+            <option value="1">Stream</option>
+            <option value="5">5 sec</option>
+            <option value="10">10 sec</option>
+            <option value="30">30 sec</option>
+            <option value="60">1 min</option>
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column">
+        <div class="ui segment chart" > 
+            <h3 class="ui header">CPU</h3>
+            <div id='graphCpuStats' class='chart half with-transitions'>
+                <svg></svg>
+            </div>
+        </div>
+        <div class="ui segment chart" > 
+            <h3 class="ui header">Memory</h3>
+            <div id='graphMemoryStats' class='chart half with-transitions'>
+                <svg></svg>
+            </div>
+        </div>
+        <div class="ui segment chart" > 
+            <h3 class="ui header">Network</h3>
+            <div id='graphNetStats' class='chart half with-transitions'>
+                <svg></svg>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+$('.ui.dropdown').dropdown();
+</script>

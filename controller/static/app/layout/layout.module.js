@@ -1,6 +1,9 @@
-(function() {
-    'use strict';
+(function(){
+	'use strict';
 
-    angular
-        .module('shipyard.layout', []);
-})()
+	angular
+		.module('shipyard.layout', [
+			'ui.router'
+		]);
+		
+})();

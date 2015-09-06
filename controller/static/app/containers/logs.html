@@ -1,14 +1,24 @@
-<div class="ui breadcrumb">
-    <a href="/#/containers" class="section">containers</a>
-    <div class="divider"> / </div>
-    <a href="/#/containers/{{container.id}}" class="section">{{container.id | limitTo:12}}</a>
-    <div class="divider"> / </div>
-    <div class="active section">logs</div>
+<div class="ui padded grid">
+<div class="row" ng-hide="vm.logs">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    Logs
+                </div>
+                <p>There are no logs available for this container.</p>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="ui small message red" flash-alert="error" ng-show="flash.message" duration="0">
-    <i class="close icon"></i>
-    {{flash.message}}
+<div class="row" ng-show="vm.logs">
+    <div class="column">
+        <div class="ui segment page" > 
+            <h4 class="dividing header">Container: {{ vm.id | limitTo:12 }}</h2>
+            <pre ng-bind-html="vm.logs" class="logs"> 
+            </pre>
+        </div>
+    </div>
 </div>
-<div class="ui segment">
-  <pre class="logs"><div ng-bind-html="logs|unsafe"></div></pre>
 </div>

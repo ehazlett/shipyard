@@ -1,0 +1,83 @@
+<div class="ui padded grid">
+<div class="row">
+    <div class="column">
+        <div class="ui segment">
+            <div class="ui form" ng-submit="vm.addAccount()" ng-method="post">
+                <h4 class="ui dividing header">Account Details</h4>
+                <label>Username</label>
+                <div class="field">
+                    <input type="text" name="username" ng-model="vm.username">
+                </div>
+                <label>First Name</label>
+                <div class="field">
+                    <input type="text" name="firstName" ng-model="vm.firstName">
+                </div>
+                <label>Last Name</label>
+                <div class="field">
+                    <input type="text" name="lastName" ng-model="vm.lastName">
+                </div>
+                <label>Password</label>
+                <div class="field">
+                    <input type="password" name="password" ng-model="vm.password">
+                </div>
+                <label>Roles</label>
+                <div class="field">
+                    <selectize options="vm.roleOptions" ng-model="vm.userRoles" config="vm.roleConfig"></selectize>
+                </div>
+                <div class="ui hidden divider"></div>
+                <div class="ui green submit button">Add Account</div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+$(function(){
+    $('.ui.form')
+        .form({
+            onSuccess: function() {
+                vm.addAccount();
+            },
+            username: {
+                identifier : 'username',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter a username'
+                }
+                ]
+            },
+            firstName: {
+                identifier : 'firstName',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter a first name'
+                }
+                ]
+            },
+            lastName: {
+                identifier : 'lastName',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter a last name'
+                }
+                ]
+            },
+            password: {
+                identifier : 'password',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter a password'
+                }
+                ]
+            }
+        });
+
+    $('.ui.checkbox').checkbox();
+});
+
+$('.ui.dropdown').dropdown();
+</script>
