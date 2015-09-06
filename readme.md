@@ -7,15 +7,12 @@ Shipyard enables multi-host, Docker cluster management.  It uses [Docker Swarm](
 # Quick Start
 
 ## Option 1: Shipyard Deploy
-This will launch an entire stack.  It uses [Docker Machine](https://docs.docker.com/machine) and the [Docker CLI](https://docs.docker.com) to create
-a Docker Swarm.  It will then deploy Shipyard to manage the Swarm.  When it is finished,
-Shipyard will be configured to manage the Swarm and be ready to go.
+There is a deploy script provided on the Shipyard website for quick
+installation.
 
-> Shipyard Deploy can use any provider supported by Docker Machine
-
-### Deploy using the VirtualBox Provider
-
-  Note: you must have VirtualBox installed.
+> Note: you must already have a Docker engine available.  If you do not have
+Docker, you can use [Docker Machine](https://github.com/docker/machine) to
+get started.
 
 ```
 curl -s https://shipyard-project.com/deploy | bash -s
@@ -26,8 +23,6 @@ For full options:
 ```
 curl -s https://shipyard-project.com/deploy | bash -s -- -h
 ```
-
-## Option 2: Manual Deployment (advanced users)
 
 # Documentation
 Full docs are available at http://shipyard-project.com
