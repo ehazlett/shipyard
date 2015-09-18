@@ -31,9 +31,9 @@
                 .success(function(data, status, headers, config) {
                     $state.transitionTo('dashboard.registry');
                 })
-            .error(function(data, status, headers, config) {
-                vm.error = data;
-            });
+                .error(function(data, status, headers, config) {
+                    vm.error = data;
+                });
         }
     }
 })();
