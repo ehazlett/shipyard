@@ -694,6 +694,14 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 }
 
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
+	resp, err := http.Get(fmt.Sprintf("%s/v1/search", registry.Addr))
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 200 {
+		return errors.New(resp.Status)
+	}
+
 	if _, err := r.Table(tblNameRegistries).Insert(registry).RunWrite(m.session); err != nil {
 		return err
 	}

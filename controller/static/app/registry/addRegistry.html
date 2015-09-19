@@ -1,4 +1,12 @@
 <div class="ui padded grid">
+<div class="row" ng-show="vm.error">
+    <div class="column">
+        <div class="ui error message">
+            <div class="header">Error...</div>
+            <p>{{vm.error}}</p>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="column">
         <div class="ui segment">
