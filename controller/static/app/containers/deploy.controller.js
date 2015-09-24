@@ -168,7 +168,6 @@
         }
 
         function transformConstraints() {
-
             var i;
             if(vm.constraintName.length > 0) {
                 vm.request.Env.push("constraint:" + vm.constraintName + vm.constraintRule + vm.constraintValue);
@@ -202,10 +201,15 @@
         function transformPorts() {
             var i;
             if(vm.containerPort.length > 0) {
-                vm.request.HostConfig.PortBindings[vm.containerPort + "/" + vm.protocol.toLowerCase()] = [{ HostIp: vm.hostIp, HostPort: vm.hostPort }];
+                // this is used in case there is just a single port and the
+                // "+" has not been clicked to push the port onto the array
+                pushPort();
             }
             for(i = 0; i < vm.ports.length; i++) {
-                vm.request.HostConfig.PortBindings[vm.ports[i].ContainerPort + "/" + vm.ports[i].Protocol.toLowerCase()] = [{ HostIp: vm.ports[i].HostIp, HostPort: vm.ports[i].HostPort }];
+                var port = vm.ports[i];
+                var key = port.ContainerPort + '/' + port.Protocol.toLowerCase();
+                vm.request.ExposedPorts[key] = {};
+                vm.request.HostConfig.PortBindings[key] = [{ HostIp: port.HostIp, HostPort: port.HostPort }];
             }
         }
 
