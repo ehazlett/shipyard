@@ -10,8 +10,28 @@
     text-transform: none;
 }
 
-#menu-bar-spacer {
-    padding: 20px;
+@media (min-width: 931px) {
+    #content {
+        margin-top: 3rem;
+    }
+}
+
+@media (max-width: 930px) {
+    #content {
+        margin-top: 5.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #content {
+        margin-top: 8rem;
+    }
+}
+
+@media (max-width: 350px) {
+    #content {
+        margin-top: 10.5rem;
+    }
 }
 
 .ui.small.model.transition {
