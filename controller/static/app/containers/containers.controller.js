@@ -254,8 +254,9 @@
 
         function containerStatusText(container) {
             if(container.Status.indexOf("Up")==0){
-                if (container.Status.indexOf("(Paused)") != -1)
+                if (container.Status.indexOf("(Paused)") != -1) {
                     return "Paused";
+                }
                 return "Running";
             }
             else if(container.Status.indexOf("Exited")==0){

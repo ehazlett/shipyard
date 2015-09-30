@@ -206,7 +206,7 @@
                             </div>
                         </td>
                         <td>
-                            <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : vm.containerStatusText(c) == 'Paused' ? 'red' : 'disabled'"></i>
+                            <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : vm.containerStatusText(c) == 'Paused' ? 'yellow' : 'red'"></i>
                             <span class="hidden">{{vm.containerStatusText(c)}}</span>
                         </td>
                         <td>{{c.Id | limitTo:12 }}</td>
