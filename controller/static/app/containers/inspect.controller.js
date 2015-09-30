@@ -12,8 +12,11 @@
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.showRestartContainerDialog = showRestartContainerDialog;
         vm.showStopContainerDialog = showStopContainerDialog;
+        vm.showPauseContainerDialog = showPauseContainerDialog;
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
+        vm.pauseContainer = pauseContainer;
+        vm.unpauseContainer = unpauseContainer;
         vm.restartContainer = restartContainer;
         vm.parseLinkingString = parseLinkingString;
         vm.isEmptyObject = isEmptyObject;
@@ -59,19 +62,24 @@
             return true;
         }
 
-        function showDestroyContainerDialog(container) {
+        function showDestroyContainerDialog() {
             vm.selectedContainerId = resolvedContainer.Id;
             $('.ui.small.destroy.modal').modal('show');
         }
 
-        function showRestartContainerDialog(container) {
+        function showRestartContainerDialog() {
             vm.selectedContainerId = resolvedContainer.Id;
             $('.ui.small.restart.modal').modal('show');
         }
 
-        function showStopContainerDialog(container) {
+        function showStopContainerDialog() {
             vm.selectedContainerId = resolvedContainer.Id;
             $('.ui.small.stop.modal').modal('show');
+        }
+
+        function showPauseContainerDialog() {
+            vm.selectedContainerId = resolvedContainer.Id;
+            $('.ui.small.pause.modal').modal('show');
         }
 
         function destroyContainer() {
@@ -85,6 +93,25 @@
 
         function stopContainer() {
             ContainerService.stop(vm.selectedContainerId)
+                .then(function(data) {
+                    $state.reload();
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function pauseContainer() {
+            ContainerService.pause(vm.selectedContainerId)
+                .then(function(data) {
+                    $state.reload();
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function unpauseContainer(container) {
+            vm.selectedContainerId = container.Id;
+            ContainerService.unpause(vm.selectedContainerId)
                 .then(function(data) {
                     $state.reload();
                 }, function(data) {
