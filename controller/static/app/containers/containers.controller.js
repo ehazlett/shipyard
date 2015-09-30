@@ -23,10 +23,13 @@
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.showRestartContainerDialog = showRestartContainerDialog;
         vm.showStopContainerDialog = showStopContainerDialog;
+        vm.showPauseContainerDialog = showPauseContainerDialog;
         vm.showScaleContainerDialog = showScaleContainerDialog;
         vm.showRenameContainerDialog = showRenameContainerDialog;
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
+        vm.pauseContainer = pauseContainer;
+        vm.unpauseContainer = unpauseContainer;
         vm.restartContainer = restartContainer;
         vm.scaleContainer = scaleContainer;
         vm.renameContainer = renameContainer;
@@ -167,6 +170,11 @@
             $('#stop-modal').modal('show');
         }
 
+        function showPauseContainerDialog(container) {
+            vm.selectedContainerId = container.Id;
+            $("#pause-modal").modal('show');
+        }
+
         function showScaleContainerDialog(container) {
             vm.selectedContainerId = container.Id;
             $('#scale-modal').modal('show');
@@ -188,6 +196,25 @@
 
         function stopContainer() {
             ContainerService.stop(vm.selectedContainerId)
+                .then(function(data) {
+                    vm.refresh();
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function pauseContainer() {
+            ContainerService.pause(vm.selectedContainerId)
+                .then(function(data) {
+                    vm.refresh();
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function unpauseContainer(container) {
+            vm.selectedContainerId = container.Id;
+            ContainerService.unpause(vm.selectedContainerId)
                 .then(function(data) {
                     vm.refresh();
                 }, function(data) {
@@ -227,6 +254,8 @@
 
         function containerStatusText(container) {
             if(container.Status.indexOf("Up")==0){
+                if (container.Status.indexOf("(Paused)") != -1)
+                    return "Paused";
                 return "Running";
             }
             else if(container.Status.indexOf("Exited")==0){

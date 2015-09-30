@@ -64,6 +64,22 @@
                     });
                 return promise;
             },
+            pause: function(containerId) {
+                var promise = $http
+                    .post('/containers/' + containerId + '/pause')
+                    .then(function(response) {
+                        return response.data;
+                    })
+                return promise;
+            },
+            unpause: function(containerId) {
+                var promise = $http
+                    .post('/containers/' + containerId + '/unpause')
+                    .then(function(response) {
+                        return response.data;
+                    })
+                return promise;
+            },
             restart: function(containerId) {
                 var promise = $http
                     .post('/containers/' + containerId + '/restart')

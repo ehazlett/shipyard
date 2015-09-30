@@ -55,6 +55,25 @@
     </div>
 </div>
 
+<div id="pause-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        Pause Container: {{ vm.selectedContainerId | limitTo:12 }}
+    </div>
+    <div class="content">
+        <p>Are you sure you want to Pause this container?</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.pauseContainer()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
 <div id="scale-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
@@ -187,7 +206,7 @@
                             </div>
                         </td>
                         <td>
-                            <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : 'disabled'"></i>
+                            <i class="circle icon" ng-class="vm.containerStatusText(c) == 'Running' ? 'green' : vm.containerStatusText(c) == 'Paused' ? 'red' : 'disabled'"></i>
                             <span class="hidden">{{vm.containerStatusText(c)}}</span>
                         </td>
                         <td>{{c.Id | limitTo:12 }}</td>
@@ -207,6 +226,9 @@
                                 <div class="menu">
                                     <a ng-click="vm.showRestartContainerDialog(c)" class="item"><i class="green refresh icon"></i> Restart</a>
                                     <a ng-click="vm.showStopContainerDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
+                                    <a ng-if="vm.containerStatusText(c) == 'Running'" ng-click="vm.showPauseContainerDialog(c)" class="item"><i class="black pause icon"></i> Pause</a>
+                                    <a ng-if="vm.containerStatusText(c) == 'Paused'" ng-click="vm.unpauseContainer(c)" class="item"><i class="black play icon"></i> Unpause</a>
+                                    
                                     <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
                                     <a ng-click="vm.showScaleContainerDialog(c)" class="item"><i class="exchange icon"></i> Scale</a>
                                     <a ng-click="vm.showRenameContainerDialog(c)" class="item"><i class="edit icon"></i> Rename</a>
