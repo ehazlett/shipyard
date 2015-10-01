@@ -55,16 +55,35 @@
     </div>
 </div>
 
+<div class="ui small pause modal transition" style="margin-top: -98px;">
+    <i class="close icon"></i>
+    <div class="header">
+        Pause Container: {{ vm.selectedContainerId | limitTo:12 }}
+    </div>
+    <div class="content">
+        <p>Are you sure you want to pause this container?</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.pauseContainer()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
 <div class="ui padded grid">
     <div class="row">
         <div class="column">
-            <div class="ui segment page" ng-class="{'green': vm.container.State.Running, 'red': !vm.container.State.Running}">
+            <div class="ui segment page" ng-class="{'yellow': (vm.container.State.Running && vm.container.State.Paused), 'green': (vm.container.State.Running && !vm.container.State.Paused), 'red': !vm.container.State.Running}">
                 <div class= "ui grid">
                     <div class="two column row">
                         <div class="column">
                             <h3 class="ui header">
                                 <div class="content">
-                                    <i class="ui circle icon" ng-class="{'green': vm.container.State.Running, 'red': !vm.container.State.Running}"></i>
+                                    <i class="ui circle icon" ng-class="{'yellow': (vm.container.State.Running && vm.container.State.Paused), 'green': (vm.container.State.Running && !vm.container.State.Paused), 'red': !vm.container.State.Running}"></i>
                                     {{ vm.container.Name.split("/")[1] }}
                                     <div class="sub header">{{ vm.container.Config.Image }}</div>
                                 </div>
@@ -82,6 +101,12 @@
 
                     <div class="row">
                         <div class="column">
+                            <div ng-click="vm.showPauseContainerDialog()" class="ui yellow small labeled icon button" ng-show="vm.container.State.Running && !vm.container.State.Paused">
+                                <i class="pause icon"></i> Pause 
+                            </div>
+                            <div ng-click="vm.unpauseContainer(vm.container)" class="ui green small labeled icon button" ng-show="vm.container.State.Paused">
+                                <i class="play icon"></i> Unpause 
+                            </div>
                             <div ng-click="vm.showStopContainerDialog()" class="ui small labeled icon button">
                                 <i class="stop icon"></i> Stop 
                             </div>
