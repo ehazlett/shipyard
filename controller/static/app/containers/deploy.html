@@ -148,6 +148,27 @@
                                     </div>
                                 </div>
                             </div>
+                            <h5 class="ui dividing header">Container DNS</h5>
+                            <div class="fields">
+                                <div class="eleven wide field">
+                                    <input name="containerDns" class="input" type="text" ng-model="vm.containerDns" placeholder="Container DNS"></input> 
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui green icon button" ng-click="vm.pushDns()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="d in vm.Dns track by $index">
+                                <div class="eleven wide field">
+                                    <input class="input" type="text" ng-model="d" placeholder="Container DNS"></input>
+                                </div>
+                                <div class="one wide field">
+                                        <div class="ui red icon button" ng-click="vm.removeDns(d)">
+                                            <i class="remove icon"></i>
+                                        </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="column">
