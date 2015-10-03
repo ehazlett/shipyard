@@ -53,7 +53,7 @@
         vm.variableValue = "";
 
         vm.Dns = [];//for dns array
-        vm.ContainerDns;//for first input
+        vm.containerDns = "";//for first input
         
         vm.deploying = false;
         vm.containerName = "";
