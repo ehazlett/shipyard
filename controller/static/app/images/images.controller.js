@@ -51,7 +51,11 @@
 
             function deployContainer(image) {
                 if (image.RepoTags[0] != undefined) {
-                    window.location = "/#/deploy/" + image.RepoTags[0];
+                    var url = "/#/deploy/" + image.RepoTags[0];
+                    if (image.RepoTags[0].indexOf('/') == -1) {
+                        url += "/";
+                    }
+                    window.location = url;
                 }
             }
 

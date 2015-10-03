@@ -76,7 +76,6 @@
             AttachStdin: false,
             Tty: true,
         };
-        vm.request.Image = $state.params.image;
 
         vm.deploy = deploy;
         vm.pushConstraint = pushConstraint;
@@ -91,6 +90,11 @@
         vm.removePort = removePort;
         vm.pushDns = pushDns;
         vm.removeDns = removeDns;
+        if ($state.params.image != "") {
+            vm.request.Image = $state.params.registry + "/" + $state.params.image;    
+        } else {
+            vm.request.Image = $state.params.registry;
+        }
 
         function pushConstraint() {
             var constraint = {'ConstraintName': vm.constraintName, 'ConstraintValue': vm.constraintValue, 'ConstraintRule': vm.constraintRule};
