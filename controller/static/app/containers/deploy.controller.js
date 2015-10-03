@@ -7,6 +7,7 @@
 
     ContainerDeployController.$inject = ['containers', '$http', '$state'];
     function ContainerDeployController(containers, $http, $state) {
+
         var vm = this;
         vm.containers = containers;
         vm.deployImages = [];
@@ -75,6 +76,7 @@
             AttachStdin: false,
             Tty: true,
         };
+        vm.request.Image = $state.params.image;
 
         vm.deploy = deploy;
         vm.pushConstraint = pushConstraint;

@@ -17,6 +17,7 @@
             vm.pullImageName = "";
             vm.showRemoveImageDialog = showRemoveImageDialog;
             vm.showPullImageDialog = showPullImageDialog;
+            vm.deployContainer = deployContainer;
             vm.error = "";
 
             function showRemoveImageDialog(image) {
@@ -46,6 +47,12 @@
                     }, function(data) {
                         vm.error = data.status + ": " + data.data;
                     });
+            }
+
+            function deployContainer(image) {
+                if (image.RepoTags[0] != undefined) {
+                    window.location = "/#/deploy/" + image.RepoTags[0];
+                }
             }
 
             function pullImage() {

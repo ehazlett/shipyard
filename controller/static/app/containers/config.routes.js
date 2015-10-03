@@ -31,7 +31,7 @@
             }
         })
         .state('dashboard.deploy', {
-            url: '^/deploy',
+            url: '^/deploy/{image}',
             templateUrl: 'app/containers/deploy.html',
             controller: 'ContainerDeployController',
             controllerAs: 'vm',
