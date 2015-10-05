@@ -194,6 +194,12 @@
                                     </div>
                                 </div>
                             </div>
+                            <h4 class="ui dividing header" ng-show="vm.container.HostConfig.Dns">User Defined Container DNS</h4>
+                            <div class="ui divided list" ng-show="vm.container.HostConfig.Dns">
+                                <div class="item">
+                                        <pre ng-repeat="d in vm.container.HostConfig.Dns">{{ d }}</pre>
+                                </div>
+                            </div>
                         </div>
                         <div class="column">
                             <h4 class="ui dividing header">Environment</h4>

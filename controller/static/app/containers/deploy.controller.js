@@ -51,6 +51,9 @@
         vm.envVars = [];
         vm.variableName = "";
         vm.variableValue = "";
+
+        vm.Dns = [];//for dns array
+        vm.containerDns = "";//for first input
         
         vm.deploying = false;
         vm.containerName = "";
@@ -63,6 +66,7 @@
                 Privileged: false,
                 PublishAllPorts: false,
                 PortBindings: {},
+                Dns:[],
             },
             Links: [],
             ExposedPorts: {},
@@ -83,6 +87,8 @@
         vm.removeEnvVar = removeEnvVar;
         vm.pushPort = pushPort;
         vm.removePort = removePort;
+        vm.pushDns = pushDns;
+        vm.removeDns = removeDns;
 
         function pushConstraint() {
             var constraint = {'ConstraintName': vm.constraintName, 'ConstraintValue': vm.constraintValue, 'ConstraintRule': vm.constraintRule};
@@ -145,6 +151,16 @@
         function removeEnvVar(envVar) {
             var index = vm.envVars.indexOf(envVar);
             vm.envVars.splice(index, 1);
+        }
+
+        function pushDns() {
+            vm.Dns.push(vm.containerDns);
+            vm.containerDns = "";
+        }
+
+        function removeDns(dns) {
+            var index = vm.Dns.indexOf(dns);
+            vm.Dns.splice(index, 1);
         }
 
         function transformLinks() {
@@ -218,6 +234,16 @@
             vm.request.Memory = parseInt(vm.memory) * 1024 * 1024;
         }
 
+        function transformDns() {
+            vm.request.HostConfig.Dns = [];
+            if(vm.containerDns.length > 0) {
+                vm.request.HostConfig.Dns.push(vm.containerDns);
+            }
+            for(i = 0; i < vm.Dns.length; i++) {
+                vm.request.HostConfig.Dns.push(vm.Dns[i]);
+            }
+        }
+
         function isFormValid() {
             return $('.ui.form').form('validate form');
         }
@@ -235,6 +261,7 @@
             transformCommand();   
             transformPorts();
             transformResourceLimits();
+            transformDns();
 
             $http
                 .post('/containers/create?name='+vm.containerName, vm.request)
