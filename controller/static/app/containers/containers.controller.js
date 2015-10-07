@@ -35,6 +35,8 @@
         vm.renameContainer = renameContainer;
         vm.refresh = refresh;
         vm.containerStatusText = containerStatusText;
+		vm.nodeName = nodeName;
+		vm.containerName = containerName;
         vm.checkAll = checkAll;
         vm.clearAll = clearAll;
         vm.destroyAll = destroyAll;
@@ -264,5 +266,36 @@
             }            
             return "Unknown";
         }   
+		
+		function nodeName(container) {
+			// Return only the node name (first component of the shortest container name)
+			var components = shortestContainerName(container).split('/');
+			return components[1];
+		}
+		
+		function containerName(container) {
+			// Remove the node name by returning the last name component of the shortest container name
+			var components = shortestContainerName(container).split('/');
+			return components[components.length-1];
+		}
+		
+		function shortestContainerName(container) {
+			// Distill shortest container name by taking the name with the fewest components
+			// Names with the same number of components are considered in undefined order
+			var shortestName = "";
+			var minComponents = 99;
+			
+			var names = container.Names
+			for(var i=0; i<names.length; i++) {
+				var name = names[i];
+				var numComponents = name.split('/').length
+				if(numComponents < minComponents) {
+					shortestName = name;
+					minComponents = numComponents;
+				}
+			}
+
+			return shortestName;			
+		}
     }
 })();
