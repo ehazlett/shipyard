@@ -103,7 +103,7 @@
 <div id="rename-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
-        Rename Container: {{ vm.selectedContainer.Names[0].split('/')[2] }}
+        Rename Container: {{ vm.containerName(vm.selectedContainer) }}
     </div>
     <div class="content">
         <div class="ui form">
@@ -210,8 +210,8 @@
                             <span class="hidden">{{vm.containerStatusText(c)}}</span>
                         </td>
                         <td>{{c.Id | limitTo:12 }}</td>
-                        <td>{{c.Names[0].split('/')[1]}}</td>
-                        <td>{{c.Names[0].split('/')[2]}}</td>
+                        <td>{{vm.nodeName(c)}}</td>
+                        <td>{{vm.containerName(c)}}</td> 
                         <td>{{c.Image}}</td>
                         <td>{{c.Status}}</td>
                         <td>{{c.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
