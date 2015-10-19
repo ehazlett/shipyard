@@ -145,7 +145,7 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/consolesession/{token}", a.removeConsoleSession).Methods("DELETE")
 
 	// global handler
-	globalMux.Handle("/", http.FileServer(http.Dir("static")))
+	globalMux.Handle("/", http.FileServer(http.Dir("public")))
 
 	auditExcludes := []string{
 		"^/containers/json",

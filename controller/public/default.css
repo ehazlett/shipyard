@@ -1,0 +1,46 @@
+.hidden.menu {
+  display: none;
+}
+.pusher {
+    padding-top: 64px;
+}
+.main-content {
+    margin: 20px;
+}
+a, .pointer {
+    cursor: pointer;
+}
+.masthead-header {
+    padding-top: 10px;
+    margin: 0 auto 20px auto;
+    min-height: 400px;
+    background-color: #dedede;
+}
+.masthead-header img {
+    width: 101%;
+}
+.login, .signup {
+    margin-top: 30px;
+}
+.notfound {
+    min-height: 500px;
+}
+.center {
+    text-align: center;
+    margin: 0 auto;
+}
+.ui.dropdown.usermenu {
+    margin-right: 20px;
+}
+.footer {
+    margin-top: 10em;
+}
+.logo {
+    width: 100%;
+    max-width: 325px;
+}
+@media only screen and (max-width: 700px) {
+  .notfound {
+    min-height: 100px;
+  }
+}
