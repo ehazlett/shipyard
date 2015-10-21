@@ -30,6 +30,10 @@ type Repo struct {
 	Repository string
 }
 
+type TagList struct {
+	Tags []string `json:"tags"`
+}
+
 func newHTTPClient(u *url.URL, tlsConfig *tls.Config, timeout time.Duration) *http.Client {
 	httpTransport := &http.Transport{
 		TLSClientConfig: tlsConfig,
@@ -72,7 +76,7 @@ func (client *RegistryClient) doRequest(method string, path string, body []byte,
 	resp, err := client.httpClient.Do(req)
 	if err != nil {
 		if !strings.Contains(err.Error(), "connection refused") && client.tlsConfig == nil {
-			return nil, nil, fmt.Errorf("%v. Are you trying to connect to a TLS-enabled daemon without TLS?", err)
+			return nil, nil, fmt.Errorf("%s. Are you trying to connect to a TLS-enabled daemon without TLS?", err)
 		}
 		return nil, nil, err
 	}
@@ -116,18 +120,8 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 	// simple filter for list
 	for _, k := range res.Repositories {
 		if strings.Index(k, query) == 0 {
-			type tagList struct {
-				Tags []string `json:"tags"`
-			}
-
-			uri := fmt.Sprintf("/%s/tags/list", k)
-			data, _, err := client.doRequest("GET", uri, nil, nil)
+			tl, err := client.getTags(k)
 			if err != nil {
-				return nil, err
-			}
-
-			tl := &tagList{}
-			if err := json.Unmarshal(data, &tl); err != nil {
 				return nil, err
 			}
 
@@ -135,6 +129,11 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 				// get the repository and append to the slice
 				r, err := client.Repository(k, t)
 				if err != nil {
+					// the registry will still list the tag after it has been deleted
+					// so ignore for now
+					if err == ErrNotFound {
+						continue
+					}
 					return nil, err
 				}
 
@@ -147,10 +146,17 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 }
 
 func (client *RegistryClient) DeleteRepository(repo string) error {
-	//uri := fmt.Sprintf("/repositories/%s/%s/", r.Namespace, r.Repository)
-	//if _, _, err := client.doRequest("DELETE", uri, nil, nil); err != nil {
-	//	return err
-	//}
+	tl, err := client.getTags(repo)
+	if err != nil {
+		return err
+	}
+
+	for _, t := range tl.Tags {
+		// remove tag
+		if err := client.DeleteTag(repo, t); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -188,4 +194,19 @@ func (client *RegistryClient) Repository(name, tag string) (*Repository, error) 
 
 	repo.Digest = hdr.Get("Docker-Content-Digest")
 	return repo, nil
+}
+
+func (client *RegistryClient) getTags(repo string) (*TagList, error) {
+	uri := fmt.Sprintf("/%s/tags/list", repo)
+	data, _, err := client.doRequest("GET", uri, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	tl := &TagList{}
+	if err := json.Unmarshal(data, &tl); err != nil {
+		return nil, err
+	}
+
+	return tl, nil
 }
