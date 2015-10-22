@@ -7,6 +7,6 @@
 
 	EventsService.$inject = ['$resource'];
 	function EventsService($resource) {
-            return $resource('/api/events');
+            return $resource('./api/events');
 	}
 })();

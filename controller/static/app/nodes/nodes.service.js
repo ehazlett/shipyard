@@ -10,7 +10,7 @@
             return {
                 list: function() {
                     var promise = $http
-                        .get('/api/nodes')
+                        .get('./api/nodes')
                         .then(function(response) {
                             return response.data;
                         });
@@ -18,7 +18,7 @@
                 },
                 removeNode: function(node) {
                     var promise = $http
-                        .delete('/api/nodes/' + node.name)
+                        .delete('./api/nodes/' + node.name)
                         .then(function(response) {
                             return response.data;
                         });

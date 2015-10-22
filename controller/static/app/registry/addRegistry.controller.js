@@ -27,7 +27,7 @@
                 addr: vm.addr,
             }
             $http
-                .post('/api/registries', vm.request)
+                .post('./api/registries', vm.request)
                 .success(function(data, status, headers, config) {
                     $state.transitionTo('dashboard.registry');
                 })

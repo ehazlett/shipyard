@@ -10,7 +10,7 @@
         return {
             list: function() {
                 var promise = $http
-                    .get('/api/registries')
+                    .get('./api/registries')
                     .then(function(response) {
                         return response.data;
                     });
@@ -18,7 +18,7 @@
             },
             inspectRegistry: function(name) {
                 var promise = $http
-                    .get('/api/registries/'+name)
+                    .get('./api/registries/'+name)
                     .then(function(response) {
                         return response.data;
                     });
@@ -26,7 +26,7 @@
             },
             inspectRepository: function(name, namespace, repository) {
                 var promise = $http
-                    .get('/api/registries/'+name +'/repositories/'+namespace+'/'+repository)
+                    .get('./api/registries/'+name +'/repositories/'+namespace+'/'+repository)
                     .then(function(response) {
                         return response.data;
                     });
@@ -34,7 +34,7 @@
             },
             listRepositories: function(name) {
                 var promise = $http
-                    .get('/api/registries/'+name+'/repositories')
+                    .get('./api/registries/'+name+'/repositories')
                     .then(function(response) {
                         return response.data;
                     });
@@ -42,7 +42,7 @@
             },
             removeRegistry: function(registry) {
                 var promise = $http
-                    .delete('/api/registries/'+registry.name)
+                    .delete('./api/registries/'+registry.name)
                     .then(function(response) {
                         return response.data;
                     });
@@ -50,7 +50,7 @@
             },
             removeRepository: function(name, repo) {
                 var promise = $http
-                    .delete('/api/registries/'+name+'/repositories/'+repo.namespace+'/'+repo.repository)
+                    .delete('./api/registries/'+name+'/repositories/'+repo.namespace+'/'+repo.repository)
                     .then(function(response) {
                         return response.data;
                     });

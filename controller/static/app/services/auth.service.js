@@ -10,7 +10,7 @@
         return {
             login: function(credentials) {
                 return $http
-                    .post('/auth/login', credentials)
+                    .post('./auth/login', credentials)
                     .success(function(data, status, headers, config) {
                         localStorage.setItem('X-Access-Token', credentials.username + ':' + data.auth_token);
                     })

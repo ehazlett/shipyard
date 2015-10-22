@@ -10,7 +10,7 @@
         return {
             list: function() {
                 var promise = $http
-                    .get('/containers/json?all=1')
+                    .get('./containers/json?all=1')
                     .then(function(response) {
                         return response.data;
                     });
@@ -18,7 +18,7 @@
             },
             inspect: function(containerId) {
                 var promise = $http
-                    .get('/containers/' + containerId + '/json')
+                    .get('./containers/' + containerId + '/json')
                     .then(function(response) {
                         return response.data;
                     });
@@ -26,7 +26,7 @@
             },
             logs: function(containerId) {
                 var promise = $http
-                    .get('/containers/' + containerId + '/logs?stderr=1&stdout=1&timestamps=1')
+                    .get('./containers/' + containerId + '/logs?stderr=1&stdout=1&timestamps=1')
                     .then(function(response) {
                         return response.data;
                     });
@@ -34,7 +34,7 @@
             },
             'top': function(containerId) {
                 var promise = $http
-                    .get('/containers/' + containerId + '/top')
+                    .get('./containers/' + containerId + '/top')
                     .then(function(response) {
                         return response.data;
                     });
@@ -42,7 +42,7 @@
             },
             stats: function(containerId) {
                 var promise = $http
-                    .get('/containers/' + containerId + '/stats')
+                    .get('./containers/' + containerId + '/stats')
                     .then(function(response) {
                         return response.data;
                     });
@@ -50,7 +50,7 @@
             },
             destroy: function(containerId) {
                 var promise = $http
-                    .delete('/containers/' + containerId + '?v=1&force=1')
+                    .delete('./containers/' + containerId + '?v=1&force=1')
                     .then(function(response) {
                         return response.data;
                     });
@@ -58,7 +58,7 @@
             },
             stop: function(containerId) {
                 var promise = $http
-                    .post('/containers/' + containerId + '/stop')
+                    .post('./containers/' + containerId + '/stop')
                     .then(function(response) {
                         return response.data;
                     });
@@ -66,7 +66,7 @@
             },
             pause: function(containerId) {
                 var promise = $http
-                    .post('/containers/' + containerId + '/pause')
+                    .post('./containers/' + containerId + '/pause')
                     .then(function(response) {
                         return response.data;
                     })
@@ -74,7 +74,7 @@
             },
             unpause: function(containerId) {
                 var promise = $http
-                    .post('/containers/' + containerId + '/unpause')
+                    .post('./containers/' + containerId + '/unpause')
                     .then(function(response) {
                         return response.data;
                     })
@@ -82,7 +82,7 @@
             },
             restart: function(containerId) {
                 var promise = $http
-                    .post('/containers/' + containerId + '/restart')
+                    .post('./containers/' + containerId + '/restart')
                     .then(function(response) {
                         return response.data;
                     });
@@ -90,7 +90,7 @@
             },
             scale: function(containerId, numOfInstances) {
                 var promise = $http
-                    .post('/api/containers/' + containerId + '/scale?n=' + numOfInstances)
+                    .post('./api/containers/' + containerId + '/scale?n=' + numOfInstances)
                     .then(function(response) {
                         return response.data;
                     });
@@ -98,7 +98,7 @@
             },
             rename: function(old, newName) {
                 var promise = $http
-                    .post('/containers/' + old + '/rename?name=' + newName)
+                    .post('./containers/' + old + '/rename?name=' + newName)
                     .then(function(response) {
                         return response.data;
                     });

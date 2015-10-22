@@ -34,7 +34,7 @@
                 // as authentication to make sure the user has console access
                 // for this exec session
                 $http
-                    .get('/api/consolesession/' + vm.id)
+                    .get('./api/consolesession/' + vm.id)
                     .success(function(data, status, headers, config) {
                         vm.token = data.token;
                         vm.addr = wsScheme + "://" + window.location.hostname + ":" + window.location.port + "/exec?id=" + vm.id + "&cmd=" + cmd + "&h=" + termHeight + "&w=" + termWidth + "&token=" + vm.token;
