@@ -43,7 +43,7 @@
                 roles: vm.userRoles
             }
             $http
-                .post('/api/accounts', vm.request)
+                .post('./api/accounts', vm.request)
                 .success(function(data, status, headers, config) {
                     $state.transitionTo('dashboard.accounts');
                 })

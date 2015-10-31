@@ -10,7 +10,7 @@
             return {
                 list: function() {
                     var promise = $http
-                        .get('/api/accounts')
+                        .get('./api/accounts')
                         .then(function(response) {
                             return response.data;
                         });
@@ -18,7 +18,7 @@
                 },
                 roles: function() {
                     var promise = $http
-                        .get('/api/roles')
+                        .get('./api/roles')
                         .then(function(response) {
                             return response.data;
                         });
@@ -26,7 +26,7 @@
                 },
                 role: function(name) {
                     var promise = $http
-                        .get('/api/roles/'+name)
+                        .get('./api/roles/'+name)
                         .then(function(response) {
                             return response.data;
                         });
@@ -34,7 +34,7 @@
                 },
                 getAccount: function(username) {
                     var promise = $http
-                        .get('/api/accounts/' + username)
+                        .get('./api/accounts/' + username)
                         .then(function(response) {
                             return response.data;
                         });
@@ -42,7 +42,7 @@
                 },
                 removeAccount: function(account) {
                     var promise = $http
-                        .delete('/api/accounts/'+account.username)
+                        .delete('./api/accounts/'+account.username)
                         .then(function(response) {
                             return response.data;
                         });
