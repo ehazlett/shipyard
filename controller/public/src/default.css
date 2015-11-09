@@ -10,6 +10,9 @@
 a, .pointer {
     cursor: pointer;
 }
+.hide {
+    display: none;
+}
 .masthead-header {
     padding-top: 10px;
     margin: 0 auto 20px auto;

@@ -167,6 +167,7 @@ func (a *Api) Run() error {
 	// account router ; protected by auth
 	accountRouter := mux.NewRouter()
 	accountRouter.HandleFunc("/account/changepassword", a.changePassword).Methods("POST")
+	accountRouter.HandleFunc("/account/logout", a.logout).Methods("GET")
 	accountAuthRouter := negroni.New()
 	accountAuthRequired := mAuth.NewAuthRequired(controllerManager, a.authWhitelistCIDRs)
 	accountAuthRouter.Use(negroni.HandlerFunc(accountAuthRequired.HandlerFuncWithNext))
@@ -277,6 +278,7 @@ func (a *Api) Run() error {
 	globalMux.Handle("/build", swarmAuthRouter)
 	globalMux.Handle("/events", swarmAuthRouter)
 	globalMux.Handle("/version", swarmAuthRouter)
+	globalMux.Handle("/info", swarmAuthRouter)
 	globalMux.Handle("/images/", swarmAuthRouter)
 	globalMux.Handle("/exec/", swarmAuthRouter)
 	globalMux.Handle("/v1.14/", swarmAuthRouter)

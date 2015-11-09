@@ -72,6 +72,17 @@ func (a *Api) login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) logout(w http.ResponseWriter, r *http.Request) {
+	session, _ := a.manager.Store().Get(r, a.manager.StoreKey())
+	username := session.Values["username"].(string)
+
+	log.Debugf("clearing auth tokens: username=%s agent=%q", username, r.UserAgent())
+	if err := a.manager.ClearAuthTokens(username, r.UserAgent()); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) changePassword(w http.ResponseWriter, r *http.Request) {
 	session, _ := a.manager.Store().Get(r, a.manager.StoreKey())
 	var creds *Credentials

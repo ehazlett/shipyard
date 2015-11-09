@@ -1,7 +1,7 @@
 {
-  "name": "shipyard",
-  "version": "3.1.0",
-  "description": "shipyard",
+  "name": "beacon",
+  "version": "0.0.1",
+  "description": "beacon",
   "main": "webpack.config.js",
   "dependencies": {
     "babel-core": "^5.8.25",
@@ -10,7 +10,7 @@
     "better-console": "^0.2.4",
     "chart.js": "^1.0.2",
     "del": "^2.0.2",
-    "dockerode": "https://github.com/shipyard/dockerode/archive/v2.2.4-dev-shipyard.tar.gz",
+    "dockerode": "^2.2.3",
     "extend": "^3.0.0",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.0.1",

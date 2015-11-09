@@ -71,6 +71,7 @@ type (
 		Accounts() ([]*auth.Account, error)
 		Account(username string) (*auth.Account, error)
 		Authenticate(username, password string) (bool, error)
+		ClearAuthTokens(username, userAgent string) error
 		GetAuthenticator() auth.Authenticator
 		SaveAccount(account *auth.Account) error
 		DeleteAccount(account *auth.Account) error
@@ -523,6 +524,29 @@ func (m DefaultManager) NewAuthToken(username string, userAgent string) (*auth.A
 		return nil, err
 	}
 	return token, nil
+}
+
+func (m DefaultManager) ClearAuthTokens(username, userAgent string) error {
+	tokens := []*auth.AuthToken{}
+
+	acct, err := m.Account(username)
+	if err != nil {
+		return err
+	}
+
+	if userAgent != "" {
+		for _, t := range acct.Tokens {
+			if t.UserAgent != userAgent {
+				tokens = append(tokens, t)
+			}
+		}
+	}
+
+	if _, err := r.Table(tblNameAccounts).Filter(map[string]string{"username": username}).Update(map[string]interface{}{"tokens": tokens}).RunWrite(m.session); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m DefaultManager) VerifyAuthToken(username, token string) error {

@@ -1,33 +1,41 @@
-var Splash = require("./splash.js");
-var Login = require("./login.js");
-var Signup = require("./signup.js");
+var React = require("react");
+var HomeView = require("./home.js");
+var LoginView = require("./login.js");
+var ContainersView = require("./containers.js");
+var ImagesView = require("./images.js");
 var NotFound = require("./notfound.js");
+var auth = require('./auth.js');
 
 var RouterMixin = require('react-mini-router').RouterMixin;
-
 var App = React.createClass({
     mixins: [RouterMixin],
     routes: {
         '/': 'home',
         '/login': 'login',
-        '/signup': 'signup',
+        '/containers': 'containers',
+        '/images': 'images'
     },
     render: function() {
         return this.renderCurrentRoute();
     },
     home: function() {
         return (
-            <Splash />
+            <HomeView />
         )
     },
     login: function() {
         return (
-            <Login />
+            <LoginView />
         )
     },
-    signup: function() {
+    containers: function() {
         return (
-            <Signup />
+            <ContainersView />
+        )
+    },
+    images: function() {
+        return (
+            <ImagesView />
         )
     },
     notFound: function(path) {

@@ -1,3 +1,4 @@
+var React = require("react");
 var Menu = require('./menu.js');
 var Footer = require('./footer.js');
 

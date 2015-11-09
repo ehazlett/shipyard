@@ -1,3 +1,4 @@
+var React = require("react");
 var navigate = require('react-mini-router').navigate;
 
 module.exports = {
@@ -48,8 +49,6 @@ module.exports = {
 
 // authenticate
 function authenticate(username, password, cb) {
-    // TODO: replace with actual authentication
-    console.log("ERR: authenticate not implemented");
     setTimeout(() => {
         $.ajax({
             method: "POST",
@@ -64,7 +63,7 @@ function authenticate(username, password, cb) {
             } else{
                 cb({
                   authenticated: true,
-                  authToken: data.authToken
+                  authToken: data.auth_token
                 }, null)
             }
         }).error(function(){
@@ -75,13 +74,12 @@ function authenticate(username, password, cb) {
 
 // userLogout removes the auth token for the user
 function userLogout(cb) {
-    console.log("ERR: logout not implemented");
     setTimeout(() => {
         $.ajax({
             method: "GET",
-            url: "/auth/logout",
+            url: "/account/logout",
             beforeSend: function(xhr){
-                xhr.setRequestHeader('X-Auth-Token', localStorage.username + ":" + localStorage.authToken);
+                xhr.setRequestHeader('X-Access-Token', localStorage.username + ":" + localStorage.authToken);
             }
         }).always(function(){
             if (cb) cb()

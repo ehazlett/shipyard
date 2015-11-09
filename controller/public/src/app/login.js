@@ -1,3 +1,4 @@
+var React = require("react");
 var Menu = require("./menu.js");
 var Footer = require("./footer.js");
 
@@ -35,9 +36,6 @@ var LoginForm = React.createClass({
                 this.setState({password: e.target.value});
                 break;
         }
-    },
-    handleSignupClick() {
-        navigate("/signup");
     },
     handleEnter(e) {
         // submit when pressing enter
@@ -77,9 +75,6 @@ var LoginForm = React.createClass({
                                 <div className="field">
                                     <label>Password</label>
                                     <input type="password" name="password" onChange={this.handleChange.bind(this, "password")} onKeyUp={this.handleEnter} placeholder=""/>
-                                </div>
-                                <div className="field">
-                                    <p>Do not have an account? <a className="pointer" onClick={this.handleSignupClick}>Sign Up</a></p>
                                 </div>
                                 <a onClick={this.handleLogin} className="ui green button fluid" >Login</a>
                             </form>

@@ -1,58 +1,50 @@
+var React = require("react");
 var navigate = require('react-mini-router').navigate;
-var auth = require('./auth.js');
-var UserMenu = require('./usermenu.js');
+var auth = require("./auth.js");
 
 module.exports = React.createClass({
     getInitialState: function() {
         return {
-            username: auth.getUsername(),
-            isLoggedIn: auth.isLoggedIn()
+            isLoggedIn: false
         }
     },
     componentDidMount() {
         this.setState({
-            username: auth.getUsername(),
             isLoggedIn: auth.isLoggedIn()
         });
-        // TODO: replace with actual results
-        var searchContent = [
-            {
-                title: "Test",
-                description: "This is a test"
-            }
-        ]
-        $(".ui.search").search({
-            source: searchContent
-        });
+        $(".ui.dropdown").dropdown();
     },
     click: function(path) {
         navigate(path);
     },
+    handleLogout: function() {
+        auth.logout();
+    },
     render: function () {
         return (
             <div className="ui large fixed menu">
-                <a onClick={this.click.bind(this, "/")} className="item">shipyard</a>
-                <div className="ui category search item">
-                    <div className="ui transparent icon input">
-                        <input className="prompt" type="text" placeholder="Discover..."/>
-                        <i className="search link icon"></i>
-                    </div>
-                    <div className="results"></div>
-                </div>
-                {
-                    this.state.isLoggedIn ? (
-                        [
-                            <div key="0" className="right item">
-                                <UserMenu />
-                                <a key="1" onClick={this.click.bind(this, "/help")} className="ui button help">Help</a>
-                            </div>
-                        ]
-                    ) : (
-                        <div className="right item">
-                            <a onClick={this.click.bind(this, "/login")} className="ui green button">Login</a>
-                        </div>
-                    )
-                }
+                <div className="item"><img src="./assets/images/logo.png"></img> <span className="logo-text">Shipyard</span></div>
+                {(this.state.isLoggedIn && 
+                    <a className="item" onClick={this.click.bind(this, "/")}><i className="dashboard icon"></i> Dashboard</a>
+                )}
+                {(this.state.isLoggedIn && 
+                    <a className="item" onClick={this.click.bind(this, "/containers")}><i className="cube icon"></i> Containers</a>
+                )}
+                {(this.state.isLoggedIn && 
+                    <a className="item" onClick={this.click.bind(this, "/images")}><i className="tasks icon"></i> Images</a>
+                )}
+                {(this.state.isLoggedIn && 
+                    <a className="item" onClick={this.click.bind(this, "/volumes")}><i className="disk outline icon"></i> Volumes</a>
+                )}
+                {(this.state.isLoggedIn && 
+                    <a className="item" onClick={this.click.bind(this, "/networks")}><i className="sitemap icon"></i> Networks</a>
+                )}
+                {(this.state.isLoggedIn && 
+                    <a className="item" onClick={this.click.bind(this, "/stats")}><i className="bar chart icon"></i> Stats</a>
+                )}
+                {(this.state.isLoggedIn && 
+                    <a className="ui button right item" onClick={this.handleLogout}>Logout</a>
+                )}
             </div>
         )
     }
