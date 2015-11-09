@@ -33,7 +33,6 @@ API.prototype = {
         } else {
             var d = docker();
             d.info(function(err, data){
-                console.log(data);
                 callback(err, data);
             });
         }
@@ -55,6 +54,16 @@ API.prototype = {
             var d = docker();
             d.listImages(opts, function(err, data){
                 callback(err, data);
+            });
+        }
+    },
+    listVolumes: function(opts, callback){
+        if (!auth.isLoggedIn()) {
+            navigate("/login");
+        } else {
+            var d = docker();
+            d.listVolumes(opts, function(err, data){
+                callback(err, data.Volumes);
             });
         }
     }

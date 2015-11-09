@@ -69,7 +69,7 @@ module.exports = React.createClass({
                                 <td>{c.Command}</td>
                                 <td>{c.Status}</td>
                                 <td><span className="popup pointer" data-content={createdTimestampFull} data-variation="inverted">{createdTimestamp}</span></td>
-                                <td>
+                                <td className="collapsing">
                                     <div className="ui icon pointing dropdown tiny button">
                                         <i className="ellipsis vertical icon"></i>
                                         <div className="menu">

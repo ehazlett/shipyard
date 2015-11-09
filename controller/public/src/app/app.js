@@ -3,6 +3,7 @@ var HomeView = require("./home.js");
 var LoginView = require("./login.js");
 var ContainersView = require("./containers.js");
 var ImagesView = require("./images.js");
+var VolumesView = require("./volumes.js");
 var NotFound = require("./notfound.js");
 var auth = require('./auth.js');
 
@@ -13,7 +14,8 @@ var App = React.createClass({
         '/': 'home',
         '/login': 'login',
         '/containers': 'containers',
-        '/images': 'images'
+        '/images': 'images',
+        '/volumes': 'volumes'
     },
     render: function() {
         return this.renderCurrentRoute();
@@ -36,6 +38,11 @@ var App = React.createClass({
     images: function() {
         return (
             <ImagesView />
+        )
+    },
+    volumes: function() {
+        return (
+            <VolumesView />
         )
     },
     notFound: function(path) {

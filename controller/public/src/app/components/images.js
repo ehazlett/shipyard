@@ -36,6 +36,7 @@ module.exports = React.createClass({
                             <th>Size</th>
                             <th>Virtual Size</th>
                             <th>Created</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -51,6 +52,7 @@ module.exports = React.createClass({
                                 <td>{size}</td>
                                 <td>{virtualSize}</td>
                                 <td><span className="popup pointer" data-content={createdTimestampFull} data-variation="inverted">{createdTimestamp}</span></td>
+                                <td className="collapsing"><div className="ui icon tiny red button"><i className="trash icon"></i></div></td>
                                 </tr>
                                 ;
                         })}
