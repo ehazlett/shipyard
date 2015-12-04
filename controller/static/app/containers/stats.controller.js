@@ -183,7 +183,21 @@
                 // convert to MB
                 addMemoryUsage(timestamp, node.memory_stats.usage / 1048576);
                 // convert to MB
-                addNetworkUsage(timestamp, node.network.rx_bytes / 1048576, node.network.tx_bytes / 1048576);
+                if(node.network) {
+                    addNetworkUsage(timestamp, node.network.rx_bytes / 1048576, node.network.tx_bytes / 1048576);
+                } else if(node.networks) {
+                    var ifs = Object.keys(node.networks);
+                    var rxbytes = 0;
+                    var txbytes = 0;
+                    
+                    for (var i = ifs.length - 1; i >= 0; i--) {
+                        txbytes+=node.networks[ifs[i]].tx_bytes;
+                        rxbytes+=node.networks[ifs[i]].rx_bytes;
+                    }
+
+                    addNetworkUsage(timestamp, txbytes / 1048576, txbytes / 1048576);
+                }
+                
                 refreshGraphs();
             }
             vm.x++;
