@@ -117,6 +117,9 @@
                     <td>{{i.Engine.Name}}</td>
                     <td>{{i.VirtualSize / 1048576 | number:2}} MB</td>
                     <td class="collapsing">
+                        <div title="Deploy Container" ng-click="vm.deployContainer(i)" class="compact ui icon button green">
+                            <i class="add icon"></i>
+                        </div>
                         <div ng-click="vm.showRemoveImageDialog(i)" class="compact ui icon button red">
                             <i class="trash icon"></i>
                         </div>
