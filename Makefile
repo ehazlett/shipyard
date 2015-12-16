@@ -3,6 +3,15 @@ GOOS=linux
 GOARCH=amd64
 TAG?="latest"
 COMMIT=`git rev-parse --short HEAD`
+GO_VERSION=$(shell go version)
+COMPATIBLE_VERSION=1.5
+
+#if GO_VERSION is later than COMPATIBLE_VERSION.
+ifeq ($(firstword $(sort $(COMPATIBLE_VERSION) $(subst go,,$(filter go%,$(GO_VERSION))))),$(COMPATIBLE_VERSION))
+	BUILD_FLAGS="-w -X github.com/shipyard/shipyard/version.GitCommit=$(COMMIT)"
+else
+	BUILD_FLAGS="-w -X github.com/shipyard/shipyard/version.GitCommit $(COMMIT)"
+endif
 
 all: build media
 
@@ -10,7 +19,7 @@ clean:
 	@rm -rf controller/controller
 
 build:
-	@cd controller && godep go build -a -tags "netgo static_build" -installsuffix netgo -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit=$(COMMIT)" .
+	@cd controller && godep go build -a -tags "netgo static_build" -installsuffix netgo -ldflags $(BUILD_FLAGS) .
 
 remote-build:
 	@docker build -t shipyard-build -f Dockerfile.build .
