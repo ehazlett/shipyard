@@ -45,7 +45,7 @@
                 }
             })
             .state('dashboard.inspectRepository', {
-                url: '^/registry/{registryName}/{repositoryName}',
+                url: '^/registry/{registryName}/repository/{repositoryName}',
                 templateUrl: 'app/registry/repository.html',
                 controller: 'RepositoryController',
                 controllerAs: 'vm',
