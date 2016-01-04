@@ -244,6 +244,14 @@
                                     <input type="number" ng-model="vm.request.HostConfig.RestartPolicy.MaximumRetryCount" placeholder="Maximum restart count">
                                 </div>
                             </div>
+                            <h5 class="ui dividing header">Network Mode</h5>
+                            <div class="field">
+                                <select class="ui fluid dropdown" default="0" ng-model="vm.request.HostConfig.NetworkMode">
+                                    <option value="bridge">Bridge</option>
+                                    <option value="host">Host</option>
+                                    <option value="none">None</option>
+                                </select>
+                            </div>
                             <h5 class="ui dividing header">Port Configuration</h5>
                             <div class="field">
                                 <div class="ui toggle checkbox">
