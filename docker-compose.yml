@@ -4,12 +4,18 @@ rethinkdb:
         - "8080"
         - "28015"
         - "29015"
+    environment:
+        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
+
 proxy:
     image: ehazlett/docker-proxy:latest
     volumes:
         - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
         - "2375"
+    command: -D
+    environment:
+        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
 swarm:
     image: swarm:latest
@@ -18,6 +24,8 @@ swarm:
         - "proxy:proxy"
     ports:
         - "2375"
+    environment:
+        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
 media:
     build: .
@@ -27,6 +35,8 @@ media:
     working_dir: /go/src/github.com/shipyard/shipyard
     volumes:
         - "/go/src/github.com/shipyard/shipyard/controller/static"
+    environment:
+        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
 controller:
     build: .
@@ -40,3 +50,5 @@ controller:
         - media
     ports:
         - "8080:8080"
+    environment:
+        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
