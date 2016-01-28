@@ -694,7 +694,7 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 }
 
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
-	resp, err := http.Get(fmt.Sprintf("%s/v1/search", registry.Addr))
+	resp, err := http.Get(fmt.Sprintf("%s/v2", registry.Addr))
 	if err != nil {
 		return err
 	}

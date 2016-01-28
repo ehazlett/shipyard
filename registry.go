@@ -1,7 +1,7 @@
 package shipyard
 
 import (
-	registry "github.com/shipyard/shipyard/registry/v1"
+	registry "github.com/shipyard/shipyard/registry/v2"
 )
 
 type Registry struct {
@@ -26,16 +26,16 @@ func NewRegistry(id, name, addr string) (*Registry, error) {
 }
 
 func (r *Registry) Repositories() ([]*registry.Repository, error) {
-	res, err := r.registryClient.Search("", 1, 100)
+	res, err := r.registryClient.Search("")
 	if err != nil {
 		return nil, err
 	}
 
-	return res.Results, nil
+	return res, nil
 }
 
 func (r *Registry) Repository(name string) (*registry.Repository, error) {
-	return r.registryClient.Repository(name)
+	return r.registryClient.Repository(name, "latest")
 }
 
 func (r *Registry) DeleteRepository(name string) error {
