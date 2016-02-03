@@ -1,4 +1,5 @@
 rethinkdb:
+    restart: always
     image: rethinkdb
     ports:
         - "8080"
@@ -8,6 +9,7 @@ rethinkdb:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
 proxy:
+    restart: always
     image: ehazlett/docker-proxy:latest
     volumes:
         - "/var/run/docker.sock:/var/run/docker.sock"
@@ -18,6 +20,7 @@ proxy:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
 swarm:
+    restart: always
     image: swarm:latest
     command: m --host tcp://0.0.0.0:2375 proxy:2375
     links:
@@ -28,6 +31,7 @@ swarm:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
 media:
+    restart: always
     build: .
     entrypoint: /bin/bash
     dockerfile: Dockerfile.build
@@ -39,6 +43,7 @@ media:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
 controller:
+    restart: always
     build: .
     dockerfile: Dockerfile.build
     entrypoint: /bin/bash
@@ -51,6 +56,6 @@ controller:
     volumes_from:
         - media
     ports:
-        - "8080:8080"
+        - "8888:8080"
     environment:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
