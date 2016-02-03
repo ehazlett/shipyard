@@ -53,12 +53,14 @@
                 vm.pulling = true;
                 // this is to prevent errors in the console since we
                 // get a stream like response back
+                // TODO: remove the 'Reg-Image-Name' header -- get image name from query
                 oboe({
                     url: '/images/create?fromImage=' + vm.pullImageName,
                     method: "POST",
                     withCredentials: true,
                     headers: {
-                        'X-Access-Token': localStorage.getItem("X-Access-Token")
+                        'X-Access-Token': localStorage.getItem("X-Access-Token"),
+                        'Reg-Image-Name': vm.pullImageName
                     }
                 })
                 .done(function(node) {

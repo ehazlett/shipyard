@@ -41,6 +41,9 @@ The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyar
 # Contributing
 
 ## Controller
+
+### Developing on your local environment
+
 To get a development environment you will need:
 
 * Go 1.4+
@@ -53,6 +56,19 @@ Run the following:
 * run `make build` to build the binary
 * run `make media` to build the media
 * run `./controller -h` for options
+
+To run the test suite issue `make test` from the root of the project.
+
+### Developing with Docker Compose
+
+To get a development environment using docker-compose you will need:
+
+* install [docker-compose](https://github.com/docker/compose/releases) version 1.5.2+
+* run `docker-compose up`
+
+To run the test suite:
+
+* run `docker-compose -f docker-compose.yml -f docker-compose.test.yml up`
 
 # License
 Shipyard is licensed under the Apache License, Version 2.0. See LICENSE for full license text.

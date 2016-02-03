@@ -18,8 +18,15 @@ var (
 		ID:   "0",
 		Name: "test-registry",
 		Addr: "http://localhost:5000",
+		Username: "admin",
+		Password: "admin",
+		TlsSkipVerify: false,
 	}
-	TestRepository    = &registry.Repository{}
+	TestRepository    = &registry.Repository{
+		Description: "repository",
+		Name: "Test Rep 1",
+		Namespace: "test",
+	}
 	TestContainerInfo = &dockerclient.ContainerInfo{
 		Id:      TestContainerId,
 		Created: string(time.Now().UnixNano()),

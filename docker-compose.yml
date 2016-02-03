@@ -34,7 +34,7 @@ media:
     command: -c "make media && sleep infinity"
     working_dir: /go/src/github.com/shipyard/shipyard
     volumes:
-        - "/go/src/github.com/shipyard/shipyard/controller/static"
+        - "./controller/static:/go/src/github.com/shipyard/shipyard/controller/static"
     environment:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
@@ -46,6 +46,8 @@ controller:
     links:
         - rethinkdb
         - swarm
+    volumes:
+        - .:/go/src/github.com/shipyard/shipyard
     volumes_from:
         - media
     ports:
