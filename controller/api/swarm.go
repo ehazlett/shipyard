@@ -130,7 +130,7 @@ func (a *Api) swarmRedirect(w http.ResponseWriter, req *http.Request) {
 				log.Debugf("Couldn't encode credentials for %s ./controller/api/swarm.go:swarmRedirect", registry.Addr)
 			}
 		} else {
-			log.Debugf("Could not locate registry %s ./controller/api/swarm.go:swarmRedirect", registry.Addr)
+			log.Debugf("%s Image name does not refer to registry ./controller/api/swarm.go:swarmRedirect", imageName)
 		}
 	}
 
