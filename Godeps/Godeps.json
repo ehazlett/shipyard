@@ -6,7 +6,7 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
+			"ImportPath": "golang.org/x/crypto/bcrypt",
 			"Comment": "null-236",
 			"Rev": "69e2a90ed92d03812364aeb947b7068dc42e561e"
 		},
