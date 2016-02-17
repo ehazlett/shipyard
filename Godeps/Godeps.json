@@ -8,7 +8,7 @@
 		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
 			"Comment": "null-236",
-			"Rev": "69e2a90ed92d03812364aeb947b7068dc42e561e"
+			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
 		},
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
