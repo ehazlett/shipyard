@@ -7,6 +7,7 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	"github.com/shipyard/shipyard/model"
 	registry "github.com/shipyard/shipyard/registry/v1"
 )
 
@@ -43,6 +44,16 @@ var (
 		Username: "testuser",
 		Password: "test",
 	}
+	//Project struct related
+	TestProject = &model.Project{
+		ProjectID:      "1234567",
+		Name:		"TestProject",
+		Description:	"For testing purposes",
+		Status:		"In testing",
+		Images:		nil,
+		IsBuildNeeded:	true,
+}
+	//end Project struct related
 	TestEvent = &shipyard.Event{
 		Type:          "test-event",
 		ContainerInfo: TestContainerInfo,

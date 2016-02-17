@@ -19,12 +19,16 @@ import (
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/shipyard/shipyard/version"
+	"github.com/shipyard/shipyard/model"
 )
 
 const (
 	tblNameConfig      = "config"
 	tblNameEvents      = "events"
 	tblNameAccounts    = "accounts"
+
+	tblNameProjects	   = "projects"
+
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
 	tblNameExtensions  = "extensions"
@@ -40,6 +44,10 @@ const (
 var (
 	ErrAccountExists              = errors.New("account already exists")
 	ErrAccountDoesNotExist        = errors.New("account does not exist")
+
+	ErrProjectExists              = errors.New("project already exists")
+	ErrProjectDoesNotExist        = errors.New("project does not exist")
+
 	ErrRoleDoesNotExist           = errors.New("role does not exist")
 	ErrNodeDoesNotExist           = errors.New("node does not exist")
 	ErrServiceKeyDoesNotExist     = errors.New("service key does not exist")
@@ -75,6 +83,12 @@ type (
 		GetAuthenticator() auth.Authenticator
 		SaveAccount(account *auth.Account) error
 		DeleteAccount(account *auth.Account) error
+
+		Projects() ([]*model.Project, error)
+		Project(name string) (*model.Project, error)
+		SaveProject(project *model.Project) error
+		DeleteProject(project *model.Project) error
+
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
 		Store() *sessions.CookieStore
@@ -158,7 +172,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -695,6 +709,88 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 	return nil, nil
 }
 
+// methods related to the Project structure
+func (m DefaultManager) Projects() ([]*model.Project, error) {
+	res, err := r.Table(tblNameProjects).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	projects := []*model.Project{}
+	if err := res.All(&projects); err != nil {
+		return nil, err
+	}
+	return projects, nil
+}
+
+func (m DefaultManager) Project(name string) (*model.Project, error) {
+	res, err := r.Table(tblNameProjects).Filter(map[string]string{"name": name}).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrProjectDoesNotExist
+	}
+	var project *model.Project
+	if err := res.One(&project); err != nil {
+		return nil, err
+	}
+	return project, nil
+}
+
+func (m DefaultManager) SaveProject(project *model.Project) error {
+	var eventType string
+
+	// check if exists; if so, update
+	proj, err := m.Project(project.Name)
+	if err != nil && err != ErrProjectDoesNotExist {
+		return err
+	}
+	// update
+	if proj != nil {
+		updates := map[string]interface{}{
+			"project_id": 	project.ProjectID,
+			"name":  	project.Name,
+			"description": 	project.Description,
+			"status": 	project.Status,
+			"images": 	project.Images,
+			"buildNeeded": 	project.IsBuildNeeded,
+		}
+
+		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"name": project.Name}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-project"
+	} else {
+		if _, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "add-project"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("name=%s", project.Name), []string{"security"})
+
+	return nil
+}
+
+
+func (m DefaultManager) DeleteProject(project *model.Project) error {
+	res, err := r.Table(tblNameProjects).Filter(map[string]string{"project_id": project.ProjectID}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrProjectDoesNotExist
+	}
+
+	m.logEvent("delete-project", fmt.Sprintf("name=%s", project.Name), []string{"security"})
+
+	return nil
+}
+// end methods related to the project structure
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 
 	// TODO: Please note the trailing forward slash / which is needed for Artifactory, else you get a 404.
@@ -883,3 +979,5 @@ func (m DefaultManager) ValidateConsoleSessionToken(containerId string, token st
 
 	return true
 }
+
+

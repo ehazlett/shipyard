@@ -8,6 +8,7 @@ import (
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/dockerhub"
 	registry "github.com/shipyard/shipyard/registry/v1"
+	"github.com/shipyard/shipyard/model"
 )
 
 type MockManager struct{}
@@ -67,7 +68,26 @@ func (m MockManager) SaveAccount(account *auth.Account) error {
 func (m MockManager) DeleteAccount(account *auth.Account) error {
 	return nil
 }
+//Project struct
 
+func (m MockManager) Projects() ([]*model.Project, error) {
+	return []*auth.Account{
+		TestAccount,
+	}, nil
+}
+
+func (m MockManager) Project(name string) (*model.Project, error) {
+	return nil, nil
+}
+
+func (m MockManager) SaveProject(project *model.Project) error {
+	return nil
+}
+
+func (m MockManager) DeleteProject(project *model.Project) error {
+	return nil
+}
+//end Project struct
 func (m MockManager) Roles() ([]*auth.ACL, error) {
 	return auth.DefaultACLs(), nil
 }

@@ -119,6 +119,12 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/accounts", a.saveAccount).Methods("POST")
 	apiRouter.HandleFunc("/api/accounts/{username}", a.account).Methods("GET")
 	apiRouter.HandleFunc("/api/accounts/{username}", a.deleteAccount).Methods("DELETE")
+
+	apiRouter.HandleFunc("/api/projects", a.projects).Methods("GET")
+	apiRouter.HandleFunc("/api/projects", a.saveProject).Methods("POST")
+	apiRouter.HandleFunc("/api/projects/{name}", a.project).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{name}", a.deleteProject).Methods("DELETE")
+
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
