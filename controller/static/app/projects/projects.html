@@ -1,25 +1,122 @@
-<div class="two column row">
-    <div class="left floated column">
-        <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
-            <i class="refresh icon"></i> Refresh
+<div class="ui padded grid">
+    <div class="two column row">
+        <div class="left floated column">
+            <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+                <i class="refresh icon"></i> Refresh
+            </div>
+            <div ui-sref="dashboard.addProject" class="ui small green labeled icon button">
+                <i class="plus icon"></i> Create New Project
+            </div>
         </div>
-        <div ui-sref="dashboard.newProject" class="ui small green labeled icon button">
-            <i class="add icon"></i> Create New Project
+        <div class="right aligned right floated column">
+            <div class="ui small icon input">
+                <input ng-model="tableFilter" placeholder="Search projects..." reset-field/>
+            </div>
         </div>
     </div>
 
-    <div class="right aligned right floated column">
-        <div class="ui small icon input">
-            <input ng-model="tableFilter" placeholder="Search containers..." reset-field/>
+    <div class="row" ng-show="vm.projects.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        Accounts
+                    </div>
+                    <p>There are no accounts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="filteredProjects.length>0">
+        <div class="column">
+            <table class="ui sortable celled table" ng-show="vm.projects">
+                <thead>
+                <tr>
+                    <th id="select-all-table-header" class="collapsing">
+                        <div class="ui fitted checkbox" ng-click="vm.checkAll()">
+                            <input type="checkbox" id="all-cb" ng-model="vm.selectedAll">
+                            <label for="all-cb"></label>
+                        </div>
+                    </th>
+                    <th class="collapsing"><i class="calendar outline icon"></i></th>
+                    <th>Project Name</th>
+                    <th>Last Run</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="a in filteredProjects = (vm.projects | filter:tableFilter)">
+                    <td class="collapsing">
+                        <div class="positive ui fitted checkbox">
+                            <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[c.Id].Selected">
+                            <label for="{{$index}}-cb"></label>
+                        </div>
+                    </td>
+                    <td>
+                        <i class="circle icon green"></i>
+                    </td>
+                    <td>{{a.name}}</td>
+                    <td>02/14/16</td>
+                    <td class="collapsing">
+                        <div ui-sref="dashboard.inspect({id: c.Id})" class="basic compact blue ui icon button">
+                            <i class="search icon"></i>
+                        </div>
+                        <div class="ui right pointing dropdown">
+                            <div class="basic compact blue ui icon button">
+                                <i class="wrench icon"></i>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.accounts.length > 0 && filteredAccounts.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        Accounts
+                    </div>
+                    <p>No accounts matched your filter query</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row" ng-show="vm.error">
-    <div class="sixteen wide column">
-        <div class="ui error message">
-            <div class="header">Error...</div>
-            <p>{{vm.error}}</p>
-        </div>
-    </div>
-</div>
+<script>
+    $('.ui.sortable.celled.table').tablesort();
+</script>
+
+
+<!--<div class="two column row">-->
+    <!--<div class="left floated column">-->
+        <!--<div ng-click="vm.refresh()" class="ui small blue labeled icon button">-->
+            <!--<i class="refresh icon"></i> Refresh-->
+        <!--</div>-->
+        <!--<div ui-sref="dashboard.newProject" class="ui small green labeled icon button">-->
+            <!--<i class="add icon"></i> Create New Project-->
+        <!--</div>-->
+    <!--</div>-->
+
+    <!--<div class="right aligned right floated column">-->
+        <!--<div class="ui small icon input">-->
+            <!--<input ng-model="tableFilter" placeholder="Search containers..." reset-field/>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+
+<!--<div class="row" ng-show="vm.error">-->
+    <!--<div class="sixteen wide column">-->
+        <!--<div class="ui error message">-->
+            <!--<div class="header">Error...</div>-->
+            <!--<p>{{vm.error}}</p>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->

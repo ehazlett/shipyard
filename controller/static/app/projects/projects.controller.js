@@ -15,10 +15,10 @@
         vm.projects = [];
 
         vm.refresh = refresh;
-        vm.projectStatusText = projectStatusText;
-        vm.nodeName = nodeName;
-        vm.projectName = projectName;
-        vm.checkAll = checkAll;
+        vm.projectStatusText = "";
+        vm.nodeName = "";
+        vm.projectName = "";
+        vm.checkAll = "";
 
 
         refresh();
@@ -42,7 +42,7 @@
             vm.selectedItemCount = count;
         });
 
-        // Remove selected items that are no longer visible 
+        // Remove selected items that are no longer visible
         $scope.$watchCollection('filteredProjects', function () {
             angular.forEach(vm.selected, function(s) {
                 if(vm.selected[s.Id].Selected == true) {
