@@ -2,6 +2,7 @@ package manager
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"crypto/tls"
 
 	log "github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
@@ -18,16 +18,16 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
-	"github.com/shipyard/shipyard/version"
 	"github.com/shipyard/shipyard/model"
+	"github.com/shipyard/shipyard/version"
 )
 
 const (
-	tblNameConfig      = "config"
-	tblNameEvents      = "events"
-	tblNameAccounts    = "accounts"
+	tblNameConfig   = "config"
+	tblNameEvents   = "events"
+	tblNameAccounts = "accounts"
 
-	tblNameProjects	   = "projects"
+	tblNameProjects = "projects"
 
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
@@ -42,11 +42,11 @@ const (
 )
 
 var (
-	ErrAccountExists              = errors.New("account already exists")
-	ErrAccountDoesNotExist        = errors.New("account does not exist")
+	ErrAccountExists       = errors.New("account already exists")
+	ErrAccountDoesNotExist = errors.New("account does not exist")
 
-	ErrProjectExists              = errors.New("project already exists")
-	ErrProjectDoesNotExist        = errors.New("project does not exist")
+	ErrProjectExists       = errors.New("project already exists")
+	ErrProjectDoesNotExist = errors.New("project does not exist")
 
 	ErrRoleDoesNotExist           = errors.New("role does not exist")
 	ErrNodeDoesNotExist           = errors.New("node does not exist")
@@ -722,8 +722,8 @@ func (m DefaultManager) Projects() ([]*model.Project, error) {
 	return projects, nil
 }
 
-func (m DefaultManager) Project(name string) (*model.Project, error) {
-	res, err := r.Table(tblNameProjects).Filter(map[string]string{"name": name}).Run(m.session)
+func (m DefaultManager) Project(id string) (*model.Project, error) {
+	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": id}).Run(m.session)
 	if err != nil {
 		return nil, err
 
@@ -738,26 +738,26 @@ func (m DefaultManager) Project(name string) (*model.Project, error) {
 	return project, nil
 }
 
+// TODO: break this down into SaveProject and UpdateProject and use the .Methods("POST") and .Methods("PUT") respectively in the api router
 func (m DefaultManager) SaveProject(project *model.Project) error {
 	var eventType string
 
 	// check if exists; if so, update
-	proj, err := m.Project(project.Name)
+	proj, err := m.Project(project.ID)
 	if err != nil && err != ErrProjectDoesNotExist {
 		return err
 	}
 	// update
 	if proj != nil {
 		updates := map[string]interface{}{
-			"project_id": 	project.ProjectID,
-			"name":  	project.Name,
-			"description": 	project.Description,
-			"status": 	project.Status,
-			"images": 	project.Images,
-			"buildNeeded": 	project.IsBuildNeeded,
+			"name":        project.Name,
+			"description": project.Description,
+			"status":      project.Status,
+			"images":      project.Images,
+			"buildNeeded": project.NeedsBuild,
 		}
 
-		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"name": project.Name}).Update(updates).RunWrite(m.session); err != nil {
+		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Update(updates).RunWrite(m.session); err != nil {
 			return err
 		}
 
@@ -770,14 +770,13 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 		eventType = "add-project"
 	}
 
-	m.logEvent(eventType, fmt.Sprintf("name=%s", project.Name), []string{"security"})
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
 
 	return nil
 }
 
-
 func (m DefaultManager) DeleteProject(project *model.Project) error {
-	res, err := r.Table(tblNameProjects).Filter(map[string]string{"project_id": project.ProjectID}).Delete().Run(m.session)
+	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Delete().Run(m.session)
 	if err != nil {
 		return err
 	}
@@ -786,10 +785,11 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 		return ErrProjectDoesNotExist
 	}
 
-	m.logEvent("delete-project", fmt.Sprintf("name=%s", project.Name), []string{"security"})
+	m.logEvent("delete-project", fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
 
 	return nil
 }
+
 // end methods related to the project structure
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 
@@ -803,13 +803,13 @@ func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 
 	var tlsConfig *tls.Config
 
-	tlsConfig = nil;
+	tlsConfig = nil
 
 	if registry.TlsSkipVerify {
 		tlsConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
-	// Create unsecured client 
+	// Create unsecured client
 	trans := &http.Transport{
 		TLSClientConfig: tlsConfig,
 	}
@@ -979,5 +979,3 @@ func (m DefaultManager) ValidateConsoleSessionToken(containerId string, token st
 
 	return true
 }
-
-

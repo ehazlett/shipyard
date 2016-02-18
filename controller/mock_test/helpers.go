@@ -16,17 +16,17 @@ var (
 	TestContainerName  = "test-container"
 	TestContainerImage = "test-image"
 	TestRegistry       = &shipyard.Registry{
-		ID:   "0",
-		Name: "test-registry",
-		Addr: "http://localhost:5000",
-		Username: "admin",
-		Password: "admin",
+		ID:            "0",
+		Name:          "test-registry",
+		Addr:          "http://localhost:5000",
+		Username:      "admin",
+		Password:      "admin",
 		TlsSkipVerify: false,
 	}
-	TestRepository    = &registry.Repository{
+	TestRepository = &registry.Repository{
 		Description: "repository",
-		Name: "Test Rep 1",
-		Namespace: "test",
+		Name:        "Test Rep 1",
+		Namespace:   "test",
 	}
 	TestContainerInfo = &dockerclient.ContainerInfo{
 		Id:      TestContainerId,
@@ -46,13 +46,13 @@ var (
 	}
 	//Project struct related
 	TestProject = &model.Project{
-		ProjectID:      "1234567",
-		Name:		"TestProject",
-		Description:	"For testing purposes",
-		Status:		"In testing",
-		Images:		nil,
-		IsBuildNeeded:	true,
-}
+		ProjectID:     "1234567",
+		Name:          "TestProject",
+		Description:   "For testing purposes",
+		Status:        "In testing",
+		Images:        nil,
+		IsBuildNeeded: true,
+	}
 	//end Project struct related
 	TestEvent = &shipyard.Event{
 		Type:          "test-event",

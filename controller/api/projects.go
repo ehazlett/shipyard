@@ -23,6 +23,9 @@ func (a *Api) projects(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TODO: need to return 201 http status code instead of 204 on POST.
+// TODO: split into different HTTP verbs (PUT, POST). PUT should go to /projects/{id}
+// TODO: need to return 422 or 400 when the entity is already existing but a POST is requested.
 func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 	var project *model.Project
 	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
@@ -72,8 +75,6 @@ func (a *Api) deleteProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Infof("deleted project: id=%s name=%s", project.ProjectID , project.Name)
+	log.Infof("deleted project: id=%s name=%s", project.ID, project.Name)
 	w.WriteHeader(http.StatusNoContent)
 }
-
-

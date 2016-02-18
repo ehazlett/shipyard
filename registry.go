@@ -1,8 +1,8 @@
 package shipyard
 
 import (
-	registry "github.com/shipyard/shipyard/registry/v2"
 	"crypto/tls"
+	registry "github.com/shipyard/shipyard/registry/v2"
 )
 
 type Registry struct {
