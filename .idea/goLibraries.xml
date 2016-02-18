@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GoLibraries">
+    <option name="urls">
+      <set>
+        <option value="file://$USER_HOME$" />
+      </set>
+    </option>
+  </component>
+</project>

@@ -11,6 +11,7 @@
                 'shipyard.login',
                 'shipyard.containers',
                 'shipyard.events',
+                'shipyard.projects',
                 'shipyard.registry',
                 'shipyard.nodes',
                 'shipyard.images',
