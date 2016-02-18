@@ -28,13 +28,24 @@ func (a *Api) projects(w http.ResponseWriter, r *http.Request) {
 // TODO: need to return 422 or 400 when the entity is already existing but a POST is requested.
 func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 	var project *model.Project
-	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
+	if err := a.manager.SaveProject(project); err != nil {
+		log.Errorf("error saving project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := a.manager.SaveProject(project); err != nil {
-		log.Errorf("error saving project: %s", err)
+	log.Debugf("saved project: name=%s", project.Name)
+	w.WriteHeader(http.StatusCreated)
+}
+func (a *Api) updateProject(w http.ResponseWriter, r *http.Request) {
+	var project *model.Project
+	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := a.manager.UpdateProject(project); err != nil {
+		log.Errorf("error updating project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -42,7 +53,6 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 	log.Debugf("updated project: name=%s", project.Name)
 	w.WriteHeader(http.StatusNoContent)
 }
-
 func (a *Api) project(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["name"]

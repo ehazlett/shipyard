@@ -28,6 +28,7 @@ const (
 	tblNameAccounts = "accounts"
 
 	tblNameProjects = "projects"
+	tblNameImages	= "images"
 
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
@@ -47,6 +48,9 @@ var (
 
 	ErrProjectExists       = errors.New("project already exists")
 	ErrProjectDoesNotExist = errors.New("project does not exist")
+
+	ErrImageExists       = errors.New("image already exists")
+	ErrImageDoesNotExist = errors.New("image does not exist")
 
 	ErrRoleDoesNotExist           = errors.New("role does not exist")
 	ErrNodeDoesNotExist           = errors.New("node does not exist")
@@ -87,7 +91,14 @@ type (
 		Projects() ([]*model.Project, error)
 		Project(name string) (*model.Project, error)
 		SaveProject(project *model.Project) error
+		UpdateProject(project *model.Project) error
 		DeleteProject(project *model.Project) error
+
+		Images() ([]*model.Image, error)
+		Image(name string) (*model.Image, error)
+		SaveImage(image *model.Image) error
+		UpdateImage(image *model.Image) error
+		DeleteImage(image *model.Image) error
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -172,7 +183,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -742,6 +753,19 @@ func (m DefaultManager) Project(id string) (*model.Project, error) {
 func (m DefaultManager) SaveProject(project *model.Project) error {
 	var eventType string
 
+	if _, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session); err != nil {
+		return err
+	}
+	eventType = "add-project"
+
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) UpdateProject(project *model.Project) error {
+	var eventType string
+
 	// check if exists; if so, update
 	proj, err := m.Project(project.ID)
 	if err != nil && err != ErrProjectDoesNotExist {
@@ -755,6 +779,8 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 			"status":      project.Status,
 			"images":      project.Images,
 			"buildNeeded": project.NeedsBuild,
+			"creationTime":project.CreationTime,
+			"updateTime":  project.UpdateTime,
 		}
 
 		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Update(updates).RunWrite(m.session); err != nil {
@@ -762,12 +788,6 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 		}
 
 		eventType = "update-project"
-	} else {
-		if _, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session); err != nil {
-			return err
-		}
-
-		eventType = "add-project"
 	}
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
@@ -791,6 +811,93 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 }
 
 // end methods related to the project structure
+
+//methods related to the Image structure
+func (m DefaultManager) Images() ([]*model.Image, error) {
+	res, err := r.Table(tblNameImages).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	images := []*model.Image{}
+	if err := res.All(&images); err != nil {
+		return nil, err
+	}
+	return images, nil
+}
+
+func (m DefaultManager) Image(id string) (*model.Image, error) {
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
+	if err != nil {
+		return nil, err
+
+	}
+	if res.IsNil() {
+		return nil, ErrImageDoesNotExist
+	}
+	var image *model.Image
+	if err := res.One(&image); err != nil {
+		return nil, err
+	}
+	return image, nil
+}
+func (m DefaultManager) SaveImage(image *model.Image) error {
+	var eventType string
+
+	if _, err := r.Table(tblNameImages).Insert(image).RunWrite(m.session); err != nil {
+		return err
+	}
+	eventType = "add-image"
+
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) UpdateImage(image *model.Image) error {
+	var eventType string
+
+	// check if exists; if so, update
+	img, err := m.Image(image.ID)
+	if err != nil && err != ErrImageDoesNotExist {
+		return err
+	}
+	// update
+	if img != nil {
+		updates := map[string]interface{}{
+			"id":		image.ID,
+			"name":		image.Name,
+			"imageId":	image.ImageId,
+			"projectId":	image.ProjectID,
+		}
+
+		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-image"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteImage(image *model.Image) error {
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrImageDoesNotExist
+	}
+
+	m.logEvent("delete-image", fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+
+	return nil
+}
+// end methods related to the Image structure
+
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 
 	// TODO: Please note the trailing forward slash / which is needed for Artifactory, else you get a 404.
