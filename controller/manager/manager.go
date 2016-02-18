@@ -95,6 +95,7 @@ type (
 		DeleteProject(project *model.Project) error
 
 		Images() ([]*model.Image, error)
+		ImagesByProjectId(projectId string) ([]*model.Image, error)
 		Image(name string) (*model.Image, error)
 		SaveImage(image *model.Image) error
 		UpdateImage(image *model.Image) error
@@ -752,6 +753,8 @@ func (m DefaultManager) Project(id string) (*model.Project, error) {
 // TODO: break this down into SaveProject and UpdateProject and use the .Methods("POST") and .Methods("PUT") respectively in the api router
 func (m DefaultManager) SaveProject(project *model.Project) error {
 	var eventType string
+	project.CreationTime = time.Now().UTC()
+	project.UpdateTime   = time.Now().UTC()
 
 	if _, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session); err != nil {
 		return err
@@ -765,7 +768,6 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 }
 func (m DefaultManager) UpdateProject(project *model.Project) error {
 	var eventType string
-
 	// check if exists; if so, update
 	proj, err := m.Project(project.ID)
 	if err != nil && err != ErrProjectDoesNotExist {
@@ -780,7 +782,7 @@ func (m DefaultManager) UpdateProject(project *model.Project) error {
 			"images":      project.Images,
 			"buildNeeded": project.NeedsBuild,
 			"creationTime":project.CreationTime,
-			"updateTime":  project.UpdateTime,
+			"updateTime":  time.Now().UTC(),
 		}
 
 		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Update(updates).RunWrite(m.session); err != nil {
@@ -839,6 +841,17 @@ func (m DefaultManager) Image(id string) (*model.Image, error) {
 		return nil, err
 	}
 	return image, nil
+}
+func (m DefaultManager) ImagesByProjectId(projectId string) ([]*model.Image, error) {
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": projectId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	images := []*model.Image{}
+	if err := res.All(&images); err != nil {
+		return nil, err
+	}
+	return images, nil
 }
 func (m DefaultManager) SaveImage(image *model.Image) error {
 	var eventType string
