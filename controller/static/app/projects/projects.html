@@ -41,7 +41,7 @@
                         </div>
                     </th>
                     <th class="collapsing"><i class="calendar outline icon"></i></th>
-                    <th>Project Name</th>
+                    <th>gbkjhdsfgsjdgfkdsa</th>
                     <th>Last Run</th>
                     <th>Action</th>
                 </tr>
@@ -67,6 +67,17 @@
                             <div class="basic compact blue ui icon button">
                                 <i class="wrench icon"></i>
                             </div>
+                            <div class="menu">
+                                <a ng-click="vm.showStopProjectDialog(c)" class="item"><i class="black play icon"></i> Start</a>
+                                <a ng-click="vm.showStopProjectDialog(c)" class="item"><i class="black stop icon"></i> Stop</a>
+                                <a ng-click="vm.showRestartProjectDialog(c)" class="item"><i class="black refresh icon"></i> Restart</a>
+                                <a ng-click="vm.showEditProjectDialog(c)" class="item"><i class="black edit icon"></i> Edit</a>
+                                <a ng-click="vm.showRenameProjectDialog(c)" class="item"><i class="black edit icon"></i> Rename</a>
+                                <a ng-click="vm.showDeleteProjectDialog(c)" class="item"><i class="black delete icon"></i> Delete</a>
+                                <a ui-sref="dashboard.stats({id: c.Id})" class="item"><i class="bar chart icon"></i> Trends</a>
+                                <a ng-click="vm.showAnalysisProjectDialog(c)" class="item"><i class="wait icon"></i> Analysis</a>
+                                <a ui-sref="dashboard.logs({id: c.Id})" class="item"><i class="text file outline icon"></i> Logs</a>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -75,48 +86,47 @@
         </div>
     </div>
 
-    <div class="row" ng-show="vm.accounts.length > 0 && filteredAccounts.length === 0">
+    <div class="row" ng-show="vm.projects.length > 0 && filteredProjects.length === 0">
         <div class="column">
             <div class="ui icon message">
                 <i class="info icon"></i>
                 <div class="content">
                     <div class="header">
-                        Accounts
+                        Projects
                     </div>
-                    <p>No accounts matched your filter query</p>
+                    <p>No projects matched your filter query</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<div id="multi-action-menu" class="ui bottom horizontal inverted labeled icon overlay sidebar menu" ng-class="{'visible': vm.selectedItemCount > 0}">
+    <a class="header item">
+        <i class="grid layout icon"></i>{{ vm.selectedItemCount }} Selected
+    </a>
+    <a class="item" ng-click="vm.clearAll()">
+        <i class="ban icon"></i>
+        Clear
+    </a>
+    <a class="item" ng-click="vm.startAll()">
+        <i class="start icon"></i>
+        Start
+    </a>
+    <a class="item" ng-click="vm.stopAll()">
+        <i class="stop icon"></i>
+        Stop
+    </a>
+    <a class="item" ng-click="vm.restartAll()">
+        <i class="refresh icon"></i>
+        Restart
+    </a>
+    <a class="item" ng-click="vm.destroyAll()">
+        <i class="delete icon"></i>
+        Delete
+    </a>
+</div>
+
 <script>
     $('.ui.sortable.celled.table').tablesort();
 </script>
-
-
-<!--<div class="two column row">-->
-    <!--<div class="left floated column">-->
-        <!--<div ng-click="vm.refresh()" class="ui small blue labeled icon button">-->
-            <!--<i class="refresh icon"></i> Refresh-->
-        <!--</div>-->
-        <!--<div ui-sref="dashboard.newProject" class="ui small green labeled icon button">-->
-            <!--<i class="add icon"></i> Create New Project-->
-        <!--</div>-->
-    <!--</div>-->
-
-    <!--<div class="right aligned right floated column">-->
-        <!--<div class="ui small icon input">-->
-            <!--<input ng-model="tableFilter" placeholder="Search containers..." reset-field/>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->
-
-<!--<div class="row" ng-show="vm.error">-->
-    <!--<div class="sixteen wide column">-->
-        <!--<div class="ui error message">-->
-            <!--<div class="header">Error...</div>-->
-            <!--<p>{{vm.error}}</p>-->
-        <!--</div>-->
-    <!--</div>-->
-<!--</div>-->

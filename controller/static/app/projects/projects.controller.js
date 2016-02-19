@@ -14,11 +14,12 @@
         vm.errors = [];
         vm.projects = [];
 
-        vm.refresh = refresh;
         vm.projectStatusText = "";
         vm.nodeName = "";
         vm.projectName = "";
-        vm.checkAll = "";
+        vm.checked = {};
+        vm.checkedItemCount = 0;
+        vm.checkedAll = false;
 
 
         refresh();
@@ -34,18 +35,18 @@
 
         $scope.$watch(function() {
             var count = 0;
-            angular.forEach(vm.selected, function (s) {
-                if(s.Selected) {
+            angular.forEach(vm.checked, function (s) {
+                if(s.checked) {
                     count += 1;
                 }
             });
-            vm.selectedItemCount = count;
+            vm.checkedItemCount = count;
         });
 
-        // Remove selected items that are no longer visible
+        // Remove checked items that are no longer visible
         $scope.$watchCollection('filteredProjects', function () {
-            angular.forEach(vm.selected, function(s) {
-                if(vm.selected[s.Id].Selected == true) {
+            angular.forEach(vm.checked, function(s) {
+                if(vm.checked[s.Id].Checked == true) {
                     var isVisible = false
                     angular.forEach($scope.filteredProjects, function(c) {
                         if(c.Id == s.Id) {
@@ -53,18 +54,24 @@
                             return;
                         }
                     });
-                    vm.selected[s.Id].Selected = isVisible;
+                    vm.checked[s.Id].Checked = isVisible;
                 }
             });
             return;
         });
+
+        function checkAll() {
+            angular.forEach($scope.filteredContainers, function (container) {
+                vm.checked[container.Id].Checked = vm.checkedAll;
+            });
+        }
 
         function refresh() {
             ProjectService.list()
                 .then(function(data) {
                     vm.projects = data;
                     angular.forEach(vm.projects, function (project) {
-                        vm.selected[project.Id] = {Id: project.Id, Selected: vm.selectedAll};
+                        vm.checked[project.Id] = {Id: project.Id, Checked: vm.checkedAll};
                     });
                 }, function(data) {
                     vm.error = data;
@@ -73,6 +80,9 @@
             vm.error = "";
             vm.errors = [];
             vm.projects = [];
+            vm.checked = {};
+            vm.checkedItemCount = 0;
+            vm.checkedAll = false;
         }
 
     }

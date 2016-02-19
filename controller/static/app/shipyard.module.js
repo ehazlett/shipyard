@@ -93,7 +93,8 @@
 
         $httpBackend.whenGET('/projects/json?all=1').respond(projects);
 
-        //Let all the endpoints that don't have "projects" got thru (i.e. make real http request)
+        //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
         $httpBackend.whenGET(/((?!projects).)*/).passThrough();
+            $httpBackend.whenPOST(/((?!projects).)*/).passThrough();
     })
 })();
