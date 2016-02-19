@@ -17,10 +17,14 @@
         vm.projectStatusText = "";
         vm.nodeName = "";
         vm.projectName = "";
-        vm.checked = {};
-        vm.checkedItemCount = 0;
-        vm.checkedAll = false;
+        vm.selected = {};
+        vm.selectedItemCount = 0;
+        vm.selectedAll = false;
+        vm.selectedProject = null;
 
+        vm.refresh = refresh;
+        vm.checkAll = checkAll;
+        vm.clearAll = clearAll;
 
         refresh();
 
@@ -35,34 +39,40 @@
 
         $scope.$watch(function() {
             var count = 0;
-            angular.forEach(vm.checked, function (s) {
-                if(s.checked) {
+            angular.forEach(vm.selected, function (s) {
+                if(s.Selected) {
                     count += 1;
                 }
             });
-            vm.checkedItemCount = count;
+            vm.selectedItemCount = count;
         });
 
-        // Remove checked items that are no longer visible
+        // Remove selected items that are no longer visible
         $scope.$watchCollection('filteredProjects', function () {
-            angular.forEach(vm.checked, function(s) {
-                if(vm.checked[s.Id].Checked == true) {
+            angular.forEach(vm.selected, function(s) {
+                if(vm.selected[s.id].Selected == true) {
                     var isVisible = false
                     angular.forEach($scope.filteredProjects, function(c) {
-                        if(c.Id == s.Id) {
+                        if(c.id == s.id) {
                             isVisible = true;
                             return;
                         }
                     });
-                    vm.checked[s.Id].Checked = isVisible;
+                    vm.selected[s.id].Selected = isVisible;
                 }
             });
             return;
         });
 
+        function clearAll() {
+            angular.forEach(vm.selected, function (s) {
+                vm.selected[s.id].Selected = false;
+            });
+        }
+
         function checkAll() {
-            angular.forEach($scope.filteredContainers, function (container) {
-                vm.checked[container.Id].Checked = vm.checkedAll;
+            angular.forEach($scope.filteredProjects, function (project) {
+                vm.selected[project.id].Selected = vm.selectedAll;
             });
         }
 
@@ -71,7 +81,7 @@
                 .then(function(data) {
                     vm.projects = data;
                     angular.forEach(vm.projects, function (project) {
-                        vm.checked[project.Id] = {Id: project.Id, Checked: vm.checkedAll};
+                        vm.selected[project.id] = {Id: project.id, Selected: vm.selectedAll};
                     });
                 }, function(data) {
                     vm.error = data;
@@ -80,9 +90,9 @@
             vm.error = "";
             vm.errors = [];
             vm.projects = [];
-            vm.checked = {};
-            vm.checkedItemCount = 0;
-            vm.checkedAll = false;
+            vm.selected = {};
+            vm.selectedItemCount = 0;
+            vm.selectedAll = false;
         }
 
     }

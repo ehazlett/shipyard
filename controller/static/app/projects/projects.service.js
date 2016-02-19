@@ -16,6 +16,14 @@
                     });
                 return promise;
             },
+            inspect: function(projectId) {
+                var promise = $http
+                    .get('/projects/' + projectId + '/json')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
         }
     }
 
