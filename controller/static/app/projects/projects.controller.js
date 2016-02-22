@@ -1,4 +1,3 @@
-
 (function(){
     'use strict';
 
@@ -49,16 +48,16 @@
 
         // Remove selected items that are no longer visible
         $scope.$watchCollection('filteredProjects', function () {
-            angular.forEach(vm.selected, function(s) {
-                if(vm.selected[s.id].Selected == true) {
+            angular.forEach(vm.selected, function (s) {
+                if(vm.selected[s.Id].Selected == true) {
                     var isVisible = false
                     angular.forEach($scope.filteredProjects, function(c) {
-                        if(c.id == s.id) {
+                        if(c.Id == s.Id) {
                             isVisible = true;
                             return;
                         }
                     });
-                    vm.selected[s.id].Selected = isVisible;
+                    vm.selected[s.Id].Selected = isVisible;
                 }
             });
             return;
@@ -66,8 +65,9 @@
 
         function clearAll() {
             angular.forEach(vm.selected, function (s) {
-                vm.selected[s.id].Selected = false;
+                vm.selected[s.Id].Selected = false;
             });
+            vm.selectedAll = false;
         }
 
         function checkAll() {
@@ -95,5 +95,34 @@
             vm.selectedAll = false;
         }
 
+        function showPlayDialog(project) {
+            vm.selectedProjectId = project.id;
+            $('#start-modal').modal('show');
+        }
+
+        function showStopProjectDialog(project) {
+            vm.selectedProjectId = project.id;
+            $('#stop-modal').modal('show');
+        }
+
+        function showRestartProjectDialog(project) {
+            vm.selectedProjectId = project.id;
+            $('#restart-modal').modal('show');
+        }
+
+        function showEditProjectDialog(project) {
+            vm.selectedProjectId = project.Id;
+            $("#edit-modal").modal('show');
+        }
+
+        function showRenameProjectDialog(project) {
+            vm.selectedProject = project;
+            $('#rename-modal').modal('show');
+        }
+
+        function showDeleteProjectDialog(project) {
+            vm.selectedProjectId = project.id;
+            $('#scale-modal').modal('show');
+        }
     }
 })();

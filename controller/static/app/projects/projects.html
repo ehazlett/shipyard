@@ -31,7 +31,7 @@
 
     <div class="row" ng-show="filteredProjects.length>0">
         <div class="column">
-            <table class="ui sortable celled table" ng-show="vm.projects">
+            <table class="ui sortable celled table">
                 <thead>
                 <tr>
                     <th id="select-all-table-header" class="collapsing">
@@ -47,7 +47,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-class="{'active': vm.selected[a.id].Selected}" ng-repeat="a in filteredProjects = (vm.projects | filter:tableFilter)">
+                <tr ng-class="{'active': vm.selected[a.id].Selected}" ng-repeat="a in filteredProjects = (vm.projects | filter:tableFilter)" jquery>
                     <td class="collapsing">
                         <div class="positive ui fitted checkbox">
                             <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[a.id].Selected">
@@ -60,7 +60,7 @@
                     <td>{{a.name}}</td>
                     <td>02/14/16</td>
                     <td class="collapsing">
-                        <div ui-sref="dashboard.inspect({id: a.id})" class="basic compact blue ui icon button">
+                        <div ui-sref="dashboard.inspect_project({id: a.id})" class="basic compact blue ui icon button">
                             <i class="search icon"></i>
                         </div>
                         <div class="ui right pointing dropdown">
@@ -68,14 +68,14 @@
                                 <i class="wrench icon"></i>
                             </div>
                             <div class="menu">
-                                <a ng-click="vm.showStopProjectDialog(a)" class="item"><i class="black play icon"></i> Start</a>
+                                <a ng-click="vm.showPlayProjectDialog(a)" class="item"><i class="black play icon"></i> Start</a>
                                 <a ng-click="vm.showStopProjectDialog(a)" class="item"><i class="black stop icon"></i> Stop</a>
                                 <a ng-click="vm.showRestartProjectDialog(a)" class="item"><i class="black refresh icon"></i> Restart</a>
                                 <a ng-click="vm.showEditProjectDialog(a)" class="item"><i class="black edit icon"></i> Edit</a>
-                                <a ng-click="vm.showRenameProjectDialog(a)" class="item"><i class="black edit icon"></i> Rename</a>
-                                <a ng-click="vm.showDeleteProjectDialog(a)" class="item"><i class="black delete icon"></i> Delete</a>
-                                <a ui-sref="dashboard.stats({id: a.id})" class="item"><i class="bar chart icon"></i> Trends</a>
-                                <a ng-click="vm.showAnalysisProjectDialog(a)" class="item"><i class="wait icon"></i> Analysis</a>
+                                <a ng-click="vm.showRenameProjectDialog(a)" class="item"><i class="black write icon"></i> Rename</a>
+                                <a ng-click="vm.showDeleteProjectDialog(a)" class="item"><i class="black trash icon"></i> Delete</a>
+                                <a ui-sref="dashboard.stats({id: a.id})" class="item"><i class="bar line chart icon"></i> Trends</a>
+                                <a ng-click="vm.showAnalysisProjectDialog(a)" class="item"><i class="history icon"></i> Analysis</a>
                                 <a ui-sref="dashboard.logs({id: a.id})" class="item"><i class="text file outline icon"></i> Logs</a>
                             </div>
                         </div>
@@ -128,5 +128,5 @@
 </div>
 
 <script>
-    $('.ui.sortable.celled.table').tablesort();
+    $('.ui.dropdown').dropdown();
 </script>
