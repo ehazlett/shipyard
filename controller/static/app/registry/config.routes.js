@@ -45,14 +45,14 @@
                 }
             })
             .state('dashboard.inspectRepository', {
-                url: '^/registry/{name}/{namespace}/{repository}',
+                url: '^/registry/{registryName}/repository/{repositoryName}',
                 templateUrl: 'app/registry/repository.html',
                 controller: 'RepositoryController',
                 controllerAs: 'vm',
                 authenticate: true,
                 resolve: { 
                     resolvedRepository: ['RegistryService', '$state', '$stateParams', function(RegistryService, $state, $stateParams) {
-                        return RegistryService.inspectRepository($stateParams.name, $stateParams.namespace, $stateParams.repository).then(null, function(errorData) {
+                        return RegistryService.inspectRepository($stateParams.registryName, $stateParams.repositoryName).then(null, function(errorData) {
                             $state.go('error');
                         });
                     }]

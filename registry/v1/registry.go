@@ -24,6 +24,8 @@ type RegistryClient struct {
 	URL        *url.URL
 	tlsConfig  *tls.Config
 	httpClient *http.Client
+	Username    string
+	Password    string
 }
 
 type Repo struct {
@@ -58,7 +60,7 @@ func newHTTPClient(u *url.URL, tlsConfig *tls.Config, timeout time.Duration) *ht
 	return &http.Client{Transport: httpTransport}
 }
 
-func NewRegistryClient(registryUrl string, tlsConfig *tls.Config) (*RegistryClient, error) {
+func NewRegistryClient(registryUrl string, tlsConfig *tls.Config, username string, password string) (*RegistryClient, error) {
 	u, err := url.Parse(registryUrl)
 	if err != nil {
 		return nil, err
@@ -68,6 +70,8 @@ func NewRegistryClient(registryUrl string, tlsConfig *tls.Config) (*RegistryClie
 		URL:        u,
 		httpClient: httpClient,
 		tlsConfig:  tlsConfig,
+		Username:   username,
+		Password:   password,
 	}, nil
 }
 
@@ -78,6 +82,8 @@ func (client *RegistryClient) doRequest(method string, path string, body []byte,
 	if err != nil {
 		return nil, err
 	}
+
+	req.SetBasicAuth(client.Username, client.Password)
 
 	req.Header.Add("Content-Type", "application/json")
 	if headers != nil {

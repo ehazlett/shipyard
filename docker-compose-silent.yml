@@ -1,0 +1,18 @@
+rethinkdb:
+    log_driver: "none"
+    restart: "no"
+proxy:
+    log_driver: "none"
+    restart: "no"
+
+swarm:
+    log_driver: "none"
+    restart: "no"
+
+media:
+    log_driver: "none"
+    restart: "no"
+
+controller:
+    log_driver: "none"
+    restart: "no"

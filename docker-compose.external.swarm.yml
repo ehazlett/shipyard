@@ -1,0 +1,16 @@
+rethinkdb:
+    restart: always
+    image: rethinkdb
+    ports:
+        - "8080"
+        - "28015"
+        - "29015"
+
+controller:
+    restart: always
+    image: shipyard/shipyard:latest
+    command: server -d tcp://myd-vm23183.hpswlabs.adapps.hp.com:3375
+    links:
+        - rethinkdb
+    ports:
+        - "8888:8080"

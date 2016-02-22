@@ -3,3 +3,5 @@
 cli/cli
 controller/controller
 bower_components
+.idea/
+docker-compose.override.yml
