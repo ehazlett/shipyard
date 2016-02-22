@@ -1,9 +1,0 @@
-controller:
-    command: -c "make build && make test"
-    links:
-        - rethinkdb
-        - swarm
-    volumes:
-        - .:/go/src/github.com/shipyard/shipyard
-    volumes_from:
-        - media

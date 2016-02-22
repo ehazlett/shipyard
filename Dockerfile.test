@@ -1,0 +1,19 @@
+FROM golang:1.5
+ENV http_proxy=http://web-proxy.il.hpecorp.net:8080 \
+    https_proxy=http://web-proxy.il.hpecorp.net:8080 \
+    no_proxy=127.0.0.1,localhost,hpeswlab.net,mydyumserver,mydyumserver.hpswlabs.adapps.hp.com,*.hp.com,16.59.0.0,hpswlabs.adapps.hp.com:80
+
+RUN curl -sL https://deb.nodesource.com/setup | bash -
+RUN apt-get update && apt-get install -y nodejs
+RUN npm install -g bower
+RUN go get github.com/tools/godep
+
+RUN apt-get update && apt-get install -y net-tools
+ADD https://get.docker.com/builds/Linux/x86_64/docker-1.7.0 /usr/local/bin/docker
+RUN chmod +x /usr/local/bin/docker
+ENV TAG latest
+ENV PATH $PATH:/go/bin:/usr/local/go/bin
+
+COPY . /go/src/github.com/shipyard/shipyard
+
+WORKDIR /go/src/github.com/shipyard/shipyard
