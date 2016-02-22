@@ -87,7 +87,7 @@ func (a *Api) hijack(addr, method, path string, setRawTerminal bool, in io.ReadC
 	}
 
 	req.Header.Set("User-Agent", "Docker-Client")
-	req.Header.Set("Content-Type", "text/plain")
+	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Connection", "Upgrade")
 	req.Header.Set("Upgrade", "tcp")
 	req.Host = addr
