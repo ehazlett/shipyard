@@ -94,35 +94,6 @@
             vm.selectedItemCount = 0;
             vm.selectedAll = false;
         }
-
-        function showPlayDialog(project) {
-            vm.selectedProjectId = project.id;
-            $('#start-modal').modal('show');
-        }
-
-        function showStopProjectDialog(project) {
-            vm.selectedProjectId = project.id;
-            $('#stop-modal').modal('show');
-        }
-
-        function showRestartProjectDialog(project) {
-            vm.selectedProjectId = project.id;
-            $('#restart-modal').modal('show');
-        }
-
-        function showEditProjectDialog(project) {
-            vm.selectedProjectId = project.Id;
-            $("#edit-modal").modal('show');
-        }
-
-        function showRenameProjectDialog(project) {
-            vm.selectedProject = project;
-            $('#rename-modal').modal('show');
-        }
-
-        function showDeleteProjectDialog(project) {
-            vm.selectedProjectId = project.id;
-            $('#scale-modal').modal('show');
-        }
+        
     }
 })();
