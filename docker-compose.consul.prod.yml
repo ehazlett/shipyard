@@ -1,0 +1,64 @@
+rethinkdb:
+    restart: always
+    image: rethinkdb
+    ports:
+        - "8080"
+        - "28015"
+        - "29015"
+#    environment:
+#        no_proxy: "localhost,127.0.0.1,proxy,swarm,rethinkdb,agent,discovery,myd-vm23183.hpswlabs.adapps.hp.com"
+
+proxy:
+    restart: always
+    environment:
+        HOSTNAME:
+    image: shipyard/docker-proxy:latest
+    volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+        - "2375:2375"
+    # environment:
+    #     no_proxy: "localhost,127.0.0.1,proxy,swarm,rethinkdb,agent,discovery,myd-vm23183.hpswlabs.adapps.hp.com"
+
+discovery:
+    restart: always
+    hostname: node
+    image: gliderlabs/consul-server:0.6
+    command: -bootstrap-expect 1
+    ports:
+        - "8500:8500"
+
+swarm:
+    restart: always
+    image: swarm:latest
+    command: manage --host tcp://0.0.0.0:3375 consul://172.17.0.1:8500
+    links:
+        - "proxy:proxy"
+    ports:
+        - "2375"
+# environment:
+        # no_proxy: "localhost,127.0.0.1,proxy,swarm,rethinkdb,agent,discovery,myd-vm23183.hpswlabs.adapps.hp.com"
+
+agent:
+    restart: always
+    image: swarm:latest
+    command: join --addr 172.17.0.1:2375 consul://172.17.0.1:8500
+    links:
+        - "proxy:proxy"
+        - "swarm:swarm"
+    ports:
+        - "2375"
+    # environment:
+    #     no_proxy: "localhost,127.0.0.1,proxy,swarm,rethinkdb,agent,discovery,myd-vm23183.hpswlabs.adapps.hp.com"
+
+controller:
+    restart: always
+    image: shipyard/shipyard:latest
+    command: server -d tcp://swarm:3375
+    links:
+        - rethinkdb
+        - swarm
+    ports:
+        - "8888:8080"
+    # environment:
+    #     no_proxy: "localhost,127.0.0.1,proxy,swarm,rethinkdb,agent,discovery,myd-vm23183.hpswlabs.adapps.hp.com"
