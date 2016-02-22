@@ -23,8 +23,6 @@ func (a *Api) projects(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: need to return 201 http status code instead of 204 on POST.
-// TODO: split into different HTTP verbs (PUT, POST). PUT should go to /projects/{id}
 // TODO: need to return 422 or 400 when the entity is already existing but a POST is requested.
 func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 	var project *model.Project
@@ -32,6 +30,22 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// TODO: Check here if the entity already exists because it is spitting this error which shows internal data from the db
+	//	Duplicate primary key `id`:
+	//	{
+	//	"id":	"b2a9ad32-e2d4-4e37-924e-4ffc4e53071f",
+	//	"imageId":	"23lk4jalskjfasljdfasf",
+	//	"name":	"myimage1",
+	//	"projectId":	"myprojectidX"
+	//	}
+	//	{
+	//	"id":	"b2a9ad32-e2d4-4e37-924e-4ffc4e53071f",
+	//	"imageId":	"23lk4jalskjfasljdfasf",
+	//	"name":	"myimage1",
+	//	"projectId":	"myprojectidX"
+	//	}
+
 	if err := a.manager.SaveProject(project); err != nil {
 		log.Errorf("error saving project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -59,9 +73,9 @@ func (a *Api) updateProject(w http.ResponseWriter, r *http.Request) {
 }
 func (a *Api) project(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["name"]
+	id := vars["id"]
 
-	project, err := a.manager.Project(name)
+	project, err := a.manager.Project(id)
 	if err != nil {
 		log.Errorf("error deleting project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -75,9 +89,9 @@ func (a *Api) project(w http.ResponseWriter, r *http.Request) {
 }
 func (a *Api) deleteProject(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["name"]
+	id := vars["id"]
 
-	project, err := a.manager.Project(name)
+	project, err := a.manager.Project(id)
 	if err != nil {
 		log.Errorf("error deleting project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

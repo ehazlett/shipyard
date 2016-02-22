@@ -28,7 +28,7 @@ const (
 	tblNameAccounts = "accounts"
 
 	tblNameProjects = "projects"
-	tblNameImages	= "images"
+	tblNameImages   = "images"
 
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
@@ -723,7 +723,8 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 
 // methods related to the Project structure
 func (m DefaultManager) Projects() ([]*model.Project, error) {
-	res, err := r.Table(tblNameProjects).OrderBy(r.Asc("name")).Run(m.session)
+	// TODO: consider making sorting customizable
+	res, err := r.Table(tblNameProjects).OrderBy(r.Asc("creationTime")).Run(m.session)
 	if err != nil {
 		return nil, err
 	}
@@ -735,6 +736,7 @@ func (m DefaultManager) Projects() ([]*model.Project, error) {
 }
 
 func (m DefaultManager) Project(id string) (*model.Project, error) {
+	// TODO: perform a merge with a subquery https://www.rethinkdb.com/docs/table-joins/#using-subqueries
 	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": id}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -750,17 +752,15 @@ func (m DefaultManager) Project(id string) (*model.Project, error) {
 	return project, nil
 }
 
-// TODO: break this down into SaveProject and UpdateProject and use the .Methods("POST") and .Methods("PUT") respectively in the api router
 func (m DefaultManager) SaveProject(project *model.Project) error {
 	var eventType string
 	project.CreationTime = time.Now().UTC()
-	project.UpdateTime   = time.Now().UTC()
+	project.UpdateTime = project.CreationTime
 
 	if _, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session); err != nil {
 		return err
 	}
 	eventType = "add-project"
-
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
 
@@ -779,10 +779,11 @@ func (m DefaultManager) UpdateProject(project *model.Project) error {
 			"name":        project.Name,
 			"description": project.Description,
 			"status":      project.Status,
-			"images":      project.Images,
-			"buildNeeded": project.NeedsBuild,
-			"creationTime":project.CreationTime,
-			"updateTime":  time.Now().UTC(),
+			// TODO: removed this to investigate if we can just add it with a resourceful POST to /api/projects/{id}/images
+			//"images":       project.Images,
+			"buildNeeded":  project.NeedsBuild,
+			"creationTime": project.CreationTime,
+			"updateTime":   time.Now().UTC(),
 		}
 
 		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Update(updates).RunWrite(m.session); err != nil {
@@ -816,6 +817,7 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 
 //methods related to the Image structure
 func (m DefaultManager) Images() ([]*model.Image, error) {
+	// TODO: sort by datetime once it is implemented
 	res, err := r.Table(tblNameImages).OrderBy(r.Asc("name")).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -842,6 +844,7 @@ func (m DefaultManager) Image(id string) (*model.Image, error) {
 	}
 	return image, nil
 }
+
 func (m DefaultManager) ImagesByProjectId(projectId string) ([]*model.Image, error) {
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": projectId}).Run(m.session)
 	if err != nil {
@@ -853,6 +856,7 @@ func (m DefaultManager) ImagesByProjectId(projectId string) ([]*model.Image, err
 	}
 	return images, nil
 }
+
 func (m DefaultManager) SaveImage(image *model.Image) error {
 	var eventType string
 
@@ -861,11 +865,11 @@ func (m DefaultManager) SaveImage(image *model.Image) error {
 	}
 	eventType = "add-image"
 
-
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
 
 	return nil
 }
+
 func (m DefaultManager) UpdateImage(image *model.Image) error {
 	var eventType string
 
@@ -877,10 +881,9 @@ func (m DefaultManager) UpdateImage(image *model.Image) error {
 	// update
 	if img != nil {
 		updates := map[string]interface{}{
-			"id":		image.ID,
-			"name":		image.Name,
-			"imageId":	image.ImageId,
-			"projectId":	image.ProjectID,
+			"name":      image.Name,
+			"imageId":   image.ImageId,
+			"projectId": image.ProjectID,
 		}
 
 		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
@@ -909,6 +912,7 @@ func (m DefaultManager) DeleteImage(image *model.Image) error {
 
 	return nil
 }
+
 // end methods related to the Image structure
 
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {

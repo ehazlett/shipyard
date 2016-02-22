@@ -56,9 +56,9 @@ func (a *Api) updateImage(w http.ResponseWriter, r *http.Request) {
 }
 func (a *Api) image(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["name"]
+	id := vars["id"]
 
-	image, err := a.manager.Image(name)
+	image, err := a.manager.Image(id)
 	if err != nil {
 		log.Errorf("error deleting image: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -73,28 +73,29 @@ func (a *Api) image(w http.ResponseWriter, r *http.Request) {
 
 func (a *Api) imagesByProjectId(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	projectId := vars["projectId"]
+	projectId := vars["project_id"]
 
-	image, err := a.manager.ImagesByProjectId(projectId)
+	// TODO: should we retrieve the project to make sure that it exists?
+	images, err := a.manager.ImagesByProjectId(projectId)
 	if err != nil {
-		log.Errorf("error deleting image: %s", err)
+		log.Errorf("error getting images for project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(image); err != nil {
+	if err := json.NewEncoder(w).Encode(images); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 func (a *Api) deleteImage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	name := vars["name"]
+	id := vars["id"]
 
-	image, err := a.manager.Image(name)
+	image, err := a.manager.Image(id)
 	if err != nil {
 		log.Errorf("error deleting image: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	if err := a.manager.DeleteImage(image); err != nil {
@@ -106,4 +107,3 @@ func (a *Api) deleteImage(w http.ResponseWriter, r *http.Request) {
 	log.Infof("deleted image: id=%s name=%s", image.ID, image.Name)
 	w.WriteHeader(http.StatusNoContent)
 }
-
