@@ -41,6 +41,7 @@
                         </div>
                     </th>
                     <th class="collapsing"><i class="calendar outline icon"></i></th>
+                    <th class="collapsing">Id</th>
                     <th>Project Name</th>
                     <th>Last Run</th>
                     <th>Action</th>
@@ -57,8 +58,9 @@
                     <td>
                         <i class="circle icon green"></i>
                     </td>
+                    <td>{{a.id}}</td>
                     <td>{{a.name}}</td>
-                    <td>02/14/16</td>
+                    <td>{{a.last_run * 1000 | date:'yyyy-MM-dd HH:mm:ss'}}</td>
                     <td class="collapsing">
                         <div ui-sref="dashboard.inspect_project({id: a.id})" class="basic compact blue ui icon button">
                             <i class="search icon"></i>
@@ -71,7 +73,7 @@
                                 <a ng-click="vm.showPlayProjectDialog(a)" class="item"><i class="black play icon"></i> Start</a>
                                 <a ng-click="vm.showStopProjectDialog(a)" class="item"><i class="black stop icon"></i> Stop</a>
                                 <a ng-click="vm.showRestartProjectDialog(a)" class="item"><i class="black refresh icon"></i> Restart</a>
-                                <a ng-click="vm.showEditProjectDialog(a)" class="item"><i class="black edit icon"></i> Edit</a>
+                                <a ui-sref="dashboard.edit_project({id: a.id})" class="item"><i class="black edit icon"></i> Edit</a>
                                 <a ng-click="vm.showRenameProjectDialog(a)" class="item"><i class="black write icon"></i> Rename</a>
                                 <a ng-click="vm.showDeleteProjectDialog(a)" class="item"><i class="black trash icon"></i> Delete</a>
                                 <a ui-sref="dashboard.stats({id: a.id})" class="item"><i class="bar line chart icon"></i> Trends</a>

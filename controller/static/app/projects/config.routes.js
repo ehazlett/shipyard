@@ -15,6 +15,21 @@
                 controller: 'ProjectsController',
                 controllerAs: 'vm',
                 authenticate: true
-            });
+            })
+            .state('dashboard.edit_project', {
+                //TODO: Is this a resource? should it have an URL?
+                url: '^/edit/{id}',
+                templateUrl: 'app/projects/edit.html',
+                controller: 'EditController',
+                controllerAs: 'vm',
+                authenticate: true,
+                resolve: {
+                    resolvedProject: ['ProjectService', '$state', '$stateParams', function(ProjectService, $state, $stateParams) {
+                        return ProjectService.edit($stateParams.id).then(null, function(errorData) {
+                            $state.go('error');
+                        });
+                    }]
+                }
+            })
     }
 })();
