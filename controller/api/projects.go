@@ -30,7 +30,6 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	// TODO: Check here if the entity already exists because it is spitting this error which shows internal data from the db
 	//	Duplicate primary key `id`:
 	//	{
@@ -56,7 +55,15 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 func (a *Api) updateProject(w http.ResponseWriter, r *http.Request) {
-	var project *model.Project
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	project, err := a.manager.Project(id)
+	if err != nil {
+		log.Errorf("error updating project: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

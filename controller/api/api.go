@@ -122,7 +122,7 @@ func (a *Api) Run() error {
 	//Project related routes
 	apiRouter.HandleFunc("/api/projects", a.projects).Methods("GET")
 	apiRouter.HandleFunc("/api/projects", a.saveProject).Methods("POST")
-	apiRouter.HandleFunc("/api/projects", a.updateProject).Methods("PUT")
+	apiRouter.HandleFunc("/api/projects/{id}", a.updateProject).Methods("PUT")
 	apiRouter.HandleFunc("/api/projects/{id}", a.project).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{id}", a.deleteProject).Methods("DELETE")
 
@@ -133,7 +133,7 @@ func (a *Api) Run() error {
 	//ILM related routes
 	apiRouter.HandleFunc("/api/ilm_images", a.images).Methods("GET")
 	apiRouter.HandleFunc("/api/ilm_images", a.saveImage).Methods("POST")
-	apiRouter.HandleFunc("/api/ilm_images", a.updateImage).Methods("PUT")
+	apiRouter.HandleFunc("/api/ilm_images/{id}", a.updateImage).Methods("PUT")
 	apiRouter.HandleFunc("/api/ilm_images/{id}", a.image).Methods("GET")
 	apiRouter.HandleFunc("/api/ilm_images/{id}", a.deleteImage).Methods("DELETE")
 

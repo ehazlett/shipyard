@@ -39,7 +39,16 @@ func (a *Api) saveImage(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 func (a *Api) updateImage(w http.ResponseWriter, r *http.Request) {
-	var image *model.Image
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	image, err := a.manager.Image(id)
+	if err != nil {
+		log.Errorf("error updating image: %s", err)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
 	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

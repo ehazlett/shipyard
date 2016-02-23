@@ -734,26 +734,51 @@ func (m DefaultManager) Projects() ([]*model.Project, error) {
 	}
 	return projects, nil
 }
-
+//r.table("companies").get(id).merge(lambda company:
+//{ 'employees': r.table('employees').get_all(company['id'],
+//index='company_id').coerce_to('array') }
+//).run()
 func (m DefaultManager) Project(id string) (*model.Project, error) {
 	// TODO: perform a merge with a subquery https://www.rethinkdb.com/docs/table-joins/#using-subqueries
+	var project *model.Project
+	var images []*model.Image
+	// Retrieve the project
 	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": id}).Run(m.session)
 	if err != nil {
 		return nil, err
-
 	}
 	if res.IsNil() {
 		return nil, ErrProjectDoesNotExist
 	}
-	var project *model.Project
 	if err := res.One(&project); err != nil {
 		return nil, err
 	}
+	// Retrieve the images
+	res, err = r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrImageDoesNotExist
+	}
+	if err := res.One(&images); err != nil {
+		return nil, err
+	}
+	// Set the project's images to the ones retrieved above
+	project.Images = images
+
 	return project, nil
 }
 
 func (m DefaultManager) SaveProject(project *model.Project) error {
 	var eventType string
+	proj, err := m.Project(project.ID)
+	if err != nil && err != ErrProjectDoesNotExist {
+		return err
+	}
+	if proj != nil {
+		return ErrProjectExists
+	}
 	project.CreationTime = time.Now().UTC()
 	project.UpdateTime = project.CreationTime
 
@@ -763,7 +788,6 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 	eventType = "add-project"
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
-
 	return nil
 }
 func (m DefaultManager) UpdateProject(project *model.Project) error {
@@ -833,7 +857,6 @@ func (m DefaultManager) Image(id string) (*model.Image, error) {
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
 	if err != nil {
 		return nil, err
-
 	}
 	if res.IsNil() {
 		return nil, ErrImageDoesNotExist
@@ -860,6 +883,13 @@ func (m DefaultManager) ImagesByProjectId(projectId string) ([]*model.Image, err
 func (m DefaultManager) SaveImage(image *model.Image) error {
 	var eventType string
 
+	img, err := m.Image(image.ID)
+	if err != nil && err != ErrImageDoesNotExist {
+		return err
+	}
+	if img != nil {
+		return ErrImageExists
+	}
 	if _, err := r.Table(tblNameImages).Insert(image).RunWrite(m.session); err != nil {
 		return err
 	}
