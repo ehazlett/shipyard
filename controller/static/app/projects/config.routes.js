@@ -15,6 +15,20 @@
                 controller: 'ProjectsController',
                 controllerAs: 'vm',
                 authenticate: true
+            })
+            .state('dashboard.inspect_project', {
+                url: '^/projects/{id}',
+                templateUrl: 'app/projects/inspect.html',
+                controller: 'ProjectController',
+                controllerAs: 'vm',
+                authenticate: true,
+                resolve: {
+                    resolvedProject: ['ProjectService', '$state', '$stateParams', function(ProjectService, $state, $stateParams) {
+                        return ProjectService.inspect($stateParams.id).then(null, function(errorData) {
+                            $state.go('error');
+                        });
+                    }]
+                }
             });
     }
 })();
