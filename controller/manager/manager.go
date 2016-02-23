@@ -734,38 +734,27 @@ func (m DefaultManager) Projects() ([]*model.Project, error) {
 	}
 	return projects, nil
 }
-//r.table("companies").get(id).merge(lambda company:
-//{ 'employees': r.table('employees').get_all(company['id'],
-//index='company_id').coerce_to('array') }
-//).run()
+
 func (m DefaultManager) Project(id string) (*model.Project, error) {
 	// TODO: perform a merge with a subquery https://www.rethinkdb.com/docs/table-joins/#using-subqueries
 	var project *model.Project
-	var images []*model.Image
-	// Retrieve the project
-	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": id}).Run(m.session)
-	if err != nil {
-		return nil, err
-	}
-	if res.IsNil() {
-		return nil, ErrProjectDoesNotExist
-	}
-	if err := res.One(&project); err != nil {
-		return nil, err
-	}
-	// Retrieve the images
-	res, err = r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
+
+	res, err := r.Table(tblNameProjects).
+	Merge(func(row r.Term) interface{} {
+		return map[string]interface{}{
+			"images": r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).CoerceTo("ARRAY"),
+		}
+	}).
+	Run(m.session)
 	if err != nil {
 		return nil, err
 	}
 	if res.IsNil() {
 		return nil, ErrImageDoesNotExist
 	}
-	if err := res.One(&images); err != nil {
+	if err := res.One(&project); err != nil {
 		return nil, err
 	}
-	// Set the project's images to the ones retrieved above
-	project.Images = images
 
 	return project, nil
 }
