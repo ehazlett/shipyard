@@ -28,79 +28,121 @@
         .run(function($httpBackend) {
 
             // TODO: Remove once the endpoint is implemented
+            var ids = ["54b6354t65rtv54t", "4h565e4tw45bw45b", "dsfsdvfasdfdsfsd", "asverea4vawrwveb", "12345436b4w54w67"];
             var projects = [
                 {
-                    id: "54b6354t65rtv54t",
+                    id: ids[0],
                     name: "SecurityProjectZ",
                     description: "Security project level A",
                     status: "Published",
-                    image_list: {
-                        "busybox:latest": "c51f86c28340",
-                        "tomcat:7.0.65-jre7": "e8353be55900",
-                        "soninob/soninob:v2": "bf4d022972f1"
-                    },
-                    "Is_build_needed": "false"
+                    last_run: "1456152831"
                 },
                 {
-                    id: "4h565e4tw45bw45b",
+                    id: ids[1],
                     name: "SecurityProjectB",
                     description: "Security project level A",
                     status: "Published",
-                    image_list: {
-                        "busybox:latest": "c51f86c28340",
-                        "tomcat:7.0.65-jre7": "e8353be55900",
-                        "soninob/soninob:v2": "bf4d022972f1"
-                    },
-                    "Is_build_needed": "false"
+                    last_run: "1456152231"
                 },
                 {
-                    id: "dsfsdvfasdfdsfsd",
+                    id: ids[2],
                     name: "SecurityProjectC",
                     description: "Security project level A",
                     status: "Published",
-                    image_list: {
-                        "busybox:latest": "c51f86c28340",
-                        "tomcat:7.0.65-jre7": "e8353be55900",
-                        "soninob/soninob:v2": "bf4d022972f1"
-                    },
-                    "Is_build_needed": "false"
+                    last_run: "1456152431"
                 },
                 {
-                    id: "asverea4vawrwveb",
+                    id: ids[3],
                     name: "SecurityProjectA",
                     description: "Security project level A",
                     status: "Published",
-                    image_list: {
-                        "busybox:latest": "c51f86c28340",
-                        "tomcat:7.0.65-jre7": "e8353be55900",
-                        "soninob/soninob:v2": "bf4d022972f1"
-                    },
-                    "Is_build_needed": "false"
+                    last_run: "1456152931"
                 },
                 {
-                    id: "12345436b4w54w67",
+                    id: ids[4],
                     name: "SecurityProjectD",
                     description: "Security project level A",
                     status: "Published",
-                    image_list: {
-                        "busybox:latest": "c51f86c28340",
-                        "tomcat:7.0.65-jre7": "e8353be55900",
-                        "soninob/soninob:v2": "bf4d022972f1"
-                    },
-                    "Is_build_needed": "false"
+                    last_run: "1456152731"
                 }
             ];
+            var first_project = {
+                id: ids[0],
+                name: "SecurityProjectZ",
+                description: "Security project level A",
+                status: "Published",
+                image_list: {
+                    "busybox:latest": "c51f86c28340",
+                    "tomcat:7.0.65-jre7": "e8353be55900",
+                    "soninob/soninob:v2": "bf4d022972f1"
+                },
+                is_build_needed: false
+            };
+            var second_project = {
+                id: ids[1],
+                name: "SecurityProjectB",
+                description: "Security project level A",
+                status: "Published",
+                image_list: {
+                    "jonbox:latest": "sdghsertewrg",
+                    "tomdog:7.0.65-jre7": "asdgfagsfga",
+                    "java:v2": "sagfegfrefg"
+                },
+                is_build_needed: false
+            };
+            var third_project = {
+                id: ids[2],
+                name: "SecurityProjectC",
+                description: "Security project level A",
+                status: "Published",
+                image_list: {
+                    "template:latest": "asdfawfgreg",
+                    "winston:1.2": "asdgfag66sfga",
+                    "oprah:v2": "567j67w45yg4w"
+                },
+                is_build_needed: false
+            };
+            var fourth_project = {
+                id: ids[3],
+                name: "SecurityProjectA",
+                description: "Security project level A",
+                status: "Published",
+                image_list: {
+                    "assasin:latest": "4y56ujty6h6ew",
+                    "druid": "tyujk67rj7j65",
+                    "paladin": "8i5tryw456w"
+                },
+                is_build_needed: false
+            };
+            var fifth_project = {
+                id: ids[4],
+                name: "SecurityProjectD",
+                description: "Security project level A",
+                status: "Published",
+                image_list: {
+                    "trapsin:latest": "4y56ujty6h6ew",
+                    "hammerdin": "tyujk67rj7j65",
+                    "lightsorc": "8i5tryw456w"
+                },
+                is_build_needed: false
+            };
 
-            $httpBackend.whenGET('/projects/json?all=1').respond(projects);
+            $httpBackend.whenGET('/api/projects').respond(projects);
+
+            $httpBackend.whenGET('/api/project/' + ids[0]).respond(first_project);
+            $httpBackend.whenGET('/api/project/' + ids[1]).respond(second_project);
+            $httpBackend.whenGET('/api/project/' + ids[2]).respond(third_project);
+            $httpBackend.whenGET('/api/project/' + ids[3]).respond(fourth_project);
+            $httpBackend.whenGET('/api/project/' + ids[4]).respond(fifth_project);
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
-            $httpBackend.whenGET(/((?!projects).)*/).passThrough();
-            $httpBackend.whenPOST(/((?!projects).)*/).passThrough();
-            $httpBackend.whenDELETE(/((?!projects).)*/).passThrough();
-            $httpBackend.whenPUT(/((?!projects).)*/).passThrough();
-            $httpBackend.whenPATCH(/((?!projects).)*/).passThrough();
-            $httpBackend.whenDELETE(/((?!projects).)*/).passThrough();
-            $httpBackend.whenJSONP(/((?!projects).)*/).passThrough();
-            $httpBackend.whenRoute(/((?!projects).)*/).passThrough();
+            $httpBackend.whenGET(/((?!project).)*/).passThrough();
+            $httpBackend.whenPOST(/((?!project).)*/).passThrough();
+            $httpBackend.whenDELETE(/((?!project).)*/).passThrough();
+            $httpBackend.whenPUT(/((?!project).)*/).passThrough();
+            $httpBackend.whenPATCH(/((?!project).)*/).passThrough();
+            $httpBackend.whenDELETE(/((?!project).)*/).passThrough();
+            $httpBackend.whenJSONP(/((?!project).)*/).passThrough();
+            $httpBackend.whenRoute(/((?!project).)*/).passThrough();
         })
 })();

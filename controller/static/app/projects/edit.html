@@ -1,0 +1,193 @@
+<div class="ui padded grid">
+    <div class="row">
+        <div class="column">
+            <div class="ui segment page">
+                <div class="ui grid">
+                    <div class="two column row">
+                        <div class="column">
+                            <h3 class="ui header">
+                                <div class="content">
+                                    <i class="ui circle icon" ng-class="{'yellow': (vm.container.State.Running && vm.container.State.Paused), 'green': (vm.container.State.Running && !vm.container.State.Paused), 'red': !vm.container.State.Running}"></i>
+                                    Project {{vm.project.name}}
+                                    <i class="ui edit icon"></i>
+                                </div>
+                            </h3>
+                            <div class="sub header" class="width: 30px; height: 50px;">
+                                <input placeholder="Add Description" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="left floated column">
+                                <div ui-sref="dashboard.addImage" class="ui small green labeled icon button">
+                                    <i class="plus icon"></i>Add New Image
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <h4 class="ui dividing header">Images Details</h4>
+                                <div class="item">
+                                    <i  ng-click="vm.skipImages=!vm.skipImages">
+                                        <i class="ui toggle off icon" ng-show="vm.skipImages"></i>
+                                        <i class="ui toggle on icon" ng-hide="vm.skipImages"></i>
+                                    </i>
+                                    Skip images
+                                </div>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th>Build</th>
+                                        <th class="collapsing">ID</th>
+                                        <th>Image Name</th>
+                                        <th>Tag</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-class="{'active': vm.selected[image.split(':')[0]].Selected}" ng-repeat="image in vm.imageList()">
+                                        <td class="collapsing">
+                                            <div class="positive ui fitted checkbox">
+                                                <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[image.split(':')[0]].Selected">
+                                                <label for="{{$index}}-cb"></label>
+                                            </div>
+                                        </td>
+                                        <td class="collapsing">{{vm.project.image_list[image]}}</td>
+                                        <td>{{image.split(":")[0]}}</td>
+                                        <td>{{( (image.split(":").length === 2) ? image.split(":")[1] : "N/A" )}}</td>
+                                        <td>{{image.split(":")[2]}}</td>
+                                        <td class="collapsing">
+                                            <div class="basic compact blue ui icon button">
+                                                <i class="pencil icon"></i>
+                                            </div>
+                                            <div class="basic compact blue ui icon button">
+                                                <i class="trash icon"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="left floated column">
+                                <div ui-sref="dashboard.addTest" class="ui small green labeled icon button">
+                                    <i class="plus icon"></i>Add Test
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <h4 class="ui dividing header">Tests Details</h4>
+                                <div class="item">
+                                    <i  ng-click="vm.skipTests=!vm.skipTests">
+                                        <i class="ui toggle off icon" ng-show="vm.skipTests"></i>
+                                        <i class="ui toggle on icon" ng-hide="vm.skipTests"></i>
+                                    </i>
+                                    Skip Tests
+                                </div>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th class="collapsing">Run</th>
+                                        <th>ID</th>
+                                        <th>Test Name</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-class="" ng-repeat="">
+                                        <td class="collapsing">
+                                            <div class="positive ui fitted checkbox">
+                                                <input type="checkbox" id="{{$index}}-cb" ng-model="">
+                                                <label for="{{$index}}-cb"></label>
+                                            </div>
+                                        </td>
+                                        <td class="collapsing"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="collapsing">
+                                            <div class="basic compact blue ui icon button">
+                                                <i class="pencil icon"></i>
+                                            </div>
+                                            <div class="basic compact blue ui icon button">
+                                                <i class="trash icon"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="left floated column">
+                                <div ui-sref="dashboard.addRepository" class="ui small green labeled icon button">
+                                    <i class="plus icon"></i>Add Repository
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <h4 class="ui dividing header">Repositories List Configuration</h4>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th class="collapsing">Int./Ext.</th>
+                                        <th>ID</th>
+                                        <th>Repository Name</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-class="" ng-repeat="">
+                                        <td class="collapsing">
+                                            <div class="positive ui fitted checkbox">
+                                                <input type="checkbox" id="{{$index}}-cb" ng-model="">
+                                                <label for="{{$index}}-cb"></label>
+                                            </div>
+                                        </td>
+                                        <td class="collapsing"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="collapsing">
+                                            <div class="basic compact blue ui icon button">
+                                                <i class="pencil icon"></i>
+                                            </div>
+                                            <div class="basic compact blue ui icon button">
+                                                <i class="trash icon"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="column">
+                                <div ui-sref="dashboard.saveProject" class="ui small gray labeled icon button">
+                                    Save Project
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
