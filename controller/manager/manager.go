@@ -845,6 +845,30 @@ func (m DefaultManager) UpdateProject(project *model.Project) error {
 			"updateTime":   time.Now().UTC(),
 			"runTime":      time.Now().UTC(),
 		}
+		//TODO: Find a more elegant approach; tested and returns 404 if using PUT -data /api/projects/{id}
+		//Delete all the images related to the project ID from tblNameImages
+
+		res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": proj.ID}).Delete().Run(m.session)
+		if err != nil {
+			return err
+		}
+
+		if res.IsNil() {
+			return ErrImageDoesNotExist
+		}
+		//Add the new images to the tblNameImages
+
+		//add the project ID to the images and save them in the Images table
+		for _, img := range project.Images {
+			img.ProjectID = project.ID
+			_, err := r.Table(tblNameImages).Insert(img).RunWrite(m.session)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		//Update the project
 
 		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Update(updates).RunWrite(m.session); err != nil {
 			return err
