@@ -733,7 +733,7 @@ func (m DefaultManager) Projects() ([]*model.Project, error) {
 		return nil, err
 	}
 	// Each project gets its images injected inside the list of images from the tblNameImages
-	projectsWithImages := []*model.Project{}
+	/*projectsWithImages := []*model.Project{}
 	for _, proj := range projects {
 		res, err = r.Table(tblNameProjects).Filter(map[string]string{"id": proj.ID}).
 			Merge(func(row r.Term) interface{} {
@@ -751,9 +751,9 @@ func (m DefaultManager) Projects() ([]*model.Project, error) {
 			return nil, err
 		}
 		projectsWithImages = append(projectsWithImages, proj)
-
-	}
-	return projectsWithImages, nil
+	*/
+	//}
+	return projects, nil
 }
 
 func (m DefaultManager) Project(id string) (*model.Project, error) {
@@ -791,22 +791,34 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 	}
 	project.CreationTime = time.Now().UTC()
 	project.UpdateTime = project.CreationTime
-	// also add a runTime, maybe instantiate it with null?
 	project.RunTime = project.CreationTime
+	//create the project
 	response, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session)
 
 	if err != nil {
 		return err
 	}
-
-	// rethinkDB returns the ID as the first element of the GeneratedKeys slice
-	// TODO: this method seems brittle, should contact the gorethink dev team for insight on this.
 	project.ID = func() string {
 		if len(response.GeneratedKeys) > 0 {
 			return string(response.GeneratedKeys[0])
 		}
 		return ""
 	}()
+	//add the project ID to the images and save them in the Images table
+	for _, img := range project.Images {
+		img.ProjectID = project.ID
+		response, err = r.Table(tblNameImages).Insert(img).RunWrite(m.session)
+
+		if err != nil {
+			return err
+		}
+	}
+	/*response, err = r.Table(tblNameProjects).Update(project).RunWrite(m.session)
+	if err != nil {
+		return err
+	}*/
+	// rethinkDB returns the ID as the first element of the GeneratedKeys slice
+	// TODO: this method seems brittle, should contact the gorethink dev team for insight on this.
 
 	eventType = "add-project"
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
@@ -827,7 +839,7 @@ func (m DefaultManager) UpdateProject(project *model.Project) error {
 			"description": project.Description,
 			"status":      project.Status,
 			// TODO: removed this to investigate if we can just add it with a resourceful POST to /api/projects/{id}/images
-			//"images":       project.Images,
+			"images":       project.Images,
 			"buildNeeded":  project.NeedsBuild,
 			"creationTime": project.CreationTime,
 			"updateTime":   time.Now().UTC(),
