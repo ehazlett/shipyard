@@ -25,9 +25,9 @@
                     });
                 return promise;
             },
-            create: function() {
+            create: function(data) {
                 var promise = $http
-                    .post('/api/projects/')
+                    .post('/api/projects/', data)
                     .then(function(response) {
                         return response.data;
                     });

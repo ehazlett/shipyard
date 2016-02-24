@@ -19,8 +19,7 @@
         vm.selectedItemCount = 0;
 
         vm.imageList = imageList;
-        vm.showScaleContainerDialog = showScaleContainerDialog;
-        vm.scaleContainer = scaleContainer;
+        vm.showImageEditDialog = showImageEditDialog;
 
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
@@ -57,21 +56,9 @@
             return Object.keys(vm.project.image_list)
         }
 
-        function showScaleContainerDialog(id) {
-            vm.selectedImageId = id;
-            $('#scale-modal').modal('show');
-        }
-
-        function scaleContainer() {
-            ContainerService.scale(vm.selectedContainerId, vm.numOfInstances)
-                .then(function(response) {
-                    vm.refresh();
-                }, function(response) {
-                    // Add unique errors to vm.errors
-                    $.each(response.data.Errors, function(i, el){
-                        if($.inArray(el, vm.errors) === -1) vm.errors.push(el);
-                    });
-                });
+        function showImageEditDialog(image) {
+            vm.selectedImage = image;
+            $('#image-edit-modal').modal('show');
         }
 
     }

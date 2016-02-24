@@ -1,7 +1,7 @@
-<div id="scale-modal" class="ui fullscreen modal transition">
+<div id="image-edit-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
-        {{ vm.selectedImageId }}
+        {{ vm.selectedImage.name }}
     </div>
     <div class="content">
         <div class="ui grid">
@@ -17,8 +17,8 @@
                                 <div class="ui horizontal segment">
                                     <h5 class="ui dividing header">Image Configuration</h5>
                                     <div class="eight wide field">
-                                        <div class="ui toggle checkbox" ng-click="vm.editSkipImageBuilding=!vm.editSkipImageBuilding">
-                                            <input type="checkbox" name="public" ng-model="vm.editSkipImageBuilding">
+                                        <div class="ui toggle checkbox" ng-click="vm.selectedImage.skipImageBuild=!vm.selectedImage.skipImageBuild">
+                                            <input type="checkbox" name="public" ng-model="vm.selectedImage.skipImageBuild">
                                             <label>Skip Image Building</label>
                                         </div>
                                     </div>
@@ -26,21 +26,21 @@
                                     <div class="three fields">
                                         <div class="field">
                                             <label>Image ID</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.request.Hostname" placeholder="ID"></input>
+                                            <input name="hostname" class="input" type="text" ng-model="vm.selectedImage.id" placeholder="ID"></input>
                                         </div>
                                         <div class="field">
                                             <label>Image Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.request.Domainname" placeholder="Name"></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.name" placeholder="Name"></input>
                                         </div>
                                         <div class="field">
                                             <label>Tag Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.request.Domainname" placeholder="Tag"></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.tag" placeholder="Tag"></input>
                                         </div>
                                     </div>
 
                                     <div class="field">
                                         <label>Image Description</label>
-                                        <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Description"></input>
+                                        <input name="command" class="input" type="text" ng-model="vm.selectedImage.description" placeholder="Description"></input>
                                     </div>
 
                                 </div>
@@ -52,12 +52,12 @@
 
                                     <div class="field">
                                         <div class="three fields">
-                                            <select class="ui selection dropdown" default="0">
+                                            <select class="ui selection dropdown" default="0" >
                                                 <option value="registry">Registry</option>
                                                 <option value="url">URL</option>
                                             </select>
                                             <div class="ui toggle checkbox" ng-click="vm.editSkipTLS=!vm.editSkipTLS">
-                                                <input type="checkbox" name="public" ng-model="vm.editSkipTLS">
+                                                <input type="checkbox" name="public" ng-model="vm.selectedImage.skipTLS">
                                                 <label>Skip TLS</label>
                                             </div>
                                             <button class="right floated ui icon button disabled">
@@ -69,15 +69,15 @@
                                     <div class="three fields">
                                         <div class="field">
                                             <label>URL</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.registry.url" placeholder=""></input>
+                                            <input name="hostname" class="input" type="text" ng-model="vm.selectedImage.url" placeholder=""></input>
                                         </div>
                                         <div class="field">
                                             <label>User Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.registry.username" placeholder=""></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.username" placeholder=""></input>
                                         </div>
                                         <div class="field">
                                             <label>Password</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.registry.password" placeholder=""></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.password" placeholder=""></input>
                                         </div>
                                     </div>
 
@@ -128,7 +128,7 @@
                         <div class="row">
                             <div class="column">
                                 <div class="ui fluid input focus">
-                                    <input type="text" placeholder="Add Description...">
+                                    <input type="text" placeholder="Add Description..." ng-model="vm.project.description">
                                 </div>
                             </div>
                         </div>
@@ -161,19 +161,19 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-class="{'active': vm.selected[vm.project.image_list[image]].Selected}" ng-repeat="image in vm.imageList()" jquery>
+                                    <tr ng-repeat="image in vm.project.images" jquery>
                                         <td class="collapsing">
                                             <div class="positive ui fitted checkbox">
-                                                <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[vm.project.image_list[image]].Selected">
+                                                <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[image.id].Selected">
                                                 <label for="{{$index}}-cb"></label>
                                             </div>
                                         </td>
-                                        <td>{{vm.project.image_list[image]}}</td>
-                                        <td>{{image.split(":")[0]}}</td>
-                                        <td>{{( (image.split(":").length === 2) ? image.split(":")[1] : "N/A" )}}</td>
-                                        <td>{{image.split(":")[2]}}</td>
+                                        <td>{{image.id}}</td>
+                                        <td>{{image.name}}</td>
+                                        <td>{{image.tag}}</td>
+                                        <td>{{image.description}}</td>
                                         <td class="collapsing">
-                                            <div ng-click="vm.showScaleContainerDialog(image)" class="basic compact blue ui icon button">
+                                            <div ng-click="vm.showImageEditDialog(image)" class="basic compact blue ui icon button">
                                                 <i class="pencil icon"></i>
                                             </div>
                                             <div class="basic compact blue ui icon button">

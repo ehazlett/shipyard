@@ -50,14 +50,7 @@
                 templateUrl: 'app/projects/create.html',
                 controller: 'CreateController',
                 controllerAs: 'vm',
-                authenticate: true,
-                resolve: {
-                    project: ['ProjectService', '$state', function(ProjectService, $state) {
-                        return ProjectService.create().then(null, function(errorData) {
-                            $state.go('error');
-                        });
-                    }]
-                }
+                authenticate: true
             })
     }
 })();
