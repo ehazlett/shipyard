@@ -12,15 +12,19 @@
                             </h3>
                         </div>
                     </div>
-
                     <div class="ui padded grid">
-                        <div class="row">
-                            <div class="column">
-                                <div class="ui fluid input focus">
-                                    <input type="text" placeholder="Add Description...">
+                        <div class=" two column row">
+                            <div class="left floated column">
+                                <div class="ui corner labeled input">
+                                    <input name="project" class="input" type="text" ng-model="vm.request.Project" placeholder="Add Name"></input>
+                                </div>
+                                <div class="ui input">
+                                    <input name="description" class="input" type="text" ng-model="vm.description" placeholder="Add Descrition..."></input>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="ui padded grid">
                         <div class="row">
                             <div class="left floated column">
                                 <div ui-sref="dashboard.addImage" class="ui small green labeled icon button">
@@ -181,7 +185,7 @@
                     <div class="ui padded grid">
                         <div class="row">
                             <div class="column">
-                                <div ui-sref="dashboard.saveProject" class="ui small gray button" ui-sref="dashboard.save_project()">
+                                <div ui-sref="dashboard.save_project" class="ui small gray button">
                                     Save Project
                                 </div>
                             </div>
