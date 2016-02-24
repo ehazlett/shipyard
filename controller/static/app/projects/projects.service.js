@@ -20,6 +20,7 @@
                 var promise = $http
                     .get('/api/projects/' + projectId)
                     .then(function(response) {
+                        console.log(response.data);
                         return response.data;
                     });
                 return promise;

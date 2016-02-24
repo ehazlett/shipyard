@@ -35,6 +35,12 @@
                     name: "SecurityProjectZ",
                     description: "Security project level A",
                     status: "Published",
+                    image_list: {
+                        "busybox:latest": "c51f86c28340",
+                        "tomcat:7.0.65-jre7": "e8353be55900",
+                        "soninob/soninob:v2": "bf4d022972f1"
+                    },
+                    is_build_needed: false,
                     last_run: "1456152831"
                 },
                 {
@@ -42,6 +48,12 @@
                     name: "SecurityProjectB",
                     description: "Security project level A",
                     status: "Published",
+                    image_list: {
+                        "jonbox:latest": "sdghsertewrg",
+                        "tomdog:7.0.65-jre7": "asdgfagsfga",
+                        "java:v2": "sagfegfrefg"
+                    },
+                    is_build_needed: false,
                     last_run: "1456152231"
                 },
                 {
@@ -49,6 +61,12 @@
                     name: "SecurityProjectC",
                     description: "Security project level A",
                     status: "Published",
+                    image_list: {
+                        "template:latest": "asdfawfgreg",
+                        "winston:1.2": "asdgfag66sfga",
+                        "oprah:v2": "567j67w45yg4w"
+                    },
+                    is_build_needed: false,
                     last_run: "1456152431"
                 },
                 {
@@ -56,6 +74,12 @@
                     name: "SecurityProjectA",
                     description: "Security project level A",
                     status: "Published",
+                    image_list: {
+                        "assasin:latest": "4y56ujty6h6ew",
+                        "druid": "tyujk67rj7j65",
+                        "paladin": "8i5tryw456w"
+                    },
+                    is_build_needed: false,
                     last_run: "1456152931"
                 },
                 {
@@ -63,77 +87,33 @@
                     name: "SecurityProjectD",
                     description: "Security project level A",
                     status: "Published",
+                    image_list: {
+                        "trapsin:latest": "4y56ujty6h6ew",
+                        "hammerdin": "tyujk67rj7j65",
+                        "lightsorc": "8i5tryw456w"
+                    },
+                    is_build_needed: false,
                     last_run: "1456152731"
                 }
             ];
-            var first_project = {
-                id: ids[0],
-                name: "SecurityProjectZ",
-                description: "Security project level A",
-                status: "Published",
-                image_list: {
-                    "busybox:latest": "c51f86c28340",
-                    "tomcat:7.0.65-jre7": "e8353be55900",
-                    "soninob/soninob:v2": "bf4d022972f1"
-                },
-                is_build_needed: false
-            };
-            var second_project = {
-                id: ids[1],
-                name: "SecurityProjectB",
-                description: "Security project level A",
-                status: "Published",
-                image_list: {
-                    "jonbox:latest": "sdghsertewrg",
-                    "tomdog:7.0.65-jre7": "asdgfagsfga",
-                    "java:v2": "sagfegfrefg"
-                },
-                is_build_needed: false
-            };
-            var third_project = {
-                id: ids[2],
-                name: "SecurityProjectC",
-                description: "Security project level A",
-                status: "Published",
-                image_list: {
-                    "template:latest": "asdfawfgreg",
-                    "winston:1.2": "asdgfag66sfga",
-                    "oprah:v2": "567j67w45yg4w"
-                },
-                is_build_needed: false
-            };
-            var fourth_project = {
-                id: ids[3],
-                name: "SecurityProjectA",
-                description: "Security project level A",
-                status: "Published",
-                image_list: {
-                    "assasin:latest": "4y56ujty6h6ew",
-                    "druid": "tyujk67rj7j65",
-                    "paladin": "8i5tryw456w"
-                },
-                is_build_needed: false
-            };
-            var fifth_project = {
-                id: ids[4],
-                name: "SecurityProjectD",
-                description: "Security project level A",
-                status: "Published",
-                image_list: {
-                    "trapsin:latest": "4y56ujty6h6ew",
-                    "hammerdin": "tyujk67rj7j65",
-                    "lightsorc": "8i5tryw456w"
-                },
-                is_build_needed: false
-            };
 
             $httpBackend.whenGET('/api/projects').respond(projects);
 
-            $httpBackend.whenGET('/api/projects/' + ids[0]).respond(first_project);
-            $httpBackend.whenGET('/api/projects/' + ids[1]).respond(second_project);
-            $httpBackend.whenGET('/api/projects/' + ids[2]).respond(third_project);
-            $httpBackend.whenGET('/api/projects/' + ids[3]).respond(fourth_project);
-            $httpBackend.whenGET('/api/projects/' + ids[4]).respond(fifth_project);
+            $httpBackend.whenGET('/api/projects/' + ids[0]).respond(function(method, url, data) {
+                return [200, angular.toJson(projects[0]), {}];
+            });
+            $httpBackend.whenGET('/api/projects/' + ids[1]).respond(function(method, url, data) {
+                return [200, angular.toJson(projects[1]), {}];
+            });
+            $httpBackend.whenGET('/api/projects/' + ids[2]).respond(function(method, url, data) {
+                return [200, angular.toJson(projects[2]), {}];
+            });
+            $httpBackend.whenGET('/api/projects/' + ids[3]).respond(function(method, url, data) {
+                return [200, angular.toJson(projects[3]), {}];
+            });
+            $httpBackend.whenGET('/api/projects/' + ids[4]).respond(function(method, url, data) {
+                return [200, angular.toJson(projects[4]), {}];
+            });
 
             $httpBackend.whenPOST('/api/projects/').respond(function(method, url, data){
                 var project = angular.fromJson(data);
