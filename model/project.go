@@ -13,12 +13,12 @@ type Project struct {
 	NeedsBuild   bool      `json:"needsBuild" gorethink:"needsBuild"`
 	CreationTime time.Time `json:"creationTime" gorethink:"creationTime"`
 	UpdateTime   time.Time `json:"updateTime" gorethink:"updateTime"`
-	RunTime      time.Time `json:"runTime" gorethink:"runTime"`
+	LastRunTime  time.Time `json:"lastRunTime" gorethink:"lastRunTime"`
 	Author       string    `json:"author" gorethink:"author"`
 	UpdatedBy    string    `json:"updatedBy" gorethink:"updatedBy"`
 }
 
-func (p *Project) NewProject(name string, description string, status string, images []*Image, needsBuild bool, creationTime time.Time, updateTime time.Time, runTime time.Time, author string, updatedBy string) *Project {
+func (p *Project) NewProject(name string, description string, status string, images []*Image, needsBuild bool, creationTime time.Time, updateTime time.Time, lastRunTime time.Time, author string, updatedBy string) *Project {
 
 	return &Project{
 		Name:         name,
@@ -28,7 +28,7 @@ func (p *Project) NewProject(name string, description string, status string, ima
 		NeedsBuild:   needsBuild,
 		CreationTime: creationTime,
 		UpdateTime:   updateTime,
-		RunTime:      runTime,
+		LastRunTime:  lastRunTime,
 		Author:       author,
 		UpdatedBy:    updatedBy,
 	}

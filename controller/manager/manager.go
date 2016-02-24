@@ -961,9 +961,13 @@ func (m DefaultManager) UpdateImage(image *model.Image) error {
 	// update
 	if img != nil {
 		updates := map[string]interface{}{
-			"name":      image.Name,
-			"imageId":   image.ImageId,
-			"projectId": image.ProjectID,
+			"name":           image.Name,
+			"imageId":        image.ImageId,
+			"tag":            image.Tag,
+			"description":    image.Description,
+			"location":       image.Location,
+			"skipImageBuild": image.SkipImageBuild,
+			"projectId":      image.ProjectID,
 		}
 
 		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
