@@ -25,6 +25,7 @@ func (a *Api) projects(w http.ResponseWriter, r *http.Request) {
 
 // TODO: need to return 422 or 400 when the entity is already existing but a POST is requested.
 func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
+
 	var project *model.Project
 	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -52,8 +53,25 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debugf("saved project: name=%s", project.Name)
+
+	// Just return the id for the Project that was created.
+	tempResponse := map[string]string{
+		"id": project.ID,
+	}
+
+	jsonResponse, err := json.Marshal(tempResponse)
+
+	if err != nil {
+		// TODO: if the Project was created but the response failed, should it be a 204?
+		http.Error(w, err.Error(), http.StatusNoContent)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write(jsonResponse)
+	return
 }
+
 func (a *Api) updateProject(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]

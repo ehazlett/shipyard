@@ -739,18 +739,18 @@ func (m DefaultManager) Project(id string) (*model.Project, error) {
 	// TODO: perform a merge with a subquery https://www.rethinkdb.com/docs/table-joins/#using-subqueries
 	var project *model.Project
 
-	res, err := r.Table(tblNameProjects).
-	Merge(func(row r.Term) interface{} {
+	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": id}).
+		Merge(func(row r.Term) interface{} {
 		return map[string]interface{}{
 			"images": r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).CoerceTo("ARRAY"),
 		}
-	}).
-	Run(m.session)
+	}).Run(m.session)
+
 	if err != nil {
 		return nil, err
 	}
 	if res.IsNil() {
-		return nil, ErrImageDoesNotExist
+		return nil, ErrProjectDoesNotExist
 	}
 	if err := res.One(&project); err != nil {
 		return nil, err
@@ -771,14 +771,26 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 	project.CreationTime = time.Now().UTC()
 	project.UpdateTime = project.CreationTime
 
-	if _, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session); err != nil {
+	response, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session)
+
+	if err != nil {
 		return err
 	}
-	eventType = "add-project"
 
+	// rethinkDB returns the ID as the first element of the GeneratedKeys slice
+	// TODO: this method seems brittle, should contact the gorethink dev team for insight on this.
+	project.ID = func() string {
+		if len(response.GeneratedKeys) > 0 {
+			return string(response.GeneratedKeys[0])
+		}
+		return ""
+	}()
+
+	eventType = "add-project"
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
 	return nil
 }
+
 func (m DefaultManager) UpdateProject(project *model.Project) error {
 	var eventType string
 	// check if exists; if so, update
@@ -883,6 +895,8 @@ func (m DefaultManager) SaveImage(image *model.Image) error {
 		return err
 	}
 	eventType = "add-image"
+
+	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
 
