@@ -24,35 +24,23 @@ func (a *Api) projects(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO: need to return 422 or 400 when the entity is already existing but a POST is requested.
+// Changed to 400 StatusBadRequest
 func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 
 	var project *model.Project
 	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	// TODO: Check here if the entity already exists because it is spitting this error which shows internal data from the db
-	//	Duplicate primary key `id`:
-	//	{
-	//	"id":	"b2a9ad32-e2d4-4e37-924e-4ffc4e53071f",
-	//	"imageId":	"23lk4jalskjfasljdfasf",
-	//	"name":	"myimage1",
-	//	"projectId":	"myprojectidX"
-	//	}
-	//	{
-	//	"id":	"b2a9ad32-e2d4-4e37-924e-4ffc4e53071f",
-	//	"imageId":	"23lk4jalskjfasljdfasf",
-	//	"name":	"myimage1",
-	//	"projectId":	"myprojectidX"
-	//	}
-
+	// This method now first checks if the project exists and returns an ErrProjectExists
 	if err := a.manager.SaveProject(project); err != nil {
 		log.Errorf("error saving project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	log.Debugf("saved project: name=%s", project.Name)
+	//Now also includes the project id in the log
+	log.Debugf("saved project: id=%s name=%s",project.ID ,project.Name)
 
 	// Just return the id for the Project that was created.
 	tempResponse := map[string]string{
@@ -63,6 +51,7 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		// TODO: if the Project was created but the response failed, should it be a 204?
+		// Most probably a 400 BadRequest would be sufficient
 		http.Error(w, err.Error(), http.StatusNoContent)
 	}
 

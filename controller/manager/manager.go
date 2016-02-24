@@ -732,11 +732,32 @@ func (m DefaultManager) Projects() ([]*model.Project, error) {
 	if err := res.All(&projects); err != nil {
 		return nil, err
 	}
-	return projects, nil
+	// Each project gets its images injected inside the list of images from the tblNameImages
+	projectsWithImages := []*model.Project{}
+	for _, proj := range projects {
+		res, err = r.Table(tblNameProjects).Filter(map[string]string{"id": proj.ID}).
+			Merge(func(row r.Term) interface{} {
+			return map[string]interface{}{
+				"images": r.Table(tblNameImages).Filter(map[string]string{"projectId": proj.ID}).CoerceTo("ARRAY"),
+			}
+		}).Run(m.session)
+		if err != nil {
+			return nil, err
+		}
+		if res.IsNil() {
+			return nil, ErrProjectDoesNotExist
+		}
+		if err := res.One(&proj); err != nil {
+			return nil, err
+		}
+		projectsWithImages = append(projectsWithImages, proj)
+
+	}
+	return projectsWithImages, nil
 }
 
 func (m DefaultManager) Project(id string) (*model.Project, error) {
-	// TODO: perform a merge with a subquery https://www.rethinkdb.com/docs/table-joins/#using-subqueries
+
 	var project *model.Project
 
 	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": id}).
@@ -770,7 +791,8 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 	}
 	project.CreationTime = time.Now().UTC()
 	project.UpdateTime = project.CreationTime
-
+	// also add a runTime, maybe instantiate it with null?
+	project.RunTime = project.CreationTime
 	response, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session)
 
 	if err != nil {
@@ -809,6 +831,7 @@ func (m DefaultManager) UpdateProject(project *model.Project) error {
 			"buildNeeded":  project.NeedsBuild,
 			"creationTime": project.CreationTime,
 			"updateTime":   time.Now().UTC(),
+			"runTime":      time.Now().UTC(),
 		}
 
 		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Update(updates).RunWrite(m.session); err != nil {
