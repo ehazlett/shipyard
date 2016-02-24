@@ -12,8 +12,8 @@
                                     <i class="ui edit icon"></i>
                                 </div>
                             </h3>
-                            <div class="sub header" class="width: 30px; height: 50px;">
-                                <input placeholder="Add Description" />
+                            <div class="ui small icon input">
+                                <input type="text" placeholder="Add Description" />
                             </div>
                         </div>
                     </div>
@@ -26,15 +26,13 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="column">
                                 <h4 class="ui dividing header">Images Details</h4>
-                                <div class="item">
-                                    <i  ng-click="vm.skipImages=!vm.skipImages">
-                                        <i class="ui toggle off icon" ng-show="vm.skipImages"></i>
-                                        <i class="ui toggle on icon" ng-hide="vm.skipImages"></i>
-                                    </i>
-                                    Skip images
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" name="skipImages">
+                                    <label>Skip images</label>
                                 </div>
                                 <table class="ui sortable celled table">
                                     <thead>
@@ -55,7 +53,7 @@
                                                 <label for="{{$index}}-cb"></label>
                                             </div>
                                         </td>
-                                        <td class="collapsing">{{vm.project.image_list[image]}}</td>
+                                        <td>{{vm.project.image_list[image]}}</td>
                                         <td>{{image.split(":")[0]}}</td>
                                         <td>{{( (image.split(":").length === 2) ? image.split(":")[1] : "N/A" )}}</td>
                                         <td>{{image.split(":")[2]}}</td>
@@ -180,7 +178,7 @@
                     <div class="ui padded grid">
                         <div class="row">
                             <div class="column">
-                                <div ui-sref="dashboard.saveProject" class="ui small gray labeled icon button">
+                                <div ui-sref="dashboard.saveProject" class="ui small gray button">
                                     Save Project
                                 </div>
                             </div>
@@ -191,3 +189,7 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('.ui.toggle').transition('slide right');
+</script>
