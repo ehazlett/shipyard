@@ -879,7 +879,21 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 	if res.IsNil() {
 		return ErrProjectDoesNotExist
 	}
+	res, err = r.Table(tblNameImages).Filter(map[string]string{"projectId": project.ID}).Run(m.session)
+	if err != nil {
+		return err
+	}
+	imagesToDelete := []*model.Image{}
+	if err := res.All(&imagesToDelete); err != nil {
+		return err
+	}
 
+	// Remove existing images for this project
+	for _, imgToDelete := range imagesToDelete {
+		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": imgToDelete.ID}).Delete().Run(m.session); err != nil {
+			return err
+		}
+	}
 	m.logEvent("delete-project", fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
 
 	return nil
