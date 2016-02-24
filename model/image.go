@@ -1,7 +1,7 @@
 package model
 
 type Image struct {
-	ID        string `json:"id,omitempty" gorethink:"id,omitempty"`
+	ID        string `json:"-" gorethink:"id,omitempty"`
 	Name      string `json:"name" gorethink:"name"`
 	ImageId   string `json:"imageId" gorethink:"imageId"`
 	ProjectID string `json:"projectId" gorethink:"projectId"`

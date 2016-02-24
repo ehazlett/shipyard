@@ -23,8 +23,6 @@ func (a *Api) projects(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: need to return 422 or 400 when the entity is already existing but a POST is requested.
-// Changed to 400 StatusBadRequest
 func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 
 	var project *model.Project
@@ -32,8 +30,6 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// TODO: Check here if the entity already exists because it is spitting this error which shows internal data from the db
-	// This method now first checks if the project exists and returns an ErrProjectExists
 	if err := a.manager.SaveProject(project); err != nil {
 		log.Errorf("error saving project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
