@@ -129,11 +129,17 @@
 
             $httpBackend.whenGET('/api/projects').respond(projects);
 
-            $httpBackend.whenGET('/api/project/' + ids[0]).respond(first_project);
-            $httpBackend.whenGET('/api/project/' + ids[1]).respond(second_project);
-            $httpBackend.whenGET('/api/project/' + ids[2]).respond(third_project);
-            $httpBackend.whenGET('/api/project/' + ids[3]).respond(fourth_project);
-            $httpBackend.whenGET('/api/project/' + ids[4]).respond(fifth_project);
+            $httpBackend.whenGET('/api/projects/' + ids[0]).respond(first_project);
+            $httpBackend.whenGET('/api/projects/' + ids[1]).respond(second_project);
+            $httpBackend.whenGET('/api/projects/' + ids[2]).respond(third_project);
+            $httpBackend.whenGET('/api/projects/' + ids[3]).respond(fourth_project);
+            $httpBackend.whenGET('/api/projects/' + ids[4]).respond(fifth_project);
+
+            $httpBackend.whenPOST('/api/projects/').respond(function(method, url, data){
+                var project = angular.fromJson(data);
+                projects.push(project);
+                return [200, project, {}];
+            });
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
             $httpBackend.whenGET(/((?!project).)*/).passThrough();

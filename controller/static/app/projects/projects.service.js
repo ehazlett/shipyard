@@ -16,17 +16,17 @@
                     });
                 return promise;
             },
-            inspect: function(projectId) {
+            edit: function(projectId) {
                 var promise = $http
-                    .get('/projects/' + projectId + '/json')
+                    .get('/api/projects/' + projectId)
                     .then(function(response) {
                         return response.data;
                     });
                 return promise;
             },
-            edit: function(projectId) {
+            create: function() {
                 var promise = $http
-                    .get('/api/project/' + projectId)
+                    .post('/api/projects/')
                     .then(function(response) {
                         return response.data;
                     });
@@ -34,7 +34,6 @@
             }
         }
     }
-
 
 })();
 

@@ -1,112 +1,3 @@
-<div id="scale-modal" class="ui fullscreen modal transition">
-    <i class="close icon"></i>
-    <div class="header">
-        {{ vm.selectedImageId }}
-    </div>
-    <div class="content">
-        <div class="ui grid">
-            <div class="row" ng-hide="vm.deploying">
-                <div class="column">
-                    <div class="ui error message" ng-show="vm.error">
-                        <div class="header">Error...</div>
-                        <p>{{vm.error}}</p>
-                    </div>
-                    <div class="ui form" ng-submit="vm.deploy()">
-                        <div class="ui two column grid">
-                            <div class="column">
-                                <div class="ui horizontal segment">
-                                    <h5 class="ui dividing header">Image Configuration</h5>
-                                    <div class="eight wide field">
-                                        <div class="ui toggle checkbox" ng-click="vm.editSkipImageBuilding=!vm.editSkipImageBuilding">
-                                            <input type="checkbox" name="public" ng-model="vm.editSkipImageBuilding">
-                                            <label>Skip Image Building</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="three fields">
-                                        <div class="field">
-                                            <label>Image ID</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.request.Hostname" placeholder="ID"></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>Image Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.request.Domainname" placeholder="Name"></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>Tag Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.request.Domainname" placeholder="Tag"></input>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <label>Image Description</label>
-                                        <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Description"></input>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="column">
-                                <div class="ui horizontal segment">
-                                    <h5 class="ui dividing header">Image Links</h5>
-
-                                    <div class="field">
-                                        <div class="three fields">
-                                            <select class="ui selection dropdown" default="0">
-                                                <option value="registry">Registry</option>
-                                                <option value="url">URL</option>
-                                            </select>
-                                            <div class="ui toggle checkbox" ng-click="vm.editSkipTLS=!vm.editSkipTLS">
-                                                <input type="checkbox" name="public" ng-model="vm.editSkipTLS">
-                                                <label>Skip TLS</label>
-                                            </div>
-                                            <button class="right floated ui icon button disabled">
-                                                <i class="check icon"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="three fields">
-                                        <div class="field">
-                                            <label>URL</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.registry.url" placeholder=""></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>User Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.registry.username" placeholder=""></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>Password</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.registry.password" placeholder=""></input>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <label>Tag Management</label>
-                                        <input name="command" class="input" type="text" ng-model="vm.image.tags" placeholder="Select Tags"></input>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="actions">
-        <div class="ui negative button">
-            Cancel
-        </div>
-        <div ng-click="vm.saveImage()" class="ui positive right labeled icon button">
-            Save Image
-            <i class="save icon"></i>
-        </div>
-    </div>
-</div>
-
-
-
 <div class="ui padded grid">
     <div class="row">
         <div class="column">
@@ -116,9 +7,7 @@
                         <div class="column">
                             <h3 class="ui header">
                                 <div class="content">
-                                    <i class="ui circle icon" ng-class="{'yellow': (vm.container.State.Running && vm.container.State.Paused), 'green': (vm.container.State.Running && !vm.container.State.Paused), 'red': !vm.container.State.Running}"></i>
-                                    Project {{vm.project.name}}
-                                    <i class="ui edit icon"></i>
+                                    Create Project
                                 </div>
                             </h3>
                         </div>
@@ -292,7 +181,7 @@
                     <div class="ui padded grid">
                         <div class="row">
                             <div class="column">
-                                <div ui-sref="dashboard.saveProject" class="ui small gray button">
+                                <div ui-sref="dashboard.saveProject" class="ui small gray button" ui-sref="dashboard.save_project()">
                                     Save Project
                                 </div>
                             </div>
@@ -303,55 +192,3 @@
         </div>
     </div>
 </div>
-
-<div id="multi-action-menu" class="ui bottom horizontal inverted labeled icon overlay sidebar menu" ng-class="{'visible': vm.selectedItemCount > 0}">
-    <a class="header item">
-        <i class="grid layout icon"></i>{{ vm.selectedItemCount }} Selected
-    </a>
-    <a class="item" ng-click="vm.clearAll()">
-        <i class="ban icon"></i>
-        Clear
-    </a>
-    <a class="item" ng-click="vm.startAll()">
-        <i class="play icon"></i>
-        Start
-    </a>
-    <a class="item" ng-click="vm.stopAll()">
-        <i class="stop icon"></i>
-        Stop
-    </a>
-    <a class="item" ng-click="vm.restartAll()">
-        <i class="refresh icon"></i>
-        Restart
-    </a>
-    <a class="item" ng-click="vm.destroyAll()">
-        <i class="delete icon"></i>
-        Delete
-    </a>
-</div>
-
-<script>
-    $(function(){
-//        $('.ui.form')
-//                .form({
-//                    image: {
-//                        identifier : 'image',
-//                        rules: [
-//                            {
-//                                type   : 'empty',
-//                                prompt : 'Please enter an image'
-//                            }
-//                        ]
-//                    },
-//                });
-        $('.help.circle.icon').popup({
-            inline: true,
-            hoverable: true,
-            delay: {
-                show: 150,
-                hide: 400
-            }
-        });
-        $('.ui.dropdown').dropdown();
-    });
-</script>
