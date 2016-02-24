@@ -84,7 +84,6 @@ func (a *Api) imagesByProjectId(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projectId := vars["project_id"]
 
-	// TODO: should we retrieve the project to make sure that it exists?
 	images, err := a.manager.ImagesByProjectId(projectId)
 	if err != nil {
 		log.Errorf("error getting images for project: %s", err)
@@ -97,6 +96,31 @@ func (a *Api) imagesByProjectId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+func (a *Api) addImagesToProjectId(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["project_id"]
+
+	project, err := a.manager.Project(id)
+	if err != nil {
+		log.Errorf("error updating project: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := a.manager.AddImagesToProjectId(project); err != nil {
+		log.Errorf("error updating images for project: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Debugf("updated project: name=%s", project.Name)
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (a *Api) deleteImage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
