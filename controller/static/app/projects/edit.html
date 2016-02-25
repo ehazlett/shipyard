@@ -1,7 +1,7 @@
-<div id="image-edit-modal" class="ui fullscreen modal transition">
+<div id="image-create-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
-        {{ vm.selectedImage.name }}
+        Create Image
     </div>
     <div class="content">
         <div class="ui grid">
@@ -17,8 +17,8 @@
                                 <div class="ui horizontal segment">
                                     <h5 class="ui dividing header">Image Configuration</h5>
                                     <div class="eight wide field">
-                                        <div class="ui toggle checkbox" ng-click="vm.selectedImage.skipImageBuild=!vm.selectedImage.skipImageBuild">
-                                            <input type="checkbox" name="public" ng-model="vm.selectedImage.skipImageBuild">
+                                        <div class="ui toggle checkbox" ng-click="vm.createImage.skipImageBuild=!vm.createImage.skipImageBuild">
+                                            <input type="checkbox" name="public" ng-model="vm.create.skipImageBuild">
                                             <label>Skip Image Building</label>
                                         </div>
                                     </div>
@@ -26,21 +26,128 @@
                                     <div class="three fields">
                                         <div class="field">
                                             <label>Image ID</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.selectedImage.id" placeholder="ID"></input>
+                                            <input name="hostname" class="input" type="text" ng-model="vm.createImage.id" placeholder="ID"></input>
                                         </div>
                                         <div class="field">
                                             <label>Image Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.name" placeholder="Name"></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.createImage.name" placeholder="Name"></input>
                                         </div>
                                         <div class="field">
                                             <label>Tag Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.tag" placeholder="Tag"></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.createImage.tag" placeholder="Tag"></input>
                                         </div>
                                     </div>
 
                                     <div class="field">
                                         <label>Image Description</label>
-                                        <input name="command" class="input" type="text" ng-model="vm.selectedImage.description" placeholder="Description"></input>
+                                        <input name="command" class="input" type="text" ng-model="vm.createImage.description" placeholder="Description"></input>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="column">
+                                <div class="ui horizontal segment">
+                                    <h5 class="ui dividing header">Image Links</h5>
+
+                                    <div class="field">
+                                        <div class="three fields">
+                                            <select class="ui selection dropdown" default="0" ng-model="vm.createImage.location">
+                                                <option value="registry">Registry</option>
+                                                <option value="url">URL</option>
+                                            </select>
+                                            <div class="ui toggle checkbox" ng-click="vm.createImage.skipTLS=!vm.createImage.skipTLS">
+                                                <input type="checkbox" name="public" ng-model="vm.createImage.skipTLS">
+                                                <label>Skip TLS</label>
+                                            </div>
+                                            <button class="right floated ui icon button disabled">
+                                                <i class="check icon"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="three fields">
+                                        <div class="field">
+                                            <label>URL</label>
+                                            <input name="hostname" class="input" type="text" ng-model="vm.createImage.url" placeholder=""></input>
+                                        </div>
+                                        <div class="field">
+                                            <label>User Name</label>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.createImage.username" placeholder=""></input>
+                                        </div>
+                                        <div class="field">
+                                            <label>Password</label>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.createImage.password" placeholder=""></input>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label>Tag Management</label>
+                                        <input name="command" class="input" type="text" placeholder="Select Tags"></input>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            Cancel
+        </div>
+        <div ng-click="vm.createSaveImage(vm.createImage)" class="ui positive right labeled icon button">
+            Save Image
+            <i class="save icon"></i>
+        </div>
+    </div>
+</div>
+
+<div id="image-edit-modal" class="ui fullscreen modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        {{ vm.editImage.name }}
+    </div>
+    <div class="content">
+        <div class="ui grid">
+            <div class="row" ng-hide="vm.deploying">
+                <div class="column">
+                    <div class="ui error message" ng-show="vm.error">
+                        <div class="header">Error...</div>
+                        <p>{{vm.error}}</p>
+                    </div>
+                    <div class="ui form" ng-submit="vm.deploy()">
+                        <div class="ui two column grid">
+                            <div class="column">
+                                <div class="ui horizontal segment">
+                                    <h5 class="ui dividing header">Image Configuration</h5>
+                                    <div class="eight wide field">
+                                        <div class="ui toggle checkbox" ng-click="vm.editImage.skipImageBuild=!vm.editImage.skipImageBuild">
+                                            <input type="checkbox" name="public" ng-model="vm.editImage.skipImageBuild">
+                                            <label>Skip Image Building</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="three fields">
+                                        <div class="field">
+                                            <label>Image ID</label>
+                                            <input name="hostname" class="input" type="text" ng-model="vm.editImage.id" placeholder="ID"></input>
+                                        </div>
+                                        <div class="field">
+                                            <label>Image Name</label>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.name" placeholder="Name"></input>
+                                        </div>
+                                        <div class="field">
+                                            <label>Tag Name</label>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.tag" placeholder="Tag"></input>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label>Image Description</label>
+                                        <input name="command" class="input" type="text" ng-model="vm.editImage.description" placeholder="Description"></input>
                                     </div>
 
                                 </div>
@@ -56,8 +163,8 @@
                                                 <option value="registry">Registry</option>
                                                 <option value="url">URL</option>
                                             </select>
-                                            <div class="ui toggle checkbox" ng-click="vm.editSkipTLS=!vm.editSkipTLS">
-                                                <input type="checkbox" name="public" ng-model="vm.selectedImage.skipTLS">
+                                            <div class="ui toggle checkbox" ng-click="vm.editImage.skipTLS=!vm.editImage.skipTLS">
+                                                <input type="checkbox" name="public" ng-model="vm.editImage.skipTLS">
                                                 <label>Skip TLS</label>
                                             </div>
                                             <button class="right floated ui icon button disabled">
@@ -69,15 +176,15 @@
                                     <div class="three fields">
                                         <div class="field">
                                             <label>URL</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.selectedImage.url" placeholder=""></input>
+                                            <input name="hostname" class="input" type="text" ng-model="vm.editImage.url" placeholder=""></input>
                                         </div>
                                         <div class="field">
                                             <label>User Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.username" placeholder=""></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.username" placeholder=""></input>
                                         </div>
                                         <div class="field">
                                             <label>Password</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.selectedImage.password" placeholder=""></input>
+                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.password" placeholder=""></input>
                                         </div>
                                     </div>
 
@@ -98,7 +205,7 @@
         <div class="ui negative button">
             Cancel
         </div>
-        <div ng-click="vm.saveImage()" class="ui positive right labeled icon button">
+        <div ng-click="vm.editSaveImage()" class="ui positive right labeled icon button">
             Save Image
             <i class="save icon"></i>
         </div>
@@ -134,7 +241,7 @@
                         </div>
                         <div class="row">
                             <div class="left floated column">
-                                <div ui-sref="dashboard.addImage" class="ui small green labeled icon button">
+                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
                                     <i class="plus icon"></i>Add New Image
                                 </div>
                             </div>

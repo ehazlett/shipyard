@@ -18,8 +18,16 @@
         vm.selected = {};
         vm.selectedItemCount = 0;
 
+        // Create modal, edit modal namespaces
+        vm.createImage = {}
+        vm.editImage = {}
+
+        vm.createSaveImage = createSaveImage;
+        vm.editSaveImage   = editSaveImage;
+
         vm.imageList = imageList;
         vm.showImageEditDialog = showImageEditDialog;
+        vm.showImageCreateDialog = showImageCreateDialog;
 
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
@@ -56,9 +64,43 @@
             return Object.keys(vm.project.image_list)
         }
 
+        function showImageCreateDialog() {
+            vm.createImage = {}
+            $('#image-create-modal').modal('show');
+        }
+
         function showImageEditDialog(image) {
-            vm.selectedImage = image;
+            vm.selectedEditImage = image;
+
+            vm.editImage = {
+                id: image.id,
+                name: image.name,
+                skipImageBuild: image.skipImageBuild,
+                tag: image.tag,
+                description: image.description,
+                skipTLS: image.skipTLS,
+                url: image.url,
+                username: image.username,
+                password: image.password
+            };
             $('#image-edit-modal').modal('show');
+        }
+
+        function createSaveImage(image) {
+            vm.project.images.push(image);
+        }
+
+        function editSaveImage() {
+            vm.selectedEditImage.id = vm.editImage.id;
+            vm.selectedEditImage.name = vm.editImage.name;
+            vm.selectedEditImage.skipImageBuild = vm.editImage.skipImageBuild;
+            vm.selectedEditImage.tag = vm.editImage.tag;
+            vm.selectedEditImage.description = vm.editImage.description;
+            vm.selectedEditImage.skipTLS = vm.editImage.skipTLS;
+            vm.selectedEditImage.url = vm.editImage.url;
+            vm.selectedEditImage.username = vm.editImage.username;
+            vm.selectedEditImage.password = vm.editImage.password;
+            console.log(vm.selectedEditImage);
         }
 
     }
