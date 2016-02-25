@@ -223,7 +223,7 @@
                         <div class="column">
                             <h3 class="ui header">
                                 <div class="content">
-                                    <i class="ui circle icon" ng-class="{'yellow': (vm.container.State.Running && vm.container.State.Paused), 'green': (vm.container.State.Running && !vm.container.State.Paused), 'red': !vm.container.State.Running}"></i>
+                                    <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>
                                     Project {{vm.project.name}}
                                     <i class="ui edit icon"></i>
                                 </div>
@@ -270,8 +270,6 @@
                                             <select class="ui selection dropdown" default="0" >
                                                 <option value="Published">Published</option>
                                                 <option value="Tested">Tested</option>
-                                                <option value="Running">Running</option>
-                                                <option value="Paused">Paused</option>
                                             </select>
                                         </div>
                                         <div class="field">

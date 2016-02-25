@@ -61,7 +61,7 @@
                     id: ids[1],
                     name: "SecurityProjectB",
                     description: "Security project level A",
-                    status: "Published",
+                    status: "Tested",
                     images: [
                         {"id":"sdghsertewrg","name":"jonbox","tag":"latest","description":"...","location":"","skipImageBuild":false,"skipTLS":false,"url":"","username":"","password":""},
                         {"id":"asdgfagsfga","name":"tomdog","tag":"7.0.65-jre7","description":"...","location":"","skipImageBuild":false,"skipTLS":false,"url":"","username":"","password":""},
@@ -151,14 +151,14 @@
             $httpBackend.whenRoute('PUT', '/api/project/:id').respond(function(method, url, data, headers, params) {
                 console.log(params);
                 var project = angular.fromJson(data);
-                projects[ids.indexOf(params.id)].description = project.description;
-                projects[ids.indexOf(params.id)].status = project.status;
+                projects.description = project.description;
+                projects.status = project.status;
                 return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
             });
 
-            /*$httpBackend.whenDelete('/api/projects/:id').respond(function(method, url, data){
+            /*$httpBackend.whenDelete('/api/projects/:id').respond(function(method, url, data) {
 
-                return [200, project, {}];
+                return [200, projects, {}];
             });*/
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)

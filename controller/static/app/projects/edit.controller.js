@@ -108,7 +108,7 @@
             console.log(vm.selectedEditImage);
         }
 
-        function updateProject(project){
+        function updateProject(project) {
             console.log("update project" + project);
             ProjectService.update(project.id, project)
                 .then(function(data) {

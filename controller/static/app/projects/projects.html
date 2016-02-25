@@ -75,7 +75,8 @@
                         </div>
                     </td>
                     <td>
-                        <i class="circle icon green"></i>
+                        <i class="circle icon" ng-class="a.status == 'Published' ? 'green' : a.status == 'Tested' ? 'yellow' : 'red'"></i>
+                        <span class="hidden">{{a.status}}</span>
                     </td>
                     <td>{{a.id}}</td>
                     <td>{{a.name}}</td>
