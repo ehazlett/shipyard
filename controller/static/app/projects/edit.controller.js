@@ -22,8 +22,8 @@
         vm.selectedItemCount = 0;
 
         // Create modal, edit modal namespaces
-        vm.createImage = {}
-        vm.editImage = {}
+        vm.createImage = {};
+        vm.editImage = {};
 
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
@@ -31,6 +31,7 @@
         vm.imageList = imageList;
         vm.showImageEditDialog = showImageEditDialog;
         vm.showImageCreateDialog = showImageCreateDialog;
+        vm.deleteImage = deleteImage;
 
         vm.updateProject = updateProject;
 
@@ -89,6 +90,10 @@
                 password: image.password
             };
             $('#image-edit-modal').modal('show');
+        }
+
+        function deleteImage(image) {
+            vm.project.images.splice(vm.project.images.indexOf(image.id), 1);
         }
 
         function createSaveImage(image) {

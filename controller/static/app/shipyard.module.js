@@ -148,18 +148,32 @@
                 return [200, project, {}];
             });
 
-            $httpBackend.whenRoute('PUT', '/api/project/:id').respond(function(method, url, data, headers, params) {
-                console.log(params);
+            $httpBackend.whenRoute('PUT', '/api/projects/:id').respond(function(method, url, data, headers, params) {
                 var project = angular.fromJson(data);
-                projects.description = project.description;
-                projects.status = project.status;
-                return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [404, {}, {}];
+                }
+
+                // Overwrite old project (this might not be how the api behaves)
+                projects[indexToEdit] = project;
+
+                return [200, angular.toJson(projects[indexToEdit]), {}];
             });
 
-            /*$httpBackend.whenDelete('/api/projects/:id').respond(function(method, url, data) {
+            $httpBackend.whenRoute('DELETE', '/api/projects/:id').respond(function(method, url, data, headers, params) {
+                var indexToEdit = ids.indexOf(params.id);
 
-                return [200, projects, {}];
-            });*/
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                // Overwrite old project (this might not be how the api behaves)
+                projects.splice(indexToEdit, 1);
+
+                return [200, {}, {}];
+            });
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
             $httpBackend.whenGET(/((?!project).)*/).passThrough();
