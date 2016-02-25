@@ -25,6 +25,21 @@
                     });
                 return promise;
             },
+            update: function(projectId, data) {
+                var promise = $http
+                    .put('/api/project/' + projectId, data)
+                    .then(function(response) {
+                        return response.data;
+                    });
+            },
+            destroy: function(projectId) {
+                var promise = $http
+                    .delete('/api/projects/' + projectId)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
             create: function(data) {
                 var promise = $http
                     .post('/api/projects/', data)

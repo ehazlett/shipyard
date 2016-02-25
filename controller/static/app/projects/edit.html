@@ -232,13 +232,61 @@
                     </div>
 
                     <div class="ui padded grid">
-                        <div class="row">
-                            <div class="column">
-                                <div class="ui fluid input focus">
-                                    <input type="text" placeholder="Add Description..." ng-model="vm.project.description">
+                        <div class="ui form">
+                            <div class="ui column grid">
+                                <div class="column">
+                                    <h5 class="ui dividing header">Project Configuration</h5>
+                                    <div class="six fields">
+                                        <div class="field">
+                                            <label>Project ID</label>
+                                            <input disabled name="projectID" class="input" type="text" ng-model="vm.project.id" placeholder="Project ID..."></input>
+                                        </div>
+                                    </div>
+                                    <div class="five fields">
+                                        <div class="field">
+                                            <label>Author</label>
+                                            <input disabled name="author" class="input" type="text" ng-model="vm.project.author" placeholder="Author"></input>
+                                            </div>
+                                        <div class="field">
+                                            <label>Creation Time</label>
+                                            <input disabled name="createTime" class="input" type="text" ng-model="vm.project.creationTime" placeholder="Creation Time..."></input>
+                                        </div>
+                                        <div class="field">
+                                            <label>Update Time</label>
+                                            <input disabled name="updateTime" class="input" type="text" ng-model="vm.project.updateTime" placeholder="Update Time..."></input>
+                                        </div>
+                                        <div class="field">
+                                            <label>Updated By</label>
+                                            <input disabled name="updateAuthor" class="input" type="text" ng-model="vm.project.updatedBy" placeholder="Update By..."></input>
+                                        </div>
+                                    </div>
+                                    <div class="four fields">
+                                        <div class="field">
+                                            <label>Project Description</label>
+                                            <input name="command" class="input" type="text" ng-model="vm.project.description" placeholder="Description..."></input>
+                                        </div>
+                                        <div class="field">
+                                            <label>Status</label>
+                                            <select class="ui selection dropdown" default="0" >
+                                                <option value="Published">Published</option>
+                                                <option value="Tested">Tested</option>
+                                                <option value="Running">Running</option>
+                                                <option value="Paused">Paused</option>
+                                            </select>
+                                        </div>
+                                        <div class="field">
+                                            <label>Needs Build</label>
+                                            <div class="ui toggle checkbox" ng-click="vm.needsBuild=!vm.needsBuild">
+                                                <input type="checkbox" name="public" ng-model="vm.needsBuild">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="ui padded grid">
                         <div class="row">
                             <div class="left floated column">
                                 <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
@@ -246,7 +294,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="column">
                                 <h4 class="ui dividing header">Images Details</h4>
@@ -399,7 +446,7 @@
                     <div class="ui padded grid">
                         <div class="row">
                             <div class="column">
-                                <div ui-sref="dashboard.saveProject" class="ui small gray button">
+                                <div ng-click='vm.updateProject(vm.project)' class="ui small gray button">
                                     Save Project
                                 </div>
                             </div>

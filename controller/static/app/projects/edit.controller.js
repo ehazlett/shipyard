@@ -10,10 +10,13 @@
         var vm = this;
 
         vm.project = resolvedProject;
+        vm.project.author = localStorage.getItem('X-Access-Token').split(":")[0];
 
         //TODO: Should the default state be on or off (i.e. checked or not checked)?
         vm.skipImages = false;
         vm.skipTests = false;
+
+        vm.needsBuild = false;
 
         vm.selected = {};
         vm.selectedItemCount = 0;
@@ -28,6 +31,8 @@
         vm.imageList = imageList;
         vm.showImageEditDialog = showImageEditDialog;
         vm.showImageCreateDialog = showImageCreateDialog;
+
+        vm.updateProject = updateProject;
 
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
@@ -103,5 +108,14 @@
             console.log(vm.selectedEditImage);
         }
 
+        function updateProject(project){
+            console.log("update project" + project);
+            ProjectService.update(project.id, project)
+                .then(function(data) {
+                    $state.transitionTo('dashboard.projects');
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
     }
 })();

@@ -20,10 +20,14 @@
         vm.selectedItemCount = 0;
         vm.selectedAll = false;
         vm.selectedProject = null;
+        vm.selectedProjectId = "";
 
         vm.refresh = refresh;
         vm.checkAll = checkAll;
         vm.clearAll = clearAll;
+
+        vm.showDeleteProjectDialog = showDeleteProjectDialog;
+        vm.destroyProject = destroyProject;
 
         refresh();
 
@@ -93,6 +97,20 @@
             vm.selected = {};
             vm.selectedItemCount = 0;
             vm.selectedAll = false;
+        }
+
+        function showDeleteProjectDialog(project) {
+            vm.selectedProjectId = project.id;
+            $('#destroy-modal').modal('show');
+        }
+
+        function destroyProject() {
+            ProjectService.destroy(vm.selectedProjectId)
+                .then(function(data) {
+                    vm.refresh();
+                }, function(data) {
+                    vm.error = data;
+                });
         }
         
     }

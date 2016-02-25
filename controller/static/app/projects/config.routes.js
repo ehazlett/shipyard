@@ -45,12 +45,5 @@
                     }]
                 }
             })
-            .state('dashboard.save_project', {
-                url: '^/projects',
-                templateUrl: 'app/projects/create.html',
-                controller: 'CreateController',
-                controllerAs: 'vm',
-                authenticate: true
-            })
     }
 })();

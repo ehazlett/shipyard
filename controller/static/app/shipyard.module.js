@@ -51,7 +51,11 @@
                         {"id":"bf4d022972f1","name":"soninob/soninob","tag":"v2","description":"...","location":"","skipImageBuild":false,"skipTLS":false,"url":"","username":"","password":""}
                     ],
                     is_build_needed: false,
-                    lastRun: "Wednesday, February 24, 2016 at 00:00:00"
+                    lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                    creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    author: "admin",
+                    updatedBy: "admin"
                 },
                 {
                     id: ids[1],
@@ -64,7 +68,11 @@
                         {"id":"sagfegfrefg","name":"java","tag":"v2","description":"...","location":"","skipImageBuild":false,"skipTLS":false,"url":"","username":"","password":""}
                     ],
                     is_build_needed: false,
-                    lastRun: "Wednesday, February 24, 2016 at 00:00:00"
+                    lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                    creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    author: "admin",
+                    updatedBy: "admin"
                 },
                 {
                     id: ids[2],
@@ -77,7 +85,11 @@
                         {"id":"567j67w45yg4w","name":"oprah","tag":"v2","description":"...","location":"","skipImageBuild":false,"skipTLS":false,"url":"","username":"","password":""}
                     ],
                     is_build_needed: false,
-                    lastRun: "Wednesday, February 24, 2016 at 00:00:00"
+                    lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                    creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    author: "admin",
+                    updatedBy: "admin"
                 },
                 {
                     id: ids[3],
@@ -90,7 +102,11 @@
                         {"id":"8i5tryw456w","name":"paladin","tag":"","description":"...","location":"","skipImageBuild":false,"skipTLS":false,"url":"","username":"","password":""}
                     ],
                     is_build_needed: false,
-                    lastRun: "Wednesday, February 24, 2016 at 00:00:00"
+                    lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                    creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    author: "admin",
+                    updatedBy: "admin"
                 },
                 {
                     id: ids[4],
@@ -103,7 +119,11 @@
                         {"id":"8i5tryw456w","name":"lightsorc","tag":"","description":"...","location":"","skipImageBuild":false,"skipTLS":false,"url":"","username":"","password":""}
                     ],
                     is_build_needed: false,
-                    lastRun: "Wednesday, February 24, 2016 at 00:00:00"
+                    lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                    creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                    author: "admin",
+                    updatedBy: "admin"
                 }
             ];
 
@@ -120,13 +140,26 @@
                 // Generate ID
                 project.id = makeid();
                 // Get last ran
-                project.lastRun = "Wednesday, February 24, 2016 at 00:00:00";
+                project.creationTime = "Wednesday, February 24, 2016 at 00:00:00";
 
                 ids.push(project.id);
                 projects.push(project);
 
                 return [200, project, {}];
             });
+
+            $httpBackend.whenRoute('PUT', '/api/project/:id').respond(function(method, url, data, headers, params) {
+                console.log(params);
+                var project = angular.fromJson(data);
+                projects[ids.indexOf(params.id)].description = project.description;
+                projects[ids.indexOf(params.id)].status = project.status;
+                return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
+            });
+
+            /*$httpBackend.whenDelete('/api/projects/:id').respond(function(method, url, data){
+
+                return [200, project, {}];
+            });*/
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
             $httpBackend.whenGET(/((?!project).)*/).passThrough();
