@@ -40,7 +40,7 @@ func (a *Api) saveProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//Now also includes the project id in the log
-	log.Debugf("saved project: id=%s name=%s",project.ID ,project.Name)
+	log.Debugf("saved project: id=%s name=%s", project.ID, project.Name)
 
 	// Just return the id for the Project that was created.
 	tempResponse := map[string]string{

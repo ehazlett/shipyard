@@ -122,7 +122,7 @@ func (a *Api) Run() error {
 	//Project related routes
 	apiRouter.HandleFunc("/api/projects", a.projects).Methods("GET")
 	apiRouter.HandleFunc("/api/projects", a.saveProject).Methods("POST")
-	apiRouter.HandleFunc("/api/projects{id}", a.updateProject).Methods("PUT")
+	apiRouter.HandleFunc("/api/projects/{id}", a.updateProject).Methods("PUT")
 	apiRouter.HandleFunc("/api/projects/{id}", a.project).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{id}", a.deleteProject).Methods("DELETE")
 
