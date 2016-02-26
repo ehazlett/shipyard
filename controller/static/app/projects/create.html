@@ -161,15 +161,18 @@
 
                             <div class="column">
                                 <div class="ui horizontal segment">
-                                    <h5 class="ui dividing header">Image Links</h5>
+                                    <!--<h5 class="ui dividing header">Image Links</h5>-->
 
                                     <div class="field">
-                                        <div class="three fields">
-                                            <select class="ui selection dropdown" default="0" >
-                                                <option value="registry">Registry</option>
-                                                <option value="url">URL</option>
-                                            </select>
-                                            <div class="ui toggle checkbox" ng-click="vm.editImage.skipTLS=!vm.editImage.skipTLS">
+                                        <select class="ui dropdown" default="0" >
+                                            <option value="registry">Registry</option>
+                                            <option value="url">URL</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="field">
+                                        <div class="two fields">
+                                            <div class="ui toggle checkbox" ng-click="vm.editImage.skipTLS=!vm.editImage.skipTLS" style="margin-top: 6px">
                                                 <input type="checkbox" name="public" ng-model="vm.editImage.skipTLS">
                                                 <label>Skip TLS</label>
                                             </div>
@@ -274,10 +277,12 @@
                         <div class="row">
                             <div class="column">
                                 <h4 class="ui dividing header">Images Details</h4>
-                                <div class="item">
-                                    <div class="ui toggle checkbox" ng-click="vm.skipImages=!vm.skipImages">
-                                        <input type="checkbox" name="public" ng-model="vm.skipImages">
-                                        <label>Skip images</label>
+                                <div class="field">
+                                    <div class="item">
+                                        <div class="ui toggle checkbox" ng-click="vm.skipImages=!vm.skipImages">
+                                            <input type="checkbox" name="public" ng-model="vm.skipImages">
+                                            <label>Skip images</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <table class="ui sortable celled table">
@@ -434,3 +439,4 @@
         </div>
     </div>
 </div>
+
