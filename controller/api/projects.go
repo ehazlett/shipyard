@@ -64,7 +64,7 @@ func (a *Api) updateProject(w http.ResponseWriter, r *http.Request) {
 	project, err := a.manager.Project(id)
 	if err != nil {
 		log.Errorf("error updating project: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
@@ -81,14 +81,15 @@ func (a *Api) updateProject(w http.ResponseWriter, r *http.Request) {
 	log.Debugf("updated project: name=%s", project.Name)
 	w.WriteHeader(http.StatusNoContent)
 }
+
 func (a *Api) project(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
 	project, err := a.manager.Project(id)
 	if err != nil {
-		log.Errorf("error deleting project: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Errorf("error retrieving project: %s", err)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
@@ -97,6 +98,7 @@ func (a *Api) project(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
 func (a *Api) deleteProject(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -104,7 +106,7 @@ func (a *Api) deleteProject(w http.ResponseWriter, r *http.Request) {
 	project, err := a.manager.Project(id)
 	if err != nil {
 		log.Errorf("error deleting project: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	if err := a.manager.DeleteProject(project); err != nil {
