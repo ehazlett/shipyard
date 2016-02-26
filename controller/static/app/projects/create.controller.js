@@ -10,19 +10,20 @@
     function CreateController($scope, ProjectService, $state) {
         var vm = this;
 
-        vm.saveProject = saveProject;
-        vm.showImageCreateDialog = showImageCreateDialog;
-
         vm.project = {};
         vm.project.images = [];
         vm.project.author = localStorage.getItem('X-Access-Token').split(":")[0];
 
         // Create modal, edit modal namespaces
-        vm.createImage = {}
-        vm.editImage = {}
+        vm.createImage = {};
+        vm.editImage = {};
 
+        vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
+        vm.showImageCreateDialog = showImageCreateDialog;
+        vm.showImageEditDialog = showImageEditDialog;
+        vm.deleteImage = deleteImage;
 
         function saveProject(project){
             console.log("saving project" + project);
@@ -71,6 +72,10 @@
             vm.selectedEditImage.username = vm.editImage.username;
             vm.selectedEditImage.password = vm.editImage.password;
             console.log(vm.selectedEditImage);
+        }
+
+        function deleteImage(image) {
+            vm.project.images.splice(vm.project.images.indexOf(image), 1);
         }
     }
 })();

@@ -52,17 +52,23 @@
 
                                     <div class="field">
                                         <div class="three fields">
+                                            <div class="field">
                                             <select class="ui selection dropdown" default="0" ng-model="vm.createImage.location">
                                                 <option value="registry">Registry</option>
                                                 <option value="url">URL</option>
                                             </select>
+                                            </div>
+                                            <div class="field">
                                             <div class="ui toggle checkbox" ng-click="vm.createImage.skipTLS=!vm.createImage.skipTLS">
                                                 <input type="checkbox" name="public" ng-model="vm.createImage.skipTLS">
                                                 <label>Skip TLS</label>
                                             </div>
+                                            </div>
+                                            <div class="field">
                                             <button class="right floated ui icon button disabled">
                                                 <i class="check icon"></i>
                                             </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -234,23 +240,24 @@
                                 <div class="column">
                                     <h5 class="ui dividing header">Project Configuration</h5>
 
-                                    <div class="three fields">
+                                    <div class="four fields">
                                         <div class="field">
                                             <label>Project Name</label>
                                             <input name="hostname" class="input" type="text" ng-model="vm.project.name" placeholder="Project name..."></input>
                                         </div>
-                                        <div class="field disabled">
+                                        <div class="field">
                                             <label>Author</label>
                                             <input disabled name="domainname" class="input" type="text" ng-model="vm.project.author" placeholder="Author"></input>
                                         </div>
                                     </div>
 
-                                    <div class="field">
-                                        <label>Project Description</label>
-                                        <input name="command" class="input" type="text" ng-model="vm.project.description" placeholder="Description..."></input>
+                                    <div class="two fields">
+                                        <div class="field">
+                                            <label>Project Description</label>
+                                            <input name="command" class="input" type="text" ng-model="vm.project.description" placeholder="Description..."></input>
+                                        </div>
                                     </div>
 
-                                    <h5 class="ui dividing header"></h5>
                                 </div>
                             </div>
                         </div>
@@ -300,7 +307,7 @@
                                             <div ng-click="vm.showImageEditDialog(image)" class="basic compact blue ui icon button">
                                                 <i class="pencil icon"></i>
                                             </div>
-                                            <div class="basic compact blue ui icon button">
+                                            <div ng-click="vm.deleteImage(image)" class="basic compact blue ui icon button">
                                                 <i class="trash icon"></i>
                                             </div>
                                         </td>

@@ -27,10 +27,11 @@
             },
             update: function(projectId, data) {
                 var promise = $http
-                    .put('/api/project/' + projectId, data)
+                    .put('/api/projects/' + projectId, data)
                     .then(function(response) {
                         return response.data;
                     });
+                return promise;
             },
             destroy: function(projectId) {
                 var promise = $http

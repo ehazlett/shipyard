@@ -262,20 +262,26 @@
                                     </div>
                                     <div class="four fields">
                                         <div class="field">
+                                            <label>Project Name</label>
+                                            <input name="command" class="input" type="text" ng-model="vm.project.name" placeholder="Name..."></input>
+                                        </div>
+                                        <div class="field">
                                             <label>Project Description</label>
                                             <input name="command" class="input" type="text" ng-model="vm.project.description" placeholder="Description..."></input>
                                         </div>
                                         <div class="field">
                                             <label>Status</label>
-                                            <select class="ui selection dropdown" default="0" >
+                                            <select class="ui selection dropdown" default="0" ng-model="vm.project.status">
+                                                <option class="placeholder" selected value="">{{vm.project.status}}</option>
                                                 <option value="Published">Published</option>
                                                 <option value="Tested">Tested</option>
                                             </select>
                                         </div>
                                         <div class="field">
                                             <label>Needs Build</label>
-                                            <div class="ui toggle checkbox" ng-click="vm.needsBuild=!vm.needsBuild">
-                                                <input type="checkbox" name="public" ng-model="vm.needsBuild">
+                                            <div class="ui toggle checkbox padded" ng-click="vm.project.needsBuild=!vm.project.needsBuild" style="margin-top: 7px">
+                                                <input type="checkbox" name="public" ng-model="vm.project.needsBuild">
+                                                <label></label>
                                             </div>
                                         </div>
                                     </div>
@@ -328,7 +334,7 @@
                                             <div ng-click="vm.showImageEditDialog(image)" class="basic compact blue ui icon button">
                                                 <i class="pencil icon"></i>
                                             </div>
-                                            <div class="basic compact blue ui icon button">
+                                            <div ng-click="vm.deleteImage(image)" class="basic compact blue ui icon button">
                                                 <i class="trash icon"></i>
                                             </div>
                                         </td>
