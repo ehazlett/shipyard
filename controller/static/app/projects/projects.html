@@ -1,0 +1,154 @@
+<div id="destroy-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        Destroy Project: {{ vm.selectedProjectId | limitTo:12 }}
+    </div>
+    <div class="content">
+        <p>Are you sure you want to destroy this project?</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.destroyProject()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="ui padded grid">
+    <div class="two column row">
+        <div class="left floated column">
+            <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+                <i class="refresh icon"></i> Refresh
+            </div>
+            <div ui-sref="dashboard.create_project" class="ui small green labeled icon button">
+                <i class="plus icon"></i> Create New Project
+            </div>
+        </div>
+        <div class="right aligned right floated column">
+            <div class="ui small icon input">
+                <input ng-model="tableFilter" placeholder="Search projects..." reset-field/>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.projects.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        Projects
+                    </div>
+                    <p>There are no projects.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="filteredProjects.length>0">
+        <div class="column">
+            <table class="ui sortable celled table">
+                <thead>
+                <tr>
+                    <th id="select-all-table-header" class="collapsing">
+                        <div class="ui fitted checkbox" ng-click="vm.checkAll()">
+                            <input type="checkbox" id="all-cb" ng-model="vm.selectedAll">
+                            <label for="all-cb"></label>
+                        </div>
+                    </th>
+                    <th class="collapsing"><i class="calendar outline icon"></i></th>
+                    <th class="collapsing">Id</th>
+                    <th>Project Name</th>
+                    <th>Last Run</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-class="{'active': vm.selected[a.id].Selected}" ng-repeat="a in filteredProjects = (vm.projects | filter:tableFilter)" jquery>
+                    <td class="collapsing">
+                        <div class="positive ui fitted checkbox">
+                            <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[a.id].Selected">
+                            <label for="{{$index}}-cb"></label>
+                        </div>
+                    </td>
+                    <td>
+                        <i class="circle icon" ng-class="a.status == 'Published' ? 'green' : a.status == 'Tested' ? 'yellow' : 'red'"></i>
+                        <span class="hidden">{{a.status}}</span>
+                    </td>
+                    <td>{{a.id}}</td>
+                    <td>{{a.name}}</td>
+                    <td>{{a.lastRun}}</td>
+                    <td class="collapsing">
+                        <div ui-sref="dashboard.inspect_project({id: a.id})" class="basic compact blue ui icon button">
+                            <i class="search icon"></i>
+                        </div>
+                        <div class="ui right pointing dropdown">
+                            <div class="basic compact blue ui icon button">
+                                <i class="wrench icon"></i>
+                            </div>
+                            <div class="menu">
+                                <a ng-click="vm.showPlayProjectDialog(a)" class="item"><i class="black play icon"></i> Start</a>
+                                <a ng-click="vm.showStopProjectDialog(a)" class="item"><i class="black stop icon"></i> Stop</a>
+                                <a ng-click="vm.showRestartProjectDialog(a)" class="item"><i class="black refresh icon"></i> Restart</a>
+                                <a ui-sref="dashboard.edit_project({id: a.id})" class="item"><i class="black edit icon"></i> Edit</a>
+                                <a ng-click="vm.showRenameProjectDialog(a)" class="item"><i class="black write icon"></i> Rename</a>
+                                <a ng-click="vm.showDeleteProjectDialog(a)" class="item"><i class="black trash icon"></i> Delete</a>
+                                <a ui-sref="dashboard.stats({id: a.id})" class="item"><i class="bar line chart icon"></i> Trends</a>
+                                <a ng-click="vm.showAnalysisProjectDialog(a)" class="item"><i class="history icon"></i> Analysis</a>
+                                <a ui-sref="dashboard.logs({id: a.id})" class="item"><i class="text file outline icon"></i> Logs</a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.projects.length > 0 && filteredProjects.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        Projects
+                    </div>
+                    <p>No projects matched your filter query</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="multi-action-menu" class="ui bottom horizontal inverted labeled icon overlay sidebar menu" ng-class="{'visible': vm.selectedItemCount > 0}">
+    <a class="header item">
+        <i class="grid layout icon"></i>{{ vm.selectedItemCount }} Selected
+    </a>
+    <a class="item" ng-click="vm.clearAll()">
+        <i class="ban icon"></i>
+        Clear
+    </a>
+    <a class="item" ng-click="vm.startAll()">
+        <i class="play icon"></i>
+        Start
+    </a>
+    <a class="item" ng-click="vm.stopAll()">
+        <i class="stop icon"></i>
+        Stop
+    </a>
+    <a class="item" ng-click="vm.restartAll()">
+        <i class="refresh icon"></i>
+        Restart
+    </a>
+    <a class="item" ng-click="vm.destroyAll()">
+        <i class="delete icon"></i>
+        Delete
+    </a>
+</div>
+
+<script>
+    $('.ui.dropdown').dropdown();
+</script>
