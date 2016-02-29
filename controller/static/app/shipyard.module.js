@@ -20,13 +20,12 @@
             'angular-jwt',
             'base64',
             'selectize',
-            'ui.router',
-            'ngMockE2E'
+            'ui.router'
         ])
 
         //Configure HttpBackend to mock requests to ILM endpoints
         //Take a look at https://docs.angularjs.org/api/ngMockE2E/service/$httpBackend
-        .run(function($httpBackend, $filter) {
+        .run(function($filter) {
 
             function makeid() {
                 var text = "";
@@ -127,81 +126,5 @@
                     updatedBy: "admin"
                 }
             ];
-
-            $httpBackend.whenGET('/api/projects').respond(projects);
-
-            $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
-                console.log(params);
-                return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
-            });
-
-            $httpBackend.whenPOST('/api/projects/').respond(function(method, url, data){
-                var project = angular.fromJson(data);
-
-                // Generate ID
-                project.id = makeid();
-                // Get last ran
-                project.creationTime = "Wednesday, February 24, 2016 at 00:00:00";
-
-                ids.push(project.id);
-                projects.push(project);
-
-                return [200, project, {}];
-            });
-
-            $httpBackend.whenRoute('PUT', '/api/projects/:id').respond(function(method, url, data, headers, params) {
-                var project = angular.fromJson(data);
-                var indexToEdit = ids.indexOf(params.id);
-
-                if (indexToEdit === -1) {
-                    return [404, {}, {}];
-                }
-
-                // Overwrite old project (this might not be how the api behaves)
-                //"dddd, mmmm dd, yyyy at hh:MM:ss"
-                var d = new Date();
-                project.updateTime = d.toUTCString();
-                project.updatedBy = "admin";
-                projects[indexToEdit] = project;
-
-                return [200, angular.toJson(projects[indexToEdit]), {}];
-            });
-
-            $httpBackend.whenRoute('DELETE', '/api/projects/:idp/images/:id').respond(function(method, url, data, headers, params) {
-                var indexToEdit = ids.indexOf(params.idp);
-                var imageToDelete = projects[indexToEdit].images;
-
-                if (imageToDelete === -1) {
-                    return [405, {}, {}];
-                }
-
-                projects[indexToEdit].images.splice(0, 1);
-
-                return [200, {}, {}];
-            });
-
-            $httpBackend.whenRoute('DELETE', '/api/projects/:id').respond(function(method, url, data, headers, params) {
-                var indexToEdit = ids.indexOf(params.id);
-
-                if (indexToEdit === -1) {
-                    return [405, {}, {}];
-                }
-
-                // Overwrite old project (this might not be how the api behaves)
-                projects.splice(indexToEdit, 1);
-
-                return [200, {}, {}];
-            });
-
-
-            //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
-            $httpBackend.whenGET(/((?!project).)*/).passThrough();
-            $httpBackend.whenPOST(/((?!project).)*/).passThrough();
-            $httpBackend.whenDELETE(/((?!project).)*/).passThrough();
-            $httpBackend.whenPUT(/((?!project).)*/).passThrough();
-            $httpBackend.whenPATCH(/((?!project).)*/).passThrough();
-            $httpBackend.whenDELETE(/((?!project).)*/).passThrough();
-            $httpBackend.whenJSONP(/((?!project).)*/).passThrough();
-            $httpBackend.whenRoute(/((?!project).)*/).passThrough();
         })
 })();

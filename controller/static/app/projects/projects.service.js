@@ -43,7 +43,7 @@
             },
             create: function(data) {
                 var promise = $http
-                    .post('/api/projects/', data)
+                    .post('/api/projects', data)
                     .then(function(response) {
                         return response.data;
                     });
