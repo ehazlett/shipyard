@@ -96,29 +96,36 @@ func (a *Api) imagesByProjectId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-func (a *Api) addImagesToProjectId(w http.ResponseWriter, r *http.Request) {
+func (a *Api) addImageToProjectId(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["project_id"]
 
-	project, err := a.manager.Project(id)
+	_, err := a.manager.Project(id)
 	if err != nil {
 		log.Errorf("error updating project: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 
-	if err := a.manager.AddImagesToProjectId(project); err != nil {
-		log.Errorf("error updating images for project: %s", err)
+	// Decode image
+	var image *model.Image
+	if err := json.NewDecoder(r.Body).Decode(&image); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Debugf("updated project: name=%s", project.Name)
-	w.WriteHeader(http.StatusNoContent)
+	// Add project id to image
+	image.ProjectID = id
+
+	// Save the image
+	if err := a.manager.SaveImage(image); err != nil {
+		log.Errorf("error saving image: %s", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Debugf("saved image: name=%s", image.Name)
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (a *Api) deleteImage(w http.ResponseWriter, r *http.Request) {

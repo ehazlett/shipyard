@@ -128,8 +128,9 @@ func (a *Api) Run() error {
 
 	// Endpoints to handle images related to a given project
 	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.imagesByProjectId).Methods("GET")
-	// TODO: add here POST /api/projects/{project_id}/images
-	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.addImagesToProjectId).Methods("POST", "PUT")
+	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.deleteImage).Methods("DELETE")
+	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.image).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.addImageToProjectId).Methods("POST", "PUT")
 
 	//ILM related routes
 	apiRouter.HandleFunc("/api/ilm_images", a.images).Methods("GET")
