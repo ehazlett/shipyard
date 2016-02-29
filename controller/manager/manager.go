@@ -825,7 +825,7 @@ func (m DefaultManager) UpdateProject(project *model.Project) error {
 			"name":        project.Name,
 			"description": project.Description,
 			"status":      project.Status,
-			"buildNeeded": project.NeedsBuild,
+			"needsBuild":  project.NeedsBuild,
 			"updateTime":  time.Now().UTC(),
 			// TODO: find a way to retrieve the current user
 			"updatedBy": "updater",
