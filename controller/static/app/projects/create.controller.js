@@ -18,6 +18,9 @@
         vm.createImage = {};
         vm.editImage = {};
 
+        vm.skipImages = true;
+        vm.skipTests= true;
+
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;

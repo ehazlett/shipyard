@@ -31,6 +31,7 @@
         vm.imageList = imageList;
         vm.showImageEditDialog = showImageEditDialog;
         vm.showImageCreateDialog = showImageCreateDialog;
+        vm.showDeleteImageDialog = showDeleteImageDialog;
         vm.deleteImage = deleteImage;
 
         vm.updateProject = updateProject;
@@ -92,8 +93,19 @@
             $('#image-edit-modal').modal('show');
         }
 
+        function showDeleteImageDialog(image) {
+            vm.selectedImage = image;
+            $('#destroy-modal').modal('show');
+        }
+
         function deleteImage(image) {
-            vm.project.images.splice(vm.project.images.indexOf(image), 1);
+            console.log("delete image " + image.id + " from project " + vm.project.id);
+            ProjectService.delete(vm.project.id,image.id)
+                .then(function(data) {
+                    vm.project.images.splice(vm.project.images.indexOf(image), 1);
+                }, function (data) {
+                    vm.error = data;
+                });
         }
 
         function createSaveImage(image) {

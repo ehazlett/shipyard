@@ -167,6 +167,19 @@
                 return [200, angular.toJson(projects[indexToEdit]), {}];
             });
 
+            $httpBackend.whenRoute('DELETE', '/api/projects/:idp/images/:id').respond(function(method, url, data, headers, params) {
+                var indexToEdit = ids.indexOf(params.idp);
+                var imageToDelete = projects[indexToEdit].images;
+
+                if (imageToDelete === -1) {
+                    return [405, {}, {}];
+                }
+
+                projects[indexToEdit].images.splice(0, 1);
+
+                return [200, {}, {}];
+            });
+
             $httpBackend.whenRoute('DELETE', '/api/projects/:id').respond(function(method, url, data, headers, params) {
                 var indexToEdit = ids.indexOf(params.id);
 
@@ -179,6 +192,7 @@
 
                 return [200, {}, {}];
             });
+
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
             $httpBackend.whenGET(/((?!project).)*/).passThrough();

@@ -48,6 +48,14 @@
                         return response.data;
                     });
                 return promise;
+            },
+            delete: function(projectId, imageId) {
+                var promise = $http
+                    .delete('/api/projects/' + projectId + '/images/' + imageId)
+                    .then(function(response) {
+                        return response.data;
+                });
+                return promise;
             }
         }
     }
