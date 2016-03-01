@@ -39,7 +39,7 @@
         }
 
         function showImageCreateDialog() {
-            vm.createImage = {}
+            vm.createImage = {};
             $('#image-create-modal').modal('show');
         }
 

@@ -72,8 +72,8 @@
         }
 
         function showImageCreateDialog() {
-            vm.createImage = {}
-            $('#image-create-modal').modal('show');
+            vm.createImage = {};
+            $('#edit-project-image-create-modal').modal('show');
         }
 
         function showImageEditDialog(image) {
@@ -85,17 +85,14 @@
                 skipImageBuild: image.skipImageBuild,
                 tag: image.tag,
                 description: image.description,
-                skipTLS: image.skipTLS,
-                url: image.url,
-                username: image.username,
-                password: image.password
+                location: image.location
             };
-            $('#image-edit-modal').modal('show');
+            $('#edit-project-image-edit-modal').modal('show');
         }
 
         function showDeleteImageDialog(image) {
             vm.selectedImage = image;
-            $('#destroy-modal').modal('show');
+            $('#edit-project-delete-image-modal').modal('show');
         }
 
         function deleteImage(image) {
@@ -109,6 +106,9 @@
         }
 
         function createSaveImage(image) {
+            if (vm.project.images == null) {
+                vm.project.images = [];
+            }
             vm.project.images.push(image);
         }
 

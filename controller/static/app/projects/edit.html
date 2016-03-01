@@ -1,4 +1,4 @@
-<div id="destroy-modal" class="ui small modal transition">
+<div id="edit-project-delete-image-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
         Delete Image: {{ vm.selectedImage.id | limitTo:12 }}
@@ -17,27 +17,27 @@
     </div>
 </div>
 
-<div id="image-create-modal" class="ui fullscreen modal transition">
+<div id="edit-project-image-create-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         Create Image
     </div>
     <div class="content">
         <div class="ui grid">
-            <div class="row" ng-hide="vm.deploying">
+            <div class="row">
                 <div class="column">
                     <div class="ui error message" ng-show="vm.error">
                         <div class="header">Error...</div>
                         <p>{{vm.error}}</p>
                     </div>
-                    <div class="ui form" ng-submit="vm.deploy()">
+                    <div class="ui form">
                         <div class="ui two column grid">
                             <div class="column">
                                 <div class="ui horizontal segment">
                                     <h5 class="ui dividing header">Image Configuration</h5>
                                     <div class="eight wide field">
                                         <div class="ui toggle checkbox" ng-click="vm.createImage.skipImageBuild=!vm.createImage.skipImageBuild">
-                                            <input type="checkbox" name="public" ng-model="vm.create.skipImageBuild">
+                                            <input type="checkbox" name="public" ng-model="vm.createImage.skipImageBuild">
                                             <label>Skip Image Building</label>
                                         </div>
                                     </div>
@@ -72,8 +72,9 @@
                                     <div class="field">
                                         <div class="three fields">
                                             <select class="ui selection dropdown" default="0" ng-model="vm.createImage.location">
-                                                <option value="registry">Registry</option>
-                                                <option value="url">URL</option>
+                                                <option class="placeholder" selected value="">{{vm.createImage.location}}</option>
+                                                <option value="Registry">Registry</option>
+                                                <option value="URL">URL</option>
                                             </select>
                                             <div class="ui toggle checkbox" ng-click="vm.createImage.skipTLS=!vm.createImage.skipTLS">
                                                 <input type="checkbox" name="public" ng-model="vm.createImage.skipTLS">
@@ -96,7 +97,7 @@
                                         </div>
                                         <div class="field">
                                             <label>Password</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.createImage.password" placeholder=""></input>
+                                            <input name="domainname" class="input" type="password" ng-model="vm.createImage.password" placeholder=""></input>
                                         </div>
                                     </div>
 
@@ -124,7 +125,7 @@
     </div>
 </div>
 
-<div id="image-edit-modal" class="ui fullscreen modal transition">
+<div id="edit-project-image-edit-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         {{ vm.editImage.name }}
@@ -178,9 +179,10 @@
 
                                     <div class="field">
                                         <div class="three fields">
-                                            <select class="ui selection dropdown" default="0" >
-                                                <option value="registry">Registry</option>
-                                                <option value="url">URL</option>
+                                            <select class="ui selection dropdown" default="0" ng-model="vm.editImage.location">
+                                                <option class="placeholder" selected value="">{{vm.editImage.location}}</option>
+                                                <option value="Registry">Registry</option>
+                                                <option value="URL">URL</option>
                                             </select>
                                             <div class="ui toggle checkbox" ng-click="vm.editImage.skipTLS=!vm.editImage.skipTLS">
                                                 <input type="checkbox" name="public" ng-model="vm.editImage.skipTLS">
@@ -203,7 +205,7 @@
                                         </div>
                                         <div class="field">
                                             <label>Password</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.password" placeholder=""></input>
+                                            <input name="domainname" class="input" type="password" ng-model="vm.editImage.password" placeholder=""></input>
                                         </div>
                                     </div>
 
@@ -392,26 +394,6 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-class="" ng-repeat="">
-                                        <td class="collapsing">
-                                            <div class="positive ui fitted checkbox">
-                                                <input type="checkbox" id="{{$index}}-cb" ng-model="">
-                                                <label for="{{$index}}-cb"></label>
-                                            </div>
-                                        </td>
-                                        <td class="collapsing"></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="collapsing">
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="pencil icon"></i>
-                                            </div>
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="trash icon"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -440,27 +422,6 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-class="" ng-repeat="">
-                                        <td class="collapsing">
-                                            <div class="positive ui fitted checkbox">
-                                                <input type="checkbox" id="{{$index}}-cb" ng-model="">
-                                                <label for="{{$index}}-cb"></label>
-                                            </div>
-                                        </td>
-                                        <td class="collapsing"></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="collapsing">
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="pencil icon"></i>
-                                            </div>
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="trash icon"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    </tbody>
                                 </table>
                             </div>
                         </div>

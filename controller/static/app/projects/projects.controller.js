@@ -91,7 +91,9 @@
                     vm.error = data;
                 });
 
+            // TODO: Shipyard follows this practice throughout it's controllers. Is this correct?
             vm.error = "";
+            vm.selectedProjectId = "";
             vm.errors = [];
             vm.projects = [];
             vm.selected = {};
@@ -101,11 +103,12 @@
 
         function showDeleteProjectDialog(project) {
             vm.selectedProjectId = project.id;
-            $('#destroy-modal').modal('show');
+            console.log("Showing modal destroy modal for: " + project.id + "    ==  " + vm.selectedProjectId);
+            $('#delete-project-modal').modal('show');
         }
 
-        function destroyProject() {
-            ProjectService.destroy(vm.selectedProjectId)
+        function destroyProject(id) {
+            ProjectService.destroy(id)
                 .then(function(data) {
                     vm.refresh();
                 }, function(data) {

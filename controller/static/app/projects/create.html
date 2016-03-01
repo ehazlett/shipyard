@@ -18,7 +18,7 @@
                                     <h5 class="ui dividing header">Image Configuration</h5>
                                     <div class="eight wide field">
                                         <div class="ui toggle checkbox" ng-click="vm.createImage.skipImageBuild=!vm.createImage.skipImageBuild">
-                                            <input type="checkbox" name="public" ng-model="vm.create.skipImageBuild">
+                                            <input type="checkbox" name="public" ng-model="vm.createImage.skipImageBuild">
                                             <label>Skip Image Building</label>
                                         </div>
                                     </div>
@@ -83,7 +83,7 @@
                                         </div>
                                         <div class="field">
                                             <label>Password</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.createImage.password" placeholder=""></input>
+                                            <input name="domainname" class="input" type="password" ng-model="vm.createImage.password" placeholder=""></input>
                                         </div>
                                     </div>
 
@@ -193,7 +193,7 @@
                                         </div>
                                         <div class="field">
                                             <label>Password</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.password" placeholder=""></input>
+                                            <input name="domainname" class="input" type="password" ng-model="vm.editImage.password" placeholder=""></input>
                                         </div>
                                     </div>
 
@@ -351,26 +351,6 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-class="" ng-repeat="">
-                                        <td class="collapsing">
-                                            <div class="positive ui fitted checkbox">
-                                                <input type="checkbox" id="{{$index}}-cb" ng-model="">
-                                                <label for="{{$index}}-cb"></label>
-                                            </div>
-                                        </td>
-                                        <td class="collapsing"></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="collapsing">
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="pencil icon"></i>
-                                            </div>
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="trash icon"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -399,26 +379,6 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-class="" ng-repeat="">
-                                        <td class="collapsing">
-                                            <div class="positive ui fitted checkbox">
-                                                <input type="checkbox" id="{{$index}}-cb" ng-model="">
-                                                <label for="{{$index}}-cb"></label>
-                                            </div>
-                                        </td>
-                                        <td class="collapsing"></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td class="collapsing">
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="pencil icon"></i>
-                                            </div>
-                                            <div class="basic compact blue ui icon button">
-                                                <i class="trash icon"></i>
-                                            </div>
-                                        </td>
-                                    </tr>
                                     </tbody>
                                 </table>
                             </div>

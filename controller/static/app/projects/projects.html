@@ -1,4 +1,4 @@
-<div id="destroy-modal" class="ui small modal transition">
+<div id="delete-project-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
         Delete Project: {{ vm.selectedProjectId | limitTo:12 }}
@@ -10,7 +10,7 @@
         <div class="ui negative button">
             No
         </div>
-        <div ng-click="vm.destroyProject()" class="ui positive right labeled icon button">
+        <div ng-click="vm.destroyProject(vm.selectedProjectId)" class="ui positive right labeled icon button">
             Yes
             <i class="checkmark icon"></i>
         </div>
@@ -78,7 +78,7 @@
                         <i class="circle icon" ng-class="a.status == 'Published' ? 'green' : a.status == 'Tested' ? 'yellow' : 'red'"></i>
                         <span class="hidden">{{a.status}}</span>
                     </td>
-                    <td>{{a.id}}</td>
+                    <td class="collapsing">{{a.id | limitTo:12}}</td>
                     <td>{{a.name}}</td>
                     <td>{{a.lastRun}}</td>
                     <td class="collapsing">
@@ -95,7 +95,7 @@
                                 <a ng-click="vm.showRestartProjectDialog(a)" class="item"><i class="black refresh icon"></i> Restart</a>
                                 <a ui-sref="dashboard.edit_project({id: a.id})" class="item"><i class="black edit icon"></i> Edit</a>
                                 <a ng-click="vm.showRenameProjectDialog(a)" class="item"><i class="black write icon"></i> Rename</a>
-                                <a ng-click="vm.showDeleteProjectDialog(a)" class="item"><i class="black trash icon"></i> Delete</a>
+                                <a ng-click="vm.showDeleteProjectDialog({id: a.id})" class="item"><i class="black trash icon"></i> Delete</a>
                                 <a ui-sref="dashboard.stats({id: a.id})" class="item"><i class="bar line chart icon"></i> Trends</a>
                                 <a ng-click="vm.showAnalysisProjectDialog(a)" class="item"><i class="history icon"></i> Analysis</a>
                                 <a ui-sref="dashboard.logs({id: a.id})" class="item"><i class="text file outline icon"></i> Logs</a>
