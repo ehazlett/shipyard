@@ -78,7 +78,7 @@
                         <i class="circle icon" ng-class="a.status == 'Published' ? 'green' : a.status == 'Tested' ? 'yellow' : 'red'"></i>
                         <span class="hidden">{{a.status}}</span>
                     </td>
-                    <td>{{a.id}}</td>
+                    <td class="collapsing">{{a.id | limitTo:12}}</td>
                     <td>{{a.name}}</td>
                     <td>{{a.lastRun}}</td>
                     <td class="collapsing">
