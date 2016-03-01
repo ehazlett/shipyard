@@ -10,7 +10,7 @@
         <div class="ui negative button">
             No
         </div>
-        <div ng-click="vm.destroyProject()" class="ui positive right labeled icon button">
+        <div ng-click="vm.destroyProject(vm.selectedProjectId)" class="ui positive right labeled icon button">
             Yes
             <i class="checkmark icon"></i>
         </div>
@@ -95,7 +95,7 @@
                                 <a ng-click="vm.showRestartProjectDialog(a)" class="item"><i class="black refresh icon"></i> Restart</a>
                                 <a ui-sref="dashboard.edit_project({id: a.id})" class="item"><i class="black edit icon"></i> Edit</a>
                                 <a ng-click="vm.showRenameProjectDialog(a)" class="item"><i class="black write icon"></i> Rename</a>
-                                <a ng-click="vm.showDeleteProjectDialog(a)" class="item"><i class="black trash icon"></i> Delete</a>
+                                <a ng-click="vm.showDeleteProjectDialog({id: a.id})" class="item"><i class="black trash icon"></i> Delete</a>
                                 <a ui-sref="dashboard.stats({id: a.id})" class="item"><i class="bar line chart icon"></i> Trends</a>
                                 <a ng-click="vm.showAnalysisProjectDialog(a)" class="item"><i class="history icon"></i> Analysis</a>
                                 <a ui-sref="dashboard.logs({id: a.id})" class="item"><i class="text file outline icon"></i> Logs</a>

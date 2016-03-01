@@ -73,7 +73,7 @@
 
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#image-create-modal').modal('show');
+            $('#edit-project-image-create-modal').modal('show');
         }
 
         function showImageEditDialog(image) {
@@ -87,12 +87,12 @@
                 description: image.description,
                 location: image.location
             };
-            $('#image-edit-modal').modal('show');
+            $('#edit-project-image-edit-modal').modal('show');
         }
 
         function showDeleteImageDialog(image) {
             vm.selectedImage = image;
-            $('#delete-image-modal').modal('show');
+            $('#edit-project-delete-image-modal').modal('show');
         }
 
         function deleteImage(image) {

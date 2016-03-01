@@ -1,4 +1,4 @@
-<div id="delete-image-modal" class="ui small modal transition">
+<div id="edit-project-delete-image-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
         Delete Image: {{ vm.selectedImage.id | limitTo:12 }}
@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<div id="image-create-modal" class="ui fullscreen modal transition">
+<div id="edit-project-image-create-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         Create Image
@@ -125,7 +125,7 @@
     </div>
 </div>
 
-<div id="image-edit-modal" class="ui fullscreen modal transition">
+<div id="edit-project-image-edit-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         {{ vm.editImage.name }}
