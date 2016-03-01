@@ -2,6 +2,7 @@ package manager
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"crypto/tls"
 
 	log "github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
@@ -707,13 +707,13 @@ func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 
 	var tlsConfig *tls.Config
 
-	tlsConfig = nil;
+	tlsConfig = nil
 
 	if registry.TlsSkipVerify {
 		tlsConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
-	// Create unsecured client 
+	// Create unsecured client
 	trans := &http.Transport{
 		TLSClientConfig: tlsConfig,
 	}
