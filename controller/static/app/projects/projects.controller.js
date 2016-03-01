@@ -101,7 +101,7 @@
 
         function showDeleteProjectDialog(project) {
             vm.selectedProjectId = project.id;
-            $('#destroy-modal').modal('show');
+            $('#delete-project-modal').modal('show');
         }
 
         function destroyProject() {

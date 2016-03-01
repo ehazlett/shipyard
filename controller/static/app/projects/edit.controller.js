@@ -92,7 +92,7 @@
 
         function showDeleteImageDialog(image) {
             vm.selectedImage = image;
-            $('#destroy-modal').modal('show');
+            $('#delete-image-modal').modal('show');
         }
 
         function deleteImage(image) {

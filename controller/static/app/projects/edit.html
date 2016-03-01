@@ -1,4 +1,4 @@
-<div id="destroy-modal" class="ui small modal transition">
+<div id="delete-image-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
         Delete Image: {{ vm.selectedImage.id | limitTo:12 }}
@@ -181,8 +181,8 @@
                                         <div class="three fields">
                                             <select class="ui selection dropdown" default="0" ng-model="vm.editImage.location">
                                                 <option class="placeholder" selected value="">{{vm.editImage.location}}</option>
-                                                <option value="registry">Registry</option>
-                                                <option value="url">URL</option>
+                                                <option value="Registry">Registry</option>
+                                                <option value="URL">URL</option>
                                             </select>
                                             <div class="ui toggle checkbox" ng-click="vm.editImage.skipTLS=!vm.editImage.skipTLS">
                                                 <input type="checkbox" name="public" ng-model="vm.editImage.skipTLS">
