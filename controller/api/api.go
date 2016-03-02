@@ -119,6 +119,26 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/accounts", a.saveAccount).Methods("POST")
 	apiRouter.HandleFunc("/api/accounts/{username}", a.account).Methods("GET")
 	apiRouter.HandleFunc("/api/accounts/{username}", a.deleteAccount).Methods("DELETE")
+	//Project related routes
+	apiRouter.HandleFunc("/api/projects", a.projects).Methods("GET")
+	apiRouter.HandleFunc("/api/projects", a.saveProject).Methods("POST")
+	apiRouter.HandleFunc("/api/projects/{id}", a.updateProject).Methods("PUT")
+	apiRouter.HandleFunc("/api/projects/{id}", a.project).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{id}", a.deleteProject).Methods("DELETE")
+
+	// Endpoints to handle images related to a given project
+	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.imagesByProjectId).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.deleteImage).Methods("DELETE")
+	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.image).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.addImageToProjectId).Methods("POST", "PUT")
+
+	//ILM related routes
+	apiRouter.HandleFunc("/api/ilm_images", a.images).Methods("GET")
+	apiRouter.HandleFunc("/api/ilm_images", a.saveImage).Methods("POST")
+	apiRouter.HandleFunc("/api/ilm_images/{id}", a.updateImage).Methods("PUT")
+	apiRouter.HandleFunc("/api/ilm_images/{id}", a.image).Methods("GET")
+	apiRouter.HandleFunc("/api/ilm_images/{id}", a.deleteImage).Methods("DELETE")
+
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")

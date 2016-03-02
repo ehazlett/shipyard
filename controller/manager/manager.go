@@ -18,13 +18,18 @@ import (
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
+	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/version"
 )
 
 const (
-	tblNameConfig      = "config"
-	tblNameEvents      = "events"
-	tblNameAccounts    = "accounts"
+	tblNameConfig   = "config"
+	tblNameEvents   = "events"
+	tblNameAccounts = "accounts"
+
+	tblNameProjects = "projects"
+	tblNameImages   = "images"
+
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
 	tblNameExtensions  = "extensions"
@@ -38,8 +43,15 @@ const (
 )
 
 var (
-	ErrAccountExists              = errors.New("account already exists")
-	ErrAccountDoesNotExist        = errors.New("account does not exist")
+	ErrAccountExists       = errors.New("account already exists")
+	ErrAccountDoesNotExist = errors.New("account does not exist")
+
+	ErrProjectExists       = errors.New("project already exists")
+	ErrProjectDoesNotExist = errors.New("project does not exist")
+
+	ErrImageExists       = errors.New("image already exists")
+	ErrImageDoesNotExist = errors.New("image does not exist")
+
 	ErrRoleDoesNotExist           = errors.New("role does not exist")
 	ErrNodeDoesNotExist           = errors.New("node does not exist")
 	ErrServiceKeyDoesNotExist     = errors.New("service key does not exist")
@@ -75,6 +87,20 @@ type (
 		GetAuthenticator() auth.Authenticator
 		SaveAccount(account *auth.Account) error
 		DeleteAccount(account *auth.Account) error
+
+		Projects() ([]*model.Project, error)
+		Project(name string) (*model.Project, error)
+		SaveProject(project *model.Project) error
+		UpdateProject(project *model.Project) error
+		DeleteProject(project *model.Project) error
+
+		Images() ([]*model.Image, error)
+		ImagesByProjectId(projectId string) ([]*model.Image, error)
+		Image(name string) (*model.Image, error)
+		SaveImage(image *model.Image) error
+		UpdateImage(image *model.Image) error
+		DeleteImage(image *model.Image) error
+
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
 		Store() *sessions.CookieStore
@@ -158,7 +184,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -694,6 +720,297 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 
 	return nil, nil
 }
+
+// methods related to the Project structure
+func (m DefaultManager) Projects() ([]*model.Project, error) {
+	// TODO: consider making sorting customizable
+	// TODO: should filter by authorization
+	// Return all projects **WITHOUT** their images embedded
+	res, err := r.Table(tblNameProjects).OrderBy(r.Asc("creationTime")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	projects := []*model.Project{}
+	if err := res.All(&projects); err != nil {
+		return nil, err
+	}
+
+	return projects, nil
+}
+
+func (m DefaultManager) Project(id string) (*model.Project, error) {
+
+	var project *model.Project
+
+	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": id}).Run(m.session)
+
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrProjectDoesNotExist
+	}
+	if err := res.One(&project); err != nil {
+		return nil, err
+	}
+
+	project.Images, err = m.ImagesByProjectId(project.ID)
+
+	if err != nil {
+		// TODO: add a better message
+		return nil, err
+	}
+
+	return project, nil
+}
+
+func (m DefaultManager) SaveProject(project *model.Project) error {
+	var eventType string
+	proj, err := m.Project(project.ID)
+
+	if err != nil && err != ErrProjectDoesNotExist {
+		return err
+	}
+	if proj != nil {
+		return ErrProjectExists
+	}
+	project.CreationTime = time.Now().UTC()
+	project.UpdateTime = project.CreationTime
+	// TODO: find a way to retrieve the current user
+	project.Author = "author"
+
+	//create the project
+	response, err := r.Table(tblNameProjects).Insert(project).RunWrite(m.session)
+
+	if err != nil {
+		return err
+	}
+	project.ID = func() string {
+		if len(response.GeneratedKeys) > 0 {
+			return string(response.GeneratedKeys[0])
+		}
+		return ""
+	}()
+
+	//add the project ID to the images and save them in the Images table
+	// TODO: investigate how to do a bulk insert
+	for _, img := range project.Images {
+		img.ProjectID = project.ID
+		response, err = r.Table(tblNameImages).Insert(img).RunWrite(m.session)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	// rethinkDB returns the ID as the first element of the GeneratedKeys slice
+	// TODO: this method seems brittle, should contact the gorethink dev team for insight on this.
+
+	eventType = "add-project"
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
+	return nil
+}
+
+func (m DefaultManager) UpdateProject(project *model.Project) error {
+	var eventType string
+	// check if exists; if so, update
+	proj, err := m.Project(project.ID)
+	if err != nil && err != ErrProjectDoesNotExist {
+		return err
+	}
+	// update
+	if proj != nil {
+		updates := map[string]interface{}{
+			"name":        project.Name,
+			"description": project.Description,
+			"status":      project.Status,
+			"needsBuild":  project.NeedsBuild,
+			"updateTime":  time.Now().UTC(),
+			// TODO: find a way to retrieve the current user
+			"updatedBy": "updater",
+		}
+
+		//TODO: Find a more elegant approach
+		// Retrieve images by projectId and delete them by their primary key id generated by rethink
+		res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": proj.ID}).Run(m.session)
+		if err != nil {
+			return err
+		}
+		oldImages := []*model.Image{}
+		if err := res.All(&oldImages); err != nil {
+			return err
+		}
+
+		// Remove existing images for this project
+		for _, oldImage := range oldImages {
+			if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": oldImage.ID}).Delete().Run(m.session); err != nil {
+				return err
+			}
+		}
+
+		// Insert all the images that are incoming from the request which should have the new and old ones
+		// TODO: investigate how we can do bulk insert
+		for _, newImage := range project.Images {
+			newImage.ProjectID = proj.ID
+			if _, err := r.Table(tblNameImages).Insert(newImage).RunWrite(m.session); err != nil {
+				return err
+			}
+		}
+
+		if _, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-project"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteProject(project *model.Project) error {
+	res, err := r.Table(tblNameProjects).Filter(map[string]string{"id": project.ID}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrProjectDoesNotExist
+	}
+	res, err = r.Table(tblNameImages).Filter(map[string]string{"projectId": project.ID}).Run(m.session)
+	if err != nil {
+		return err
+	}
+	imagesToDelete := []*model.Image{}
+	if err := res.All(&imagesToDelete); err != nil {
+		return err
+	}
+
+	// Remove existing images for this project
+	for _, imgToDelete := range imagesToDelete {
+		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": imgToDelete.ID}).Delete().Run(m.session); err != nil {
+			return err
+		}
+	}
+	m.logEvent("delete-project", fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
+
+	return nil
+}
+
+// end methods related to the project structure
+
+//methods related to the Image structure
+func (m DefaultManager) Images() ([]*model.Image, error) {
+	// TODO: sort by datetime once it is implemented
+	res, err := r.Table(tblNameImages).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	images := []*model.Image{}
+	if err := res.All(&images); err != nil {
+		return nil, err
+	}
+	return images, nil
+}
+
+func (m DefaultManager) Image(id string) (*model.Image, error) {
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrImageDoesNotExist
+	}
+	var image *model.Image
+	if err := res.One(&image); err != nil {
+		return nil, err
+	}
+	return image, nil
+}
+
+func (m DefaultManager) ImagesByProjectId(projectId string) ([]*model.Image, error) {
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": projectId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	images := []*model.Image{}
+	if err := res.All(&images); err != nil {
+		return nil, err
+	}
+	return images, nil
+}
+
+func (m DefaultManager) SaveImage(image *model.Image) error {
+	var eventType string
+
+	img, err := m.Image(image.ID)
+	if err != nil && err != ErrImageDoesNotExist {
+		return err
+	}
+	if img != nil {
+		return ErrImageExists
+	}
+	if _, err := r.Table(tblNameImages).Insert(image).RunWrite(m.session); err != nil {
+		return err
+	}
+	eventType = "add-image"
+
+	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) UpdateImage(image *model.Image) error {
+	var eventType string
+
+	// check if exists; if so, update
+	img, err := m.Image(image.ID)
+	if err != nil && err != ErrImageDoesNotExist {
+		return err
+	}
+	// update
+	if img != nil {
+		updates := map[string]interface{}{
+			"name":           image.Name,
+			"imageId":        image.ImageId,
+			"tag":            image.Tag,
+			"description":    image.Description,
+			"location":       image.Location,
+			"skipImageBuild": image.SkipImageBuild,
+			"projectId":      image.ProjectID,
+		}
+
+		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-image"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteImage(image *model.Image) error {
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrImageDoesNotExist
+	}
+
+	m.logEvent("delete-image", fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+
+	return nil
+}
+
+// end methods related to the Image structure
 
 func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 

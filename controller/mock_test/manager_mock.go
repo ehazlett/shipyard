@@ -7,6 +7,7 @@ import (
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/dockerhub"
+	"github.com/shipyard/shipyard/model"
 	registry "github.com/shipyard/shipyard/registry/v1"
 )
 
@@ -68,6 +69,7 @@ func (m MockManager) DeleteAccount(account *auth.Account) error {
 	return nil
 }
 
+//end Project struct
 func (m MockManager) Roles() ([]*auth.ACL, error) {
 	return auth.DefaultACLs(), nil
 }
@@ -199,4 +201,49 @@ func (m MockManager) GetAuthenticator() auth.Authenticator {
 
 func (m MockManager) ScaleContainer(id string, numInstances int) manager.ScaleResult {
 	return manager.ScaleResult{Scaled: []string{"9c3c7dd2199a95cce29950b612ecf918ae278a42e53e10f6cccb752b6fbcd8b3"}, Errors: []string{"500 Internal Server Error: no resources available to schedule container"}}
+}
+
+// TODO: add mock objects for Projects and Images (ILM) to helpers.go
+func (m MockManager) Projects() ([]*model.Project, error) {
+	return nil, nil
+}
+
+func (m MockManager) Project(name string) (*model.Project, error) {
+	return nil, nil
+}
+
+func (m MockManager) SaveProject(project *model.Project) error {
+	return nil
+}
+
+func (m MockManager) UpdateProject(project *model.Project) error {
+	return nil
+}
+
+func (m MockManager) DeleteProject(project *model.Project) error {
+	return nil
+}
+
+func (m MockManager) Images() ([]*model.Image, error) {
+	return nil, nil
+}
+
+func (m MockManager) ImagesByProjectId(projectId string) ([]*model.Image, error) {
+	return nil, nil
+}
+
+func (m MockManager) Image(name string) (*model.Image, error) {
+	return nil, nil
+}
+
+func (m MockManager) SaveImage(image *model.Image) error {
+	return nil
+}
+
+func (m MockManager) UpdateImage(image *model.Image) error {
+	return nil
+}
+
+func (m MockManager) DeleteImage(image *model.Image) error {
+	return nil
 }
