@@ -32,7 +32,7 @@
                 }
             })
             .state('dashboard.create_project', {
-                url: '^/projects',
+                url: '^/projects_create',
                 templateUrl: 'app/projects/create.html',
                 controller: 'CreateController',
                 controllerAs: 'vm',
