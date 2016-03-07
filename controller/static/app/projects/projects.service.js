@@ -56,6 +56,15 @@
                         return response.data;
                 });
                 return promise;
+            },
+            getImages: function() {
+                var promise = $http
+                    .get('/api/projects/location')
+                    .then(function(response) {
+                        console.log(response.data);
+                        return response.data;
+                    });
+                return promise;
             }
         }
     }

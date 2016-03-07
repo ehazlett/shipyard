@@ -17,7 +17,6 @@
                 authenticate: true
             })
             .state('dashboard.edit_project', {
-                //TODO: Is this a resource? should it have an URL?
                 url: '^/projects/{id}',
                 templateUrl: 'app/projects/edit.html',
                 controller: 'EditController',

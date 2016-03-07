@@ -27,6 +27,7 @@
         vm.showImageCreateDialog = showImageCreateDialog;
         vm.showImageEditDialog = showImageEditDialog;
         vm.deleteImage = deleteImage;
+        vm.getImages = getImages;
 
         function saveProject(project){
             console.log("saving project" + project);
@@ -47,15 +48,11 @@
             vm.selectedEditImage = image;
 
             vm.editImage = {
-                id: image.id,
                 name: image.name,
                 skipImageBuild: image.skipImageBuild,
                 tag: image.tag,
                 description: image.description,
-                skipTLS: image.skipTLS,
-                url: image.url,
-                username: image.username,
-                password: image.password
+                location: image.location
             };
             $('#image-edit-modal').modal('show');
         }
@@ -65,20 +62,27 @@
         }
 
         function editSaveImage() {
-            vm.selectedEditImage.id = vm.editImage.id;
             vm.selectedEditImage.name = vm.editImage.name;
             vm.selectedEditImage.skipImageBuild = vm.editImage.skipImageBuild;
             vm.selectedEditImage.tag = vm.editImage.tag;
             vm.selectedEditImage.description = vm.editImage.description;
-            vm.selectedEditImage.skipTLS = vm.editImage.skipTLS;
-            vm.selectedEditImage.url = vm.editImage.url;
-            vm.selectedEditImage.username = vm.editImage.username;
-            vm.selectedEditImage.password = vm.editImage.password;
+            vm.selectedEditImage.location = vm.editImage.location;
             console.log(vm.selectedEditImage);
         }
 
         function deleteImage(image) {
             vm.project.images.splice(vm.project.images.indexOf(image), 1);
+        }
+
+        function getImages() {
+            console.log("get images");
+            ProjectService.getImages()
+                .then(function(data) {
+                    vm.Images = [];
+                    vm.Images = data;
+                }, function(data) {
+                    vm.error = data;
+                });
         }
     }
 })();
