@@ -6,6 +6,7 @@ rethinkdb:
         - "29015"
 proxy:
     image: ehazlett/docker-proxy:latest
+    command: -i
     volumes:
         - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
