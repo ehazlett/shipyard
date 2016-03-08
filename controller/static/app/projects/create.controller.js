@@ -22,7 +22,7 @@
         vm.skipTests= true;
 
         vm.registries = [];
-        vm.Images = [];
+        vm.images = [];
 
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
@@ -30,7 +30,26 @@
         vm.showImageCreateDialog = showImageCreateDialog;
         vm.showImageEditDialog = showImageEditDialog;
         vm.deleteImage = deleteImage;
+        vm.getRegistries = getRegistries;
         vm.getImages = getImages;
+
+        vm.getRegistries();
+
+        $(".ui.search.fluid.dropdown.registry")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    console.log('getting images for ' + text);
+                    getImages(text);
+                }
+            });
+        $(".ui.search.fluid.dropdown.publicregistryimage")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    console.log('searching dockerhub ');
+                    getImagesDockerhub(text);
+                }
+            });
+
 
         function saveProject(project){
             console.log("saving project" + project);
@@ -77,8 +96,8 @@
             vm.project.images.splice(vm.project.images.indexOf(image), 1);
         }
 
-        function getImages() {
-            console.log("get images");
+        function getRegistries() {
+            console.log("get regs");
             /*ProjectService.getImages()
                 .then(function(data) {
                     vm.Images = [];
@@ -88,11 +107,32 @@
                 });*/
             RegistryService.list()
                 .then(function(data) {
+                    console.log(data);
                     vm.registries = data;
                 }, function(data) {
                     vm.error = data;
                 });
             vm.error = "";
+        }
+
+        function getImages(registry) {
+            console.log("get images");
+            RegistryService.listRepositories(registry)
+                .then(function(data) {
+                    console.log(data);
+                    vm.images = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+        }
+
+        function getImagesDockerhub(name) {
+            RegistryService.listDockerhubRepos(name)
+                .then(function(data) {
+                    console.log("dockerhub images: " + data);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
     }
 })();
