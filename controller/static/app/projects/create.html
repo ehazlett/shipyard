@@ -20,8 +20,8 @@
                         <div class="ui two column grid">
                             <div class="column">
 
-                                <div class="four fields">
-                                    <div class="field">
+                                <div class="fields">
+                                    <div class="four wide field" ng-click="vm.getImages()">
                                         <label>Location</label>
                                         <select name="location" ng-model="vm.createImage.location" class="ui search fluid dropdown">
                                             <option value="">Choose Location</option>
@@ -38,21 +38,21 @@
                                         <div></div>
                                     </div>
 
-                                    <div ng-if="vm.createImage.location === 'ShipyardRegistry'" class="field">
+                                    <div ng-if="vm.createImage.location === 'ShipyardRegistry'" class="four wide field">
                                         <label>Registry </label>
                                         <select name="image" ng-model="vm.createImage.registry" class="ui search fluid dropdown">
                                             <option value="">Registry Name</option>
-                                            <!--<option ng-repeat="a in vm.Images" value="{{a.name}}">{{a.name}}</option>-->
+                                            <option ng-repeat="r in vm.registries" value="{{r.name}}">{{r.name}}</option>
                                         </select>
                                     </div>
-                                    <div ng-if="vm.createImage.location === 'ShipyardRegistry'" class="field">
+                                    <div ng-if="vm.createImage.location === 'ShipyardRegistry'" class="four wide field">
                                         <label>Image Name </label>
                                         <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown">
                                             <option value="">Name</option>
-                                            <!--<option ng-repeat="a in vm.Images" value="{{a.name}}">{{a.name}}</option>-->
+                                            <!--<option ng-repeat="a in vm.Images" value="{{a}}">{{a.Id}}</i></option>-->
                                         </select>
                                     </div>
-                                    <div ng-if="vm.createImage.location === 'ShipyardRegistry'" class="field">
+                                    <div ng-if="vm.createImage.location === 'ShipyardRegistry'" class="three wide field">
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown">
                                             <option value="">Tag</option>
@@ -60,26 +60,38 @@
                                         </select>
                                     </div>
 
-                                    <div ng-if="vm.createImage.location === 'PublicRegistry'" class="field">
-                                        <label>URL </label>
-                                        <select name="image" ng-model="vm.createImage.registry" class="ui search fluid dropdown">
-                                            <option value="">URL</option>
-                                            <!--<option ng-repeat="a in vm.Images" value="{{a.name}}">{{a.name}}</option>-->
-                                        </select>
-                                    </div>
-                                    <div ng-if="vm.createImage.location === 'PublicRegistry'" class="field">
-                                        <label>User Name </label>
+                                    <div ng-if="vm.createImage.location === 'PublicRegistry'" class="four wide field">
+                                        <label>Image Name </label>
                                         <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown">
-                                            <option value="">User Name</option>
+                                            <option value="">Name</option>
                                             <!--<option ng-repeat="a in vm.Images" value="{{a.name}}">{{a.name}}</option>-->
                                         </select>
                                     </div>
-                                    <div ng-if="vm.createImage.location === 'PublicRegistry'" class="field">
-                                        <label>Password</label>
+                                    <div ng-if="vm.createImage.location === 'PublicRegistry'" class="four wide field">
+                                        <label>Tag</label>
                                         <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown">
-                                            <option value="">Password</option>
+                                            <option value="">Tag</option>
                                             <!--<option ng-repeat="a in vm.Images" value="{{a.tag}}">{{a.tag}}</option>-->
                                         </select>
+                                    </div>
+
+                                    <div ng-if="vm.createImage.location === 'File'" class="four wide field">
+                                        <label>Upload File</label>
+                                        <input name="file" type="file" placeholder="Choose a File..."/>
+                                    </div>
+                                    <div ng-if="vm.createImage.location === 'File'" class="four wide field">
+                                        <label>Image Name </label>
+                                        <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown">
+                                            <option value="">Name</option>
+                                            <!--<option ng-repeat="a in vm.Images" value="{{a.name}}">{{a.name}}</option>-->
+                                        </select>
+                                    </div>
+
+                                    <div ng-if="vm.createImage.location" class="one wide field">
+                                        <label>&nbsp;</label>
+                                        <button class="right floated ui icon button disabled">
+                                            <i class="check icon"></i>
+                                        </button>
                                     </div>
 
                                 </div>
@@ -88,10 +100,19 @@
                                     <div></div>
                                 </div>
 
-                                <div ng-if="vm.createImage.location" class="field">
+                                <div ng-if="vm.createImage.location && vm.createImage.location != 'File'" class="field">
                                     <label>Additional Image Tag</label>
-                                    <input name="additionalTag" class="input" type="text" ng-model="vm.createImage.additionalTag" placeholder="Tags" />
+                                    <input disabled name="additionalTag" class="input" type="text" ng-model="vm.createImage.additionalTag" placeholder="Tags" />
                                 </div>
+
+                                <div ng-if="vm.createImage.location ==='File'" class="two fields">
+                                    <div class="field"></div>
+                                    <div class="field">
+                                        <label>Tag the Image</label>
+                                        <input name="tag" type="text" ng-model="vm.createImage.tag" placeholder="Tag name"/>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="column">
@@ -101,7 +122,7 @@
                                     <input name="description" class="input" type="text" ng-model="vm.createImage.description" placeholder="Add Description" />
                                 </div>
 
-                                <div ng-if="vm.createImage.location" class="field">
+                                <div ng-if="vm.createImage.location && vm.createImage.location === 'File'" class="field">
                                     <label>Tags to Apply on Successful Build</label>
                                     <input name="successTags" class="input" type="text" placeholder="Tags" />
                                 </div>

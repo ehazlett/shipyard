@@ -6,8 +6,8 @@
         .module('shipyard.projects')
         .controller('CreateController', CreateController);
 
-    CreateController.$inject = ['$scope', 'ProjectService', '$state'];
-    function CreateController($scope, ProjectService, $state) {
+    CreateController.$inject = ['$scope', 'ProjectService', 'RegistryService', '$state'];
+    function CreateController($scope, ProjectService, RegistryService, $state) {
         var vm = this;
 
         vm.project = {};
@@ -20,6 +20,9 @@
 
         vm.skipImages = true;
         vm.skipTests= true;
+
+        vm.registries = [];
+        vm.Images = [];
 
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
@@ -76,13 +79,20 @@
 
         function getImages() {
             console.log("get images");
-            ProjectService.getImages()
+            /*ProjectService.getImages()
                 .then(function(data) {
                     vm.Images = [];
                     vm.Images = data;
                 }, function(data) {
                     vm.error = data;
+                });*/
+            RegistryService.list()
+                .then(function(data) {
+                    vm.registries = data;
+                }, function(data) {
+                    vm.error = data;
                 });
+            vm.error = "";
         }
     }
 })();
