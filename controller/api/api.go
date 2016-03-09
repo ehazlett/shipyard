@@ -132,6 +132,8 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.image).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.addImageToProjectId).Methods("POST", "PUT")
 
+	apiRouter.HandleFunc("/api/test_image", a.testImage).Methods("POST")
+
 	//ILM related routes
 	apiRouter.HandleFunc("/api/ilm_images", a.images).Methods("GET")
 	apiRouter.HandleFunc("/api/ilm_images", a.saveImage).Methods("POST")

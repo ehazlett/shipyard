@@ -25,8 +25,11 @@ const (
 
 func checkImage(image string) {
 	// TODO: parse firs 2 params from config file
-	endpoint := "http://127.0.0.1:6060"
-	myAddress := "127.0.0.1"
+	endpoint_value := "http://127.0.0.1:6060"
+	myAddress_value := "127.0.0.1"
+	endpoint := &endpoint_value
+	myAddress := &myAddress_value
+
 	imageName := image
 
 	// Save image.

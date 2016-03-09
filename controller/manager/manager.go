@@ -101,6 +101,8 @@ type (
 		UpdateImage(image *model.Image) error
 		DeleteImage(image *model.Image) error
 
+		TestImage(image, tag string) error
+
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
 		Store() *sessions.CookieStore
@@ -899,6 +901,12 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 }
 
 // end methods related to the project structure
+
+func (m DefaultManager) TestImage(image, tag string) error {
+	//for now always succeed, no work done
+	fmt.Printf("calling clair to check %s:%s\n", image, tag)
+	return nil
+}
 
 //methods related to the Image structure
 func (m DefaultManager) Images() ([]*model.Image, error) {
