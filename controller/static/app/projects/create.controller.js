@@ -33,6 +33,7 @@
         vm.getRegistries = getRegistries;
         vm.getImages = getImages;
         vm.getImagesDockerhub = getImagesDockerhub;
+        vm.showTestCreateDialog = showTestCreateDialog;
 
         vm.getRegistries();
         //vm.getImagesDockerhub("tomcat");
@@ -66,6 +67,11 @@
         function showImageCreateDialog() {
             vm.createImage = {};
             $('#image-create-modal').modal('show');
+        }
+
+        function showTestCreateDialog() {
+            vm.createImage = {};
+            $('#test-create-modal').modal('show');
         }
 
         function showImageEditDialog(image) {
