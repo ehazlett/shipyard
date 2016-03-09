@@ -27,7 +27,7 @@
                                             <option value="">Choose Location</option>
                                             <option value="ShipyardRegistry" ng-click="console.log('clicked')">Shipyard Registry</option>
                                             <option value="PublicRegistry">Public Registry</option>
-                                            <option value="File">File</option>
+                                            <!--<option value="File">File</option>-->
                                         </select>
                                     </div>
 
@@ -40,7 +40,7 @@
 
                                     <div ng-show="vm.createImage.location === 'ShipyardRegistry'" class="four wide field">
                                         <label>Registry </label>
-                                        <select id="erfgergergere" name="image" ng-model="vm.createImage.registry" class="ui search fluid dropdown registry">
+                                        <select name="registry_name" ng-model="vm.createImage.registry" class="ui search fluid dropdown registry">
                                             <option value="">Registry Name</option>
                                             <option ng-repeat="r in vm.registries" value="{{r.name}}">{{r.name}}</option>
                                         </select>
@@ -49,23 +49,27 @@
                                         <label>Image Name </label>
                                         <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown">
                                             <option value="">Name</option>
-                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</i></option>
+                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.createImage.location === 'ShipyardRegistry'" class="three wide field">
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown">
                                             <option value="">Tag</option>
-                                            <!--<option ng-repeat="a in vm.Images" value="{{a.tag}}">{{a.tag}}</option>-->
+                                            <option ng-repeat="a in vm.images | filter: { name: vm.createImage.name }" value="{{a.tag}}">{{a.tag}}</option>
                                         </select>
                                     </div>
 
                                     <div ng-show="vm.createImage.location === 'PublicRegistry'" class="four wide field">
                                         <label>Image Name </label>
-                                        <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown">
+                                        <!--<select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown">
                                             <option value="">Name</option>
-                                            <!--<option ng-repeat="a in vm.Images" value="{{a.name}}">{{a.name}}</option>-->
-                                        </select>
+                                            <option ng-repeat="a in vm.imagesPublic" value="{{a.name}}">{{a.name}}</option>
+                                        </select>-->
+                                        <div class="ui search">
+                                            <input class="prompt" type="text" placeholder="Name" ng-model="vm.createImage.name" />
+                                            <div class="results"></div>
+                                        </div>
                                     </div>
                                     <div ng-show="vm.createImage.location === 'PublicRegistry'" class="four wide field">
                                         <label>Tag</label>
@@ -102,7 +106,10 @@
 
                                 <div ng-show="vm.createImage.location && vm.createImage.location != 'File'" class="field">
                                     <label>Additional Image Tag</label>
-                                    <input disabled name="additionalTag" class="input" type="text" ng-model="vm.createImage.additionalTag" placeholder="Tags" />
+                                    <input disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
+                                    <!--<i ng-show="vm.createImage.name" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.createImage.name }">
+                                        {{a.tag}}
+                                    </i>-->
                                 </div>
 
                                 <div ng-show="vm.createImage.location ==='File'" class="two fields">
@@ -390,5 +397,16 @@
 <script>
     $(function(){
         $('.ui.dropdown').dropdown();
+    });
+
+    $(function() {
+        $('.ui.search').search({
+            apiSettings: {
+                url: 'https://index.docker.io/v1/search?q={query}',
+                /*dataType:"jsonp",
+                jsonpCallback: 'callback'*/
+            },
+            type: 'name'
+        });
     });
 </script>

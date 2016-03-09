@@ -32,8 +32,10 @@
         vm.deleteImage = deleteImage;
         vm.getRegistries = getRegistries;
         vm.getImages = getImages;
+        vm.getImagesDockerhub = getImagesDockerhub;
 
         vm.getRegistries();
+        //vm.getImagesDockerhub("tomcat");
 
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
@@ -98,21 +100,14 @@
 
         function getRegistries() {
             console.log("get regs");
-            /*ProjectService.getImages()
-                .then(function(data) {
-                    vm.Images = [];
-                    vm.Images = data;
-                }, function(data) {
-                    vm.error = data;
-                });*/
             RegistryService.list()
                 .then(function(data) {
                     console.log(data);
                     vm.registries = data;
                 }, function(data) {
                     vm.error = data;
-                });
-            vm.error = "";
+                })
+
         }
 
         function getImages(registry) {
@@ -130,6 +125,7 @@
             RegistryService.listDockerhubRepos(name)
                 .then(function(data) {
                     console.log("dockerhub images: " + data);
+                    vm.imagesPublic = data;
                 }, function(data) {
                     vm.error = data;
                 })
