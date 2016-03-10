@@ -13,20 +13,24 @@
         vm.project = {};
         vm.project.images = [];
         vm.project.author = localStorage.getItem('X-Access-Token').split(":")[0];
+        vm.project.tests = [];
 
         // Create modal, edit modal namespaces
         vm.createImage = {};
         vm.editImage = {};
+        vm.createTest = {};
 
         vm.skipImages = true;
         vm.skipTests= true;
 
         vm.registries = [];
         vm.images = [];
+        vm.tests = [];
 
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
+        vm.createSaveTest = createSaveTest;
         vm.showImageCreateDialog = showImageCreateDialog;
         vm.showImageEditDialog = showImageEditDialog;
         vm.deleteImage = deleteImage;
@@ -36,7 +40,6 @@
         vm.showTestCreateDialog = showTestCreateDialog;
 
         vm.getRegistries();
-        //vm.getImagesDockerhub("tomcat");
 
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
@@ -66,12 +69,24 @@
 
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#image-create-modal').modal('show');
+            $('#image-create-modal')
+                .modal({
+                    onHidden: function() {
+                        $('#image-create-modal').find("input,select").val("").end();
+                    }
+                })
+                .modal('show');
         }
 
         function showTestCreateDialog() {
             vm.createImage = {};
-            $('#test-create-modal').modal('show');
+            $('#test-create-modal')
+                .modal({
+                    onHidden: function() {
+                        $('#test-create-modal').find("input,select").val("").end();
+                    }
+                })
+                .modal('show');
         }
 
         function showImageEditDialog(image) {
@@ -79,6 +94,7 @@
 
             vm.editImage = {
                 name: image.name,
+                registry: image.registry,
                 skipImageBuild: image.skipImageBuild,
                 tag: image.tag,
                 description: image.description,
@@ -93,6 +109,7 @@
 
         function editSaveImage() {
             vm.selectedEditImage.name = vm.editImage.name;
+            vm.selectedEditImage.registry = vm.selectedEditImage.registry;
             vm.selectedEditImage.skipImageBuild = vm.editImage.skipImageBuild;
             vm.selectedEditImage.tag = vm.editImage.tag;
             vm.selectedEditImage.description = vm.editImage.description;
@@ -102,6 +119,10 @@
 
         function deleteImage(image) {
             vm.project.images.splice(vm.project.images.indexOf(image), 1);
+        }
+
+        function createSaveTest(test) {
+            vm.project.tests.push(test);
         }
 
         function getRegistries() {
