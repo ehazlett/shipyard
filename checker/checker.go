@@ -24,8 +24,9 @@ const (
 
 func CheckImage(name string) {
 	// TODO: parse first./ 2 params from config file
-	endpoint_value := "http://172.17.0.1:6060"
-	myAddress_value := "172.17.0.1"
+
+	endpoint_value := "http://clair:6060"
+	myAddress_value := "controller"
 	endpoint := &endpoint_value
 	myAddress := &myAddress_value
 
