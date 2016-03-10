@@ -1,4 +1,4 @@
-package image_verification
+package checker
 
 import (
 	"bufio"
@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/coreos/clair/api/v1"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -13,8 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/coreos/clair/api/v1"
 )
 
 const (
@@ -23,14 +22,14 @@ const (
 	httpPort            = 9279
 )
 
-func checkImage(image string) {
-	// TODO: parse firs 2 params from config file
-	endpoint_value := "http://127.0.0.1:6060"
-	myAddress_value := "127.0.0.1"
+func CheckImage(name string) {
+	// TODO: parse first./ 2 params from config file
+	endpoint_value := "http://172.17.0.1:6060"
+	myAddress_value := "172.17.0.1"
 	endpoint := &endpoint_value
 	myAddress := &myAddress_value
 
-	imageName := image
+	imageName := name
 
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)
@@ -52,7 +51,7 @@ func checkImage(image string) {
 		os.Exit(1)
 	}
 
-	// Setup a simple HTTP server if Clair is not local.
+	//Setup a simple HTTP server if Clair is not local.
 	if !strings.Contains(*endpoint, "127.0.0.1") && !strings.Contains(*endpoint, "localhost") {
 		allowedHost := strings.TrimPrefix(*endpoint, "http://")
 		portIndex := strings.Index(allowedHost, ":")

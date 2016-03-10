@@ -45,6 +45,8 @@ media:
 controller:
     restart: always
     build: .
+    ports:
+      - "92"
     dockerfile: Dockerfile.build
     entrypoint: /bin/bash
     command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
@@ -52,7 +54,9 @@ controller:
         - rethinkdb
         - swarm
     volumes:
-        - .:/go/src/github.com/shipyard/shipyard
+        - .:/go/src/github.com/shipyard/shipyard 
+        - "/var/run/docker.sock:/var/run/docker.sock" 
+
     volumes_from:
         - media
     ports:

@@ -17,6 +17,7 @@ import (
 	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
+	c "github.com/shipyard/shipyard/checker"
 	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/version"
@@ -101,7 +102,8 @@ type (
 		UpdateImage(image *model.Image) error
 		DeleteImage(image *model.Image) error
 
-		TestImage(image, tag string) error
+		TestImage(id string) error
+		TestImagesForProjectId(id string) error
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -902,9 +904,50 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 
 // end methods related to the project structure
 
-func (m DefaultManager) TestImage(image, tag string) error {
-	//for now always succeed, no work done
-	fmt.Printf("calling clair to check %s:%s\n", image, tag)
+// begin methods for verifying images using clair
+func (m DefaultManager) TestImage(id string) error {
+	//get an image by id
+	var image *model.Image
+
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
+
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrImageDoesNotExist
+	}
+	if err := res.One(&image); err != nil {
+		return err
+	}
+	// check the image with clair
+	name := image.Name
+	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
+	c.CheckImage(name)
+
+	m.logEvent("test-image", fmt.Sprintf("id=%s, name=%s", image.Name, image.Tag), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) TestImagesForProjectId(id string) error {
+	//get all the images by a project id
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
+	if err != nil {
+		return err
+	}
+	imagesToCheck := []*model.Image{}
+	if err := res.All(&imagesToCheck); err != nil {
+		return err
+	}
+	// check each image with clair
+	for _, imageToCheck := range imagesToCheck {
+		name := imageToCheck.Name
+		fmt.Printf("calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
+		c.CheckImage(name)
+	}
+
+	m.logEvent("test-images-for-project", fmt.Sprintf("id=%s, name=%s", id), []string{"security"})
+
 	return nil
 }
 
