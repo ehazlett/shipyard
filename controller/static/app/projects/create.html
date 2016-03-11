@@ -78,7 +78,7 @@
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown">
                                             <option value="">Tag</option>
-                                            <!--<option ng-repeat="a in vm.Images" value="{{a.tag}}">{{a.tag}}</option>-->
+                                            <option ng-repeat="a in vm.tags" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
 
@@ -223,7 +223,7 @@
                                             <option value="">Name</option>
                                             <option ng-repeat="a in vm.imagesPublic" value="{{a.name}}">{{a.name}}</option>
                                         </select>-->
-                                        <div class="ui search">
+                                        <div class="ui search" id="public-registry-image-search">
                                             <input class="prompt" type="text" placeholder="vm.editImage.name" ng-model="vm.editImage.name" />
                                             <div class="results"></div>
                                         </div>
@@ -591,20 +591,6 @@
 <script>
     $(function() {
         $('.ui.dropdown').dropdown();
-    });
-
-    $(function() {
-        $('.ui.search').search({
-            apiSettings: {
-                url: 'https://index.docker.io/v1/search?q={query}',
-            },
-            /*searchFields: ['name'],*/
-            fields: {
-                results: 'results',
-                name: 'name'
-            },
-            minCharacters: 3
-        });
     });
 
     /*$('#image-create-modal').on('hidden', function(){

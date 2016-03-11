@@ -6,8 +6,8 @@
         .module('shipyard.projects')
         .controller('CreateController', CreateController);
 
-    CreateController.$inject = ['$scope', 'ProjectService', 'RegistryService', '$state'];
-    function CreateController($scope, ProjectService, RegistryService, $state) {
+    CreateController.$inject = ['$scope', 'ProjectService', 'RegistryService', '$state', '$http'];
+    function CreateController($scope, ProjectService, RegistryService, $state, $http) {
         var vm = this;
 
         vm.project = {};
@@ -25,6 +25,7 @@
 
         vm.registries = [];
         vm.images = [];
+        vm.tags = [];
         vm.tests = [];
 
         vm.saveProject = saveProject;
@@ -39,6 +40,7 @@
         vm.getImagesDockerhub = getImagesDockerhub;
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.checkImage = checkImage;
+        vm.getTags = getTags;
 
         vm.getRegistries();
 
@@ -59,6 +61,23 @@
                     getImagesDockerhub(text);
                 }
             });
+        $('.ui.search').search({
+            apiSettings: {
+                url: 'https://index.docker.io/v1/search?q={query}',
+                // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
+                successTest: function(response) {
+                    $.each(response.results, function(index,item) {
+                        response.results[index].title = response.results[index].name;
+                    });
+                    return true;
+                }
+            },
+            onSelect: function(result,response) {
+                vm.getTags(result.name);
+                console.log(vm.tags);
+            },
+            minCharacters: 3
+        });
 
         function saveProject(project){
             console.log("saving project" + project);
@@ -151,6 +170,17 @@
                 .then(function(data) {
                     console.log(data);
                     vm.images = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+        }
+
+        function getTags(imageName) {
+            console.log("get tags");
+            vm.tags = [];
+            $http.get('https://registry.hub.docker.com/v1/repositories/'+imageName+'/tags')
+                .then(function(response) {
+                    vm.tags = response.data;
                 }, function(data) {
                     vm.error = data;
                 })
