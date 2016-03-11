@@ -23,7 +23,7 @@
                                 <div class="fields">
                                     <div class="four wide field">
                                         <label>Location</label>
-                                        <select name="location" ng-model="vm.createImage.location" class="ui search fluid dropdown">
+                                        <select id="imageLocation" name="location" ng-model="vm.createImage.location" class="ui search fluid dropdown">
                                             <option value="">Choose Location</option>
                                             <option value="ShipyardRegistry" ng-click="console.log('clicked')">Shipyard Registry</option>
                                             <option value="PublicRegistry">Public Registry</option>
@@ -47,14 +47,14 @@
                                     </div>
                                     <div ng-show="vm.createImage.location === 'ShipyardRegistry'" class="four wide field">
                                         <label>Image Name </label>
-                                        <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown">
+                                        <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown" ng-change="vm.checkImage()">
                                             <option value="">Name</option>
                                             <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
-                                    <div ng-show="vm.createImage.location === 'ShipyardRegistry'" class="three wide field">
+                                    <div ng-show="vm.createImage.location === 'ShipyardRegistry'" class="three wide field" >
                                         <label>Tag</label>
-                                        <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown">
+                                        <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown" ng-change="vm.checkImage()">
                                             <option value="">Tag</option>
                                             <option ng-repeat="a in vm.images | filter: { name: vm.createImage.name }" value="{{a.tag}}">{{a.tag}}</option>
                                         </select>
@@ -67,7 +67,10 @@
                                             <option ng-repeat="a in vm.imagesPublic" value="{{a.name}}">{{a.name}}</option>
                                         </select>-->
                                         <div class="ui search">
-                                            <input class="prompt" type="text" placeholder="Name" ng-model="vm.createImage.name" />
+                                            <div class="ui icon input">
+                                                <input class="prompt" type="text" placeholder="Name" ng-model="vm.createImage.name" />
+                                                <i class="search icon"></i>
+                                            </div>
                                             <div class="results"></div>
                                         </div>
                                     </div>
@@ -93,7 +96,7 @@
 
                                     <div ng-show="vm.createImage.location" class="one wide field">
                                         <label>&nbsp;</label>
-                                        <button class="right floated ui icon button disabled">
+                                        <button class="right floated ui icon button {{vm.buttonStyle}}">
                                             <i class="check icon"></i>
                                         </button>
                                     </div>
@@ -145,7 +148,7 @@
         <div class="ui negative button">
             Cancel
         </div>
-        <div ng-click="vm.createSaveImage(vm.createImage)" class="ui positive right labeled icon button">
+        <div ng-click="vm.createSaveImage(vm.createImage)" class="ui positive right labeled icon button {{vm.buttonStyle}}">
             Save Image
             <i class="save icon"></i>
         </div>

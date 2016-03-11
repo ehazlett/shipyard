@@ -38,14 +38,18 @@
         vm.getImages = getImages;
         vm.getImagesDockerhub = getImagesDockerhub;
         vm.showTestCreateDialog = showTestCreateDialog;
+        vm.checkImage = checkImage;
 
         vm.getRegistries();
+
+        vm.buttonStyle = "disabled";
 
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
                     console.log('getting images for ' + text);
                     getImages(text);
+                    checkImage();
                 }
             });
         $(".ui.search.fluid.dropdown.publicregistryimage")
@@ -55,7 +59,6 @@
                     getImagesDockerhub(text);
                 }
             });
-
 
         function saveProject(project){
             console.log("saving project" + project);
@@ -72,7 +75,10 @@
             $('#image-create-modal')
                 .modal({
                     onHidden: function() {
-                        $('#image-create-modal').find("input,select").val("").end();
+                        $('#image-create-modal').find("input").val("");
+                        console.log('remove Data');
+                        //$('#image-create-modal').empty();
+                        $('#imageLocation').removeData();
                     }
                 })
                 .modal('show');
@@ -83,7 +89,7 @@
             $('#test-create-modal')
                 .modal({
                     onHidden: function() {
-                        $('#test-create-modal').find("input,select").val("").end();
+                        $('#test-create-modal').find("input").val("");
                     }
                 })
                 .modal('show');
@@ -127,6 +133,7 @@
 
         function getRegistries() {
             console.log("get regs");
+            vm.registries = [];
             RegistryService.list()
                 .then(function(data) {
                     console.log(data);
@@ -139,6 +146,7 @@
 
         function getImages(registry) {
             console.log("get images");
+            vm.images = [];
             RegistryService.listRepositories(registry)
                 .then(function(data) {
                     console.log(data);
@@ -146,6 +154,15 @@
                 }, function(data) {
                     vm.error = data;
                 })
+        }
+
+        function checkImage() {
+            vm.buttonStyle = "disabled";
+            angular.forEach(vm.images, function (image) {
+                if(image.name === vm.createImage.name && image.tag === vm.createImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
         }
 
         function getImagesDockerhub(name) {
