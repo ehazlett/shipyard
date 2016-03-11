@@ -16,6 +16,10 @@ import (
 	"time"
 )
 
+var (
+	server_exists bool = false
+)
+
 const (
 	postLayerURI        = "/v1/layers"
 	getLayerFeaturesURI = "/v1/layers/%s?vulnerabilities"
@@ -38,7 +42,7 @@ func CheckImage(name string) {
 	defer os.RemoveAll(path)
 	if err != nil {
 		fmt.Printf("- Could not save image: %s\n", err)
-		os.Exit(1)
+		return
 	}
 
 	// Retrieve history.
@@ -49,7 +53,7 @@ func CheckImage(name string) {
 	}
 	if err != nil || len(layerIDs) == 0 {
 		fmt.Printf("- Could not get image's history: %s\n", err)
-		os.Exit(1)
+		return
 	}
 
 	//Setup a simple HTTP server if Clair is not local.
@@ -59,8 +63,10 @@ func CheckImage(name string) {
 		if portIndex >= 0 {
 			allowedHost = allowedHost[:portIndex]
 		}
-
-		go listenHTTP(path, allowedHost)
+		if !server_exists {
+			server_exists = true
+			go listenHTTP(path, allowedHost)
+		}
 
 		path = "http://" + *myAddress + ":" + strconv.Itoa(httpPort)
 		time.Sleep(200 * time.Millisecond)
@@ -79,7 +85,7 @@ func CheckImage(name string) {
 		}
 		if err != nil {
 			fmt.Printf("- Could not analyze layer: %s\n", err)
-			os.Exit(1)
+			return
 		}
 	}
 
@@ -88,7 +94,7 @@ func CheckImage(name string) {
 	layer, err := getLayer(*endpoint, layerIDs[len(layerIDs)-1])
 	if err != nil {
 		fmt.Printf("- Could not get layer information: %s\n", err)
-		os.Exit(1)
+		return
 	}
 
 	// Print report.
@@ -97,7 +103,7 @@ func CheckImage(name string) {
 	if len(layer.Features) == 0 {
 		fmt.Println("No feature has been detected on the image.")
 		fmt.Println("This usually means that the image isn't supported by Clair.")
-		os.Exit(0)
+		return
 	}
 
 	isSafe := true
@@ -241,11 +247,10 @@ func listenHTTP(path, allowedHost string) {
 		}
 		return http.HandlerFunc(fc)
 	}
-
 	err := http.ListenAndServe(":"+strconv.Itoa(httpPort), restrictedFileServer(path, allowedHost))
 	if err != nil {
 		fmt.Printf("- An error occurs with the HTTP server: %s\n", err)
-		os.Exit(1)
+		return
 	}
 }
 
