@@ -5,5 +5,5 @@ import (
 )
 
 func TestImage(t *testing.T) {
-	CheckImage("marvambass/nginx-registry-proxy")
+	_ = CheckImage("marvambass/nginx-registry-proxy")
 }

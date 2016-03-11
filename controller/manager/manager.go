@@ -923,13 +923,15 @@ func (m DefaultManager) TestImage(id string) error {
 	// check the image with clair
 	name := image.Name
 	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
-	c.CheckImage(name)
+	err = c.CheckImage(name)
 
 	m.logEvent("test-image", fmt.Sprintf("id=%s, name=%s", image.Name, image.Tag), []string{"security"})
 
-	return nil
+	return err
 }
 func (m DefaultManager) TestImagesForProjectId(id string) error {
+	var the_error error
+	the_error = nil
 	//get all the images by a project id
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
 	if err != nil {
@@ -943,12 +945,15 @@ func (m DefaultManager) TestImagesForProjectId(id string) error {
 	for _, imageToCheck := range imagesToCheck {
 		name := imageToCheck.Name
 		fmt.Printf("calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
-		c.CheckImage(name)
+		err = c.CheckImage(name)
+		if err != nil {
+			the_error = err
+		}
 	}
 
 	m.logEvent("test-images-for-project", fmt.Sprintf("id=%s, name=%s", id), []string{"security"})
 
-	return nil
+	return the_error
 }
 
 //methods related to the Image structure

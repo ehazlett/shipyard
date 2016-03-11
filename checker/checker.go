@@ -26,7 +26,7 @@ const (
 	httpPort            = 9279
 )
 
-func CheckImage(name string) {
+func CheckImage(name string) error {
 	// TODO: parse first./ 2 params from config file
 
 	endpoint_value := "http://clair:6060"
@@ -42,7 +42,7 @@ func CheckImage(name string) {
 	defer os.RemoveAll(path)
 	if err != nil {
 		fmt.Printf("- Could not save image: %s\n", err)
-		return
+		return errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
 	}
 
 	// Retrieve history.
@@ -53,7 +53,7 @@ func CheckImage(name string) {
 	}
 	if err != nil || len(layerIDs) == 0 {
 		fmt.Printf("- Could not get image's history: %s\n", err)
-		return
+		return errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
 	}
 
 	//Setup a simple HTTP server if Clair is not local.
@@ -85,7 +85,7 @@ func CheckImage(name string) {
 		}
 		if err != nil {
 			fmt.Printf("- Could not analyze layer: %s\n", err)
-			return
+			return errors.New(fmt.Sprintf("- Could not analyze layer: %s\n", err))
 		}
 	}
 
@@ -94,7 +94,7 @@ func CheckImage(name string) {
 	layer, err := getLayer(*endpoint, layerIDs[len(layerIDs)-1])
 	if err != nil {
 		fmt.Printf("- Could not get layer information: %s\n", err)
-		return
+		return errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
 	}
 
 	// Print report.
@@ -103,7 +103,7 @@ func CheckImage(name string) {
 	if len(layer.Features) == 0 {
 		fmt.Println("No feature has been detected on the image.")
 		fmt.Println("This usually means that the image isn't supported by Clair.")
-		return
+		return nil
 	}
 
 	isSafe := true
@@ -140,6 +140,7 @@ func CheckImage(name string) {
 	if isSafe {
 		fmt.Println("\nBravo, your image looks SAFE !")
 	}
+	return nil
 }
 
 func save(imageName string) (string, error) {
