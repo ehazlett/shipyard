@@ -22,7 +22,7 @@ func (a *Api) testImage(w http.ResponseWriter, r *http.Request) {
 }
 func (a *Api) testImagesForProjectId(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id := vars["id"]
+	id := vars["project_id"]
 
 	err := a.manager.TestImagesForProjectId(id)
 	if err != nil {
