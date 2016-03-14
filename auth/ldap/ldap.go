@@ -2,6 +2,7 @@ package ldap
 
 import (
 	"fmt"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/shipyard/shipyard/auth"
@@ -44,6 +45,13 @@ func (a LdapAuthenticator) Authenticate(username, password, hash string) (bool, 
 	defer l.Close()
 
 	dn := fmt.Sprintf("cn=%s,%s", username, a.BaseDN)
+
+	if strings.Contains(a.BaseDN, "{username}") {
+		dn = strings.Replace(a.BaseDN, "{username}", username, -1)
+	}
+
+	log.Debugf("ldap authentication: dn=%s", dn)
+
 	if err := l.Bind(dn, password); err != nil {
 		return false, err
 	}
