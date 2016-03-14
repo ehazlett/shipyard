@@ -55,6 +55,7 @@
                     $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                     vm.createImage.name = "";
                     vm.createImage.tag = "";
+                    vm.createImage.description = "";
                     vm.buttonStyle = "disabled";
                     getImages(text);
                 }
@@ -81,6 +82,7 @@
         function resetValues() {
             vm.createImage.name = "";
             vm.createImage.tag = "";
+            vm.createImage.description = "";
             vm.buttonStyle = "disabled";
             $('#image-create-modal').find("input").val("");
             $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
@@ -105,6 +107,7 @@
                     onHidden: function() {
                         $('#image-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
+                        vm.createImage.location = "";
                     }
                 })
                 .modal('show');
