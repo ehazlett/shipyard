@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
 	log "github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
@@ -94,6 +93,8 @@ type (
 		SaveProject(project *model.Project) error
 		UpdateProject(project *model.Project) error
 		DeleteProject(project *model.Project) error
+
+		PullImage(name string) bool
 
 		Images() ([]*model.Image, error)
 		ImagesByProjectId(projectId string) ([]*model.Image, error)
@@ -904,6 +905,16 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 
 // end methods related to the project structure
 
+// check if an image exists
+func (m DefaultManager) PullImage(name string) bool{
+
+	error := m.client.PullImage(name, nil)
+	if error != nil {
+		return false
+	}
+	return true
+}
+
 // begin methods for verifying images using clair
 func (m DefaultManager) TestImage(id string) error {
 	//get an image by id
@@ -922,9 +933,11 @@ func (m DefaultManager) TestImage(id string) error {
 	}
 	// check the image with clair
 	name := image.Name
+	result := m.PullImage(name)
 	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
-	err = c.CheckImage(name)
-
+	if result == true {
+		err = c.CheckImage(name)
+	}
 	m.logEvent("test-image", fmt.Sprintf("id=%s, name=%s", image.Name, image.Tag), []string{"security"})
 
 	return err
@@ -945,7 +958,10 @@ func (m DefaultManager) TestImagesForProjectId(id string) error {
 	for _, imageToCheck := range imagesToCheck {
 		name := imageToCheck.Name
 		fmt.Printf("calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
-		err = c.CheckImage(name)
+		result := m.PullImage(name)
+		if result == true {
+			err = c.CheckImage(name)
+		}
 		if err != nil {
 			the_error = err
 		}

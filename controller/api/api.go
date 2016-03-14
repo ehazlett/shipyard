@@ -145,7 +145,6 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/ilm_images/{id}", a.deleteImage).Methods("DELETE")
 
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
-	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/scale", a.scaleContainer).Methods("POST")

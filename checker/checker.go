@@ -35,7 +35,6 @@ func CheckImage(name string) error {
 	myAddress := &myAddress_value
 
 	imageName := name
-
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)
 	path, err := save(imageName)
