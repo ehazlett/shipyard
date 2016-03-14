@@ -26,14 +26,14 @@ const (
 	httpPort            = 9279
 )
 
-func CheckImage(name string) error {
+func CheckImage(name string) (string, error) {
 	// TODO: parse first./ 2 params from config file
 
 	endpoint_value := "http://clair:6060"
 	myAddress_value := "controller"
 	endpoint := &endpoint_value
 	myAddress := &myAddress_value
-
+	var message string
 	imageName := name
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)
@@ -41,7 +41,7 @@ func CheckImage(name string) error {
 	defer os.RemoveAll(path)
 	if err != nil {
 		fmt.Printf("- Could not save image: %s\n", err)
-		return errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
+		return fmt.Sprintf("- Could not save image: %s\n", err), errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
 	}
 
 	// Retrieve history.
@@ -52,7 +52,7 @@ func CheckImage(name string) error {
 	}
 	if err != nil || len(layerIDs) == 0 {
 		fmt.Printf("- Could not get image's history: %s\n", err)
-		return errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
+		return fmt.Sprintf("- Could not get image's history: %s\n", err), errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
 	}
 
 	//Setup a simple HTTP server if Clair is not local.
@@ -84,7 +84,7 @@ func CheckImage(name string) error {
 		}
 		if err != nil {
 			fmt.Printf("- Could not analyze layer: %s\n", err)
-			return errors.New(fmt.Sprintf("- Could not analyze layer: %s\n", err))
+			return fmt.Sprintf("- Could not analyze layer: %s\n", err), errors.New(fmt.Sprintf("- Could not analyze layer: %s\n", err))
 		}
 	}
 
@@ -93,44 +93,53 @@ func CheckImage(name string) error {
 	layer, err := getLayer(*endpoint, layerIDs[len(layerIDs)-1])
 	if err != nil {
 		fmt.Printf("- Could not get layer information: %s\n", err)
-		return errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
+		return fmt.Sprintf("- Could not get layer information: %s\n", err), errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
 	}
 
 	// Print report.
 	fmt.Printf("\n# Clair report for image %s (%s)\n", imageName, time.Now().UTC())
+	message = fmt.Sprintf("\n# Clair report for image %s (%s)\n", imageName, time.Now().UTC())
 
 	if len(layer.Features) == 0 {
 		fmt.Println("No feature has been detected on the image.")
 		fmt.Println("This usually means that the image isn't supported by Clair.")
-		return nil
+		message = fmt.Sprintf("%sNo feature has been detected on the image.\nThis usually means that the image isn't supported by Clair.\n", message)
+		return message, nil
 	}
 
 	isSafe := true
 	for _, feature := range layer.Features {
 		fmt.Printf("## Feature: %s %s (%s)\n", feature.Name, feature.Version, feature.Namespace)
+		message = fmt.Sprintf("%s## Feature: %s %s (%s)\n", message, feature.Name, feature.Version, feature.Namespace)
 
 		if len(feature.Vulnerabilities) > 0 {
 			isSafe = false
 
 			fmt.Printf("   - Added by: %s\n", feature.AddedBy)
+			message = fmt.Sprintf("%s   - Added by: %s\n", message, feature.AddedBy)
 
 			for _, vulnerability := range feature.Vulnerabilities {
 				fmt.Printf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
+				message = fmt.Sprintf("%s### (%s) %s\n", message, vulnerability.Severity, vulnerability.Name)
 
 				if vulnerability.Description != "" {
 					fmt.Printf("    - Link:          %s\n", vulnerability.Link)
+					message = fmt.Sprintf("%s    - Link:          %s\n", message, vulnerability.Link)
 				}
 
 				if vulnerability.Link != "" {
 					fmt.Printf("    - Description:   %s\n", vulnerability.Description)
+					message = fmt.Sprintf("%s    - Description:   %s\n", message, vulnerability.Description)
 				}
 
 				if vulnerability.FixedBy != "" {
 					fmt.Printf("    - Fixed version: %s\n", vulnerability.FixedBy)
+					message = fmt.Sprintf("%s    - Fixed version: %s\n", message, vulnerability.FixedBy)
 				}
 
 				if len(vulnerability.Metadata) > 0 {
 					fmt.Printf("    - Metadata:      %+v\n", vulnerability.Metadata)
+					message = fmt.Sprintf("%s    - Metadata:      %+v\n", message, vulnerability.Metadata)
 				}
 			}
 		}
@@ -138,8 +147,9 @@ func CheckImage(name string) error {
 
 	if isSafe {
 		fmt.Println("\nBravo, your image looks SAFE !")
+		message = fmt.Sprintf("%s\nBravo, your image looks SAFE !", message)
 	}
-	return nil
+	return message, nil
 }
 
 func save(imageName string) (string, error) {

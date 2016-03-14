@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net"
-	"net/http"
-	"strings"
-	"time"
 	log "github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
@@ -20,6 +16,10 @@ import (
 	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/version"
+	"net"
+	"net/http"
+	"strings"
+	"time"
 )
 
 const (
@@ -103,8 +103,8 @@ type (
 		UpdateImage(image *model.Image) error
 		DeleteImage(image *model.Image) error
 
-		TestImage(id string) error
-		TestImagesForProjectId(id string) error
+		TestImage(id string) (string, error)
+		TestImagesForProjectId(id string) (string, error)
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -906,7 +906,7 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 // end methods related to the project structure
 
 // check if an image exists
-func (m DefaultManager) PullImage(name string) bool{
+func (m DefaultManager) PullImage(name string) bool {
 
 	error := m.client.PullImage(name, nil)
 	if error != nil {
@@ -916,43 +916,45 @@ func (m DefaultManager) PullImage(name string) bool{
 }
 
 // begin methods for verifying images using clair
-func (m DefaultManager) TestImage(id string) error {
+func (m DefaultManager) TestImage(id string) (string, error) {
 	//get an image by id
 	var image *model.Image
-
+	var message string
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 	if res.IsNil() {
-		return ErrImageDoesNotExist
+		return "Image not found", ErrImageDoesNotExist
 	}
 	if err := res.One(&image); err != nil {
-		return err
+		return "", err
 	}
 	// check the image with clair
 	name := image.Name
 	result := m.PullImage(name)
 	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
 	if result == true {
-		err = c.CheckImage(name)
+		message, err = c.CheckImage(name)
 	}
 	m.logEvent("test-image", fmt.Sprintf("id=%s, name=%s", image.Name, image.Tag), []string{"security"})
-
-	return err
+	return message, err
 }
-func (m DefaultManager) TestImagesForProjectId(id string) error {
+func (m DefaultManager) TestImagesForProjectId(id string) (string, error) {
 	var the_error error
+	var message string
+	var the_message string
+	the_message = ""
 	the_error = nil
 	//get all the images by a project id
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
 	if err != nil {
-		return err
+		return "", err
 	}
 	imagesToCheck := []*model.Image{}
 	if err := res.All(&imagesToCheck); err != nil {
-		return err
+		return "", err
 	}
 	// check each image with clair
 	for _, imageToCheck := range imagesToCheck {
@@ -960,16 +962,19 @@ func (m DefaultManager) TestImagesForProjectId(id string) error {
 		fmt.Printf("calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
 		result := m.PullImage(name)
 		if result == true {
-			err = c.CheckImage(name)
+			message, err = c.CheckImage(name)
 		}
 		if err != nil {
 			the_error = err
+		}
+		if message != "" {
+			the_message = fmt.Sprintf("%s%s", the_message, message)
 		}
 	}
 
 	m.logEvent("test-images-for-project", fmt.Sprintf("id=%s, name=%s", id), []string{"security"})
 
-	return the_error
+	return the_message, the_error
 }
 
 //methods related to the Image structure
