@@ -74,7 +74,7 @@
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkImagePublicRepository()">
                                             <option value="">Tag</option>
-                                            <option ng-repeat="a in vm.tags" value="{{a.name}}">{{a.name}}</option>
+                                            <option ng-repeat="a in vm.tags" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
 
@@ -105,10 +105,9 @@
 
                                 <div ng-show="vm.createImage.location && vm.createImage.location != 'File'" class="field">
                                     <label>Additional Image Tag</label>
-                                    <input disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
-                                    <!--<i ng-show="vm.createImage.name" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.createImage.name }">
-                                        {{a.tag}}
-                                    </i>-->
+                                    <i ng-show="vm.createImage.tag" class="ui label" ng-repeat="a in vm.tags | filter: { layer: vm.createImage.tagLayer }">
+                                        {{a.name}}
+                                    </i>
                                 </div>
 
                                 <div ng-show="vm.createImage.location ==='File'" class="two fields">

@@ -19,6 +19,8 @@
         vm.editImage = {};
         vm.createTest = {};
 
+        vm.createImage.additionalTags = [];
+
         vm.skipImages = true;
         vm.skipTests= true;
 
@@ -49,7 +51,6 @@
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    console.log('getting images for ' + text);
                     $('#image-create-modal').find("input").val("");
                     $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
                     $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
@@ -58,6 +59,22 @@
                     vm.createImage.description = "";
                     vm.buttonStyle = "disabled";
                     getImages(text);
+                }
+            });
+        $(".ui.search.fluid.dropdown.tag")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    // Search for the image layer of the chosen tag
+                    // TODO: find a way to save the layer when the user clicks on the tag name
+                    console.log(value);
+                    var tagObject = $.grep(vm.tags, function (tag) {
+                        return tag.name == value;
+                    })[0];
+
+                    if (tagObject)
+                        vm.createImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
+
+                    $scope.$apply();
                 }
             });
         $('.ui.search').search({
