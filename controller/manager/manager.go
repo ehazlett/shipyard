@@ -250,6 +250,7 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 			// clear hostname to get a newly generated
 			config.Hostname = ""
 			hostConfig := containerInfo.HostConfig
+			config.HostConfig = *hostConfig // sending hostconfig via the Start-endpoint is deprecated starting with docker-engine 1.12
 			id, err := m.client.CreateContainer(config, "")
 			if err != nil {
 				errChan <- err
