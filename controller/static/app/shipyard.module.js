@@ -20,8 +20,7 @@
             'angular-jwt',
             'base64',
             'selectize',
-            'ui.router',
-            'ngMockE2E'
+            'ui.router'
         ])
 
         //Configure HttpBackend to mock requests to ILM endpoints
@@ -138,7 +137,7 @@
             ];
 
 
-            $httpBackend.whenGET('/api/projects').respond(projects);
+            /*$httpBackend.whenGET('/api/projects').respond(projects);
 
             $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
                 console.log(params);
@@ -188,18 +187,18 @@
                 projects.splice(indexToEdit, 1);
 
                 return [200, {}, {}];
-            });
+            });*/
 
-            $httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
+            /*$httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
-            $httpBackend.whenGET(/((?!project).)*/).passThrough();
-            $httpBackend.whenPOST(/((?!project).)*/).passThrough();
-            $httpBackend.whenDELETE(/((?!project).)*/).passThrough();
-            $httpBackend.whenPUT(/((?!project).)*/).passThrough();
-            $httpBackend.whenPATCH(/((?!project).)*/).passThrough();
-            $httpBackend.whenDELETE(/((?!project).)*/).passThrough();
-            $httpBackend.whenJSONP(/((?!project).)*/).passThrough();
-            $httpBackend.whenRoute(/((?!project).)*/).passThrough();
+            $httpBackend.whenGET(/((?!project).)*!/).passThrough();
+            $httpBackend.whenPOST(/((?!project).)*!/).passThrough();
+            $httpBackend.whenDELETE(/((?!project).)*!/).passThrough();
+            $httpBackend.whenPUT(/((?!project).)*!/).passThrough();
+            $httpBackend.whenPATCH(/((?!project).)*!/).passThrough();
+            $httpBackend.whenDELETE(/((?!project).)*!/).passThrough();
+            $httpBackend.whenJSONP(/((?!project).)*!/).passThrough();
+            $httpBackend.whenRoute(/((?!project).)*!/).passThrough();*/
         })
 })();

@@ -1,4 +1,3 @@
-
 (function(){
     'use strict';
 
@@ -37,10 +36,11 @@
         vm.deleteImage = deleteImage;
         vm.getRegistries = getRegistries;
         vm.getImages = getImages;
-        vm.getImagesDockerhub = getImagesDockerhub;
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.checkImage = checkImage;
         vm.getTags = getTags;
+        vm.resetValues = resetValues;
+        vm.checkImagePublicRepository = checkImagePublicRepository;
 
         vm.getRegistries();
 
@@ -50,15 +50,13 @@
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
                     console.log('getting images for ' + text);
+                    $('#image-create-modal').find("input").val("");
+                    $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
+                    $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                    vm.createImage.name = "";
+                    vm.createImage.tag = "";
+                    vm.buttonStyle = "disabled";
                     getImages(text);
-                    checkImage();
-                }
-            });
-        $(".ui.search.fluid.dropdown.publicregistryimage")
-            .dropdown({
-                onChange: function(value, text, $selectedItem) {
-                    console.log('searching dockerhub ');
-                    getImagesDockerhub(text);
                 }
             });
         $('.ui.search').search({
@@ -73,11 +71,22 @@
                 }
             },
             onSelect: function(result,response) {
+                vm.createImage.description = result.description;
                 vm.getTags(result.name);
                 console.log(vm.tags);
             },
             minCharacters: 3
         });
+
+        function resetValues() {
+            vm.createImage.name = "";
+            vm.createImage.tag = "";
+            vm.buttonStyle = "disabled";
+            $('#image-create-modal').find("input").val("");
+            $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
+            $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
+            $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+        }
 
         function saveProject(project){
             console.log("saving project" + project);
@@ -95,9 +104,7 @@
                 .modal({
                     onHidden: function() {
                         $('#image-create-modal').find("input").val("");
-                        console.log('remove Data');
-                        //$('#image-create-modal').empty();
-                        $('#imageLocation').removeData();
+                        $('.ui.dropdown').dropdown('restore defaults');
                     }
                 })
                 .modal('show');
@@ -129,6 +136,7 @@
         }
 
         function createSaveImage(image) {
+            vm.buttonStyle = "disabled";
             vm.project.images.push(image);
         }
 
@@ -188,6 +196,7 @@
 
         function checkImage() {
             vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
             angular.forEach(vm.images, function (image) {
                 if(image.name === vm.createImage.name && image.tag === vm.createImage.tag) {
                     vm.buttonStyle = "positive";
@@ -195,14 +204,14 @@
             });
         }
 
-        function getImagesDockerhub(name) {
-            RegistryService.listDockerhubRepos(name)
-                .then(function(data) {
-                    console.log("dockerhub images: " + data);
-                    vm.imagesPublic = data;
-                }, function(data) {
-                    vm.error = data;
-                })
+        function checkImagePublicRepository() {
+            vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
+            angular.forEach(vm.tags, function (tag) {
+                if(tag.name === vm.createImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
         }
     }
 })();
