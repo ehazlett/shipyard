@@ -103,8 +103,8 @@ type (
 		UpdateImage(image *model.Image) error
 		DeleteImage(image *model.Image) error
 
-		TestImage(id string) (string, error)
-		TestImagesForProjectId(id string) (string, error)
+		TestImage(id string) (model.Report, error)
+		TestImagesForProjectId(id string) ([]model.Report, error)
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -906,23 +906,23 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 // end methods related to the project structure
 
 // check if an image exists
-func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) (bool){
+func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool {
 	images, err := m.client.ListImages(true)
 	imageToCheck := name + ":" + tag
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _,img := range images  {
+	for _, img := range images {
 		imageRepoTags := img.RepoTags
 		for _, imageRepoTag := range imageRepoTags {
 			if strings.Contains(imageRepoTag, imageToCheck) {
 				fmt.Printf("Image %s exists locally ... Proceeding to check with clair ... \n", imageToCheck)
-				return true;
+				return true
 			}
 		}
 
 	}
-	fmt.Printf ("Image does not exist locally. Pulling image %s ... \n", imageToCheck )
+	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageToCheck)
 	error := m.client.PullImage(name, nil)
 	if error != nil {
 		fmt.Printf("Could not pull image %s ... \n%s \n", imageToCheck, error)
@@ -933,65 +933,63 @@ func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) (boo
 }
 
 // begin methods for verifying images using clair
-func (m DefaultManager) TestImage(id string) (string, error) {
+func (m DefaultManager) TestImage(id string) (model.Report, error) {
 	//get an image by id
 	var image *model.Image
-	var message string
+	var report model.Report
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
 
 	if err != nil {
-		return "", err
+		return report, err
 	}
 	if res.IsNil() {
-		return "Image not found", ErrImageDoesNotExist
+		report.Message = "Image not found"
+		return report, ErrImageDoesNotExist
 	}
 	if err := res.One(&image); err != nil {
-		return "", err
+		return report, err
 	}
 	// check the image with clair
 	name := image.Name
 	result := m.VerifyIfImageExistsLocally(image.Name, image.Tag)
 	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
 	if result == true {
-		message, err = c.CheckImage(name)
+		report, err = c.CheckImage(name)
 	}
 	m.logEvent("test-image", fmt.Sprintf("id=%s, name=%s", image.Name, image.Tag), []string{"security"})
-	return message, err
+	return report, err
 }
-func (m DefaultManager) TestImagesForProjectId(id string) (string, error) {
+func (m DefaultManager) TestImagesForProjectId(id string) ([]model.Report, error) {
 	var the_error error
-	var message string
-	var the_message string
-	the_message = ""
+	var report model.Report
+	var reports []model.Report
 	the_error = nil
 	//get all the images by a project id
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
 	if err != nil {
-		return "", err
+		return reports, err
 	}
 	imagesToCheck := []*model.Image{}
 	if err := res.All(&imagesToCheck); err != nil {
-		return "", err
+		return reports, err
 	}
 	// check each image with clair
 	for _, imageToCheck := range imagesToCheck {
-		
+
 		fmt.Printf("Calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
 		result := m.VerifyIfImageExistsLocally(imageToCheck.Name, imageToCheck.Tag)
 		if result == true {
-			message, err = c.CheckImage(imageToCheck.Name)
+			report, err = c.CheckImage(imageToCheck.Name)
+			reports = append(reports, report)
 		}
 		if err != nil {
 			the_error = err
-		}
-		if message != "" {
-			the_message = fmt.Sprintf("%s%s", the_message, message)
 		}
 	}
 
 	m.logEvent("test-images-for-project", fmt.Sprintf("id=%s, name=%s", id), []string{"security"})
 
-	return the_message, the_error
+	return reports, the_error
 }
 
 //methods related to the Image structure
