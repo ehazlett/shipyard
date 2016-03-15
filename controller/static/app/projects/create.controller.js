@@ -26,7 +26,7 @@
 
         vm.registries = [];
         vm.images = [];
-        vm.tags = [];
+        vm.publicRegistryTags = [];
         vm.tests = [];
 
         vm.saveProject = saveProject;
@@ -65,7 +65,7 @@
                 onChange: function(value, text, $selectedItem) {
                     // Search for the image layer of the chosen tag
                     // TODO: find a way to save the layer when the user clicks on the tag name
-                    var tagObject = $.grep(vm.tags, function (tag) {
+                    var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
                         return tag.name == value;
                     })[0];
 
@@ -93,7 +93,7 @@
                 $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
-                        vm.tags = data;
+                        vm.publicRegistryTags = data;
                     }, function(data) {
                         vm.error = data;
                     });
@@ -222,7 +222,7 @@
         function checkImagePublicRepository() {
             vm.buttonStyle = "disabled";
             console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
-            angular.forEach(vm.tags, function (tag) {
+            angular.forEach(vm.publicRegistryTags, function (tag) {
                 if(tag.name === vm.createImage.tag) {
                     vm.buttonStyle = "positive";
                 }
