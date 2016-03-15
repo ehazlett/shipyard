@@ -89,7 +89,10 @@
                 }
             },
             onSelect: function(result,response) {
+                vm.createImage.name = result.title;
                 vm.createImage.description = result.description;
+                vm.createImage.tag = "";
+                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                 vm.getTags(result.name);
                 console.log(vm.tags);
             },
@@ -208,9 +211,10 @@
             vm.tags = [];
             $http.get('https://registry.hub.docker.com/v1/repositories/'+imageName+'/tags')
                 .then(function(response) {
+                    console.log(response.data);
                     vm.tags = response.data;
-                }, function(data) {
-                    vm.error = data;
+                }, function(response) {
+                    vm.error = response.data;
                 })
         }
 

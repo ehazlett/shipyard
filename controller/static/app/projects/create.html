@@ -105,7 +105,11 @@
 
                                 <div ng-show="vm.createImage.location && vm.createImage.location != 'File'" class="field">
                                     <label>Additional Image Tag</label>
-                                    <i ng-show="vm.createImage.tag" class="ui label" ng-repeat="a in vm.tags | filter: { layer: vm.createImage.tagLayer }">
+                                    <input ng-show="!vm.createImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
+                                    <i ng-show="vm.createImage.location === 'ShipyardRegistry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.createImage.name }">
+                                        {{a.tag}}
+                                    </i>
+                                    <i ng-show="vm.createImage.location === 'PublicRegistry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.tags | filter: { layer: vm.createImage.tagLayer }">
                                         {{a.name}}
                                     </i>
                                 </div>
