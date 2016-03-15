@@ -94,7 +94,7 @@ type (
 		UpdateProject(project *model.Project) error
 		DeleteProject(project *model.Project) error
 
-		PullImage(name string) bool
+		VerifyIfImageExistsLocally(name string, tag string) bool
 
 		Images() ([]*model.Image, error)
 		ImagesByProjectId(projectId string) ([]*model.Image, error)
@@ -906,11 +906,28 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 // end methods related to the project structure
 
 // check if an image exists
-func (m DefaultManager) PullImage(name string) bool {
+func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) (bool){
+	images, err := m.client.ListImages(true)
+	imageToCheck := name + ":" + tag
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _,img := range images  {
+		imageRepoTags := img.RepoTags
+		for _, imageRepoTag := range imageRepoTags {
+			if strings.Contains(imageRepoTag, imageToCheck) {
+				fmt.Printf("Image %s exists locally ... Proceeding to check with clair ... \n", imageToCheck)
+				return true;
+			}
+		}
 
+	}
+	fmt.Printf ("Image does not exist locally. Pulling image %s ... \n", imageToCheck )
 	error := m.client.PullImage(name, nil)
 	if error != nil {
+		fmt.Printf("Could not pull image %s ... \n%s \n", imageToCheck, error)
 		return false
+
 	}
 	return true
 }
@@ -933,7 +950,7 @@ func (m DefaultManager) TestImage(id string) (string, error) {
 	}
 	// check the image with clair
 	name := image.Name
-	result := m.PullImage(name)
+	result := m.VerifyIfImageExistsLocally(image.Name, image.Tag)
 	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
 	if result == true {
 		message, err = c.CheckImage(name)
@@ -958,11 +975,11 @@ func (m DefaultManager) TestImagesForProjectId(id string) (string, error) {
 	}
 	// check each image with clair
 	for _, imageToCheck := range imagesToCheck {
-		name := imageToCheck.Name
-		fmt.Printf("calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
-		result := m.PullImage(name)
+		
+		fmt.Printf("Calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
+		result := m.VerifyIfImageExistsLocally(imageToCheck.Name, imageToCheck.Tag)
 		if result == true {
-			message, err = c.CheckImage(name)
+			message, err = c.CheckImage(imageToCheck.Name)
 		}
 		if err != nil {
 			the_error = err
