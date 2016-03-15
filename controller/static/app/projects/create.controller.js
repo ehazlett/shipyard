@@ -40,7 +40,6 @@
         vm.getImages = getImages;
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.checkImage = checkImage;
-        vm.getTags = getTags;
         vm.resetValues = resetValues;
         vm.checkImagePublicRepository = checkImagePublicRepository;
 
@@ -66,7 +65,6 @@
                 onChange: function(value, text, $selectedItem) {
                     // Search for the image layer of the chosen tag
                     // TODO: find a way to save the layer when the user clicks on the tag name
-                    console.log(value);
                     var tagObject = $.grep(vm.tags, function (tag) {
                         return tag.name == value;
                     })[0];
@@ -93,8 +91,12 @@
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
                 $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
-                vm.getTags(result.name);
-                console.log(vm.tags);
+                ProjectService.getPublicRegistryTags(result.name)
+                    .then(function(data) {
+                        vm.tags = data;
+                    }, function(data) {
+                        vm.error = data;
+                    });
             },
             minCharacters: 3
         });
@@ -128,7 +130,8 @@
                         $('#image-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createImage.location = "";
-                    }
+                    },
+                    closable: false
                 })
                 .modal('show');
         }
@@ -203,18 +206,6 @@
                     vm.images = data;
                 }, function(data) {
                     vm.error = data;
-                })
-        }
-
-        function getTags(imageName) {
-            console.log("get tags");
-            vm.tags = [];
-            $http.get('https://registry.hub.docker.com/v1/repositories/'+imageName+'/tags')
-                .then(function(response) {
-                    console.log(response.data);
-                    vm.tags = response.data;
-                }, function(response) {
-                    vm.error = response.data;
                 })
         }
 

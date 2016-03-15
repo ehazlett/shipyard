@@ -61,7 +61,14 @@
                 var promise = $http
                     .get('/api/projects/location')
                     .then(function(response) {
-                        console.log(response.data);
+                        return response.data;
+                    });
+                return promise;
+            },
+            getPublicRegistryTags: function(imageName) {
+                var promise = $http
+                    .get('https://registry.hub.docker.com/v1/repositories/'+imageName+'/tags')
+                    .then(function(response) {
                         return response.data;
                     });
                 return promise;
