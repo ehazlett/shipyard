@@ -129,6 +129,7 @@
                 vm.createImage.name = result.title;
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
+                vm.buttonStyle = "disabled";
                 $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
