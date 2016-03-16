@@ -5,8 +5,8 @@
         .module('shipyard.projects')
         .controller('EditController', EditController);
 
-    EditController.$inject = ['resolvedProject', '$scope', 'ProjectService', '$state'];
-    function EditController(resolvedProject, $scope, ProjectService, $state) {
+    EditController.$inject = ['resolvedProject', '$scope', 'ProjectService', 'RegistryService', '$state'];
+    function EditController(resolvedProject, $scope, ProjectService, RegistryService, $state) {
         var vm = this;
 
         vm.project = resolvedProject;
@@ -25,6 +25,14 @@
         vm.createImage = {};
         vm.editImage = {};
 
+        vm.createImage.additionalTags = [];
+
+        vm.registries = [];
+        vm.images = [];
+        vm.publicRegistryTags = [];
+
+        vm.buttonStyle = "disabled";
+
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
 
@@ -35,6 +43,13 @@
         vm.deleteImage = deleteImage;
 
         vm.updateProject = updateProject;
+        vm.resetValues = resetValues;
+        vm.getRegistries = getRegistries;
+        vm.checkImage = checkImage;
+        vm.checkImagePublicRepository = checkImagePublicRepository;
+        vm.getImages = getImages;
+
+        vm.getRegistries();
 
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
@@ -71,9 +86,83 @@
             return Object.keys(vm.project.image_list)
         }
 
+        $(".ui.search.fluid.dropdown.registry")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    $('#edit-project-image-create-modal').find("input").val("");
+                    $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
+                    $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                    vm.createImage.name = "";
+                    vm.createImage.tag = "";
+                    vm.createImage.description = "";
+                    vm.buttonStyle = "disabled";
+                    getImages(text);
+                }
+            });
+        $(".ui.search.fluid.dropdown.tag")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    // Search for the image layer of the chosen tag
+                    // TODO: find a way to save the layer when the user clicks on the tag name
+                    var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
+                        return tag.name == value;
+                    })[0];
+
+                    if (tagObject)
+                        vm.createImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
+
+                    $scope.$apply();
+                }
+            });
+        $('.ui.search').search({
+            apiSettings: {
+                url: 'https://index.docker.io/v1/search?q={query}',
+                // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
+                successTest: function(response) {
+                    $.each(response.results, function(index,item) {
+                        response.results[index].title = response.results[index].name;
+                    });
+                    return true;
+                }
+            },
+            onSelect: function(result,response) {
+                vm.createImage.name = result.title;
+                vm.createImage.description = result.description;
+                vm.createImage.tag = "";
+                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                ProjectService.getPublicRegistryTags(result.name)
+                    .then(function(data) {
+                        vm.publicRegistryTags = data;
+                    }, function(data) {
+                        vm.error = data;
+                    });
+            },
+            minCharacters: 3
+        });
+
+        function resetValues() {
+            vm.createImage.name = "";
+            vm.createImage.tag = "";
+            vm.createImage.description = "";
+            vm.buttonStyle = "disabled";
+            $('#edit-project-image-create-modal').find("input").val("");
+            $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
+            $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
+            $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+        }
+
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#edit-project-image-create-modal').modal('show');
+            $('#edit-project-image-create-modal')
+                .modal({
+                    onHidden: function() {
+                        $('#edit-project-image-create-modal').find("input").val("");
+                        $('.ui.dropdown').dropdown('restore defaults');
+                        vm.createImage.location = "";
+                    },
+                    closable: false
+                })
+                .modal('show');
         }
 
         function showImageEditDialog(image) {
@@ -103,6 +192,51 @@
                 }, function (data) {
                     vm.error = data;
                 });
+        }
+
+        function getRegistries() {
+            console.log("get regs");
+            vm.registries = [];
+            RegistryService.list()
+                .then(function(data) {
+                    console.log(data);
+                    vm.registries = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+
+        }
+
+        function getImages(registry) {
+            console.log("get images");
+            vm.images = [];
+            RegistryService.listRepositories(registry)
+                .then(function(data) {
+                    console.log(data);
+                    vm.images = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+        }
+
+        function checkImage() {
+            vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
+            angular.forEach(vm.images, function (image) {
+                if(image.name === vm.createImage.name && image.tag === vm.createImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
+        }
+
+        function checkImagePublicRepository() {
+            vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
+            angular.forEach(vm.publicRegistryTags, function (tag) {
+                if(tag.name === vm.createImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
         }
 
         function createSaveImage(image) {

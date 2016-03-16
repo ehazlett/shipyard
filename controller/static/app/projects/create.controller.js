@@ -149,14 +149,13 @@
 
         function showImageEditDialog(image) {
             vm.selectedEditImage = image;
-
+            console.log(image);
             vm.editImage = {
+                location: image.location,
                 name: image.name,
                 registry: image.registry,
-                skipImageBuild: image.skipImageBuild,
                 tag: image.tag,
-                description: image.description,
-                location: image.location
+                description: image.description
             };
             $('#image-edit-modal').modal('show');
         }
@@ -164,15 +163,15 @@
         function createSaveImage(image) {
             vm.buttonStyle = "disabled";
             vm.project.images.push(image);
+            console.log(vm.project.images);
         }
 
         function editSaveImage() {
+            vm.selectedEditImage.location = vm.editImage.location;
             vm.selectedEditImage.name = vm.editImage.name;
             vm.selectedEditImage.registry = vm.selectedEditImage.registry;
-            vm.selectedEditImage.skipImageBuild = vm.editImage.skipImageBuild;
             vm.selectedEditImage.tag = vm.editImage.tag;
             vm.selectedEditImage.description = vm.editImage.description;
-            vm.selectedEditImage.location = vm.editImage.location;
             console.log(vm.selectedEditImage);
         }
 
