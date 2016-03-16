@@ -18,6 +18,7 @@ import (
 	"github.com/shipyard/shipyard/version"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -909,6 +910,7 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool {
 	images, err := m.client.ListImages(true)
 	imageToCheck := name + ":" + tag
+	auth := dockerclient.AuthConfig{"", "", ""}
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -923,7 +925,18 @@ func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool
 
 	}
 	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageToCheck)
-	error := m.client.PullImage(name, nil)
+	//get registry
+	match, _ := regexp.MatchString(":[0-9]{4}/", imageToCheck)
+	if match {
+		parts := strings.Split(imageToCheck, "/")
+		address := "https://" + parts[0]
+
+		registry, err := m.RegistryByAddress(address)
+		auth = dockerclient.AuthConfig{registry.Username, registry.Password, ""}
+		err = err //TODO: must manage the error
+	}
+	error := m.client.PullImage(imageToCheck, &auth)
+
 	if error != nil {
 		fmt.Printf("Could not pull image %s ... \n%s \n", imageToCheck, error)
 		return false
