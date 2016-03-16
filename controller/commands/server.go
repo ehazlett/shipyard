@@ -81,7 +81,12 @@ func CmdServer(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	if err := shipyardApi.Run(); err != nil {
+	shipyardRouter, err := shipyardApi.Setup()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := shipyardApi.Run(shipyardRouter); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -2,14 +2,29 @@
 	"ImportPath": "github.com/shipyard/shipyard",
 	"GoVersion": "go1.5",
 	"Packages": [
-		"./..."
+		"github.com/shipyard/shipyard",
+		"github.com/shipyard/shipyard/auth",
+		"github.com/shipyard/shipyard/auth/builtin",
+		"github.com/shipyard/shipyard/auth/ldap",
+		"github.com/shipyard/shipyard/client",
+		"github.com/shipyard/shipyard/controller",
+		"github.com/shipyard/shipyard/controller/api",
+		"github.com/shipyard/shipyard/controller/commands",
+		"github.com/shipyard/shipyard/controller/manager",
+		"github.com/shipyard/shipyard/controller/middleware/access",
+		"github.com/shipyard/shipyard/controller/middleware/audit",
+		"github.com/shipyard/shipyard/controller/middleware/auth",
+		"github.com/shipyard/shipyard/controller/mock_test",
+		"github.com/shipyard/shipyard/dockerhub",
+		"github.com/shipyard/shipyard/model",
+		"github.com/shipyard/shipyard/registry/v1",
+		"github.com/shipyard/shipyard/registry/v2",
+		"github.com/shipyard/shipyard/test-assets",
+		"github.com/shipyard/shipyard/tlsutils",
+		"github.com/shipyard/shipyard/utils",
+		"github.com/shipyard/shipyard/version"
 	],
 	"Deps": [
-		{
-			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
-			"Comment": "null-236",
-			"Rev": "69e2a90ed92d03812364aeb947b7068dc42e561e"
-		},
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
 			"Comment": "v0.8.6-13-g84b968c",
@@ -18,11 +33,6 @@
 		{
 			"ImportPath": "github.com/cenkalti/backoff",
 			"Rev": "4dc77674aceaabba2c7e3da25d4c823edfb73f99"
-		},
-		{
-			"ImportPath": "github.com/citadel/citadel",
-			"Comment": "beta4-79-g55418e9",
-			"Rev": "55418e9e8d61b680b751b25048b5b27482cd1543"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
@@ -49,6 +59,11 @@
 			"Rev": "6dfb160b2754e3b3fa583fbd0c207dfab2e836e5"
 		},
 		{
+			"ImportPath": "github.com/gopherjs/gopherjs/js",
+			"Comment": "go1.5-30-g853fd42",
+			"Rev": "853fd4283f54c8abba3d98ffb31fa626e2119f71"
+		},
+		{
 			"ImportPath": "github.com/gorilla/context",
 			"Rev": "1c83b3eabd45b6d76072b66b746c20815fb2872d"
 		},
@@ -63,6 +78,10 @@
 		{
 			"ImportPath": "github.com/gorilla/sessions",
 			"Rev": "b6bcae186ac3099dba8fafce125dc930393f1e5e"
+		},
+		{
+			"ImportPath": "github.com/jtolds/gls",
+			"Rev": "8ddce2a84170772b95dd5d576c48d517b22cac63"
 		},
 		{
 			"ImportPath": "github.com/mailgun/oxy/forward",
@@ -81,9 +100,23 @@
 			"Rev": "8802d66ce78e69ff16692f6fa89ad969a5711b8b"
 		},
 		{
+			"ImportPath": "github.com/smartystreets/assertions",
+			"Comment": "1.6.0",
+			"Rev": "e9a2f6771d97c709b2f7609fdf89ebde8b64c926"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey",
+			"Comment": "1.6.1-2-g99f2b1e",
+			"Rev": "99f2b1e01343c8bc2d9d12f1194d2d68ce18b063"
+		},
+		{
 			"ImportPath": "github.com/stretchr/testify/assert",
 			"Comment": "v1.0-40-g7c2b1e5",
 			"Rev": "7c2b1e5640dcf2631213ca962d892bffa1e08860"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",

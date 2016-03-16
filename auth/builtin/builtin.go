@@ -1,8 +1,8 @@
 package builtin
 
 import (
-	"code.google.com/p/go.crypto/bcrypt"
 	"github.com/shipyard/shipyard/auth"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type (

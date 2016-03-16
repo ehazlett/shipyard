@@ -24,8 +24,8 @@ type RegistryClient struct {
 	URL        *url.URL
 	tlsConfig  *tls.Config
 	httpClient *http.Client
-	Username    string
-	Password    string
+	Username   string
+	Password   string
 }
 
 type Repo struct {

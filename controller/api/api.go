@@ -32,6 +32,7 @@ type (
 		tlsKeyPath         string
 		dUrl               string
 		fwd                *forward.Forwarder
+		globalMux          http.Handler
 	}
 
 	ApiConfig struct {
@@ -70,7 +71,8 @@ func NewApi(config ApiConfig) (*Api, error) {
 	}, nil
 }
 
-func (a *Api) Run() error {
+func (a *Api) Setup() (*http.ServeMux, error) {
+
 	globalMux := http.NewServeMux()
 	controllerManager := a.manager
 	client := a.manager.DockerClient()
@@ -79,7 +81,7 @@ func (a *Api) Run() error {
 	var err error
 	a.fwd, err = forward.New()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	u := client.URL
@@ -98,7 +100,7 @@ func (a *Api) Run() error {
 			})
 		f, err := forward.New(r)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		a.fwd = f
@@ -322,6 +324,10 @@ func (a *Api) Run() error {
 		}
 		log.Infof("created admin user: username: admin password: shipyard")
 	}
+	return globalMux, nil
+}
+
+func (a *Api) Run(globalMux http.Handler) error {
 
 	log.Infof("controller listening on %s", a.listenAddr)
 
