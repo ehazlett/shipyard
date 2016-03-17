@@ -40,8 +40,10 @@
         vm.getImages = getImages;
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.checkImage = checkImage;
+        vm.checkEditImage = checkEditImage;
         vm.resetValues = resetValues;
         vm.checkImagePublicRepository = checkImagePublicRepository;
+        vm.checkEditImagePublicRepository = checkEditImagePublicRepository;
 
         vm.getRegistries();
 
@@ -57,6 +59,9 @@
                     vm.createImage.tag = "";
                     vm.createImage.description = "";
                     vm.buttonStyle = "disabled";
+                    vm.editImage.name = "";
+                    vm.editImage.tag = "";
+                    vm.editImage.description = "";
                     getImages(text);
                 }
             });
@@ -71,6 +76,21 @@
 
                     if (tagObject)
                         vm.createImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
+
+                    $scope.$apply();
+                }
+            });
+        $(".ui.search.fluid.dropdown.edit.tag")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    // Search for the image layer of the chosen tag
+                    // TODO: find a way to save the layer when the user clicks on the tag name
+                    var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
+                        return tag.name == value;
+                    })[0];
+
+                    if (tagObject)
+                        vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
 
                     $scope.$apply();
                 }
@@ -90,7 +110,36 @@
                 vm.createImage.name = result.title;
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
+                vm.editImage.tag = "";
                 vm.buttonStyle = "disabled";
+                vm.publicRegistryTags = "";
+                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                ProjectService.getPublicRegistryTags(result.name)
+                    .then(function(data) {
+                        vm.publicRegistryTags = data;
+                    }, function(data) {
+                        vm.error = data;
+                    });
+            },
+            minCharacters: 3
+        });
+        $('.ui.search.edit').search({
+            apiSettings: {
+                url: 'https://index.docker.io/v1/search?q={query}',
+                // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
+                successTest: function(response) {
+                    $.each(response.results, function(index,item) {
+                        response.results[index].title = response.results[index].name;
+                    });
+                    return true;
+                }
+            },
+            onSelect: function(result,response) {
+                vm.editImage.name = result.title;
+                vm.editImage.description = result.description;
+                vm.editImage.tag = "";
+                vm.buttonStyle = "disabled";
+                vm.publicRegistryTags = "";
                 $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
@@ -149,21 +198,25 @@
         }
 
         function showImageEditDialog(image) {
+            vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
-            console.log(image);
-            vm.editImage = {
-                location: image.location,
-                name: image.name,
-                registry: image.registry,
-                tag: image.tag,
-                description: image.description
-            };
-            $('#image-edit-modal').modal('show');
+            vm.buttonStyle = "positive";
+            ProjectService.getPublicRegistryTags(image.name)
+                .then(function(data) {
+                    vm.publicRegistryTags = data;
+                }, function(data) {
+                    vm.error = data;
+                });
+            $('#image-edit-modal')
+                .modal({
+                    closable: false
+                })
+                .modal('show');
         }
 
         function createSaveImage(image) {
             vm.buttonStyle = "disabled";
-            vm.project.images.push(image);
+            vm.project.images.push($.extend(true,{},image));
             console.log(vm.project.images);
         }
 
@@ -219,11 +272,31 @@
             });
         }
 
+        function checkEditImage() {
+            vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
+            angular.forEach(vm.images, function (image) {
+                if(image.name === vm.editImage.name && image.tag === vm.editImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
+        }
+
         function checkImagePublicRepository() {
             vm.buttonStyle = "disabled";
             console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
             angular.forEach(vm.publicRegistryTags, function (tag) {
                 if(tag.name === vm.createImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
+        }
+
+        function checkEditImagePublicRepository() {
+            vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
+            angular.forEach(vm.publicRegistryTags, function (tag) {
+                if(tag.name === vm.editImage.tag) {
                     vm.buttonStyle = "positive";
                 }
             });

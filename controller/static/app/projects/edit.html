@@ -180,87 +180,132 @@
     </div>
     <div class="content">
         <div class="ui grid">
-            <div class="row" ng-hide="vm.deploying">
+            <div class="row">
                 <div class="column">
                     <div class="ui error message" ng-show="vm.error">
                         <div class="header">Error...</div>
                         <p>{{vm.error}}</p>
                     </div>
-                    <div class="ui form" ng-submit="vm.deploy()">
+                    <div class="ui form">
+                        <h5 style="display: inline">Image Configuration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
+                        <div class="ui toggle checkbox" ng-click="vm.editImage.skipImageBuild=!vm.editImage.skipImageBuild">
+                            <input type="checkbox" name="public" ng-model="vm.editImage.skipImageBuild">
+                            <label>Skip Image Building</label>
+                        </div>
                         <div class="ui two column grid">
                             <div class="column">
-                                <div class="ui horizontal segment">
-                                    <h5 class="ui dividing header">Image Configuration</h5>
-                                    <div class="eight wide field">
-                                        <div class="ui toggle checkbox" ng-click="vm.editImage.skipImageBuild=!vm.editImage.skipImageBuild">
-                                            <input type="checkbox" name="public" ng-model="vm.editImage.skipImageBuild">
-                                            <label>Skip Image Building</label>
+
+                                <div class="fields">
+                                    <div class="four wide field">
+                                        <label>Location</label>
+                                        <div class="ui input">
+                                            <input type="text" ng-model="vm.editImage.location" disabled>
                                         </div>
                                     </div>
 
-                                    <div class="three fields">
-                                        <div class="field">
-                                            <label>Image ID</label>
-                                            <input disabled name="hostname" class="input" type="text" ng-model="vm.editImage.id" placeholder="ID"></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>Image Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.name" placeholder="Name"></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>Tag Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.tag" placeholder="Tag"></input>
-                                        </div>
+                                    <div ng-show="!vm.editImage.location" class="field">
+                                        <div></div>
+                                    </div>
+                                    <div ng-show="!vm.editImage.location" class="field">
+                                        <div></div>
                                     </div>
 
-                                    <div class="field">
-                                        <label>Image Description</label>
-                                        <input name="command" class="input" type="text" ng-model="vm.editImage.description" placeholder="Description"></input>
+                                    <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="four wide field">
+                                        <label>Registry </label>
+                                        <select name="registry_name" ng-model="vm.editImage.registry" class="ui search fluid dropdown registry">
+                                            <option value="">{{vm.editImage.registry}}</option>
+                                            <option ng-repeat="r in vm.registries" value="{{r.name}}">{{r.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="four wide field">
+                                        <label>Image Name </label>
+                                        <select name="image" ng-model="vm.editImage.name" class="ui search fluid dropdown image" ng-change="vm.checkEditImage()">
+                                            <option value="">{{vm.editImage.name}}</option>
+                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="three wide field" >
+                                        <label>Tag</label>
+                                        <select name="tag" ng-model="vm.editImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkEditImage()">
+                                            <option value="">{{vm.editImage.tag}}</option>
+                                            <option ng-repeat="a in vm.images | filter: { name: vm.editImage.name }" value="{{a.tag}}">{{a.tag}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div ng-show="vm.editImage.location === 'Public Registry'" class="four wide field">
+                                        <label>Image Name </label>
+                                        <div class="ui search edit">
+                                            <div class="ui icon input">
+                                                <input class="prompt" type="text" placeholder="{{vm.editImage.name}}" ng-model="vm.editImage.name" />
+                                                <i class="search icon"></i>
+                                            </div>
+                                            <div class="results"></div>
+                                        </div>
+                                    </div>
+                                    <div ng-show="vm.editImage.location === 'Public Registry'" class="four wide field">
+                                        <label>Tag</label>
+                                        <select name="tag" ng-model="vm.editImage.tag" class="ui search fluid dropdown edit tag" ng-change="vm.checkEditImagePublicRepository()">
+                                            <option value="">{{vm.editImage.tag}}</option>
+                                            <option ng-repeat="a in vm.publicRegistryTags" data-value="{{a.name}}">{{a.name}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div ng-show="vm.editImage.location === 'File'" class="four wide field">
+                                        <label>Upload File</label>
+                                        <input name="file" type="file" placeholder="Choose a File..."/>
+                                    </div>
+                                    <div ng-show="vm.editImage.location === 'File'" class="four wide field">
+                                        <label>Image Name </label>
+                                        <select name="image" ng-model="vm.editImage.name" class="ui search fluid dropdown">
+                                            <option value="">Name</option>
+                                            <!--<option ng-repeat="a in vm.Images" value="{{a.name}}">{{a.name}}</option>-->
+                                        </select>
+                                    </div>
+
+                                    <div ng-show="vm.editImage.location" class="one wide field">
+                                        <label>&nbsp;</label>
+                                        <button class="right floated ui icon button {{vm.buttonStyle}}">
+                                            <i class="check icon"></i>
+                                        </button>
                                     </div>
 
                                 </div>
+
+                                <div ng-show="!vm.editImage.location" class="field">
+                                    <div></div>
+                                </div>
+
+                                <div ng-show="vm.editImage.location && vm.createImage.location != 'File'" class="field">
+                                    <label>Additional Image Tag</label>
+                                    <input ng-show="!vm.editImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
+                                    <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.editImage.name }">
+                                        {{a.tag}}
+                                    </i>
+                                    <i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.editImage.tagLayer }">
+                                        {{a.name}}
+                                    </i>
+                                </div>
+
+                                <div ng-show="vm.editImage.location ==='File'" class="two fields">
+                                    <div class="field"></div>
+                                    <div class="field">
+                                        <label>Tag the Image</label>
+                                        <input name="tag" type="text" ng-model="vm.editImage.tag" placeholder="Tag name"/>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="column">
-                                <div class="ui horizontal segment">
-                                    <h5 class="ui dividing header">Image Links</h5>
 
-                                    <div class="field">
-                                        <div class="three fields">
-                                            <select class="ui selection dropdown" default="0" ng-model="vm.editImage.location">
-                                                <option class="placeholder" selected value="">{{vm.editImage.location}}</option>
-                                                <option value="Registry">Registry</option>
-                                                <option value="URL">URL</option>
-                                            </select>
-                                            <div class="ui toggle checkbox" ng-click="vm.editImage.skipTLS=!vm.editImage.skipTLS">
-                                                <input type="checkbox" name="public" ng-model="vm.editImage.skipTLS">
-                                                <label>Skip TLS</label>
-                                            </div>
-                                            <button class="right floated ui icon button disabled">
-                                                <i class="check icon"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div class="field">
+                                    <label>Image Description</label>
+                                    <input name="description" class="input" type="text" ng-model="vm.editImage.description" placeholder="{{vm.editImage.description}}" />
+                                </div>
 
-                                    <div class="three fields">
-                                        <div class="field">
-                                            <label>URL</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.editImage.url" placeholder=""></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>User Name</label>
-                                            <input name="domainname" class="input" type="text" ng-model="vm.editImage.username" placeholder=""></input>
-                                        </div>
-                                        <div class="field">
-                                            <label>Password</label>
-                                            <input name="domainname" class="input" type="password" ng-model="vm.editImage.password" placeholder=""></input>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <label>Tag Management</label>
-                                        <input name="command" class="input" type="text" ng-model="vm.image.tags" placeholder="Select Tags"></input>
-                                    </div>
+                                <div ng-show="vm.editImage.location && vm.editImage.location === 'File'" class="field">
+                                    <label>Tags to Apply on Successful Build</label>
+                                    <input name="successTags" class="input" type="text" placeholder="Tags" />
                                 </div>
                             </div>
 
@@ -274,8 +319,8 @@
         <div class="ui negative button">
             Cancel
         </div>
-        <div ng-click="vm.editSaveImage()" class="ui positive right labeled icon button">
-            Save Image
+        <div  ng-click="vm.editSaveImage()" class="ui positive right labeled icon button {{vm.buttonStyle}}">
+            Apply Changes
             <i class="save icon"></i>
         </div>
     </div>

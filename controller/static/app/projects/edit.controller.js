@@ -46,7 +46,9 @@
         vm.resetValues = resetValues;
         vm.getRegistries = getRegistries;
         vm.checkImage = checkImage;
+        vm.checkEditImage = checkEditImage;
         vm.checkImagePublicRepository = checkImagePublicRepository;
+        vm.checkImagePublicRepository = checkEditImagePublicRepository;
         vm.getImages = getImages;
 
         vm.getRegistries();
@@ -96,6 +98,9 @@
                     vm.createImage.tag = "";
                     vm.createImage.description = "";
                     vm.buttonStyle = "disabled";
+                    vm.editImage.name = "";
+                    vm.editImage.tag = "";
+                    vm.editImage.description = "";
                     getImages(text);
                 }
             });
@@ -110,6 +115,21 @@
 
                     if (tagObject)
                         vm.createImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
+
+                    $scope.$apply();
+                }
+            });
+        $(".ui.search.fluid.dropdown.edit.tag")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    // Search for the image layer of the chosen tag
+                    // TODO: find a way to save the layer when the user clicks on the tag name
+                    var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
+                        return tag.name == value;
+                    })[0];
+
+                    if (tagObject)
+                        vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
 
                     $scope.$apply();
                 }
@@ -130,6 +150,33 @@
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
                 vm.buttonStyle = "disabled";
+                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                ProjectService.getPublicRegistryTags(result.name)
+                    .then(function(data) {
+                        vm.publicRegistryTags = data;
+                    }, function(data) {
+                        vm.error = data;
+                    });
+            },
+            minCharacters: 3
+        });
+        $('.ui.search.edit').search({
+            apiSettings: {
+                url: 'https://index.docker.io/v1/search?q={query}',
+                // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
+                successTest: function(response) {
+                    $.each(response.results, function(index,item) {
+                        response.results[index].title = response.results[index].name;
+                    });
+                    return true;
+                }
+            },
+            onSelect: function(result,response) {
+                vm.editImage.name = result.title;
+                vm.editImage.description = result.description;
+                vm.editImage.tag = "";
+                vm.buttonStyle = "disabled";
+                vm.publicRegistryTags = "";
                 $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
@@ -167,17 +214,20 @@
         }
 
         function showImageEditDialog(image) {
+            vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
-
-            vm.editImage = {
-                id: image.id,
-                name: image.name,
-                skipImageBuild: image.skipImageBuild,
-                tag: image.tag,
-                description: image.description,
-                location: image.location
-            };
-            $('#edit-project-image-edit-modal').modal('show');
+            vm.buttonStyle = "positive";
+            ProjectService.getPublicRegistryTags(image.name)
+                .then(function(data) {
+                    vm.publicRegistryTags = data;
+                }, function(data) {
+                    vm.error = data;
+                });
+            $('#edit-project-image-edit-modal')
+                .modal({
+                    closable: false
+                })
+                .modal('show');
         }
 
         function showDeleteImageDialog(image) {
@@ -230,6 +280,16 @@
             });
         }
 
+        function checkEditImage() {
+            vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
+            angular.forEach(vm.images, function (image) {
+                if(image.name === vm.editImage.name && image.tag === vm.editImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
+        }
+
         function checkImagePublicRepository() {
             vm.buttonStyle = "disabled";
             console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
@@ -240,23 +300,29 @@
             });
         }
 
+        function checkEditImagePublicRepository() {
+            vm.buttonStyle = "disabled";
+            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
+            angular.forEach(vm.publicRegistryTags, function (tag) {
+                if(tag.name === vm.editImage.tag) {
+                    vm.buttonStyle = "positive";
+                }
+            });
+        }
+
         function createSaveImage(image) {
             if (vm.project.images == null) {
                 vm.project.images = [];
             }
-            vm.project.images.push(image);
+            vm.project.images.push($.extend(true,{},image));
         }
 
         function editSaveImage() {
-            vm.selectedEditImage.id = vm.editImage.id;
+            vm.selectedEditImage.location = vm.editImage.location;
             vm.selectedEditImage.name = vm.editImage.name;
-            vm.selectedEditImage.skipImageBuild = vm.editImage.skipImageBuild;
+            vm.selectedEditImage.registry = vm.selectedEditImage.registry;
             vm.selectedEditImage.tag = vm.editImage.tag;
             vm.selectedEditImage.description = vm.editImage.description;
-            vm.selectedEditImage.skipTLS = vm.editImage.skipTLS;
-            vm.selectedEditImage.url = vm.editImage.url;
-            vm.selectedEditImage.username = vm.editImage.username;
-            vm.selectedEditImage.password = vm.editImage.password;
             console.log(vm.selectedEditImage);
         }
 
