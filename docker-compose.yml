@@ -2,9 +2,9 @@ rethinkdb:
     restart: always
     image: rethinkdb
     ports:
-        - "8080"
-        - "28015"
-        - "29015"
+        - "8083:8080"
+        - "8084:28015"
+        - "8085:29015"
     environment:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
 
@@ -56,6 +56,6 @@ controller:
     volumes_from:
         - media
     ports:
-        - "8888:8080"
+        - "8082:8080"
     environment:
         no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"

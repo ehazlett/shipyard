@@ -1,17 +1,17 @@
 package api
 
 import (
-//	"bytes"
+	//	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"bytes"
+	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/mock_test"
 	"github.com/stretchr/testify/assert"
-	"github.com/shipyard/shipyard"
-	"bytes"
 )
 
 func TestApiGetRegistries(t *testing.T) {
@@ -95,7 +95,7 @@ func TestApiRemoveRegistry(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(api.removeRegistry))
 	defer ts.Close()
 
-	req, err := http.NewRequest("DELETE", ts.URL + "/api/registries/" + mock_test.TestRegistry.Name, nil)
+	req, err := http.NewRequest("DELETE", ts.URL+"/api/registries/"+mock_test.TestRegistry.Name, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -46,8 +46,9 @@ var (
 	ErrAccountExists       = errors.New("account already exists")
 	ErrAccountDoesNotExist = errors.New("account does not exist")
 
-	ErrProjectExists       = errors.New("project already exists")
-	ErrProjectDoesNotExist = errors.New("project does not exist")
+	ErrProjectExists        = errors.New("project already exists")
+	ErrProjectDoesNotExist  = errors.New("project does not exist")
+	ErrProjectImagesProblem = errors.New("problem retrieving images for project")
 
 	ErrImageExists       = errors.New("image already exists")
 	ErrImageDoesNotExist = errors.New("image does not exist")
@@ -93,6 +94,7 @@ type (
 		SaveProject(project *model.Project) error
 		UpdateProject(project *model.Project) error
 		DeleteProject(project *model.Project) error
+		DeleteAllProjects() error
 
 		Images() ([]*model.Image, error)
 		ImagesByProjectId(projectId string) ([]*model.Image, error)
@@ -100,6 +102,7 @@ type (
 		SaveImage(image *model.Image) error
 		UpdateImage(image *model.Image) error
 		DeleteImage(image *model.Image) error
+		DeleteAllImages() error
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -757,8 +760,7 @@ func (m DefaultManager) Project(id string) (*model.Project, error) {
 	project.Images, err = m.ImagesByProjectId(project.ID)
 
 	if err != nil {
-		// TODO: add a better message
-		return nil, err
+		return nil, ErrProjectImagesProblem
 	}
 
 	return project, nil
@@ -898,6 +900,16 @@ func (m DefaultManager) DeleteProject(project *model.Project) error {
 	return nil
 }
 
+func (m DefaultManager) DeleteAllProjects() error {
+	_, err := r.Table(tblNameProjects).Delete().Run(m.session)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // end methods related to the project structure
 
 //methods related to the Image structure
@@ -1006,6 +1018,16 @@ func (m DefaultManager) DeleteImage(image *model.Image) error {
 	}
 
 	m.logEvent("delete-image", fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteAllImages() error {
+	_, err := r.Table(tblNameImages).Delete().Run(m.session)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

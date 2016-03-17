@@ -247,3 +247,11 @@ func (m MockManager) UpdateImage(image *model.Image) error {
 func (m MockManager) DeleteImage(image *model.Image) error {
 	return nil
 }
+
+func (m MockManager) DeleteAllProjects() error {
+	return nil
+}
+
+func (m MockManager) DeleteAllImages() error {
+	return nil
+}

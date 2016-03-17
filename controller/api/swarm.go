@@ -2,23 +2,23 @@ package api
 
 import (
 	"bytes"
+	"crypto/tls"
+	"encoding/base64"
+	"encoding/json"
+	"errors"
 	"net/http"
 	"net/url"
-	"encoding/json"
-	"encoding/base64"
 	"strings"
-	"errors"
-	"crypto/tls"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/shipyard/shipyard"
 )
 
 type AuthConfig struct {
-	Username		string		`json:"username"`
-	Password		string		`json:"password"`
-	Auth			string		`json:"auth"`
-	Email			string		`json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Auth     string `json:"auth"`
+	Email    string `json:"email"`
 }
 
 // authConfigB64 assembles the credentials needed for establishing a communication
@@ -27,8 +27,8 @@ func authConfigB64(username, password, auth, email string) (string, error) {
 	authConfig := AuthConfig{
 		Username: username,
 		Password: password,
-		Auth: "",
-		Email: "",
+		Auth:     "",
+		Email:    "",
 	}
 
 	authJson, err := json.Marshal(authConfig)
@@ -80,7 +80,7 @@ func pingRegistry(registry, username, password string) (bool, error) {
 
 // findRegistry checks to see if a valid registry is embedded into imageName.
 // It returns the hostname if it was found within imageName.
-func (a *Api) findRegistry(imageName string) (*shipyard.Registry, error)  {
+func (a *Api) findRegistry(imageName string) (*shipyard.Registry, error) {
 	possibleRegistry := strings.SplitN(imageName, "/", 2)[0]
 
 	var registry *shipyard.Registry
