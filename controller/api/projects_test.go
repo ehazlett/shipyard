@@ -266,7 +266,7 @@ func TestDeleteProject(t *testing.T) {
 				Convey("And if we try to retrieve the project again by its id it should fail.", func() {
 					//try to get the second project and make sure the server sends an error
 					_, code, err = apiClient.GetProject(SY_AUTHTOKEN, ts.URL, PROJECT1_SAVED_ID)
-					So(err, ShouldNotBeNil)
+					So(err, ShouldBeNil)
 					So(code, ShouldEqual, http.StatusNotFound)
 					Convey("And if we get all projects, it should not be in the collection.", func() {
 						projects, code, err := apiClient.GetProjects(SY_AUTHTOKEN, ts.URL)
@@ -298,26 +298,24 @@ func TestDeleteProject(t *testing.T) {
 
 }
 
-// TODO: need to standardize Not Found errors
-func TestProjectNotFound(t *testing.T) {
+func TestProjectNotFoundScenarios(t *testing.T) {
+	cleanup()
 	Convey("Given that a project with a given id does not exist", t, func() {
-		cleanup()
 		Convey("When we try to retrieve that project by its id", func() {
 			project, code, err := apiClient.GetProject(SY_AUTHTOKEN, ts.URL, PROJECT1_SAVED_ID)
 			Convey("Then we should get a not found error", func() {
 				So(project, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusNotFound)
-				So(err, ShouldNotBeNil)
+				So(err, ShouldBeNil)
 			})
 		})
 		Convey("When we try to delete that project by its id", func() {
 			code, err := apiClient.DeleteProject(SY_AUTHTOKEN, ts.URL, PROJECT1_SAVED_ID)
 			Convey("Then we should get a not found error", func() {
 				So(code, ShouldEqual, http.StatusNotFound)
-				So(err, ShouldNotBeNil)
+				So(err, ShouldBeNil)
 			})
 		})
-
 	})
 }
 

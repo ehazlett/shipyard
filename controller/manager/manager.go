@@ -46,8 +46,9 @@ var (
 	ErrAccountExists       = errors.New("account already exists")
 	ErrAccountDoesNotExist = errors.New("account does not exist")
 
-	ErrProjectExists       = errors.New("project already exists")
-	ErrProjectDoesNotExist = errors.New("project does not exist")
+	ErrProjectExists        = errors.New("project already exists")
+	ErrProjectDoesNotExist  = errors.New("project does not exist")
+	ErrProjectImagesProblem = errors.New("problem retrieving images for project")
 
 	ErrImageExists       = errors.New("image already exists")
 	ErrImageDoesNotExist = errors.New("image does not exist")
@@ -759,8 +760,7 @@ func (m DefaultManager) Project(id string) (*model.Project, error) {
 	project.Images, err = m.ImagesByProjectId(project.ID)
 
 	if err != nil {
-		// TODO: add a better message
-		return nil, err
+		return nil, ErrProjectImagesProblem
 	}
 
 	return project, nil

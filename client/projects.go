@@ -21,14 +21,13 @@ func GetAuthToken(url, user, pass string) (string, error) {
 func GetProjects(authHeader, url string) ([]model.Project, int, error) {
 	var projects []model.Project
 	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects", url), "")
-	if nil == err {
-		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-		err = json.Unmarshal([]byte(body), &projects)
-		if err != nil {
-			return nil, resp.StatusCode, err
-		}
-	} else {
+	if err != nil {
+		return nil, resp.StatusCode, err
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal([]byte(body), &projects)
+	if err != nil {
 		return nil, resp.StatusCode, err
 	}
 	return projects, resp.StatusCode, nil
@@ -46,18 +45,18 @@ func CreateProject(authHeader string, url string, name string, description strin
 	resp, err := sendRequest(authHeader, "POST", fmt.Sprintf("%s/api/projects", url), string(data))
 	if err != nil {
 		return "", resp.StatusCode, err
-	} else {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", resp.StatusCode, err
-		}
-		err = json.Unmarshal(body, &project)
-		if err != nil {
-			return "", resp.StatusCode, err
-		} else {
-			return project.ID, resp.StatusCode, nil
-		}
 	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", resp.StatusCode, err
+	}
+	err = json.Unmarshal(body, &project)
+	if err != nil {
+		return "", resp.StatusCode, err
+	} else {
+		return project.ID, resp.StatusCode, nil
+	}
+
 }
 
 func GetProject(authHeader, url, id string) (*model.Project, int, error) {
@@ -65,17 +64,23 @@ func GetProject(authHeader, url, id string) (*model.Project, int, error) {
 	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s", url, id), "")
 	if err != nil {
 		return project, resp.StatusCode, err
-	} else {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return project, resp.StatusCode, err
-		}
-
-		err = json.Unmarshal([]byte(body), &project)
-		if err != nil {
-			return project, resp.StatusCode, err
-		}
 	}
+
+	// If we get an error status code we should not try to unmarshall body, since it will come empty from server.
+	if resp.StatusCode != http.StatusOK {
+		return nil, resp.StatusCode, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return project, resp.StatusCode, err
+	}
+
+	err = json.Unmarshal([]byte(body), &project)
+	if err != nil {
+		return project, resp.StatusCode, errors.New("Error, could not unmarshall project body")
+	}
+
 	return project, resp.StatusCode, nil
 }
 
@@ -94,20 +99,12 @@ func UpdateProject(authHeader string, url string, id string, name string, descri
 	if err != nil {
 		return resp.StatusCode, err
 	}
-	if resp.StatusCode != http.StatusNoContent { //not ok
-		err = errors.New(resp.Status)
-		return resp.StatusCode, err
-	}
 	return resp.StatusCode, nil
 }
 
 func DeleteProject(authHeader, url, id string) (int, error) {
 	resp, err := sendRequest(authHeader, "DELETE", fmt.Sprintf("%s/api/projects/%s", url, id), "")
 	if err != nil {
-		return resp.StatusCode, err
-	}
-	if resp.StatusCode != http.StatusNoContent { //not ok
-		err = errors.New(resp.Status)
 		return resp.StatusCode, err
 	}
 	return resp.StatusCode, nil
@@ -133,15 +130,14 @@ func AddProjectImage(authHeader, url, projectId string, name string, imageId str
 func GetProjectImages(authHeader, url string, projectId string) ([]*model.Image, int, error) {
 	var images []*model.Image
 	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s/images", url, projectId), "")
-	if nil == err {
-		defer resp.Body.Close()
+	if nil != err {
+		return images, resp.StatusCode, err
+	}
+	defer resp.Body.Close()
 
-		body, _ := ioutil.ReadAll(resp.Body)
-		err = json.Unmarshal([]byte(body), &images)
-		if err != nil {
-			return images, resp.StatusCode, err
-		}
-	} else {
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal([]byte(body), &images)
+	if err != nil {
 		return images, resp.StatusCode, err
 	}
 	return images, resp.StatusCode, nil
@@ -152,27 +148,23 @@ func GetProjectImage(authHeader, url, projectId string, imageId string) (model.I
 	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s/images/%s", url, projectId, imageId), "")
 	if err != nil {
 		return image, resp.StatusCode, err
-	} else {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return image, resp.StatusCode, err
-		}
-
-		err = json.Unmarshal([]byte(body), &image)
-		if err != nil {
-			return image, resp.StatusCode, err
-		}
 	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return image, resp.StatusCode, err
+	}
+
+	err = json.Unmarshal([]byte(body), &image)
+	if err != nil {
+		return image, resp.StatusCode, err
+	}
+
 	return image, resp.StatusCode, nil
 }
 
 func DeleteProjectImage(authHeader, url, projectId string, imageId string) (int, error) {
 	resp, err := sendRequest(authHeader, "DELETE", fmt.Sprintf("%s/api/projects/%s/images/%s", url, projectId, imageId), "")
 	if err != nil {
-		return resp.StatusCode, err
-	}
-	if resp.StatusCode != http.StatusNoContent { //not ok
-		err = errors.New(resp.Status)
 		return resp.StatusCode, err
 	}
 	return resp.StatusCode, nil
