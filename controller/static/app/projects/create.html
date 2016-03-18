@@ -353,12 +353,14 @@
                                         </select>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.createTest.testProvider === 'Clair [Internal]'">
+                                    <div class="eight wide field" ng-show="vm.createTest.testProvider === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <select name="testImageList" ng-model="vm.createTest.testImageList" class="ui search fluid dropdown">
-                                            <option value="">Image Name</option>
-                                            <option ng-repeat="a in vm.project.images" value="{{a.name}}">{{a.name}}</option>
-                                        </select>
+                                        <!--<select name="testImageList" ng-model="vm.createTest.testImageList" class="ui search fluid dropdown">-->
+                                            <!--<option value="">Image Name</option>-->
+                                            <!--<option ng-repeat="a in vm.project.images" value="{{a.name}}">{{a.name}}</option>-->
+                                        <!--</select>-->
+
+                                        <selectize config='vm.myConfig' options='vm.myOptions' ng-model="vm.myModel"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.createTest.testProvider === 'Predefined Provider'">
