@@ -256,7 +256,7 @@
                                     <div></div>
                                 </div>
 
-                                <div ng-show="vm.editImage.location && vm.createImage.location != 'File'" class="field">
+                                <div ng-show="vm.editImage.location && vm.editImage.location != 'File'" class="field">
                                     <label>Additional Image Tag</label>
                                     <input ng-show="!vm.editImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
                                     <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.editImage.name }">

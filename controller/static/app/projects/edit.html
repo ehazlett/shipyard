@@ -221,14 +221,14 @@
                                         <label>Image Name </label>
                                         <select name="image" ng-model="vm.editImage.name" class="ui search fluid dropdown image" ng-change="vm.checkEditImage()">
                                             <option value="">{{vm.editImage.name}}</option>
-                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
+                                            <option ng-repeat="a in vm.project.images" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="three wide field" >
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.editImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkEditImage()">
                                             <option value="">{{vm.editImage.tag}}</option>
-                                            <option ng-repeat="a in vm.images | filter: { name: vm.editImage.name }" value="{{a.tag}}">{{a.tag}}</option>
+                                            <option ng-repeat="a in vm.project.images | filter: { name: vm.editImage.name }" value="{{a.tag}}">{{a.tag}}</option>
                                         </select>
                                     </div>
 
@@ -275,10 +275,10 @@
                                     <div></div>
                                 </div>
 
-                                <div ng-show="vm.editImage.location && vm.createImage.location != 'File'" class="field">
+                                <div ng-show="vm.editImage.location && vm.editImage.location != 'File'" class="field">
                                     <label>Additional Image Tag</label>
                                     <input ng-show="!vm.editImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
-                                    <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.editImage.name }">
+                                    <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.project.images | filter: { name: vm.editImage.name }">
                                         {{a.tag}}
                                     </i>
                                     <i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.editImage.tagLayer }">

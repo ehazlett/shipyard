@@ -48,7 +48,7 @@
         vm.checkImage = checkImage;
         vm.checkEditImage = checkEditImage;
         vm.checkImagePublicRepository = checkImagePublicRepository;
-        vm.checkImagePublicRepository = checkEditImagePublicRepository;
+        vm.checkEditImagePublicRepository = checkEditImagePublicRepository;
         vm.getImages = getImages;
 
         vm.getRegistries();
@@ -217,12 +217,21 @@
             vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
+
             ProjectService.getPublicRegistryTags(image.name)
                 .then(function(data) {
                     vm.publicRegistryTags = data;
+
+                    var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
+                        return tag.name == image.tag;
+                    })[0];
+
+                    if (tagObject)
+                        vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
                 }, function(data) {
                     vm.error = data;
                 });
+
             $('#edit-project-image-edit-modal')
                 .modal({
                     closable: false
