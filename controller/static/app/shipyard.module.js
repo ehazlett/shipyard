@@ -50,6 +50,11 @@
                         {"id":"e8353be55900","name":"tomcat","tag":"7.0.65-jre7","description":"...","location":"","skipImageBuild":false},
                         {"id":"bf4d022972f1","name":"soninob/soninob","tag":"v2","description":"...","location":"","skipImageBuild":false}
                     ],
+                    tests: [
+                        {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                    ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
@@ -66,6 +71,11 @@
                         {"id":"sdghsertewrg","name":"jonbox","tag":"latest","description":"...","location":"","skipImageBuild":false},
                         {"id":"asdgfagsfga","name":"tomdog","tag":"7.0.65-jre7","description":"...","location":"","skipImageBuild":false},
                         {"id":"sagfegfrefg","name":"java","tag":"v2","description":"...","location":"","skipImageBuild":false}
+                    ],
+                    tests: [
+                        {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -84,6 +94,11 @@
                         {"id":"asdgfag66sfga","name":"winston","tag":"1.2","description":"...","location":"","skipImageBuild":false},
                         {"id":"567j67w45yg4w","name":"oprah","tag":"v2","description":"...","location":"","skipImageBuild":false}
                     ],
+                    tests: [
+                        {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"ertehgfhsg","name":"test2.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"hkfgohkfog","name":"test2.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                    ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
@@ -101,6 +116,11 @@
                         {"id":"tyujk67rj7j65","name":"hammerdin","tag":"","description":"...","location":"","skipImageBuild":false},
                         {"id":"8i5tryw456w","name":"paladin","tag":"","description":"...","location":"","skipImageBuild":false}
                     ],
+                    tests: [
+                        {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                    ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
@@ -117,6 +137,11 @@
                         {"id":"4y56ujty6h6ew","name":"trapsin","tag":"latest","description":"...","location":"","skipImageBuild":false},
                         {"id":"tyujk67rj7j65","name":"hammerdin","tag":"","description":"...","location":"","skipImageBuild":false},
                         {"id":"8i5tryw456w","name":"lightsorc","tag":"","description":"...","location":"","skipImageBuild":false}
+                    ],
+                    tests: [
+                        {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"uyiyuyukku","name":"test4.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"tyrtyrthjy","name":"test4.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: true,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -187,9 +212,9 @@
                 projects.splice(indexToEdit, 1);
 
                 return [200, {}, {}];
-            });*/
+            });
 
-            /*$httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
+            $httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
             $httpBackend.whenGET(/((?!project).)*!/).passThrough();

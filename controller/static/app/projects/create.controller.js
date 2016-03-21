@@ -28,6 +28,7 @@
         vm.images = [];
         vm.publicRegistryTags = [];
         vm.tests = [];
+        vm.imagesSelectize= [];
 
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
@@ -45,25 +46,24 @@
         vm.checkImagePublicRepository = checkImagePublicRepository;
         vm.checkEditImagePublicRepository = checkEditImagePublicRepository;
 
-
-        vm.myOptions = [
+        /*vm.myOptions = [
             {id: 1, title: 'Spectrometer'},
             {id: 2, title: 'Star Chart'},
             {id: 3, title: 'Laser Pointer'}
-        ];
-        vm.myConfig = {
+        ];*/
+
+       /* vm.myConfig = {
             create: true,
+            options: vm.imagesSelectize,
             valueField: 'id',
             labelField: 'title',
             delimiter: '|',
-            placeholder: 'Pick something',
+            placeholder: 'All images',
             onInitialize: function(selectize){
                 // receives the selectize object as an argument
             },
             // maxItems: 1
-        };
-
-
+        };*/
 
         vm.getRegistries();
 
@@ -206,12 +206,31 @@
                 .modal('show');
         }
 
+        vm.myConfig = {
+            create: true,
+            valueField: 'item',
+            labelField: 'item',
+            delimiter: '|',
+            placeholder: 'All images',
+            onInitialize: function(selectize){
+                // receives the selectize object as an argument
+            },
+            // maxItems: 1
+        };
+
         function showTestCreateDialog() {
-            vm.createImage = {};
+            vm.createTest = {};
+            vm.imagesSelectize = [];
+            angular.forEach(vm.project.images, function (image) {
+                vm.imagesSelectize.push(image.name);
+            });
+            vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
             $('#test-create-modal')
                 .modal({
                     onHidden: function() {
                         $('#test-create-modal').find("input").val("");
+                        $('.ui.dropdown').dropdown('restore defaults');
+                        vm.createTest.provider="";
                     }
                 })
                 .modal('show');
@@ -240,6 +259,10 @@
             console.log(vm.project.images);
         }
 
+        function createSaveTest(test) {
+            vm.project.tests.push($.extend(true,{},test));
+        }
+
         function editSaveImage() {
             vm.selectedEditImage.location = vm.editImage.location;
             vm.selectedEditImage.name = vm.editImage.name;
@@ -253,9 +276,6 @@
             vm.project.images.splice(vm.project.images.indexOf(image), 1);
         }
 
-        function createSaveTest(test) {
-            vm.project.tests.push(test);
-        }
 
         function getRegistries() {
             console.log("get regs");
