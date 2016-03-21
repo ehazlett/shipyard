@@ -10,7 +10,10 @@
         var vm = this;
 
         vm.project = resolvedProject;
-        vm.project.author = localStorage.getItem('X-Access-Token').split(":")[0];
+
+        /*issues with ngmocksE2E. Commenting for now.*/
+        vm.project.author = "admin";
+        //vm.project.author = localStorage.getItem('X-Access-Token').split(":")[0];
 
         //TODO: Should the default state be on or off (i.e. checked or not checked)?
         vm.skipImages = false;

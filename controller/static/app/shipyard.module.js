@@ -20,7 +20,8 @@
             'angular-jwt',
             'base64',
             'selectize',
-            'ui.router'
+            'ui.router',
+            'ngMockE2E'
         ])
 
         //Configure HttpBackend to mock requests to ILM endpoints
@@ -162,14 +163,19 @@
             ];
 
 
-            /*$httpBackend.whenGET('/api/projects').respond(projects);
+            $httpBackend.whenGET('/api/projects').respond(projects);
 
             $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
                 console.log(params);
                 return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
             });
 
-            $httpBackend.whenPOST('/api/projects/').respond(function(method, url, data){
+            $httpBackend.whenRoute('GET', '/api/projects/:id/results').respond(function(method, url, data, headers, params) {
+                console.log("yup");
+                return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
+            });
+
+            $httpBackend.whenPOST('/api/projects').respond(function(method, url, data){
                 var project = angular.fromJson(data);
 
                 // Generate ID
@@ -217,13 +223,13 @@
             $httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
 
             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
-            $httpBackend.whenGET(/((?!project).)*!/).passThrough();
-            $httpBackend.whenPOST(/((?!project).)*!/).passThrough();
-            $httpBackend.whenDELETE(/((?!project).)*!/).passThrough();
-            $httpBackend.whenPUT(/((?!project).)*!/).passThrough();
-            $httpBackend.whenPATCH(/((?!project).)*!/).passThrough();
-            $httpBackend.whenDELETE(/((?!project).)*!/).passThrough();
-            $httpBackend.whenJSONP(/((?!project).)*!/).passThrough();
-            $httpBackend.whenRoute(/((?!project).)*!/).passThrough();*/
+            $httpBackend.whenGET(/.*/).passThrough();
+            $httpBackend.whenPOST(/.*/).passThrough();
+            $httpBackend.whenDELETE(/.*/).passThrough();
+            $httpBackend.whenPUT(/.*/).passThrough();
+            $httpBackend.whenPATCH(/.*/).passThrough();
+            $httpBackend.whenDELETE(/.*/).passThrough();
+            $httpBackend.whenJSONP(/.*/).passThrough();
+            $httpBackend.whenRoute(/.*/).passThrough();
         })
 })();

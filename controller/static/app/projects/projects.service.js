@@ -25,6 +25,15 @@
                     });
                 return promise;
             },
+            results: function(projectId) {
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/results')
+                    .then(function(response) {
+                        console.log(response.data);
+                        return response.data;
+                    });
+                return promise;
+            },
             update: function(projectId, data) {
                 var promise = $http
                     .put('/api/projects/' + projectId, data)

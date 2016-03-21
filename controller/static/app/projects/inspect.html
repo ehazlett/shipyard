@@ -1,0 +1,161 @@
+<div class="ui padded grid">
+    <div class="row">
+        <div class="column">
+            <div class="ui segment page">
+                <div class="ui grid">
+                    <div class="two column row">
+                        <div class="column">
+                            <h3 class="ui header">
+                                <div class="content">
+                                    <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>
+                                    Project {{vm.project.name}} Results
+                                </div>
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="ui form">
+                            <div class="ui column grid">
+                                <div class="column">
+                                    <h5 class="ui dividing header">Project Details</h5>
+                                    <div class="six fields">
+                                        <div class="field">
+                                            <label>Project ID: {{vm.project.id}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Description: {{vm.project.description}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="six fields">
+                                        <div class="field">
+                                            <label>Build ID: {{vm.project.buildID || 'Not implemented'}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Run Date: {{vm.project.runDate || 'Not implemented'}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>End Date: {{vm.project.endDate || 'Not implemented'}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Create Date: {{vm.project.createDate || 'Not implemented'}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Author: {{vm.project.author || 'Not implemented'}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="six fields">
+                                        <div class="field">
+                                            <label>Project Version: {{vm.project.projectVersion || 'Not implemented'}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Last Tag Applied: {{vm.project.lastTagApplied || 'Not implemented'}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Last Update: {{vm.project.lastUpdate || 'Not implemented'}}</label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Last Update Name: {{vm.project.lastUpdate || 'Not implemented'}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="column">
+                                <h4 class="ui dividing header">Results</h4>
+                                <div class="item">
+                                    <div class="ui toggle checkbox" ng-click="vm.skipImages=!vm.skipImages">
+                                        <input type="checkbox" name="public" ng-model="vm.skipImages">
+                                        <label>Skip images</label>
+                                    </div>
+                                </div>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th class="collapsing">Build</th>
+                                        <th>Image ID</th>
+                                        <th>Image Name</th>
+                                        <th>Tag</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="image in vm.project.images" jquery>
+                                        <td class="collapsing">
+                                            <div class="positive ui fitted checkbox">
+                                                <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[image.id].Selected">
+                                                <label for="{{$index}}-cb"></label>
+                                            </div>
+                                        </td>
+                                        <td>{{image.id}}</td>
+                                        <td>{{image.name}}</td>
+                                        <td>{{image.tag}}</td>
+                                        <td>{{image.description}}</td>
+                                        <td class="collapsing">
+                                            <div ng-click="vm.showImageEditDialog(image)" class="basic compact blue ui icon button">
+                                                <i class="pencil icon"></i>
+                                            </div>
+                                            <div ng-click="vm.showDeleteImageDialog(image)" class="basic compact blue ui icon button">
+                                                <i class="trash icon"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="left floated column">
+                                <div ui-sref="dashboard.addTest" class="ui small green labeled icon button">
+                                    <i class="plus icon"></i>Add Test
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="column">
+                                <h4 class="ui dividing header">Tests Details</h4>
+                                <div class="item">
+                                    <div class="ui toggle checkbox" ng-click="vm.skipTests=!vm.skipTests">
+                                        <input type="checkbox" name="public" ng-model="vm.skipTests">
+                                        <label>Skip Tests</label>
+                                    </div>
+                                </div>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th class="collapsing">Run</th>
+                                        <th>Test ID</th>
+                                        <th>Test Name</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="column">
+                                <div ng-click='vm.updateProject(vm.project)' class="ui small gray button">
+                                    Save Project
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

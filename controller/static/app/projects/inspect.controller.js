@@ -3,78 +3,98 @@
 
     angular
         .module('shipyard.projects')
-        .controller('CreateController', CreateController);
+        .controller('InspectController', InspectController);
 
-    CreateController.$inject = ['$scope', 'ProjectService', 'RegistryService', '$state', '$http'];
-    function CreateController($scope, ProjectService, RegistryService, $state, $http) {
+    InspectController.$inject = ['resolvedProject', '$scope', 'ProjectService', 'RegistryService', '$state'];
+    function InspectController(resolvedProject, $scope, ProjectService, RegistryService, $state) {
         var vm = this;
 
-        vm.project = {};
-        vm.project.images = [];
-        vm.project.author = localStorage.getItem('X-Access-Token').split(":")[0];
-        vm.project.tests = [];
+        vm.project = resolvedProject;
+
+        /*issues with ngmocksE2E. Commenting for now.*/
+        vm.project.author = "admin";
+        //vm.project.author = localStorage.getItem('X-Access-Token').split(":")[0];
+
+        //TODO: Should the default state be on or off (i.e. checked or not checked)?
+        vm.skipImages = false;
+        vm.skipTests = false;
+
+        vm.needsBuild = false;
+
+        vm.selected = {};
+        vm.selectedItemCount = 0;
 
         // Create modal, edit modal namespaces
         vm.createImage = {};
         vm.editImage = {};
-        vm.createTest = {};
 
         vm.createImage.additionalTags = [];
-
-        vm.skipImages = true;
-        vm.skipTests= true;
 
         vm.registries = [];
         vm.images = [];
         vm.publicRegistryTags = [];
-        vm.tests = [];
-        vm.imagesSelectize= [];
 
-        vm.saveProject = saveProject;
+        vm.buttonStyle = "disabled";
+
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
-        vm.editSaveTest    = editSaveTest;
-        vm.createSaveTest = createSaveTest;
-        vm.showImageCreateDialog = showImageCreateDialog;
+
+        vm.imageList = imageList;
         vm.showImageEditDialog = showImageEditDialog;
+        vm.showImageCreateDialog = showImageCreateDialog;
+        vm.showDeleteImageDialog = showDeleteImageDialog;
         vm.deleteImage = deleteImage;
+
+        vm.updateProject = updateProject;
+        vm.resetValues = resetValues;
         vm.getRegistries = getRegistries;
-        vm.getImages = getImages;
-        vm.showTestCreateDialog = showTestCreateDialog;
-        vm.showTestEditDialog = showTestEditDialog;
         vm.checkImage = checkImage;
         vm.checkEditImage = checkEditImage;
-        vm.resetValues = resetValues;
         vm.checkImagePublicRepository = checkImagePublicRepository;
         vm.checkEditImagePublicRepository = checkEditImagePublicRepository;
-
-        /*vm.myOptions = [
-            {id: 1, title: 'Spectrometer'},
-            {id: 2, title: 'Star Chart'},
-            {id: 3, title: 'Laser Pointer'}
-        ];*/
-
-       /* vm.myConfig = {
-            create: true,
-            options: vm.imagesSelectize,
-            valueField: 'id',
-            labelField: 'title',
-            delimiter: '|',
-            placeholder: 'All images',
-            onInitialize: function(selectize){
-                // receives the selectize object as an argument
-            },
-            // maxItems: 1
-        };*/
+        vm.getImages = getImages;
 
         vm.getRegistries();
 
-        vm.buttonStyle = "disabled";
+        $scope.$on('ngRepeatFinished', function() {
+            $('.ui.sortable.celled.table').tablesort();
+        });
+
+        $scope.$watch(function() {
+            var count = 0;
+            angular.forEach(vm.selected, function (s) {
+                if(s.Selected) {
+                    count += 1;
+                }
+            });
+            vm.selectedItemCount = count;
+        });
+
+        // Remove selected items that are no longer visible
+        $scope.$watchCollection('imageList()', function () {
+            angular.forEach(vm.selected, function (s) {
+                if(vm.selected[s.Id].Selected == true) {
+                    var isVisible = false
+                    angular.forEach($scope.imageList(), function(c) {
+                        if(c.Id == s.Id) {
+                            isVisible = true;
+                            return;
+                        }
+                    });
+                    vm.selected[s.Id].Selected = isVisible;
+                }
+            });
+            return;
+        });
+
+        function imageList() {
+            return Object.keys(vm.project.image_list)
+        }
 
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    $('#image-create-modal').find("input").val("");
+                    $('#edit-project-image-create-modal').find("input").val("");
                     $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
                     $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                     vm.createImage.name = "";
@@ -132,9 +152,7 @@
                 vm.createImage.name = result.title;
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
-                vm.editImage.tag = "";
                 vm.buttonStyle = "disabled";
-                vm.publicRegistryTags = "";
                 $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
@@ -178,77 +196,21 @@
             vm.createImage.tag = "";
             vm.createImage.description = "";
             vm.buttonStyle = "disabled";
-            $('#image-create-modal').find("input").val("");
+            $('#edit-project-image-create-modal').find("input").val("");
             $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
         }
 
-        function saveProject(project){
-            console.log("saving project" + project);
-            ProjectService.create(project)
-                .then(function(data) {
-                    $state.transitionTo('dashboard.projects');
-                }, function(data) {
-                    vm.error = data;
-                });
-        }
-
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#image-create-modal')
+            $('#edit-project-image-create-modal')
                 .modal({
                     onHidden: function() {
-                        $('#image-create-modal').find("input").val("");
+                        $('#edit-project-image-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createImage.location = "";
                     },
-                    closable: false
-                })
-                .modal('show');
-        }
-
-        vm.myConfig = {
-            create: true,
-            valueField: 'item',
-            labelField: 'item',
-            delimiter: '|',
-            placeholder: 'All images',
-            onInitialize: function(selectize){
-                // receives the selectize object as an argument
-            },
-            // maxItems: 1
-        };
-
-        function showTestCreateDialog() {
-            vm.createTest = {};
-            vm.imagesSelectize = [];
-            angular.forEach(vm.project.images, function (image) {
-                vm.imagesSelectize.push(image.name);
-            });
-            vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
-            $('#test-create-modal')
-                .modal({
-                    onHidden: function() {
-                        $('#test-create-modal').find("input").val("");
-                        $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider="";
-                    }
-                })
-                .modal('show');
-        }
-
-        function showTestEditDialog(test) {
-            vm.editTest = $.extend(true, {}, test);
-            vm.selectedEditTest = test;
-            console.log(test);
-            $('#test-edit-modal')
-                .modal({
-                    //onHidden: function() {
-                    //    $('#test-create-modal').find("input").val("");
-                    //    $('.ui.dropdown').dropdown('restore defaults');
-                    //    vm.createTest.provider="";
-                    //}
                     closable: false
                 })
                 .modal('show');
@@ -258,51 +220,42 @@
             vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
+
             ProjectService.getPublicRegistryTags(image.name)
                 .then(function(data) {
                     vm.publicRegistryTags = data;
+
+                    var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
+                        return tag.name == image.tag;
+                    })[0];
+
+                    if (tagObject)
+                        vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
                 }, function(data) {
                     vm.error = data;
                 });
-            $('#image-edit-modal')
+
+            $('#edit-project-image-edit-modal')
                 .modal({
                     closable: false
                 })
                 .modal('show');
         }
 
-        function createSaveImage(image) {
-            vm.buttonStyle = "disabled";
-            vm.project.images.push($.extend(true,{},image));
-            console.log(vm.project.images);
-        }
-
-        function createSaveTest(test) {
-            vm.project.tests.push($.extend(true,{},test));
-        }
-
-        function editSaveImage() {
-            vm.selectedEditImage.location = vm.editImage.location;
-            vm.selectedEditImage.name = vm.editImage.name;
-            vm.selectedEditImage.registry = vm.editImage.registry;
-            vm.selectedEditImage.tag = vm.editImage.tag;
-            vm.selectedEditImage.description = vm.editImage.description;
-            console.log(vm.selectedEditImage);
-        }
-
-        function editSaveTest() {
-            vm.selectedEditTest.description = vm.editTest.description;
-            vm.selectedEditTest.name = vm.editTest.name;
-            vm.selectedEditTest.onFailure = vm.editTest.onFailure;
-            vm.selectedEditTest.onSuccess = vm.editTest.onSuccess;
-            vm.selectedEditTest.provider = vm.editTest.provider;
-            vm.selectedEditTest.testImages = vm.editTest.testImages;
+        function showDeleteImageDialog(image) {
+            vm.selectedImage = image;
+            $('#edit-project-delete-image-modal').modal('show');
         }
 
         function deleteImage(image) {
-            vm.project.images.splice(vm.project.images.indexOf(image), 1);
+            console.log("delete image " + image.id + " from project " + vm.project.id);
+            ProjectService.delete(vm.project.id,image.id)
+                .then(function(data) {
+                    vm.project.images.splice(vm.project.images.indexOf(image), 1);
+                }, function (data) {
+                    vm.error = data;
+                });
         }
-
 
         function getRegistries() {
             console.log("get regs");
@@ -367,6 +320,32 @@
                     vm.buttonStyle = "positive";
                 }
             });
+        }
+
+        function createSaveImage(image) {
+            if (vm.project.images == null) {
+                vm.project.images = [];
+            }
+            vm.project.images.push($.extend(true,{},image));
+        }
+
+        function editSaveImage() {
+            vm.selectedEditImage.location = vm.editImage.location;
+            vm.selectedEditImage.name = vm.editImage.name;
+            vm.selectedEditImage.registry = vm.selectedEditImage.registry;
+            vm.selectedEditImage.tag = vm.editImage.tag;
+            vm.selectedEditImage.description = vm.editImage.description;
+            console.log(vm.selectedEditImage);
+        }
+
+        function updateProject(project) {
+            console.log("update project" + project);
+            ProjectService.update(project.id, project)
+                .then(function(data) {
+                    $state.transitionTo('dashboard.projects');
+                }, function(data) {
+                    vm.error = data;
+                });
         }
     }
 })();
