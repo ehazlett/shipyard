@@ -69,8 +69,8 @@
                     description: "Security project level A",
                     status: "Tested",
                     images: [
-                        {"id":"sdghsertewrg","name":"jonbox","tag":"latest","description":"...","location":"","skipImageBuild":false},
-                        {"id":"asdgfagsfga","name":"tomdog","tag":"7.0.65-jre7","description":"...","location":"","skipImageBuild":false},
+                        {"id":"sdghsertewrg","name":"verigreen","tag":"latest","description":"...","location":"","skipImageBuild":false},
+                        {"id":"asdgfagsfga","name":"rethinkdb","tag":"7.0.65-jre7","description":"...","location":"","skipImageBuild":false},
                         {"id":"sagfegfrefg","name":"java","tag":"v2","description":"...","location":"","skipImageBuild":false}
                     ],
                     tests: [
@@ -113,9 +113,9 @@
                     description: "Security project level A",
                     status: "Published",
                     images: [
-                        {"id":"4y56ujty6h6ew","name":"assasin","tag":"latest","description":"...","location":"","skipImageBuild":false},
-                        {"id":"tyujk67rj7j65","name":"hammerdin","tag":"","description":"...","location":"","skipImageBuild":false},
-                        {"id":"8i5tryw456w","name":"paladin","tag":"","description":"...","location":"","skipImageBuild":false}
+                        {"id":"4y56ujty6h6ew","name":"busybox","tag":"latest","description":"...","location":"","skipImageBuild":false},
+                        {"id":"tyujk67rj7j65","name":"ubuntu","tag":"","description":"...","location":"","skipImageBuild":false},
+                        {"id":"8i5tryw456w","name":"mongodb","tag":"","description":"...","location":"","skipImageBuild":false}
                     ],
                     tests: [
                         {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
@@ -162,6 +162,32 @@
                 {id:"8i5tryw456w",name:"paladin",tag:"",description:"..."}
             ];
 
+            var providers = [
+                {
+                    id:"34234234",
+                    name:"provider_name1",
+                    availableBuildTypes:"",
+                    config:"",
+                    url:"",
+                    providerJobs: [
+                        {id:"6745674565",name:"test1.1"},
+                        {id:"67fdgdf456",name:"test1.2"}
+                    ]
+                },
+                {
+                    id:"dfsdfsdf43",
+                    name:"provider_name2",
+                    availableBuildTypes:"",
+                    config:"",
+                    url:"",
+                    providerJobs: [
+                        {id:"45453fdsdf",name:"test2.1"},
+                        {id:"hg7665nb65",name:"test2.2"}
+                    ]
+                }
+            ];
+
+            $httpBackend.whenGET('/api/providers').respond(providers);
 
             $httpBackend.whenGET('/api/projects').respond(projects);
 

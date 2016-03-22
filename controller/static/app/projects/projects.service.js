@@ -81,6 +81,14 @@
                         return response.data;
                     });
                 return promise;
+            },
+            getProviders: function() {
+                var promise = $http
+                    .get('/api/providers')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
             }
         }
     }

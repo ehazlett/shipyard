@@ -487,6 +487,25 @@
                                     </tr>
                                     </thead>
                                     <tbody>
+                                    <tr ng-repeat="test in vm.project.tests" jquery>
+                                        <td class="collapsing">
+                                            <div class="positive ui fitted checkbox">
+                                                <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[test.id].Selected">
+                                                <label for="{{$index}}-cb"></label>
+                                            </div>
+                                        </td>
+                                        <td>{{test.id}}</td>
+                                        <td>{{test.name}}</td>
+                                        <td>{{test.description}}</td>
+                                        <td class="collapsing">
+                                            <div ng-click="" class="basic compact blue ui icon button">
+                                                <i class="pencil icon"></i>
+                                            </div>
+                                            <div ng-click="" class="basic compact blue ui icon button">
+                                                <i class="trash icon"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>
