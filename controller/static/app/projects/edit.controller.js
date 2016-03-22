@@ -34,10 +34,15 @@
         vm.images = [];
         vm.publicRegistryTags = [];
 
+        vm.providers = [];
+        vm.providerTests = [];
+
         vm.buttonStyle = "disabled";
 
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
+
+        vm.createSaveTest = createSaveTest;
 
         vm.imageList = imageList;
         vm.showImageEditDialog = showImageEditDialog;
@@ -53,6 +58,11 @@
         vm.checkImagePublicRepository = checkImagePublicRepository;
         vm.checkEditImagePublicRepository = checkEditImagePublicRepository;
         vm.getImages = getImages;
+        vm.showTestCreateDialog = showTestCreateDialog;
+        vm.getTestsProviders = getTestsProviders;
+        vm.getJobs = getJobs;
+        vm.checkProviderTest = checkProviderTest;
+        vm.resetTestValues = resetTestValues;
 
         vm.getRegistries();
 
@@ -191,6 +201,46 @@
             minCharacters: 3
         });
 
+        $(".ui.search.fluid.dropdown.testProvider")
+            .dropdown({
+                onChange: function(value, text, $selectedItem) {
+                    $('#edit-project-test-create-modal').find("input").val("");
+                    if(value === "Predefined Provider")
+                        getTestsProviders();
+                }
+            });
+
+        vm.myConfig = {
+            create: true,
+            valueField: 'item',
+            labelField: 'item',
+            delimiter: '|',
+            placeholder: 'All images',
+            onInitialize: function(selectize){
+                // receives the selectize object as an argument
+            },
+            // maxItems: 1
+        };
+
+        function showTestCreateDialog() {
+            vm.createTest = {};
+            vm.imagesSelectize = [];
+            angular.forEach(vm.project.images, function (image) {
+                vm.imagesSelectize.push(image.name);
+            });
+            vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
+            $('#edit-project-test-create-modal')
+                .modal({
+                    onHidden: function() {
+                        vm.buttonStyle = "disabled";
+                        $('#test-create-modal').find("input").val("");
+                        $('.ui.dropdown').dropdown('restore defaults');
+                        vm.createTest.provider="";
+                    }
+                })
+                .modal('show');
+        }
+
         function resetValues() {
             vm.createImage.name = "";
             vm.createImage.tag = "";
@@ -200,6 +250,25 @@
             $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+        }
+
+        function resetTestValues() {
+            vm.createTest.providerName = "";
+            vm.createTest.test = "";
+            vm.createTest.testImages = "";
+            vm.createTest.blocker = "";
+            vm.createTest.name = "";
+            vm.createTest.tag = "";
+            vm.createTest.description = "";
+            vm.createTest.onSuccess = "";
+            vm.createTest.onFailure = "";
+            vm.buttonStyle = "disabled";
+            if(vm.createTest.provider === "Clair [Internal]") {
+                vm.buttonStyle = "positive";
+            }
+            $('#test-create-modal').find("input").val("");
+            $('.ui.search.fluid.dropdown.providerName').dropdown('restore defaults');
+            $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
         }
 
         function showImageCreateDialog() {
@@ -282,6 +351,29 @@
                 })
         }
 
+        function getTestsProviders() {
+            console.log("get providers");
+            vm.providers = [];
+            ProjectService.getProviders()
+                .then(function(data) {
+                    console.log(data);
+                    vm.providers = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+        }
+
+        function getJobs(testProvider) {
+            vm.providerTests = [];
+            vm.createTest.test = "";
+            $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
+            angular.forEach(vm.providers, function(provider) {
+                if(provider.name === testProvider) {
+                    vm.providerTests = provider.providerJobs;
+                }
+            });
+        }
+
         function checkImage() {
             vm.buttonStyle = "disabled";
             console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
@@ -322,11 +414,32 @@
             });
         }
 
+        function checkProviderTest(providerName,providerTest) {
+            vm.buttonStyle = "disabled";
+            console.log(" check provider name " + providerName + " with tag " + providerTest);
+            angular.forEach(vm.providers, function (provider) {
+                if(provider.name === providerName) {
+                    angular.forEach(provider.providerJobs, function (test) {
+                        if(test.name === providerTest) {
+                            vm.buttonStyle = "positive";
+                        }
+                    });
+                }
+            });
+        }
+
         function createSaveImage(image) {
             if (vm.project.images == null) {
                 vm.project.images = [];
             }
             vm.project.images.push($.extend(true,{},image));
+        }
+
+        function createSaveTest(test) {
+            if (vm.project.tests == null) {
+                vm.project.tests = [];
+            }
+            vm.project.tests.push($.extend(true,{},test));
         }
 
         function editSaveImage() {

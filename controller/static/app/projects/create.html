@@ -341,7 +341,7 @@
 
                                     <div class="four wide field" ng-show="vm.createTest.provider === 'Predefined Provider'">
                                         <label>Provider Name</label>
-                                        <select name="providerName" ng-model="vm.createTest.providerName" class="ui search fluid dropdown" ng-change="vm.getJobs(vm.createTest.providerName);vm.checkPoviderTest(vm.createTest.providerName,vm.createTest.test)">
+                                        <select name="providerName" ng-model="vm.createTest.providerName" class="ui search fluid dropdown providerName" ng-change="vm.getJobs(vm.createTest.providerName);vm.checkProviderTest(vm.createTest.providerName,vm.createTest.test)">
                                             <option value="">Name</option>
                                             <option ng-repeat="a in vm.providers" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
@@ -349,7 +349,7 @@
 
                                     <div class="four wide field" ng-show="vm.createTest.provider === 'Predefined Provider'">
                                         <label>Test</label>
-                                        <select name="test" ng-model="vm.createTest.test" class="ui search fluid dropdown providerTest" ng-change="vm.checkPoviderTest(vm.createTest.providerName,vm.createTest.test)">
+                                        <select name="test" ng-model="vm.createTest.test" class="ui search fluid dropdown providerTest" ng-change="vm.checkProviderTest(vm.createTest.providerName,vm.createTest.test)">
                                             <option value="">Test</option>
                                             <option ng-repeat="a in vm.providerTests" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
@@ -467,7 +467,7 @@
 
                                     <div class="four wide field" ng-show="vm.editTest.provider === 'Predefined Provider'">
                                         <label>Provider Name</label>
-                                        <select name="providerName" ng-model="vm.editTest.providerName" class="ui search fluid dropdown" ng-change="vm.getJobsEdit(vm.editTest.providerName);vm.checkPoviderTest(vm.editTest.providerName,vm.editTest.test)">
+                                        <select name="providerName" ng-model="vm.editTest.providerName" class="ui search fluid dropdown" ng-change="vm.getJobsEdit(vm.editTest.providerName);vm.checkProviderTest(vm.editTest.providerName,vm.editTest.test)">
                                             <option value="">{{vm.editTest.providerName}}</option>
                                             <option ng-repeat="a in vm.providers" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
@@ -475,7 +475,7 @@
 
                                     <div class="four wide field" ng-show="vm.editTest.provider === 'Predefined Provider'">
                                         <label>Test</label>
-                                        <select name="test" ng-model="vm.editTest.test" class="ui search fluid dropdown" ng-change="vm.checkPoviderTest(vm.editTest.providerName,vm.editTest.test)">
+                                        <select name="test" ng-model="vm.editTest.test" class="ui search fluid dropdown" ng-change="vm.checkProviderTest(vm.editTest.providerName,vm.editTest.test)">
                                             <option value="">{{vm.editTest.test}}</option>
                                             <option ng-repeat="a in vm.providerTests" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
