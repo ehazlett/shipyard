@@ -54,7 +54,7 @@
         vm.getTestsProviders = getTestsProviders;
         vm.getJobs = getJobs;
         vm.getJobsEdit = getJobsEdit;
-        vm.checkPoviderTest = checkProviderTest;
+        vm.checkProviderTest = checkProviderTest;
 
         vm.getRegistries();
 
@@ -196,10 +196,9 @@
             if(vm.createTest.provider === "Clair [Internal]") {
                 vm.buttonStyle = "positive";
             }
-            $('#image-create-modal').find("input").val("");
-            $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
-            $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
-            $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+            $('#test-create-modal').find("input").val("");
+            $('.ui.search.fluid.dropdown.providerName').dropdown('restore defaults');
+            $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
         }
 
         function saveProject(project){
