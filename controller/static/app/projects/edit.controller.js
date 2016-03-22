@@ -47,6 +47,7 @@
         vm.imageList = imageList;
         vm.showImageEditDialog = showImageEditDialog;
         vm.showImageCreateDialog = showImageCreateDialog;
+        vm.showTestEditDialog = showTestEditDialog;
         vm.showDeleteImageDialog = showDeleteImageDialog;
         vm.deleteImage = deleteImage;
 
@@ -237,6 +238,18 @@
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createTest.provider="";
                     }
+                })
+                .modal('show');
+        }
+
+        function showTestEditDialog(test) {
+            vm.editTest = $.extend(true, {}, test);
+            vm.selectedEditTest = test;
+            vm.buttonStyle = "positive";
+            console.log(test);
+            $('#edit-project-test-edit-modal')
+                .modal({
+                    closable: false
                 })
                 .modal('show');
         }

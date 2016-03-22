@@ -52,9 +52,9 @@
                         {"id":"bf4d022972f1","name":"soninob/soninob","tag":"v2","description":"...","location":"","skipImageBuild":false}
                     ],
                     tests: [
-                        {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                        {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -74,9 +74,9 @@
                         {"id":"sagfegfrefg","name":"java","tag":"v2","description":"...","location":"","skipImageBuild":false}
                     ],
                     tests: [
-                        {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                        {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -96,9 +96,9 @@
                         {"id":"567j67w45yg4w","name":"oprah","tag":"v2","description":"...","location":"","skipImageBuild":false}
                     ],
                     tests: [
-                        {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"ertehgfhsg","name":"test2.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"hkfgohkfog","name":"test2.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                        {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"ertehgfhsg","name":"test2.2","description":"test2_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"hkfgohkfog","name":"test2.3","description":"test3_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -118,9 +118,9 @@
                         {"id":"8i5tryw456w","name":"mongodb","tag":"","description":"...","location":"","skipImageBuild":false}
                     ],
                     tests: [
-                        {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                        {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -140,9 +140,9 @@
                         {"id":"8i5tryw456w","name":"lightsorc","tag":"","description":"...","location":"","skipImageBuild":false}
                     ],
                     tests: [
-                        {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"uyiyuyukku","name":"test4.2","description":"test2_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
-                        {"id":"tyrtyrthjy","name":"test4.3","description":"test3_description","targets":"","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
+                        {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"uyiyuyukku","name":"test4.2","description":"test2_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
+                        {"id":"tyrtyrthjy","name":"test4.3","description":"test3_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: true,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
