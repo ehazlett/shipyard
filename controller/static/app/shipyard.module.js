@@ -187,17 +187,47 @@
                 }
             ];
 
+            var results = {
+                projectId: "",
+                description: "string",
+                buildId: "dbUuid",
+                runDate: "08:10:22 2016-02-26 AD",
+                endDate: "08:10:22 2016-02-26 AD",
+                createDate: "08:10:22 2016-02-26 AD",
+                author: "Jonathan Rosado",
+                projectVersion: "v0.1",
+                lastTagApplied: "4.05",
+                lastUpdate: "08:10:22 2016-02-26 AD",
+                updater: "updater value",
+                imageResults: [
+                    {imageId: 'jsurnrpofn', imageName: 'image name 1'},
+                    {imageId: 'pqochfntio', imageName: 'image name 2'},
+                    {imageId: 'polejamnvd', imageName: 'image name 3'},
+                    {imageId: 'pqoeinchdf', imageName: 'image name 4'}
+                ],
+                testsResults: [
+                    {testId: 'paodjmnrht',imageId: 'powejrnamr',blocker: true,testName: 'test 1',
+                        status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag1', 'tag2']},
+                    {testId: 'hjfgernjtu',imageId: 'nandmgemrt',blocker: false,testName: 'test 2',
+                        status: '',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag3', 'tag4']},
+                    {testId: 'ieurnsahgt',imageId: 'majndgpfre',blocker: true,testName: 'test 3',
+                        status: 'Failure',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag5', 'tag6']},
+                    {testId: 'pwoeitnhmf',imageId: 'fjghthfgtq',blocker: false,testName: 'test 4',
+                        status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag7', 'tag8']}
+                ]
+            };
+
             $httpBackend.whenGET('/api/providers').respond(providers);
 
             $httpBackend.whenGET('/api/projects').respond(projects);
 
-            $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
-                console.log(params);
-                return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
+            $httpBackend.whenRoute('GET', '/api/projects/:id/results').respond(function(method, url, data, headers, params) {
+                results.projectId = params.id;
+                return [200, angular.toJson(results), {}];
             });
 
-            $httpBackend.whenRoute('GET', '/api/projects/:id/results').respond(function(method, url, data, headers, params) {
-                console.log("yup");
+            $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
+                console.log(params);
                 return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
             });
 
