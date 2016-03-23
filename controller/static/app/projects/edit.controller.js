@@ -66,6 +66,7 @@
         vm.resetTestValues = resetTestValues;
         vm.showDeleteTestDialog = showDeleteTestDialog;
         vm.deleteTest = deleteTest;
+        vm.editSaveTest = editSaveTest;
 
         vm.getRegistries();
 
@@ -248,6 +249,15 @@
             vm.editTest = $.extend(true, {}, test);
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
+            vm.providers = [];
+            ProjectService.getProviders()
+                .then(function(data) {
+                    console.log(data);
+                    vm.providers = data;
+                    getJobs(test.providerName);
+                }, function(data) {
+                    vm.error = data;
+                })
             console.log(test);
             $('#edit-project-test-edit-modal')
                 .modal({
@@ -395,7 +405,6 @@
 
         function getJobs(testProvider) {
             vm.providerTests = [];
-            vm.createTest.test = "";
             $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
             angular.forEach(vm.providers, function(provider) {
                 if(provider.name === testProvider) {
@@ -479,6 +488,19 @@
             vm.selectedEditImage.tag = vm.editImage.tag;
             vm.selectedEditImage.description = vm.editImage.description;
             console.log(vm.selectedEditImage);
+        }
+
+        function editSaveTest() {
+            vm.selectedEditTest.selecteTestType = vm.editTest.selecteTestType;
+            vm.selectedEditTest.providerName = vm.editTest.providerName;
+            vm.selectedEditTest.test = vm.editTest.test;
+            vm.selectedEditTest.name = vm.editTest.name;
+            vm.selectedEditTest.tag = vm.editTest.tag;
+            vm.selectedEditTest.description = vm.editTest.description;
+            vm.selectedEditTest.onFailure = vm.editTest.onFailure;
+            vm.selectedEditTest.onSuccess = vm.editTest.onSuccess;
+            vm.selectedEditTest.blocker = vm.editTest.blocker;
+            vm.selectedEditTest.targets = vm.editTest.targets;
         }
 
         function updateProject(project) {
