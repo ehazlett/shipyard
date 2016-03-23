@@ -17,6 +17,25 @@
     </div>
 </div>
 
+<div id="edit-project-delete-test-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        Delete Test: {{ vm.selectedTest.id | limitTo:12 }}
+    </div>
+    <div class="content">
+        <p>Are you sure you want to delete this test?</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.deleteTest(vm.selectedTest)" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
 <div id="edit-project-image-create-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
@@ -399,7 +418,7 @@
                                 <div class="two fields">
 
                                     <div class="field">
-                                        <label>Test Name</label>
+                                        <label>Display Name</label>
                                         <input name="tag" class="input" type="text" ng-model="vm.createTest.name" placeholder="Add Name" />
                                     </div>
 
@@ -458,7 +477,7 @@
 <div id="edit-project-test-edit-modal" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
-        Create Test
+        {{vm.editTest.name}}
     </div>
     <div class="content">
         <div class="ui grid">
@@ -525,7 +544,7 @@
                                 <div class="two fields">
 
                                     <div class="field">
-                                        <label>Test Name</label>
+                                        <label>Display Name</label>
                                         <input name="tag" class="input" type="text" ng-model="vm.editTest.name" placeholder="Add Name" />
                                     </div>
 
@@ -640,7 +659,7 @@
                                         <div class="field">
                                             <label>Status</label>
                                             <select class="ui selection dropdown" default="0" ng-model="vm.project.status">
-                                                <option class="placeholder" selected value="">{{vm.project.status}}</option>
+                                                <option value="">{{vm.project.status || 'Select status'}}</option>
                                                 <option value="Published">Published</option>
                                                 <option value="Tested">Tested</option>
                                             </select>
@@ -755,7 +774,7 @@
                                             <div ng-click="vm.showTestEditDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="pencil icon"></i>
                                             </div>
-                                            <div ng-click="" class="basic compact blue ui icon button">
+                                            <div ng-click="vm.showDeleteTestDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="trash icon"></i>
                                             </div>
                                         </td>

@@ -64,6 +64,8 @@
         vm.getJobs = getJobs;
         vm.checkProviderTest = checkProviderTest;
         vm.resetTestValues = resetTestValues;
+        vm.showDeleteTestDialog = showDeleteTestDialog;
+        vm.deleteTest = deleteTest;
 
         vm.getRegistries();
 
@@ -329,11 +331,26 @@
             $('#edit-project-delete-image-modal').modal('show');
         }
 
+        function showDeleteTestDialog(test) {
+            vm.selectedTest = test;
+            $('#edit-project-delete-test-modal').modal('show');
+        }
+
         function deleteImage(image) {
             console.log("delete image " + image.id + " from project " + vm.project.id);
             ProjectService.delete(vm.project.id,image.id)
                 .then(function(data) {
                     vm.project.images.splice(vm.project.images.indexOf(image), 1);
+                }, function (data) {
+                    vm.error = data;
+                });
+        }
+
+        function deleteTest(test) {
+            console.log("delete test " + test.id + " from project " + vm.project.id);
+            ProjectService.deleteTest(vm.project.id,test.id)
+                .then(function(data) {
+                    vm.project.tests.splice(vm.project.tests.indexOf(test), 1);
                 }, function (data) {
                     vm.error = data;
                 });

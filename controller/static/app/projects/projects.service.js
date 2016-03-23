@@ -89,6 +89,14 @@
                         return response.data;
                     });
                 return promise;
+            },
+            deleteTest: function(projectId, testId) {
+                var promise = $http
+                    .delete('/api/projects/' + projectId + '/tests/' + testId)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
             }
         }
     }

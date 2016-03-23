@@ -47,9 +47,9 @@
                     description: "Security project level A",
                     status: "Published",
                     images: [
-                        {"id":"c51f86c28340","name":"busybox","tag":"latest","description":"...","location":"","skipImageBuild":false},
-                        {"id":"e8353be55900","name":"tomcat","tag":"7.0.65-jre7","description":"...","location":"","skipImageBuild":false},
-                        {"id":"bf4d022972f1","name":"soninob/soninob","tag":"v2","description":"...","location":"","skipImageBuild":false}
+                        {"id":"c51f86c28340","name":"busybox","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
+                        {"id":"e8353be55900","name":"tomcat","tag":"7.0.65-jre7","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"bf4d022972f1","name":"soninob/soninob","tag":"v2","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false}
                     ],
                     tests: [
                         {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
@@ -69,9 +69,9 @@
                     description: "Security project level A",
                     status: "Tested",
                     images: [
-                        {"id":"sdghsertewrg","name":"verigreen","tag":"latest","description":"...","location":"","skipImageBuild":false},
-                        {"id":"asdgfagsfga","name":"rethinkdb","tag":"7.0.65-jre7","description":"...","location":"","skipImageBuild":false},
-                        {"id":"sagfegfrefg","name":"java","tag":"v2","description":"...","location":"","skipImageBuild":false}
+                        {"id":"sdghsertewrg","name":"verigreen","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
+                        {"id":"asdgfagsfga","name":"rethinkdb","tag":"7.0.65-jre7","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"sagfegfrefg","name":"java","tag":"v2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                     ],
                     tests: [
                         {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
@@ -91,9 +91,9 @@
                     description: "Security project level A",
                     status: "Published",
                     images: [
-                        {"id":"asdfawfgreg","name":"template","tag":"latest","description":"...","location":"","skipImageBuild":false},
-                        {"id":"asdgfag66sfga","name":"winston","tag":"1.2","description":"...","location":"","skipImageBuild":false},
-                        {"id":"567j67w45yg4w","name":"oprah","tag":"v2","description":"...","location":"","skipImageBuild":false}
+                        {"id":"asdfawfgreg","name":"template","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"asdgfag66sfga","name":"winston","tag":"1.2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"567j67w45yg4w","name":"oprah","tag":"v2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                     ],
                     tests: [
                         {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
@@ -113,9 +113,9 @@
                     description: "Security project level A",
                     status: "Published",
                     images: [
-                        {"id":"4y56ujty6h6ew","name":"busybox","tag":"latest","description":"...","location":"","skipImageBuild":false},
-                        {"id":"tyujk67rj7j65","name":"ubuntu","tag":"","description":"...","location":"","skipImageBuild":false},
-                        {"id":"8i5tryw456w","name":"mongodb","tag":"","description":"...","location":"","skipImageBuild":false}
+                        {"id":"4y56ujty6h6ew","name":"busybox","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"tyujk67rj7j65","name":"ubuntu","tag":"","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"8i5tryw456w","name":"mongodb","tag":"","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                     ],
                     tests: [
                         {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},
@@ -135,9 +135,9 @@
                     description: "Security project level A",
                     status: "Published",
                     images: [
-                        {"id":"4y56ujty6h6ew","name":"trapsin","tag":"latest","description":"...","location":"","skipImageBuild":false},
-                        {"id":"tyujk67rj7j65","name":"hammerdin","tag":"","description":"...","location":"","skipImageBuild":false},
-                        {"id":"8i5tryw456w","name":"lightsorc","tag":"","description":"...","location":"","skipImageBuild":false}
+                        {"id":"4y56ujty6h6ew","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
+                        {"id":"tyujk67rj7j65","name":"rethinkdb","tag":"","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"8i5tryw456w","name":"busybox","tag":"","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                     ],
                     tests: [
                         {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"",providerId: "buid","selectedTestType":"","providerName":"","onSuccess":"","onFailure":""},

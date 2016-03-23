@@ -69,7 +69,7 @@
                                 <div class="ui dividing header"></div>
                                 <div class="six fields">
                                     <div class="field">
-                                        <label>Test Results</label>
+                                        <h5>Test Results</h5>
                                     </div>
                                 </div>
                                 <table class="ui sortable celled table">
@@ -79,6 +79,8 @@
                                         <th>Image ID</th>
                                         <th>Blocker</th>
                                         <th>Test Name</th>
+                                        <th>Image Name</th>
+                                        <th>Docker Image ID</th>
                                         <th>Date</th>
                                         <th>End Date</th>
                                         <th>Applied Tag</th>
@@ -91,9 +93,11 @@
                                             <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>
                                             <span class="hidden">{{test.status}}</span>
                                         </td>
-                                        <td>{{test.testId}}</td>
+                                        <td>{{test.imageId}}</td>
                                         <td>{{test.blocker}}</td>
                                         <td>{{test.testName}}</td>
+                                        <td></td>
+                                        <td></td>
                                         <td>{{test.date}}</td>
                                         <td>{{test.endDate}}</td>
                                         <td><span ng-repeat="tag in test.appliedTag">
