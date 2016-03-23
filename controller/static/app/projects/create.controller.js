@@ -185,7 +185,7 @@
         function resetTestValues() {
             vm.createTest.providerName = "";
             vm.createTest.test = "";
-            vm.createTest.testImages = "";
+            vm.createTest.targets = "";
             vm.createTest.blocker = "";
             vm.createTest.name = "";
             vm.createTest.tag = "";
@@ -193,7 +193,7 @@
             vm.createTest.onSuccess = "";
             vm.createTest.onFailure = "";
             vm.buttonStyle = "disabled";
-            if(vm.createTest.provider === "Clair [Internal]") {
+            if(vm.createTest.selectedTestType === "Clair [Internal]") {
                 vm.buttonStyle = "positive";
             }
             $('#test-create-modal').find("input").val("");
@@ -202,7 +202,8 @@
         }
 
         function saveProject(project){
-            console.log("saving project" + project);
+            console.log("saving project");
+            console.log(project);
             ProjectService.create(project)
                 .then(function(data) {
                     $state.transitionTo('dashboard.projects');
@@ -250,7 +251,7 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider="";
+                        vm.createTest.selectedTestType ="";
                     }
                 })
                 .modal('show');
@@ -305,7 +306,7 @@
         }
 
         function editSaveTest() {
-            vm.selectedEditTest.provider = vm.editTest.provider;
+            vm.selectedEditTest.selectedTestType = vm.editTest.selectedTestType ;
             vm.selectedEditTest.providerName = vm.editTest.providerName;
             vm.selectedEditTest.test = vm.editTest.test;
             vm.selectedEditTest.name = vm.editTest.name;
@@ -314,7 +315,7 @@
             vm.selectedEditTest.onFailure = vm.editTest.onFailure;
             vm.selectedEditTest.onSuccess = vm.editTest.onSuccess;
             vm.selectedEditTest.blocker = vm.editTest.blocker;
-            vm.selectedEditTest.testImages = vm.editTest.testImages;
+            vm.selectedEditTest.targets = vm.editTest.targets;
         }
 
         function deleteImage(image) {

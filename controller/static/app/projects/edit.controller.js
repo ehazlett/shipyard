@@ -239,7 +239,7 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider="";
+                        vm.createTest.selectedTestType ="";
                     }
                 })
                 .modal('show');
@@ -280,7 +280,7 @@
         function resetTestValues() {
             vm.createTest.providerName = "";
             vm.createTest.test = "";
-            vm.createTest.testImages = "";
+            vm.createTest.targets = "";
             vm.createTest.blocker = "";
             vm.createTest.name = "";
             vm.createTest.tag = "";
@@ -288,7 +288,7 @@
             vm.createTest.onSuccess = "";
             vm.createTest.onFailure = "";
             vm.buttonStyle = "disabled";
-            if(vm.createTest.provider === "Clair [Internal]") {
+            if(vm.createTest.selectedTestType === "Clair [Internal]") {
                 vm.buttonStyle = "positive";
             }
             $('#test-create-modal').find("input").val("");
