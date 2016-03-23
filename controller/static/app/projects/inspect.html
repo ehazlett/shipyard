@@ -76,7 +76,7 @@
                                     <thead>
                                     <tr>
                                         <th class="collapsing"><i class="heartbeat icon"></i></th>
-                                        <th>Image ID</th>
+                                        <th>Test ID</th>
                                         <th>Blocker</th>
                                         <th>Test Name</th>
                                         <th>Image Name</th>
@@ -93,11 +93,11 @@
                                             <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>
                                             <span class="hidden">{{test.status}}</span>
                                         </td>
-                                        <td>{{test.imageId}}</td>
+                                        <td>{{test.testId}}</td>
                                         <td>{{test.blocker}}</td>
                                         <td>{{test.testName}}</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>{{test.imageName}}</td>
+                                        <td>{{test.dockerImageId}}</td>
                                         <td>{{test.date}}</td>
                                         <td>{{test.endDate}}</td>
                                         <td><span ng-repeat="tag in test.appliedTag">

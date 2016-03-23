@@ -206,13 +206,13 @@
                     {imageId: 'pqoeinchdf', imageName: 'image name 4'}
                 ],
                 testsResults: [
-                    {testId: 'paodjmnrht',imageId: 'powejrnamr',blocker: true,testName: 'test 1',
+                    {testId: 'paodjmnrht',imageId: 'powejrnamr',blocker: true,testName: 'test 1',imageName:'image name 1',dockerImageId: '7ae9b01b9b50',
                         status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag1', 'tag2']},
-                    {testId: 'hjfgernjtu',imageId: 'nandmgemrt',blocker: false,testName: 'test 2',
+                    {testId: 'hjfgernjtu',imageId: 'nandmgemrt',blocker: false,testName: 'test 2',imageName:'image name 2',dockerImageId: '13350b9ed27e',
                         status: '',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag3', 'tag4']},
-                    {testId: 'ieurnsahgt',imageId: 'majndgpfre',blocker: true,testName: 'test 3',
+                    {testId: 'ieurnsahgt',imageId: 'majndgpfre',blocker: true,testName: 'test 3',imageName:'image name 3',dockerImageId: '033290b56c88',
                         status: 'Failure',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag5', 'tag6']},
-                    {testId: 'pwoeitnhmf',imageId: 'fjghthfgtq',blocker: false,testName: 'test 4',
+                    {testId: 'pwoeitnhmf',imageId: 'fjghthfgtq',blocker: false,testName: 'test 4',imageName:'image name 4',dockerImageId: '4745e5c6efe2',
                         status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag7', 'tag8']}
                 ]
             };
