@@ -52,7 +52,7 @@
                         {"id":"bf4d022972f1","name":"soninob/soninob","tag":"v2","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false}
                     ],
                     tests: [
-                        {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"rethinkdb","selectedTestType":"Clair [Internal]","providerName":"","test":"","onSuccess":"","onFailure":""},
+                        {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"busybox","selectedTestType":"Clair [Internal]","providerName":"","test":"","onSuccess":"","onFailure":""},
                         {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"","selectedTestType":"Predefined Provider","providerName":"provider_name1","test":"test1.1","onSuccess":"","onFailure":""},
                         {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"tomcat","selectedTestType":"Clair [Internal]","providerName":"","test":"","onSuccess":"","onFailure":""}
                     ],
@@ -74,7 +74,7 @@
                         {"id":"sagfegfrefg","name":"java","tag":"v2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                     ],
                     tests: [
-                        {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"ubuntu","selectedTestType":"Clair [Internal]","providerName":"","test":"","onSuccess":"","onFailure":""},
+                        {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"verigreen","selectedTestType":"Clair [Internal]","providerName":"","test":"","onSuccess":"","onFailure":""},
                         {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"","selectedTestType":"Predefined Provider","providerName":"provider_name2","test":"test1.2","onSuccess":"","onFailure":""},
                         {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"","selectedTestType":"Predefined Provider","providerName":"provider_name2","test":"test2.2","onSuccess":"","onFailure":""}
                     ],
@@ -91,9 +91,9 @@
                     description: "Security project level A",
                     status: "Published",
                     images: [
-                        {"id":"asdfawfgreg","name":"template","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-                        {"id":"asdgfag66sfga","name":"winston","tag":"1.2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-                        {"id":"567j67w45yg4w","name":"oprah","tag":"v2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
+                        {"id":"asdfawfgreg","name":"mongodb","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"asdgfag66sfga","name":"verigreen","tag":"1.2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                        {"id":"567j67w45yg4w","name":"shipyard","tag":"v2","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                     ],
                     tests: [
                         {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"","selectedTestType":"Predefined Provider","providerName":"provider_name1","test":"test1.2","onSuccess":"","onFailure":""},
@@ -120,7 +120,7 @@
                     tests: [
                         {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","selectedTestType":"Predefined Provider","providerName":"provider_name2","test":"test2.2","onSuccess":"","onFailure":""},
                         {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"","selectedTestType":"Predefined Provider","providerName":"provider_name1","test":"test1.1","onSuccess":"","onFailure":""},
-                        {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"rethinkdb","selectedTestType":"Clair [Internal]","providerName":"","test":"","onSuccess":"","onFailure":""}
+                        {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"ubuntu","selectedTestType":"Clair [Internal]","providerName":"","test":"","onSuccess":"","onFailure":""}
                     ],
                     needsBuild: false,
                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",

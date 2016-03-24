@@ -55,9 +55,7 @@
         vm.resetValues = resetValues;
         vm.getRegistries = getRegistries;
         vm.checkImage = checkImage;
-        vm.checkEditImage = checkEditImage;
         vm.checkImagePublicRepository = checkImagePublicRepository;
-        vm.checkEditImagePublicRepository = checkEditImagePublicRepository;
         vm.getImages = getImages;
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.getTestsProviders = getTestsProviders;
@@ -249,15 +247,24 @@
             vm.editTest = $.extend(true, {}, test);
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
-            vm.providers = [];
-            ProjectService.getProviders()
-                .then(function(data) {
-                    console.log(data);
-                    vm.providers = data;
-                    getJobs(test.providerName);
-                }, function(data) {
-                    vm.error = data;
-                })
+            if(test.selectedTestType === "Predefined Provider") {
+                vm.providers = [];
+                ProjectService.getProviders()
+                    .then(function(data) {
+                        console.log(data);
+                        vm.providers = data;
+                        getJobs(test.providerName);
+                    }, function(data) {
+                        vm.error = data;
+                    })
+            }
+            if(test.selectedTestType === "Clair [Internal]") {
+                vm.imagesSelectize = [];
+                angular.forEach(vm.project.images, function (image) {
+                    vm.imagesSelectize.push(image.name);
+                });
+                vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
+            }
             console.log(test);
             $('#edit-project-test-edit-modal')
                 .modal({
@@ -413,41 +420,21 @@
             });
         }
 
-        function checkImage() {
+        function checkImage(imageData) {
             vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
+            console.log(" check image " + imageData.name + " with tag " + imageData.tag);
             angular.forEach(vm.images, function (image) {
-                if(image.name === vm.createImage.name && image.tag === vm.createImage.tag) {
+                if(image.name === imageData.name && image.tag === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }
             });
         }
 
-        function checkEditImage() {
+        function checkImagePublicRepository(imageData) {
             vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
-            angular.forEach(vm.images, function (image) {
-                if(image.name === vm.editImage.name && image.tag === vm.editImage.tag) {
-                    vm.buttonStyle = "positive";
-                }
-            });
-        }
-
-        function checkImagePublicRepository() {
-            vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
+            console.log(" check image " + imageData.name + " with tag " + imageData.tag);
             angular.forEach(vm.publicRegistryTags, function (tag) {
-                if(tag.name === vm.createImage.tag) {
-                    vm.buttonStyle = "positive";
-                }
-            });
-        }
-
-        function checkEditImagePublicRepository() {
-            vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
-            angular.forEach(vm.publicRegistryTags, function (tag) {
-                if(tag.name === vm.editImage.tag) {
+                if(tag.name === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }
             });

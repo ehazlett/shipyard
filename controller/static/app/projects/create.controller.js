@@ -46,14 +46,11 @@
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.showTestEditDialog = showTestEditDialog;
         vm.checkImage = checkImage;
-        vm.checkEditImage = checkEditImage;
         vm.resetValues = resetValues;
         vm.resetTestValues = resetTestValues;
         vm.checkImagePublicRepository = checkImagePublicRepository;
-        vm.checkEditImagePublicRepository = checkEditImagePublicRepository;
         vm.getTestsProviders = getTestsProviders;
         vm.getJobs = getJobs;
-        vm.getJobsEdit = getJobsEdit;
         vm.checkProviderTest = checkProviderTest;
 
         vm.getRegistries();
@@ -365,7 +362,6 @@
 
         function getJobs(testProvider) {
             vm.providerTests = [];
-            vm.createTest.test = "";
             $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
             angular.forEach(vm.providers, function(provider) {
                 if(provider.name === testProvider) {
@@ -374,52 +370,21 @@
             });
         }
 
-        function getJobsEdit(testProvider) {
-            vm.providerTests = [];
-            vm.editTest.test = "";
-            $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
-            angular.forEach(vm.providers, function(provider) {
-                if(provider.name === testProvider) {
-                    vm.providerTests = provider.providerJobs;
-                }
-            });
-        }
-
-        function checkImage() {
+        function checkImage(imageData) {
             vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
+            console.log(" check image " + imageData.name + " with tag " + imageData.tag);
             angular.forEach(vm.images, function (image) {
-                if(image.name === vm.createImage.name && image.tag === vm.createImage.tag) {
+                if(image.name === imageData.name && image.tag === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }
             });
         }
 
-        function checkEditImage() {
+        function checkImagePublicRepository(imageData) {
             vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
-            angular.forEach(vm.images, function (image) {
-                if(image.name === vm.editImage.name && image.tag === vm.editImage.tag) {
-                    vm.buttonStyle = "positive";
-                }
-            });
-        }
-
-        function checkImagePublicRepository() {
-            vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.createImage.name + " with tag " + vm.createImage.tag);
+            console.log(" check image " + imageData.name + " with tag " + imageData.tag);
             angular.forEach(vm.publicRegistryTags, function (tag) {
-                if(tag.name === vm.createImage.tag) {
-                    vm.buttonStyle = "positive";
-                }
-            });
-        }
-
-        function checkEditImagePublicRepository() {
-            vm.buttonStyle = "disabled";
-            console.log(" check image " + vm.editImage.name + " with tag " + vm.editImage.tag);
-            angular.forEach(vm.publicRegistryTags, function (tag) {
-                if(tag.name === vm.editImage.tag) {
+                if(tag.name === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }
             });
