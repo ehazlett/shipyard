@@ -218,7 +218,7 @@
                                     <div class="four wide field">
                                         <label>Location</label>
                                         <div class="ui input">
-                                            <input type="text" ng-model="vm.editImage.location" disabled>
+                                            <input type="text" class="editImageLocation" disabled>
                                         </div>
                                     </div>
 
@@ -255,7 +255,7 @@
                                         <label>Image Name </label>
                                         <div class="ui search edit">
                                             <div class="ui icon input">
-                                                <input class="prompt" type="text" placeholder="{{vm.editImage.name}}" ng-model="vm.editImage.name" />
+                                                <input class="prompt editImageName" type="text"/>
                                                 <i class="search icon"></i>
                                             </div>
                                             <div class="results"></div>
@@ -263,10 +263,19 @@
                                     </div>
                                     <div ng-show="vm.editImage.location === 'Public Registry'" class="four wide field">
                                         <label>Tag</label>
-                                        <select name="tag" ng-model="vm.editImage.tag" class="ui search fluid dropdown edit tag" ng-change="vm.checkImagePublicRepository(vm.editImage)">
-                                            <option value="">{{vm.editImage.tag}}</option>
+                                        <select name="tag" ng-model="vm.editImage.tag" id="editImageTag" class="ui search fluid dropdown edit tag editImageTag" ng-change="vm.checkImagePublicRepository(vm.editImage)">
+                                            <!--<option value=""></option>-->
                                             <option ng-repeat="a in vm.publicRegistryTags" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
+
+                                        <!--<div class="ui selection dropdown">-->
+                                            <!--<input ng-model="vm.editImage.tag" type="hidden" name="gender" ng-change="vm.checkImagePublicRepository(vm.editImage)">-->
+                                            <!--<i class="dropdown icon"></i>-->
+                                            <!--<div class="default text editImageTagPlaceholder"></div>-->
+                                            <!--<div class="menu">-->
+                                                <!--<div class="item" ng-repeat="a in vm.publicRegistryTags" data-value="{{a.name}}">{{a.name}}</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
                                     </div>
 
                                     <div ng-show="vm.editImage.location === 'File'" class="four wide field">

@@ -338,7 +338,17 @@
 
             $('#edit-project-image-edit-modal')
                 .modal({
-                    closable: false
+                    closable: false,
+                    onShow: function() {
+                        console.log("showing");
+                        console.log(image);
+                        $(".prompt.editImageName").val(image.name);
+                        $(".editImageLocation").val(image.location);
+                        $('#editImageTag').dropdown({placeholder:'sdsdfdsfdf'});
+                    },
+                    onApprove: function() {
+                        //Get values using jquery && Pass values to vm.editSaveImage()
+                    }
                 })
                 .modal('show');
         }
