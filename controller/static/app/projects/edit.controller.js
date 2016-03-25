@@ -321,21 +321,24 @@
             vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
+            if(image.location === "Public Registry") {
+                ProjectService.getPublicRegistryTags(image.name)
+                    .then(function(data) {
+                        vm.publicRegistryTags = data;
 
-            ProjectService.getPublicRegistryTags(image.name)
-                .then(function(data) {
-                    vm.publicRegistryTags = data;
+                        var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
+                            return tag.name == image.tag;
+                        })[0];
 
-                    var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
-                        return tag.name == image.tag;
-                    })[0];
-
-                    if (tagObject)
-                        vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
-                }, function(data) {
-                    vm.error = data;
-                });
-
+                        if (tagObject)
+                            vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
+                    }, function(data) {
+                        vm.error = data;
+                    });
+            }
+            if(image.location === "Shipyard Registry") {
+                getImages(image.registry);
+            }
             $('#edit-project-image-edit-modal')
                 .modal({
                     closable: false,
