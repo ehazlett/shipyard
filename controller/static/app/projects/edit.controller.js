@@ -340,6 +340,7 @@
                 getImages(image.registry);
             }
             $('#edit-project-image-edit-modal')
+                .remove()
                 .modal({
                     closable: false,
                     onShow: function() {
