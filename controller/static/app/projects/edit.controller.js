@@ -333,14 +333,14 @@
             if(image.location === "Public Registry") {
                 ProjectService.getPublicRegistryTags(image.name)
                     .then(function(data) {
-                        vm.publicRegistryTags = data;
-
-                        var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
+                        var tagObject = $.grep(data, function (tag) {
                             return tag.name == image.tag;
                         })[0];
 
-                        if (tagObject)
-                            vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
+                        if (tagObject && tagObject.hasOwnProperty('layer')) {
+                            vm.editImage.tagLayer = tagObject.layer;
+                            vm.publicRegistryTags = data;
+                        }
                     }, function(data) {
                         vm.error = data;
                     });
