@@ -275,7 +275,7 @@
                 vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
             }
             console.log(test);
-            $('#edit-project-test-edit-modal')
+            $('#edit-project-test-edit-modal-'+vm.project.id)
                 .modal({
                     closable: false
                 })
