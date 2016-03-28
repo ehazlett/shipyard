@@ -17,7 +17,13 @@
         // Create modal, edit modal namespaces
         vm.createImage = {};
         vm.editImage = {};
+
         vm.createTest = {};
+        vm.createTest.tagging = {};
+        vm.createTest.provider = {};
+        vm.editTest = {};
+        vm.editTest.tagging = {};
+        vm.editTest.provider = {};
 
         vm.createImage.additionalTags = [];
 
@@ -237,6 +243,8 @@
 
         function showTestCreateDialog() {
             vm.createTest = {};
+            vm.createTest.tagging = {};
+            vm.createTest.provider = {};
             vm.imagesSelectize = [];
             angular.forEach(vm.project.images, function (image) {
                 vm.imagesSelectize.push(image.name);

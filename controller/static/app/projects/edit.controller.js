@@ -28,6 +28,13 @@
         vm.createImage = {};
         vm.editImage = {};
 
+        vm.createTest = {};
+        vm.createTest.tagging = {};
+        vm.createTest.provider = {};
+        vm.editTest = {};
+        vm.editTest.tagging = {};
+        vm.editTest.provider = {};
+
         vm.createImage.additionalTags = [];
 
         vm.registries = [];
@@ -226,6 +233,8 @@
 
         function showTestCreateDialog() {
             vm.createTest = {};
+            vm.createTest.tagging = {};
+            vm.createTest.provider = {};
             vm.imagesSelectize = [];
             angular.forEach(vm.project.images, function (image) {
                 vm.imagesSelectize.push(image.name);
@@ -237,7 +246,7 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.selectedTestType ="";
+                        vm.createTest.provider.type ="";
                     }
                 })
                 .modal('show');
@@ -247,18 +256,18 @@
             vm.editTest = $.extend(true, {}, test);
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
-            if(test.selectedTestType === "Predefined Provider") {
+            if(test.provider.type === "Predefined Provider") {
                 vm.providers = [];
                 ProjectService.getProviders()
                     .then(function(data) {
                         console.log(data);
                         vm.providers = data;
-                        getJobs(test.providerName);
+                        getJobs(test.provider.name);
                     }, function(data) {
                         vm.error = data;
                     })
             }
-            if(test.selectedTestType === "Clair [Internal]") {
+            if(test.provider.type === "Clair [Internal]") {
                 vm.imagesSelectize = [];
                 angular.forEach(vm.project.images, function (image) {
                     vm.imagesSelectize.push(image.name);
@@ -285,17 +294,17 @@
         }
 
         function resetTestValues() {
-            vm.createTest.providerName = "";
-            vm.createTest.test = "";
+            vm.createTest.provider.name = "";
+            vm.createTest.provider.test = "";
             vm.createTest.targets = "";
             vm.createTest.blocker = "";
             vm.createTest.name = "";
             vm.createTest.tag = "";
             vm.createTest.description = "";
-            vm.createTest.onSuccess = "";
-            vm.createTest.onFailure = "";
+            vm.createTest.tagging.onSuccess = "";
+            vm.createTest.tagging.onFailure = "";
             vm.buttonStyle = "disabled";
-            if(vm.createTest.selectedTestType === "Clair [Internal]") {
+            if(vm.createTest.provider.type === "Clair [Internal]") {
                 vm.buttonStyle = "positive";
             }
             $('#test-create-modal').find("input").val("");
@@ -482,14 +491,14 @@
         }
 
         function editSaveTest() {
-            vm.selectedEditTest.selecteTestType = vm.editTest.selecteTestType;
-            vm.selectedEditTest.providerName = vm.editTest.providerName;
-            vm.selectedEditTest.test = vm.editTest.test;
+            vm.selectedEditTest.provider.type = vm.editTest.provider.type;
+            vm.selectedEditTest.provider.name = vm.editTest.provider.name;
+            vm.selectedEditTest.provider.test = vm.editTest.provider.test;
             vm.selectedEditTest.name = vm.editTest.name;
             vm.selectedEditTest.tag = vm.editTest.tag;
             vm.selectedEditTest.description = vm.editTest.description;
-            vm.selectedEditTest.onFailure = vm.editTest.onFailure;
-            vm.selectedEditTest.onSuccess = vm.editTest.onSuccess;
+            vm.selectedEditTest.tagging.onFailure = vm.editTest.onFailure;
+            vm.selectedEditTest.tagging.onSuccess = vm.editTest.onSuccess;
             vm.selectedEditTest.blocker = vm.editTest.blocker;
             vm.selectedEditTest.targets = vm.editTest.targets;
         }
