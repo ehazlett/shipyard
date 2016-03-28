@@ -180,17 +180,17 @@
         }
 
         function resetTestValues() {
-            vm.createTest.providerName = "";
-            vm.createTest.test = "";
+            vm.createTest.provider.name = "";
+            vm.createTest.provider.test = "";
             vm.createTest.targets = "";
             vm.createTest.blocker = "";
             vm.createTest.name = "";
             vm.createTest.tag = "";
             vm.createTest.description = "";
-            vm.createTest.onSuccess = "";
-            vm.createTest.onFailure = "";
+            vm.createTest.tagging.onSuccess = "";
+            vm.createTest.tagging.onFailure = "";
             vm.buttonStyle = "disabled";
-            if(vm.createTest.selectedTestType === "Clair [Internal]") {
+            if(vm.createTest.provider.type === "Clair [Internal]") {
                 vm.buttonStyle = "positive";
             }
             $('#test-create-modal').find("input").val("");
@@ -248,7 +248,7 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.selectedTestType ="";
+                        vm.createTest.provider.type ="";
                     }
                 })
                 .modal('show');
@@ -303,14 +303,14 @@
         }
 
         function editSaveTest() {
-            vm.selectedEditTest.selectedTestType = vm.editTest.selectedTestType ;
-            vm.selectedEditTest.providerName = vm.editTest.providerName;
-            vm.selectedEditTest.test = vm.editTest.test;
+            vm.selectedEditTest.provider.type = vm.editTest.provider.type ;
+            vm.selectedEditTest.provider.name = vm.editTest.provider.name;
+            vm.selectedEditTest.provider.test = vm.editTest.provider.test;
             vm.selectedEditTest.name = vm.editTest.name;
             vm.selectedEditTest.tag = vm.editTest.tag;
             vm.selectedEditTest.description = vm.editTest.description;
-            vm.selectedEditTest.onFailure = vm.editTest.onFailure;
-            vm.selectedEditTest.onSuccess = vm.editTest.onSuccess;
+            vm.selectedEditTest.tagging.onFailure = vm.editTest.tagging.onFailure;
+            vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
             vm.selectedEditTest.blocker = vm.editTest.blocker;
             vm.selectedEditTest.targets = vm.editTest.targets;
         }

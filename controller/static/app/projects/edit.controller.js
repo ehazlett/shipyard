@@ -339,20 +339,10 @@
             if(image.location === "Shipyard Registry") {
                 getImages(image.registry);
             }
-            $('#edit-project-image-edit-modal')
+            $('#edit-project-image-edit-modal-'+vm.project.id)
                 .remove()
                 .modal({
-                    closable: false,
-                    onShow: function() {
-                        console.log("showing");
-                        console.log(image);
-                        $(".prompt.editImageName").val(image.name);
-                        $(".editImageLocation").val(image.location);
-                        $('#editImageTag').dropdown({placeholder:'sdsdfdsfdf'});
-                    },
-                    onApprove: function() {
-                        //Get values using jquery && Pass values to vm.editSaveImage()
-                    }
+                    closable: false
                 })
                 .modal('show');
         }
