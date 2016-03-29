@@ -1,0 +1,124 @@
+<div class="ui padded grid">
+    <div class="row">
+        <div class="column">
+            <div class="ui segment page">
+                <div class="ui grid">
+                    <div class="two column row">
+                        <div class="column">
+                            <h3 class="ui header">
+                                <div class="content">
+                                    <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>
+                                    Project Results
+                                </div>
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="ui form">
+                            <div class="ui column grid">
+                                <div class="column">
+                                    <h5 class="ui dividing header">Project Details</h5>
+                                    <div class="six fields">
+                                        <div class="field">
+                                            <label>Project ID: <span style="font-weight: normal">{{vm.results.projectId}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Description: <span style="font-weight: normal">{{vm.results.description}}</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="six fields">
+                                        <div class="field">
+                                            <label>Build ID: <span style="font-weight: normal">{{vm.results.buildId || 'Not implemented'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Run Date: <span style="font-weight: normal">{{vm.results.runDate || 'Not implemented'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>End Date: <span style="font-weight: normal">{{vm.results.endDate || 'Not implemented'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Create Date: <span style="font-weight: normal">{{vm.results.createDate || 'Not implemented'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Author: <span style="font-weight: normal">{{vm.results.author || 'Not implemented'}}</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="six fields">
+                                        <div class="field">
+                                            <label>Project Version: <span style="font-weight: normal">{{vm.results.projectVersion || 'Not implemented'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Last Tag Applied: <span style="font-weight: normal">{{vm.results.lastTagApplied || 'Not implemented'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Last Update: <span style="font-weight: normal">{{vm.results.lastUpdate || 'Not implemented'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Last Update Name: <span style="font-weight: normal">{{vm.results.lastUpdate || 'Not implemented'}}</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="column">
+                                <div class="ui dividing header"></div>
+                                <div class="six fields">
+                                    <div class="field">
+                                        <h5>Test Results</h5>
+                                    </div>
+                                </div>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th class="collapsing"><i class="heartbeat icon"></i></th>
+                                        <th>Test ID</th>
+                                        <th>Blocker</th>
+                                        <th>Test Name</th>
+                                        <th>Image Name</th>
+                                        <th>Docker Image ID</th>
+                                        <th>Date</th>
+                                        <th>End Date</th>
+                                        <th>Applied Tag</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="test in vm.results.testsResults" jquery>
+                                        <td>
+                                            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>
+                                            <span class="hidden">{{test.status}}</span>
+                                        </td>
+                                        <td>{{test.testId}}</td>
+                                        <td>{{test.blocker}}</td>
+                                        <td>{{test.testName}}</td>
+                                        <td>{{test.imageName}}</td>
+                                        <td>{{test.dockerImageId}}</td>
+                                        <td>{{test.date}}</td>
+                                        <td>{{test.endDate}}</td>
+                                        <td><span ng-repeat="tag in test.appliedTag">
+                                            <div class="ui label">
+                                                {{tag}}
+                                            </div>
+                                        </span></td>
+                                        <td class="collapsing">
+                                            <div class="basic compact blue ui icon button">
+                                                <i class="file text icon"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

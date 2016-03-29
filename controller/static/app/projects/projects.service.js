@@ -25,6 +25,15 @@
                     });
                 return promise;
             },
+            results: function(projectId) {
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/results')
+                    .then(function(response) {
+                        console.log(response.data);
+                        return response.data;
+                    });
+                return promise;
+            },
             update: function(projectId, data) {
                 var promise = $http
                     .put('/api/projects/' + projectId, data)
@@ -55,6 +64,38 @@
                     .then(function(response) {
                         return response.data;
                 });
+                return promise;
+            },
+            getImages: function() {
+                var promise = $http
+                    .get('/api/projects/location')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            getPublicRegistryTags: function(imageName) {
+                var promise = $http
+                    .get('https://registry.hub.docker.com/v1/repositories/'+imageName+'/tags')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            getProviders: function() {
+                var promise = $http
+                    .get('/api/providers')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            deleteTest: function(projectId, testId) {
+                var promise = $http
+                    .delete('/api/projects/' + projectId + '/tests/' + testId)
+                    .then(function(response) {
+                        return response.data;
+                    });
                 return promise;
             }
         }

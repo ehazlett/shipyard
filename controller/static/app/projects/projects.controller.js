@@ -101,10 +101,22 @@
             vm.selectedAll = false;
         }
 
+        function waitAndApply(fn) {
+            if(!$scope.$$phase) {
+                $scope.$apply(fn);
+            } else {
+                setTimeout( function() {
+                    waitAndApply(fn);
+                },10);
+            }
+        }
+
         function showDeleteProjectDialog(project) {
-            vm.selectedProjectId = project.id;
+            waitAndApply(function() {
+                vm.selectedProjectId = project.id;
+            });
             console.log("Showing modal destroy modal for: " + project.id + "    ==  " + vm.selectedProjectId);
-            $('#delete-project-modal').modal('show');
+            $('#delete-project-modal-'+vm.selectedProjectId).modal('show');
         }
 
         function destroyProject(id) {
