@@ -10,6 +10,7 @@ type Project struct {
 	Description  string    `json:"description" gorethink:"description"`
 	Status       string    `json:"status" gorethink:"status"`
 	Images       []*Image  `json:"images,omitempty" gorethink:"-"`
+	Tests        []*Test   `json:"tests,omitempty" gorethink:"-"`
 	NeedsBuild   bool      `json:"needsBuild" gorethink:"needsBuild"`
 	CreationTime time.Time `json:"creationTime" gorethink:"creationTime"`
 	UpdateTime   time.Time `json:"updateTime" gorethink:"updateTime"`
