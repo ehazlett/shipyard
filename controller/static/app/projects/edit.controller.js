@@ -497,8 +497,8 @@
             vm.selectedEditTest.name = vm.editTest.name;
             vm.selectedEditTest.tag = vm.editTest.tag;
             vm.selectedEditTest.description = vm.editTest.description;
-            vm.selectedEditTest.tagging.onFailure = vm.editTest.onFailure;
-            vm.selectedEditTest.tagging.onSuccess = vm.editTest.onSuccess;
+            vm.selectedEditTest.tagging.onFailure = vm.editTest.tagging.onFailure;
+            vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
             vm.selectedEditTest.blocker = vm.editTest.blocker;
             vm.selectedEditTest.targets = vm.editTest.targets;
         }
