@@ -822,6 +822,9 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 	if err != nil {
 		return err
 	}
+
+	// rethinkDB returns the ID as the first element of the GeneratedKeys slice
+	// TODO: this method seems brittle, should contact the gorethink dev team for insight on this.
 	project.ID = func() string {
 		if len(response.GeneratedKeys) > 0 {
 			return string(response.GeneratedKeys[0])
@@ -840,8 +843,15 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 		}
 	}
 
-	// rethinkDB returns the ID as the first element of the GeneratedKeys slice
-	// TODO: this method seems brittle, should contact the gorethink dev team for insight on this.
+	// TODO: investigate how to do a bulk insert
+	for _, test := range project.Tests {
+		test.ProjectId = project.ID
+		response, err = r.Table(tblNameTests).Insert(test).RunWrite(m.session)
+
+		if err != nil {
+			return err
+		}
+	}
 
 	eventType = "add-project"
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
