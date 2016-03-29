@@ -141,6 +141,30 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/ilm_images/{id}", a.image).Methods("GET")
 	apiRouter.HandleFunc("/api/ilm_images/{id}", a.deleteImage).Methods("DELETE")
 
+	//Result Related routes
+	apiRouter.HandleFunc("/api/projects/{projectId}/results", a.createResult).Methods("POST")
+	apiRouter.HandleFunc("/api/projects/{projectId}/results", a.getResults).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/results/{resultId}", a.getResult).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/results/{resultId}", a.updateResult).Methods("PUT")
+	apiRouter.HandleFunc("/api/projects/{projectId}/results/{resultId}", a.deleteResult).Methods("DELETE")
+	//end Result related routes
+
+	//Test related routes
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests", a.createTest).Methods("POST")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests", a.getTests).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.getTest).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.updateTest).Methods("PUT")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.deleteTest).Methods("DELETE")
+
+	//Provider related routes
+	apiRouter.HandleFunc("/api/providers", a.createProvider).Methods("POST")
+	apiRouter.HandleFunc("/api/providers", a.getProviders).Methods("GET")
+	apiRouter.HandleFunc("/api/providers/{providerId}", a.getProvider).Methods("GET")
+	apiRouter.HandleFunc("/api/providers/{providerId}", a.updateProvider).Methods("PUT")
+	apiRouter.HandleFunc("/api/providers/{providerId}", a.deleteProvider).Methods("DELETE")
+	apiRouter.HandleFunc("/api/providers/{providerId}/jobs", a.getJobsByProviderId).Methods("GET")
+	apiRouter.HandleFunc("/api/providers/{providerId}/jobs", a.addJobToProviderId).Methods("POST")
+
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")

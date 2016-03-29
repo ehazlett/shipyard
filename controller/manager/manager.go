@@ -27,8 +27,11 @@ const (
 	tblNameEvents   = "events"
 	tblNameAccounts = "accounts"
 
-	tblNameProjects = "projects"
-	tblNameImages   = "images"
+	tblNameProjects  = "projects"
+	tblNameImages    = "images"
+	tblNameResults   = "results"
+	tblNameTests     = "tests"
+	tblNameProviders = "providers"
 
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
@@ -52,6 +55,15 @@ var (
 
 	ErrImageExists       = errors.New("image already exists")
 	ErrImageDoesNotExist = errors.New("image does not exist")
+
+	ErrResultExists       = errors.New("result already exists")
+	ErrResultDoesNotExist = errors.New("result does not exist")
+
+	ErrTestExists       = errors.New("test already exists")
+	ErrTestDoesNotExist = errors.New("test does not exist")
+
+	ErrProviderExists       = errors.New("provider already exists")
+	ErrProviderDoesNotExist = errors.New("provider does not exist")
 
 	ErrRoleDoesNotExist           = errors.New("role does not exist")
 	ErrNodeDoesNotExist           = errors.New("node does not exist")
@@ -103,6 +115,29 @@ type (
 		UpdateImage(image *model.Image) error
 		DeleteImage(image *model.Image) error
 		DeleteAllImages() error
+
+		GetTests(projectId string) ([]*model.Test, error)
+		GetTest(projectId, testId string) (*model.Test, error)
+		CreateTest(projectId string, test *model.Test) error
+		UpdateTest(projectId string, test *model.Test) error
+		DeleteTest(projectId string, testId string) error
+		DeleteAllTests() error
+
+		GetResults(projectId string) ([]*model.Result, error)
+		GetResult(projectId, resultId string) (*model.Result, error)
+		CreateResult(projectId string, result *model.Result) error
+		UpdateResult(projectId string, result *model.Result) error
+		DeleteResult(projectId string, resultId string) error
+		DeleteAllResults() error
+
+		GetProviders() ([]*model.Provider, error)
+		GetProvider(providerId string) (*model.Provider, error)
+		CreateProvider(provider *model.Provider) error
+		UpdateProvider(provider *model.Provider) error
+		DeleteProvider(providerId string) error
+		GetJobsByProviderId(providerId string) ([]*model.ProviderJob, error)
+		AddJobToProviderId(providerId string, job *model.ProviderJob) error
+		DeleteAllProviders() error
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -187,7 +222,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages, tblNameResults, tblNameTests, tblNameProviders}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -1024,6 +1059,371 @@ func (m DefaultManager) DeleteImage(image *model.Image) error {
 
 func (m DefaultManager) DeleteAllImages() error {
 	_, err := r.Table(tblNameImages).Delete().Run(m.session)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//methods related to Test structure
+
+func (m DefaultManager) GetTests(projectId string) ([]*model.Test, error) {
+
+	res, err := r.Table(tblNameTests).Filter(map[string]string{"projectId": projectId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	tests := []*model.Test{}
+	if err := res.All(&tests); err != nil {
+		return nil, err
+	}
+	return tests, nil
+}
+
+func (m DefaultManager) GetTest(projectId, testId string) (*model.Test, error) {
+	var test *model.Test
+	res, err := r.Table(tblNameTests).Filter(map[string]string{"id": testId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrTestDoesNotExist
+	}
+	if err := res.One(&test); err != nil {
+		return nil, err
+	}
+
+	return test, nil
+}
+
+func (m DefaultManager) CreateTest(projectId string, test *model.Test) error {
+	var eventType string
+	test.ProjectId = projectId
+	response, err := r.Table(tblNameTests).Insert(test).RunWrite(m.session)
+	if err != nil {
+
+		return err
+	}
+	test.ID = func() string {
+		if len(response.GeneratedKeys) > 0 {
+			return string(response.GeneratedKeys[0])
+		}
+		return ""
+	}()
+	eventType = "add-test"
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", test.ID), []string{"security"})
+	return nil
+}
+
+func (m DefaultManager) UpdateTest(projectId string, test *model.Test) error {
+	var eventType string
+	// check if exists; if so, update
+	rez, err := m.GetTest(projectId, test.ID)
+	if err != nil && err != ErrTestDoesNotExist {
+		return err
+	}
+	// update
+	if rez != nil {
+		updates := map[string]interface{}{
+			"projectId":        test.ProjectId,
+			"description":      test.Description,
+			"name":             test.Name,
+			"targets":          test.Targets,
+			"selectedTestType": test.SelectedTestType,
+			"providerId":       test.ProviderId,
+		}
+		if _, err := r.Table(tblNameTests).Filter(map[string]string{"id": test.ID}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-test"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", test.ID), []string{"security"})
+	return nil
+}
+
+func (m DefaultManager) DeleteTest(projectId string, testId string) error {
+	res, err := r.Table(tblNameTests).Filter(map[string]string{"id": testId}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrTestDoesNotExist
+	}
+
+	m.logEvent("delete-test", fmt.Sprintf("id=%s", testId), []string{"security"})
+	return nil
+}
+func (m DefaultManager) DeleteAllTests() error {
+	_, err := r.Table(tblNameTests).Delete().Run(m.session)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Methods related to the results structure
+func (m DefaultManager) GetResults(projectId string) ([]*model.Result, error) {
+
+	res, err := r.Table(tblNameResults).Filter(map[string]string{"projectId": projectId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	results := []*model.Result{}
+	if err := res.All(&results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (m DefaultManager) GetResult(projectId, resultId string) (*model.Result, error) {
+	res, err := r.Table(tblNameResults).Filter(map[string]string{"id": resultId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrImageDoesNotExist
+	}
+	var result *model.Result
+	if err := res.One(&result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (m DefaultManager) CreateResult(projectId string, result *model.Result) error {
+	var eventType string
+
+	result, err := m.GetResult(projectId, result.ID)
+	if err != nil && err != ErrResultDoesNotExist {
+		return err
+	}
+	if result != nil {
+		return ErrResultExists
+	}
+	result.ProjectId = projectId
+	if _, err := r.Table(tblNameResults).Insert(result).RunWrite(m.session); err != nil {
+		return err
+	}
+	eventType = "add-result"
+
+	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", result.ID), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) UpdateResult(projectId string, result *model.Result) error {
+	var eventType string
+
+	// check if exists; if so, update
+	rez, err := m.GetResult(projectId, result.ID)
+	if err != nil && err != ErrResultDoesNotExist {
+		return err
+	}
+	// update
+	if rez != nil {
+		updates := map[string]interface{}{
+			"projectId":      result.ProjectId,
+			"description":    result.Description,
+			"buildId":        result.BuildId,
+			"runDate":        result.RunDate,
+			"endDate":        result.EndDate,
+			"createDate":     result.CreateDate,
+			"author":         result.Author,
+			"projectVersion": result.ProjectVersion,
+			"lastTagApplied": result.LastTagApplied,
+			"lastUpdate":     result.LastUpdate,
+			"updater":        result.Updater,
+			"testResults":    result.TestResults,
+		}
+
+		if _, err := r.Table(tblNameResults).Filter(map[string]string{"id": result.ID}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-result"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", result.ID), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) DeleteResult(projectId string, resultId string) error {
+	res, err := r.Table(tblNameResults).Filter(map[string]string{"id": resultId}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrResultDoesNotExist
+	}
+
+	m.logEvent("delete-result", fmt.Sprintf("id=%s", resultId), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) DeleteAllResults() error {
+	_, err := r.Table(tblNameResults).Delete().Run(m.session)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Methods related to the Provider structure
+func (m DefaultManager) GetProviders() ([]*model.Provider, error) {
+
+	res, err := r.Table(tblNameProviders).OrderBy(r.Asc("name")).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	providers := []*model.Provider{}
+	if err := res.All(&providers); err != nil {
+		return nil, err
+	}
+	return providers, nil
+}
+
+func (m DefaultManager) GetProvider(providerId string) (*model.Provider, error) {
+	res, err := r.Table(tblNameProviders).Filter(map[string]string{"id": providerId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrProviderDoesNotExist
+	}
+	var provider *model.Provider
+	if err := res.One(&provider); err != nil {
+		return nil, err
+	}
+	return provider, nil
+}
+
+func (m DefaultManager) CreateProvider(provider *model.Provider) error {
+	var eventType string
+
+	prov, err := m.GetProvider(provider.ID)
+	if err != nil && err != ErrProviderDoesNotExist {
+		return err
+	}
+	if prov != nil {
+		return ErrProviderExists
+	}
+	if _, err := r.Table(tblNameProviders).Insert(provider).RunWrite(m.session); err != nil {
+		return err
+	}
+	eventType = "add-provider"
+
+	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", provider.ID, provider.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) UpdateProvider(provider *model.Provider) error {
+	var eventType string
+
+	// check if exists; if so, update
+	prov, err := m.GetProvider(provider.ID)
+	if err != nil && err != ErrProviderDoesNotExist {
+		return err
+	}
+	// update
+
+	if prov != nil {
+		updates := map[string]interface{}{
+			"name":              provider.Name,
+			"availableJobTypes": provider.AvailableJobTypes,
+			"config":            provider.Config,
+			"url":               provider.Url,
+			"providerJobs":      provider.ProviderJobs,
+		}
+
+		if _, err := r.Table(tblNameProviders).Filter(map[string]string{"id": provider.ID}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-provider"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", provider.ID, provider.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteProvider(providerId string) error {
+	res, err := r.Table(tblNameProviders).Filter(map[string]string{"id": providerId}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if res.IsNil() {
+		return ErrProviderDoesNotExist
+	}
+
+	m.logEvent("delete-provider", fmt.Sprintf("id=%s", providerId), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) GetJobsByProviderId(providerId string) ([]*model.ProviderJob, error) {
+	res, err := r.Table(tblNameProviders).Filter(map[string]string{"id": providerId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrProviderDoesNotExist
+	}
+	var provider *model.Provider
+	if err := res.One(&provider); err != nil {
+		return nil, err
+	}
+	return provider.ProviderJobs, nil
+}
+
+func (m DefaultManager) AddJobToProviderId(providerId string, job *model.ProviderJob) error {
+
+	var eventType string
+
+	res, err := r.Table(tblNameProviders).Filter(map[string]string{"id": providerId}).Run(m.session)
+	if err != nil {
+		return err
+	}
+	if res.IsNil() {
+		return ErrProviderDoesNotExist
+	}
+	var provider *model.Provider
+	if err := res.One(&provider); err != nil {
+		return err
+	}
+
+	provider.ProviderJobs = append(provider.ProviderJobs, job)
+
+	if _, err := r.Table(tblNameProviders).Filter(map[string]string{"id": provider.ID}).Update(provider).RunWrite(m.session); err != nil {
+		return err
+	}
+	eventType = "add-job-to-provider"
+
+	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", provider.ID, provider.Name), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteAllProviders() error {
+	_, err := r.Table(tblNameProviders).Delete().Run(m.session)
 
 	if err != nil {
 		return err

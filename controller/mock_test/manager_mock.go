@@ -255,3 +255,28 @@ func (m MockManager) DeleteAllProjects() error {
 func (m MockManager) DeleteAllImages() error {
 	return nil
 }
+
+func (m MockManager) GetTest(projectId, testId string) (*model.Test, error) { return nil, nil }
+func (m MockManager) GetTests(projectId string) ([]*model.Test, error)      { return nil, nil }
+func (m MockManager) CreateTest(projectId string, test *model.Test) error   { return nil }
+func (m MockManager) UpdateTest(projectId string, test *model.Test) error   { return nil }
+func (m MockManager) DeleteTest(projectId string, testId string) error      { return nil }
+func (m MockManager) DeleteAllTests() error                                 { return nil }
+
+func (m MockManager) GetResults(projectId string) ([]*model.Result, error)        { return nil, nil }
+func (m MockManager) GetResult(projectId, resultId string) (*model.Result, error) { return nil, nil }
+func (m MockManager) CreateResult(projectId string, result *model.Result) error   { return nil }
+func (m MockManager) UpdateResult(projectId string, result *model.Result) error   { return nil }
+func (m MockManager) DeleteResult(projectId string, resultId string) error        { return nil }
+func (m MockManager) DeleteAllResults() error                                     { return nil }
+
+func (m MockManager) GetProviders() ([]*model.Provider, error)               { return nil, nil }
+func (m MockManager) GetProvider(providerId string) (*model.Provider, error) { return nil, nil }
+func (m MockManager) CreateProvider(provider *model.Provider) error          { return nil }
+func (m MockManager) UpdateProvider(provider *model.Provider) error          { return nil }
+func (m MockManager) DeleteProvider(providerId string) error                 { return nil }
+func (m MockManager) GetJobsByProviderId(providerId string) ([]*model.ProviderJob, error) {
+	return nil, nil
+}
+func (m MockManager) AddJobToProviderId(providerId string, job *model.ProviderJob) error { return nil }
+func (m MockManager) DeleteAllProviders() error                                          { return nil }
