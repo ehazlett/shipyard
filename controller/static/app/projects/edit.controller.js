@@ -299,7 +299,7 @@
             vm.createTest.targets = "";
             vm.createTest.blocker = "";
             vm.createTest.name = "";
-            vm.createTest.tag = "";
+            vm.createTest.fromTag = "";
             vm.createTest.description = "";
             vm.createTest.tagging.onSuccess = "";
             vm.createTest.tagging.onFailure = "";
@@ -495,7 +495,7 @@
             vm.selectedEditTest.provider.name = vm.editTest.provider.name;
             vm.selectedEditTest.provider.test = vm.editTest.provider.test;
             vm.selectedEditTest.name = vm.editTest.name;
-            vm.selectedEditTest.tag = vm.editTest.tag;
+            vm.selectedEditTest.fromTag = vm.editTest.fromTag;
             vm.selectedEditTest.description = vm.editTest.description;
             vm.selectedEditTest.tagging.onFailure = vm.editTest.tagging.onFailure;
             vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
