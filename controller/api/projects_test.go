@@ -535,9 +535,9 @@ func TestCleanupProjectTests(t *testing.T) {
 		Convey("Then we can cleanup", func() {
 			err := cleanup()
 			So(err, ShouldBeNil)
-			Convey("And we should be able to shutdown the server", func() {
-				ts.Close()
-			})
+			//Convey("And we should be able to shutdown the server", func() {
+			//	ts.Close()
+			//})
 		})
 	})
 

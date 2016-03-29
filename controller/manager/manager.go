@@ -1205,16 +1205,25 @@ func (m DefaultManager) CreateResult(projectId string, result *model.Result) err
 	if err != nil && err != ErrResultDoesNotExist {
 		return err
 	}
+
 	if result != nil {
 		return ErrResultExists
 	}
+
 	result.ProjectId = projectId
-	if _, err := r.Table(tblNameResults).Insert(result).RunWrite(m.session); err != nil {
+	response, err := r.Table(tblNameResults).Insert(result).RunWrite(m.session)
+
+	if err != nil {
 		return err
 	}
 	eventType = "add-result"
 
-	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
+	result.ID = func() string {
+		if len(response.GeneratedKeys) > 0 {
+			return string(response.GeneratedKeys[0])
+		}
+		return ""
+	}()
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s", result.ID), []string{"security"})
 
@@ -1319,12 +1328,20 @@ func (m DefaultManager) CreateProvider(provider *model.Provider) error {
 	if prov != nil {
 		return ErrProviderExists
 	}
-	if _, err := r.Table(tblNameProviders).Insert(provider).RunWrite(m.session); err != nil {
+
+	response, err := r.Table(tblNameProviders).Insert(provider).RunWrite(m.session)
+
+	if err != nil {
 		return err
 	}
 	eventType = "add-provider"
 
-	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
+	provider.ID = func() string {
+		if len(response.GeneratedKeys) > 0 {
+			return string(response.GeneratedKeys[0])
+		}
+		return ""
+	}()
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", provider.ID, provider.Name), []string{"security"})
 
@@ -1414,8 +1431,6 @@ func (m DefaultManager) AddJobToProviderId(providerId string, job *model.Provide
 		return err
 	}
 	eventType = "add-job-to-provider"
-
-	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", provider.ID, provider.Name), []string{"security"})
 

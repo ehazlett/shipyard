@@ -37,8 +37,25 @@ func (a *Api) createProvider(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debugf("saved provider: id=%s", provider.ID)
+
+	// Just return the id for the Project that was created.
+	tempResponse := map[string]string{
+		"id": provider.ID,
+	}
+
+	jsonResponse, err := json.Marshal(tempResponse)
+
+	if err != nil {
+		// Most probably a 400 BadRequest would be sufficient
+		http.Error(w, err.Error(), http.StatusNoContent)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write(jsonResponse)
+	return
 }
+
 func (a *Api) updateProvider(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
@@ -71,7 +88,7 @@ func (a *Api) getProvider(w http.ResponseWriter, r *http.Request) {
 	provider, err := a.manager.GetProvider(providerId)
 	if err != nil {
 		log.Errorf("error retrieving provider: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
@@ -104,6 +121,13 @@ func (a *Api) getJobsByProviderId(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	providerId := vars["providerId"]
 
+	_, err := a.manager.GetProvider(providerId)
+	if err != nil {
+		log.Errorf("error deleting result: %s", err)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
 	jobs, err := a.manager.GetJobsByProviderId(providerId)
 	if err != nil {
 		log.Errorf("error retrieving jobs for provider: %s", err)
@@ -120,9 +144,16 @@ func (a *Api) addJobToProviderId(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	providerId := vars["providerId"]
 
-	var provider *model.Provider
 	var job *model.ProviderJob
-	if err := json.NewDecoder(r.Body).Decode(&provider); err != nil {
+
+	provider, err := a.manager.GetProvider(providerId)
+	if err != nil {
+		log.Errorf("error deleting result: %s", err)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&job); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
