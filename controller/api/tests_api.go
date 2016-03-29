@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/shipyard/shipyard/model"
@@ -28,20 +27,37 @@ func (a *Api) createTest(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	vars := mux.Vars(r)
-	projId := vars["projectId"]
+	projectId := vars["projectId"]
 	w.Header().Set("content-type", "application/json")
 	var test *model.Test
 	if err := json.NewDecoder(r.Body).Decode(&test); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := a.manager.CreateTest(projId, test); err != nil {
+	if err := a.manager.CreateTest(projectId, test); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	log.Debugf("saved test: id=%s", test.ID)
-	w.Write([]byte(fmt.Sprintf("id = %s\n", test.ID)))
+
+	// Just return the id for the Project that was created.
+	tempResponse := map[string]string{
+		"id": test.ID,
+	}
+
+	jsonResponse, err := json.Marshal(tempResponse)
+
+	if err != nil {
+		// Most probably a 400 BadRequest would be sufficient
+		http.Error(w, err.Error(), http.StatusNoContent)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write(jsonResponse)
+	return
+
 }
 
 func (a *Api) getTests(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +118,7 @@ func (a *Api) getTest(w http.ResponseWriter, r *http.Request) {
 	test, err := a.manager.GetTest(projId, testId)
 	if err != nil {
 		log.Errorf("error retrieving result: %s", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 

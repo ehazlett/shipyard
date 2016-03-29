@@ -68,14 +68,14 @@ func CreateProvider(authHeader string, url string, name string, availableJobType
 		return "", resp.StatusCode, err
 	}
 
-	var responseObject map[string]string
+	apiResponse := &model.ApiResponse{}
 
-	err = json.Unmarshal(body, &responseObject)
+	err = json.Unmarshal(body, &apiResponse)
 	if err != nil {
 		return "", resp.StatusCode, err
 	}
 
-	return responseObject["id"], resp.StatusCode, nil
+	return apiResponse.ID, resp.StatusCode, nil
 }
 
 func UpdateProvider(authHeader string, url string, name string, providerId string, availableJobTypes types.Array, config types.Object, provUrl string, providerJobs []*model.ProviderJob) (int, error) {
