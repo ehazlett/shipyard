@@ -145,7 +145,7 @@ func TestCreateNewProject(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		Convey("When we make a request to create a new project", func() {
-			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, false)
+			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, false)
 			Convey("Then we get back a successful response", func() {
 				So(id, ShouldNotBeEmpty)
 				So(err, ShouldBeNil)
@@ -187,7 +187,7 @@ func TestGetAllProjects(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		//So(PROJECT1_ID, ShouldNotBeEmpty)
-		id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT2_NAME, PROJECT2_DESC, PROJECT2_STATUS, nil, false)
+		id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT2_NAME, PROJECT2_DESC, PROJECT2_STATUS, nil, nil, false)
 		So(err, ShouldBeNil)
 		So(id, ShouldNotBeEmpty)
 		So(code, ShouldEqual, http.StatusCreated)
@@ -236,7 +236,7 @@ func TestUpdateProject(t *testing.T) {
 	Convey("Given that we have a project created already.", t, func() {
 		Convey("When we request to update that project.", func() {
 			code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_SAVED_ID, PROJECT1_NAME2, PROJECT1_DESC2,
-				PROJECT1_STATUS2, nil, true)
+				PROJECT1_STATUS2, nil, nil, true)
 			Convey("Then we get an appropriate response back", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusNoContent)
@@ -348,7 +348,8 @@ func TestUnauthorizedProjectRequests(t *testing.T) {
 	})
 	Convey("Given that we have an empty token", t, func() {
 		Convey("When we request to create a new project", func() {
-			id, code, err := apiClient.CreateProject("", ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, false)
+			id, code, err := apiClient.CreateProject("", ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, nil,
+				false)
 			Convey("Then we should be denied access", func() {
 				So(err, ShouldNotBeNil)
 				So(code, ShouldEqual, http.StatusUnauthorized)
@@ -362,7 +363,7 @@ func TestUnauthorizedProjectRequests(t *testing.T) {
 
 func TestAddProjectImage(t *testing.T) {
 	Convey("Given that we create a new project", t, func() {
-		projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, false)
+		projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, nil, false)
 		So(projectId, ShouldNotBeEmpty)
 		So(code, ShouldEqual, http.StatusCreated)
 		So(err, ShouldBeNil)
@@ -400,7 +401,7 @@ func TestAddProjectImageViaUpdate(t *testing.T) {
 			var image *model.Image
 			newImage := image.NewImage(IMAGE2_NAME, "", IMAGE2_TAG, IMAGE2_DESC, IMAGE2_LOCATION, true, "")
 			project.Images = append(project.Images, newImage)
-			code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, project.Images, true)
+			code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, project.Images, nil, true)
 			Convey("Then we should get a successful response", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusNoContent)
@@ -425,7 +426,7 @@ func TestAddProjectImageViaUpdate(t *testing.T) {
 								break
 							}
 						}
-						code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, imagesToKeep, true)
+						code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, imagesToKeep, nil, true)
 						So(err, ShouldBeNil)
 						So(code, ShouldEqual, http.StatusNoContent)
 						project, code, err := apiClient.GetProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID)
@@ -456,7 +457,7 @@ func TestManagingProjectImagesNesting(t *testing.T) {
 	Convey("Given that we do not have any projects or images", t, func() {
 		cleanup()
 		Convey("When we create a new project with two images in it", func() {
-			projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, "Project with cool images", "self-explanatory", "new", imageList, true)
+			projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, "Project with cool images", "self-explanatory", "new", imageList, nil, true)
 			So(projectId, ShouldNotBeBlank)
 			So(code, ShouldEqual, http.StatusCreated)
 			So(err, ShouldBeNil)
