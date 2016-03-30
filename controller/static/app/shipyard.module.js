@@ -20,13 +20,13 @@
             'angular-jwt',
             'base64',
             'selectize',
-            'ui.router'
-            //'ngMockE2E'
+            'ui.router',
+            'ngMockE2E'
         ])
 
         //Configure HttpBackend to mock requests to ILM endpoints
         //Take a look at https://docs.angularjs.org/api/ngMockE2E/service/$httpBackend
-        //.run(function($httpBackend, $filter) {
+        .run(function($httpBackend, $filter) {
 
         //     function makeid() {
         //         var text = "";
@@ -187,44 +187,43 @@
         //         }
         //     ];
 
-        //     var results = {
-        //         projectId: "",
-        //         description: "string",
-        //         buildId: "dbUuid",
-        //         runDate: "08:10:22 2016-02-26 AD",
-        //         endDate: "08:10:22 2016-02-26 AD",
-        //         createDate: "08:10:22 2016-02-26 AD",
-        //         author: "Jonathan Rosado",
-        //         projectVersion: "v0.1",
-        //         lastTagApplied: "4.05",
-        //         lastUpdate: "08:10:22 2016-02-26 AD",
-        //         updater: "updater value",
-        //         imageResults: [
-        //             {imageId: 'jsurnrpofn', imageName: 'image name 1'},
-        //             {imageId: 'pqochfntio', imageName: 'image name 2'},
-        //             {imageId: 'polejamnvd', imageName: 'image name 3'},
-        //             {imageId: 'pqoeinchdf', imageName: 'image name 4'}
-        //         ],
-        //         testsResults: [
-        //             {testId: 'paodjmnrht',imageId: 'powejrnamr',blocker: true,testName: 'test 1',imageName:'image name 1',dockerImageId: '7ae9b01b9b50',
-        //                 status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag1', 'tag2']},
-        //             {testId: 'hjfgernjtu',imageId: 'nandmgemrt',blocker: false,testName: 'test 2',imageName:'image name 2',dockerImageId: '13350b9ed27e',
-        //                 status: '',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag3', 'tag4']},
-        //             {testId: 'ieurnsahgt',imageId: 'majndgpfre',blocker: true,testName: 'test 3',imageName:'image name 3',dockerImageId: '033290b56c88',
-        //                 status: 'Failure',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag5', 'tag6']},
-        //             {testId: 'pwoeitnhmf',imageId: 'fjghthfgtq',blocker: false,testName: 'test 4',imageName:'image name 4',dockerImageId: '4745e5c6efe2',
-        //                 status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag7', 'tag8']}
-        //         ]
-        //     };
+             var results = {
+                 projectId: "",
+                 description: "string",
+                 buildId: "dbUuid",
+                 runDate: "08:10:22 2016-02-26 AD",
+                 endDate: "08:10:22 2016-02-26 AD",
+                 createDate: "08:10:22 2016-02-26 AD",author: "Jonathan Rosado",
+                 projectVersion: "v0.1",
+                 lastTagApplied: "4.05",
+                 lastUpdate: "08:10:22 2016-02-26 AD",
+                 updater: "updater value",
+                 imageResults: [
+                     {imageId: 'jsurnrpofn', imageName: 'image name 1'},
+                     {imageId: 'pqochfntio', imageName: 'image name 2'},
+                     {imageId: 'polejamnvd', imageName: 'image name 3'},
+                     {imageId: 'pqoeinchdf', imageName: 'image name 4'}
+                 ],
+                 testsResults: [
+                     {testId: 'paodjmnrht',imageId: 'powejrnamr',blocker: true,testName: 'test 1',imageName:'image name 1',dockerImageId: '7ae9b01b9b50',
+                         status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag1', 'tag2']},
+                     {testId: 'hjfgernjtu',imageId: 'nandmgemrt',blocker: false,testName: 'test 2',imageName:'image name 2',dockerImageId: '13350b9ed27e',
+                         status: '',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag3', 'tag4']},
+                     {testId: 'ieurnsahgt',imageId: 'majndgpfre',blocker: true,testName: 'test 3',imageName:'image name 3',dockerImageId: '033290b56c88',
+                         status: 'Failure',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag5', 'tag6']},
+                     {testId: 'pwoeitnhmf',imageId: 'fjghthfgtq',blocker: false,testName: 'test 4',imageName:'image name 4',dockerImageId: '4745e5c6efe2',
+                         status: 'Success',date: '08:10:22 2016-02-26 AD',endDate: '08:10:22 2016-02-26 AD',appliedTag: ['tag7', 'tag8']}
+                 ]
+            };
 
         //     $httpBackend.whenGET('/api/providers').respond(providers);
 
         //     $httpBackend.whenGET('/api/projects').respond(projects);
 
-        //     $httpBackend.whenRoute('GET', '/api/projects/:id/results').respond(function(method, url, data, headers, params) {
-        //         results.projectId = params.id;
-        //         return [200, angular.toJson(results), {}];
-        //     });
+             $httpBackend.whenRoute('GET', '/api/projects/:id/results').respond(function(method, url, data, headers, params) {
+                 results.projectId = params.id;
+                 return [200, angular.toJson(results), {}];
+             });
 
         //     $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
         //         console.log(params);
@@ -278,14 +277,14 @@
 
         //     $httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
 
-        //     //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
-        //     $httpBackend.whenGET(/.).passThrough();
-        //     $httpBackend.whenPOST(/.*/).passThrough();
-        //     $httpBackend.whenDELETE(/.*/).passThrough();
-        //     $httpBackend.whenPUT(/.*/).passThrough();
-        //     $httpBackend.whenPATCH(/.*/).passThrough();
-        //     $httpBackend.whenDELETE(/.*/).passThrough();
-        //     $httpBackend.whenJSONP(/.*/).passThrough();
-        //     $httpBackend.whenRoute(/.*/).passThrough();
-        // })
+             //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
+             $httpBackend.whenGET(/.*/).passThrough();
+             $httpBackend.whenPOST(/.*/).passThrough();
+             $httpBackend.whenDELETE(/.*/).passThrough();
+             $httpBackend.whenPUT(/.*/).passThrough();
+             $httpBackend.whenPATCH(/.*/).passThrough();
+             $httpBackend.whenDELETE(/.*/).passThrough();
+             $httpBackend.whenJSONP(/.*/).passThrough();
+             $httpBackend.whenRoute(/.*/).passThrough();
+        })
 })();
