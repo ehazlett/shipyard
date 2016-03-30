@@ -859,6 +859,16 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 		}
 	}
 
+	// TODO: investigate how to do a bulk insert
+	for _, test := range project.Tests {
+		test.ProjectId = project.ID
+		response, err = r.Table(tblNameTests).Insert(test).RunWrite(m.session)
+
+		if err != nil {
+			return err
+		}
+	}
+
 	eventType = "add-project"
 	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", project.ID, project.Name), []string{"security"})
 	return nil
