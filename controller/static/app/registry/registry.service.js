@@ -56,6 +56,14 @@
                     });
                 return promise;
             },
+            listDockerhubRepos: function(repo) {
+                var promise = $http
+                    .get("https://index.docker.io/v1/search?q=" + repo + "*&page=1&n=25")
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
         } 
     }
 })();

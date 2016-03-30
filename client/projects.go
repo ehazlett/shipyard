@@ -33,10 +33,10 @@ func GetProjects(authHeader, url string) ([]model.Project, int, error) {
 	return projects, resp.StatusCode, nil
 }
 
-func CreateProject(authHeader string, url string, name string, description string, status string, images []*model.Image, needsBuild bool) (string, int, error) {
+func CreateProject(authHeader string, url string, name string, description string, status string, images []*model.Image, tests []*model.Test, needsBuild bool) (string, int, error) {
 	var project *model.Project
 	timestamp := time.Now()
-	project = project.NewProject(name, description, status, images, needsBuild, timestamp, timestamp, timestamp, "", "")
+	project = project.NewProject(name, description, status, images, tests, needsBuild, timestamp, timestamp, timestamp, "", "")
 
 	data, err := json.Marshal(project)
 	if err != nil {
@@ -84,12 +84,12 @@ func GetProject(authHeader, url, id string) (*model.Project, int, error) {
 	return project, resp.StatusCode, nil
 }
 
-func UpdateProject(authHeader string, url string, id string, name string, description string, status string, images []*model.Image, needsBuild bool) (int, error) {
+func UpdateProject(authHeader string, url string, id string, name string, description string, status string, images []*model.Image, tests []*model.Test, needsBuild bool) (int, error) {
 
 	//create the project
 	var project *model.Project
 	var never time.Time //empty time stamp
-	project = project.NewProject(name, description, status, images, needsBuild, never, never, never, "", "")
+	project = project.NewProject(name, description, status, images, tests, needsBuild, never, never, never, "", "")
 	project.ID = id
 	data, err := json.Marshal(project)
 	if err != nil {

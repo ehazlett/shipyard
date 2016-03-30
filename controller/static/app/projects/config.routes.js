@@ -17,7 +17,6 @@
                 authenticate: true
             })
             .state('dashboard.edit_project', {
-                //TODO: Is this a resource? should it have an URL?
                 url: '^/projects/{id}',
                 templateUrl: 'app/projects/edit.html',
                 controller: 'EditController',
@@ -37,6 +36,20 @@
                 controller: 'CreateController',
                 controllerAs: 'vm',
                 authenticate: true
+            })
+            .state('dashboard.inspect_project', {
+                url: '^/inspect/{id}',
+                templateUrl: 'app/projects/inspect.html',
+                controller: 'InspectController',
+                controllerAs: 'vm',
+                authenticate: true,
+                resolve: {
+                    resolvedResults: ['ProjectService', '$state', '$stateParams', function(ProjectService, $state, $stateParams) {
+                        return ProjectService.results($stateParams.id).then(null, function(errorData) {
+                            $state.go('error');
+                        });
+                    }]
+                }
             })
     }
 })();
