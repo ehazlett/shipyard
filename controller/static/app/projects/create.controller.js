@@ -19,7 +19,8 @@
         vm.editImage = {};
 
         vm.createTest = {};
-        vm.createTest.tagging = {};
+        vm.createTest.tagging = [];
+        vm.createTest.targets = [];
         vm.createTest.provider = {};
         vm.editTest = {};
         vm.editTest.tagging = {};
@@ -58,6 +59,7 @@
         vm.getTestsProviders = getTestsProviders;
         vm.getJobs = getJobs;
         vm.checkProviderTest = checkProviderTest;
+        vm.setTargets = setTargets;
 
         vm.getRegistries();
 
@@ -260,6 +262,13 @@
                     }
                 })
                 .modal('show');
+        }
+
+        function setTargets(data) {
+            vm.createTest.targets=[];
+            angular.forEach(data, function (target) {
+                vm.createTest.targets.push({id: "",type: target});
+            });
         }
 
         function showTestEditDialog(test) {

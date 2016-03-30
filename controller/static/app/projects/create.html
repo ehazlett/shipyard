@@ -357,7 +357,7 @@
 
                                     <div class="eight wide field" ng-show="vm.createTest.provider.type === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.createTest.targets"></selectize>
+                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
@@ -483,7 +483,7 @@
 
                                     <div class="eight wide field" ng-show="vm.editTest.provider.type === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.editTest.targets"></selectize>
+                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">

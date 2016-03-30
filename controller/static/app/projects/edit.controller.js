@@ -72,6 +72,7 @@
         vm.showDeleteTestDialog = showDeleteTestDialog;
         vm.deleteTest = deleteTest;
         vm.editSaveTest = editSaveTest;
+        vm.setTargets = setTargets;
 
         vm.getRegistries();
 
@@ -250,6 +251,17 @@
                     }
                 })
                 .modal('show');
+        }
+
+        function setTargets(data) {
+            vm.createTest.targets=[];
+            angular.forEach(data, function (target) {
+                angular.forEach(vm.project.images, function (image) {
+                    if(image.name === target) {
+                        vm.createTest.targets.push({id: image.id,type: target});
+                    }
+                });
+            });
         }
 
         function showTestEditDialog(test) {
