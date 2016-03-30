@@ -19,13 +19,14 @@ type Project struct {
 	UpdatedBy    string    `json:"updatedBy" gorethink:"updatedBy"`
 }
 
-func (p *Project) NewProject(name string, description string, status string, images []*Image, needsBuild bool, creationTime time.Time, updateTime time.Time, lastRunTime time.Time, author string, updatedBy string) *Project {
+func (p *Project) NewProject(name string, description string, status string, images []*Image, tests []*Test, needsBuild bool, creationTime time.Time, updateTime time.Time, lastRunTime time.Time, author string, updatedBy string) *Project {
 
 	return &Project{
 		Name:         name,
 		Description:  description,
 		Status:       status,
 		Images:       images,
+		Tests:        tests,
 		NeedsBuild:   needsBuild,
 		CreationTime: creationTime,
 		UpdateTime:   updateTime,
