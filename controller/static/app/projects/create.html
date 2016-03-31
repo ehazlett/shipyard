@@ -604,25 +604,32 @@
                         </div>
                     </div>
                     <div class="ui padded grid">
-                        <div class="row">
-                            <div class="left floated column">
-                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
-                                    <i class="plus icon"></i>Add Image
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="row">
                             <div class="column">
-                                <h4 class="ui dividing header">Images Details</h4>
+                                <h4 class="ui dividing header"></h4>
+                                <h4 class="ui header">Images Details &nbsp &nbsp &nbsp
+                                    <div class="field" style="display: inline-block">
+                                        <div class="item">
+                                            <div class="ui toggle checkbox" ng-click="vm.skipImages=!vm.skipImages">
+                                                <input type="checkbox" name="public" ng-model="vm.skipImages">
+                                                <label style="font-weight: lighter">Skip images</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h4>
                                 <div class="field">
                                     <div class="item">
-                                        <div class="ui toggle checkbox" ng-click="vm.skipImages=!vm.skipImages">
-                                            <input type="checkbox" name="public" ng-model="vm.skipImages">
-                                            <label>Skip images</label>
+                                        <div class="row">
+                                            <div class="left column">
+                                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
+                                                    <i class="plus icon"></i>Add Image
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
                                 <table class="ui sortable celled table">
                                     <thead>
                                     <tr>
@@ -662,22 +669,32 @@
                     </div>
 
                     <div class="ui padded grid">
-                        <div class="row">
-                            <div class="left floated column">
-                                <div ng-click="vm.showTestCreateDialog()" class="ui small green labeled icon button">
-                                    <i class="plus icon"></i>Add Test
-                                </div>
-                            </div>
-                        </div>
+
                         <div class="row">
                             <div class="column">
-                                <h4 class="ui dividing header">Tests Details</h4>
-                                <div class="item">
-                                    <div class="ui toggle checkbox" ng-click="vm.skipTests=!vm.skipTests">
-                                        <input type="checkbox" name="public" ng-model="vm.skipTests">
-                                        <label>Skip Tests</label>
+                                <h4 class="ui dividing header"></h4>
+                                <h4 class="ui header">Tests Details &nbsp &nbsp &nbsp
+                                    <div class="field" style="display: inline-block">
+                                        <div class="item">
+                                            <div class="ui toggle checkbox" ng-click="vm.skipTests=!vm.skipTests">
+                                                <input type="checkbox" name="public" ng-model="vm.skipTests">
+                                                <label>Skip Tests</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h4>
+                                <div class="field">
+                                    <div class="item">
+                                        <div class="row">
+                                            <div class="left column">
+                                                <div ng-click="vm.showTestCreateDialog()" class="ui small green labeled icon button">
+                                                    <i class="plus icon"></i>Add Test
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <table class="ui sortable celled table">
                                     <thead>
                                     <tr>
