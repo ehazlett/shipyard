@@ -1,2 +1,2 @@
 #!/bin/bash
-godep go test -v $* ./...
+cd ../../ && go test -v `go list ./... | grep -v /vendor`

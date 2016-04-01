@@ -8,4 +8,4 @@ install:
     - go get -d github.com/stretchr/testify/assert
     - go get github.com/tools/godep
 script:
-    - bash test.sh
+    - bash scripts/travis/test.sh

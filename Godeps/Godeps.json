@@ -3,9 +3,9 @@
 	"GoVersion": "go1.5",
 	"Packages": [
 		"github.com/shipyard/shipyard",
-		"github.com/shipyard/shipyard/auth",
-		"github.com/shipyard/shipyard/auth/builtin",
-		"github.com/shipyard/shipyard/auth/ldap",
+		"github.com/shipyard/shipyard/utils/auth",
+		"github.com/shipyard/shipyard/utils/auth/builtin",
+		"github.com/shipyard/shipyard/utils/auth/ldap",
 		"github.com/shipyard/shipyard/client",
 		"github.com/shipyard/shipyard/controller",
 		"github.com/shipyard/shipyard/controller/api",
