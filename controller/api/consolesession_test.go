@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/mock_test"
+	"github.com/shipyard/shipyard/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +28,7 @@ func TestApiGetConsoleSession(t *testing.T) {
 	}
 
 	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	cs := &shipyard.ConsoleSession{}
+	cs := &model.ConsoleSession{}
 	if err := json.NewDecoder(res.Body).Decode(&cs); err != nil {
 		t.Fatal(err)
 	}

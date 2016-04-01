@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"github.com/shipyard/shipyard/auth"
+	"github.com/shipyard/shipyard/utils/auth"
 	"golang.org/x/crypto/bcrypt"
 )
 

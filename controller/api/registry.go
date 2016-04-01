@@ -6,7 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/model"
 )
 
 func (a *Api) registries(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +23,7 @@ func (a *Api) registries(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) addRegistry(w http.ResponseWriter, r *http.Request) {
-	var registry *shipyard.Registry
+	var registry *model.Registry
 	if err := json.NewDecoder(r.Body).Decode(&registry); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/manager"
+	"github.com/shipyard/shipyard/model"
 )
 
 var (
@@ -81,7 +81,7 @@ func (a *Auditor) HandlerFuncWithNext(w http.ResponseWriter, r *http.Request, ne
 		tagParts := strings.Split(path, "/")
 		tag := tagParts[1]
 
-		evt := &shipyard.Event{
+		evt := &model.Event{
 			Type:     "api",
 			Time:     time.Now(),
 			Username: user,

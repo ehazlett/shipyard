@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/model"
 )
 
 func getTLSConfig(caCert, sslCert, sslKey []byte) (*tls.Config, error) {
@@ -36,9 +36,9 @@ func generateId(n int) string {
 	return mdStr[:n]
 }
 
-func parseClusterNodes(driverStatus [][]string) ([]*shipyard.Node, error) {
-	nodes := []*shipyard.Node{}
-	var node *shipyard.Node
+func parseClusterNodes(driverStatus [][]string) ([]*model.Node, error) {
+	nodes := []*model.Node{}
+	var node *model.Node
 	nodeComplete := false
 	name := ""
 	addr := ""
@@ -80,7 +80,7 @@ func parseClusterNodes(driverStatus [][]string) ([]*shipyard.Node, error) {
 		}
 
 		if nodeComplete {
-			node = &shipyard.Node{
+			node = &model.Node{
 				Name:           name,
 				Addr:           addr,
 				Containers:     containers,

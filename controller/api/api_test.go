@@ -2,11 +2,11 @@ package api
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/shipyard/shipyard/auth/builtin"
-	"github.com/shipyard/shipyard/auth/ldap"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/mock_test"
 	"github.com/shipyard/shipyard/utils"
+	"github.com/shipyard/shipyard/utils/auth/builtin"
+	"github.com/shipyard/shipyard/utils/auth/ldap"
 	"github.com/shipyard/shipyard/version"
 	"net/http"
 )

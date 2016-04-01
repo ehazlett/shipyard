@@ -1,11 +1,11 @@
-package main
+package shipyard
 
 import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	"github.com/shipyard/shipyard/controller/commands"
+	"github.com/shipyard/shipyard/controller"
 	"github.com/shipyard/shipyard/version"
 )
 
@@ -30,7 +30,7 @@ func main() {
 		{
 			Name:   "server",
 			Usage:  "run shipyard controller",
-			Action: commands.CmdServer,
+			Action: controller.CmdServer,
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "listen, l",

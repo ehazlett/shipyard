@@ -3,12 +3,11 @@ package mock_test
 import (
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
-	"github.com/shipyard/shipyard"
-	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/controller/manager"
-	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/shipyard/shipyard/model"
-	registry "github.com/shipyard/shipyard/registry/v1"
+	"github.com/shipyard/shipyard/model/dockerhub"
+	registry "github.com/shipyard/shipyard/model/registry/v1"
+	"github.com/shipyard/shipyard/utils/auth"
 )
 
 type MockManager struct{}
@@ -29,11 +28,11 @@ func (m MockManager) RemoveServiceKey(key string) error {
 	return nil
 }
 
-func (m MockManager) SaveEvent(event *shipyard.Event) error {
+func (m MockManager) SaveEvent(event *model.Event) error {
 	return nil
 }
 
-func (m MockManager) Events(limit int) ([]*shipyard.Event, error) {
+func (m MockManager) Events(limit int) ([]*model.Event, error) {
 	return getTestEvents(), nil
 }
 
@@ -133,30 +132,30 @@ func (m MockManager) StoreKey() string {
 	return ""
 }
 
-func (m MockManager) AddRegistry(registry *shipyard.Registry) error {
+func (m MockManager) AddRegistry(registry *model.Registry) error {
 	return nil
 }
 
-func (m MockManager) Registries() ([]*shipyard.Registry, error) {
-	return []*shipyard.Registry{
+func (m MockManager) Registries() ([]*model.Registry, error) {
+	return []*model.Registry{
 		TestRegistry,
 	}, nil
 }
 
-func (m MockManager) Registry(name string) (*shipyard.Registry, error) {
+func (m MockManager) Registry(name string) (*model.Registry, error) {
 	return TestRegistry, nil
 }
 
-func (m MockManager) RegistryByAddress(addr string) (*shipyard.Registry, error) {
+func (m MockManager) RegistryByAddress(addr string) (*model.Registry, error) {
 	return TestRegistry, nil
 }
 
-func (m MockManager) RemoveRegistry(registry *shipyard.Registry) error {
+func (m MockManager) RemoveRegistry(registry *model.Registry) error {
 	return nil
 }
 
-func (m MockManager) Nodes() ([]*shipyard.Node, error) {
-	return []*shipyard.Node{
+func (m MockManager) Nodes() ([]*model.Node, error) {
+	return []*model.Node{
 		TestNode,
 	}, nil
 }
@@ -175,19 +174,19 @@ func (m MockManager) DeleteRepository(name string) error {
 	return nil
 }
 
-func (m MockManager) Node(name string) (*shipyard.Node, error) {
+func (m MockManager) Node(name string) (*model.Node, error) {
 	return TestNode, nil
 }
 
-func (m MockManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {
+func (m MockManager) CreateConsoleSession(c *model.ConsoleSession) error {
 	return nil
 }
 
-func (m MockManager) RemoveConsoleSession(c *shipyard.ConsoleSession) error {
+func (m MockManager) RemoveConsoleSession(c *model.ConsoleSession) error {
 	return nil
 }
 
-func (m MockManager) ConsoleSession(token string) (*shipyard.ConsoleSession, error) {
+func (m MockManager) ConsoleSession(token string) (*model.ConsoleSession, error) {
 	return TestConsoleSession, nil
 }
 

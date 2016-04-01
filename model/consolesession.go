@@ -1,4 +1,4 @@
-package shipyard
+package model
 
 type ConsoleSession struct {
 	ID          string `json:"id,omitempty" gorethink:"id,omitempty"`
