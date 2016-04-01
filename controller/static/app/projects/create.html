@@ -615,6 +615,11 @@
                                                 <input type="checkbox" name="public" ng-model="vm.skipImages">
                                                 <label style="font-weight: lighter">Skip images</label>
                                             </div>
+                                            <i class="blue help circle icon"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Skip Images</h5>
+                                                <p>Click the slider to skip images.</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </h4>
@@ -679,6 +684,11 @@
                                             <div class="ui toggle checkbox" ng-click="vm.skipTests=!vm.skipTests">
                                                 <input type="checkbox" name="public" ng-model="vm.skipTests">
                                                 <label>Skip Tests</label>
+                                            </div>
+                                            <i class="blue help circle icon"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Skip Tests</h5>
+                                                <p>Click the slider to skip tests.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -748,6 +758,14 @@
 
 <script>
     $(function() {
+        $('.help.circle.icon').popup({
+            inline: true,
+            hoverable: true,
+            delay: {
+                show: 150,
+                hide: 400
+            }
+        });
         $('.ui.dropdown').dropdown();
     });
 
