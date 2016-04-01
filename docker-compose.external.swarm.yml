@@ -1,6 +1,6 @@
 rethinkdb:
     restart: always
-    image: rethinkdb
+    image: rethinkdb:2.2
     ports:
         - "8080"
         - "28015"

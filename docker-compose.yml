@@ -1,6 +1,6 @@
 rethinkdb:
     restart: always
-    image: rethinkdb
+    image: rethinkdb:2.2
     ports:
         - "8083:8080"
         - "8084:28015"
@@ -21,7 +21,7 @@ proxy:
 
 swarm:
     restart: always
-    image: swarm:latest
+    image: swarm:1.1.3
     command: m --host tcp://0.0.0.0:2375 proxy:2375
     links:
         - "proxy:proxy"

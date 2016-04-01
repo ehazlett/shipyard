@@ -43,10 +43,10 @@ docker run -d --name="shipyard_artifactory" \
           -v $here/test-assets/artifactory/default.conf:/etc/nginx/conf.d/default.conf \
           -v $here/test-assets/artifactory/artifactory.lic:/var/opt/jfrog/artifactory/etc/artifactory.lic \
           -v $here/test-assets/artifactory/artifactory.config.xml:/var/opt/jfrog/artifactory/etc/artifactory.config \
-          jfrog-docker-reg2.bintray.io/jfrog/artifactory-registry:latest
+          jfrog-docker-reg2.bintray.io/jfrog/artifactory-registry:4.7.0
 
 echo "Starting artifactory test container"
-docker pull jfrog-docker-reg2.bintray.io/jfrog/artifactory-registry:latest
+docker pull jfrog-docker-reg2.bintray.io/jfrog/artifactory-registry:4.7.0
 docker run -it --name="shipyard_test" \
             -v $here:/go/src/github.com/shipyard/shipyard \
             -v /var/run/docker.sock:/var/run/docker.sock \
