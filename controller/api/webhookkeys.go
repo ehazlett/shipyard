@@ -6,7 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-	"github.com/shipyard/shipyard/dockerhub"
+	"github.com/shipyard/shipyard/model/dockerhub"
 )
 
 func (a *Api) webhookKeys(w http.ResponseWriter, r *http.Request) {

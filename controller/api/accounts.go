@@ -6,7 +6,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-	"github.com/shipyard/shipyard/auth"
+	"github.com/shipyard/shipyard/utils/auth"
 )
 
 func (a *Api) accounts(w http.ResponseWriter, r *http.Request) {

@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/mock_test"
+	"github.com/shipyard/shipyard/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +27,7 @@ func TestApiGetNode(t *testing.T) {
 	}
 
 	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	node := &shipyard.Node{}
+	node := &model.Node{}
 	if err := json.NewDecoder(res.Body).Decode(&node); err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestApiGetNodes(t *testing.T) {
 	}
 
 	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	nodes := []*shipyard.Node{}
+	nodes := []*model.Node{}
 	if err := json.NewDecoder(res.Body).Decode(&nodes); err != nil {
 		t.Fatal(err)
 	}

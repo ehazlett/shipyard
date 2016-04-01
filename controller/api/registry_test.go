@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"bytes"
-	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/controller/mock_test"
+	"github.com/shipyard/shipyard/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,7 +29,7 @@ func TestApiGetRegistries(t *testing.T) {
 	}
 
 	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	regs := []*shipyard.Registry{}
+	regs := []*model.Registry{}
 	if err := json.NewDecoder(res.Body).Decode(&regs); err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestApiGetRegistry(t *testing.T) {
 	}
 
 	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	reg := shipyard.Registry{}
+	reg := model.Registry{}
 	if err := json.NewDecoder(res.Body).Decode(&reg); err != nil {
 		t.Fatal(err)
 	}

@@ -15,10 +15,9 @@ import (
 	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
-	"github.com/shipyard/shipyard"
-	"github.com/shipyard/shipyard/auth"
-	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/shipyard/shipyard/model"
+	"github.com/shipyard/shipyard/model/dockerhub"
+	"github.com/shipyard/shipyard/utils/auth"
 	"github.com/shipyard/shipyard/version"
 )
 
@@ -148,8 +147,8 @@ type (
 		ScaleContainer(id string, numInstances int) ScaleResult
 		SaveServiceKey(key *auth.ServiceKey) error
 		RemoveServiceKey(key string) error
-		SaveEvent(event *shipyard.Event) error
-		Events(limit int) ([]*shipyard.Event, error)
+		SaveEvent(event *model.Event) error
+		Events(limit int) ([]*model.Event, error)
 		PurgeEvents() error
 		ServiceKey(key string) (*auth.ServiceKey, error)
 		ServiceKeys() ([]*auth.ServiceKey, error)
@@ -165,18 +164,18 @@ type (
 		DeleteWebhookKey(id string) error
 		DockerClient() *dockerclient.DockerClient
 
-		Nodes() ([]*shipyard.Node, error)
-		Node(name string) (*shipyard.Node, error)
+		Nodes() ([]*model.Node, error)
+		Node(name string) (*model.Node, error)
 
-		AddRegistry(registry *shipyard.Registry) error
-		RemoveRegistry(registry *shipyard.Registry) error
-		Registries() ([]*shipyard.Registry, error)
-		Registry(name string) (*shipyard.Registry, error)
-		RegistryByAddress(addr string) (*shipyard.Registry, error)
+		AddRegistry(registry *model.Registry) error
+		RemoveRegistry(registry *model.Registry) error
+		Registries() ([]*model.Registry, error)
+		Registry(name string) (*model.Registry, error)
+		RegistryByAddress(addr string) (*model.Registry, error)
 
-		CreateConsoleSession(c *shipyard.ConsoleSession) error
-		RemoveConsoleSession(c *shipyard.ConsoleSession) error
-		ConsoleSession(token string) (*shipyard.ConsoleSession, error)
+		CreateConsoleSession(c *model.ConsoleSession) error
+		RemoveConsoleSession(c *model.ConsoleSession) error
+		ConsoleSession(token string) (*model.ConsoleSession, error)
 		ValidateConsoleSessionToken(containerId, token string) bool
 	}
 )
@@ -241,7 +240,7 @@ func (m DefaultManager) init() error {
 }
 
 func (m DefaultManager) logEvent(eventType, message string, tags []string) {
-	evt := &shipyard.Event{
+	evt := &model.Event{
 		Type:    eventType,
 		Time:    time.Now(),
 		Message: message,
@@ -279,7 +278,7 @@ func (m DefaultManager) uploadUsage() {
 			}
 		}
 	}
-	usage := &shipyard.Usage{
+	usage := &model.Usage{
 		ID:      id,
 		Version: version.Version,
 	}
@@ -363,7 +362,7 @@ func (m DefaultManager) RemoveServiceKey(key string) error {
 	return nil
 }
 
-func (m DefaultManager) SaveEvent(event *shipyard.Event) error {
+func (m DefaultManager) SaveEvent(event *model.Event) error {
 	if _, err := r.Table(tblNameEvents).Insert(event).RunWrite(m.session); err != nil {
 		return err
 	}
@@ -371,7 +370,7 @@ func (m DefaultManager) SaveEvent(event *shipyard.Event) error {
 	return nil
 }
 
-func (m DefaultManager) Events(limit int) ([]*shipyard.Event, error) {
+func (m DefaultManager) Events(limit int) ([]*model.Event, error) {
 	t := r.Table(tblNameEvents).OrderBy(r.Desc("Time"))
 	if limit > -1 {
 		t.Limit(limit)
@@ -380,7 +379,7 @@ func (m DefaultManager) Events(limit int) ([]*shipyard.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-	events := []*shipyard.Event{}
+	events := []*model.Event{}
 	if err := res.All(&events); err != nil {
 		return nil, err
 	}
@@ -731,7 +730,7 @@ func (m DefaultManager) DeleteWebhookKey(id string) error {
 	return nil
 }
 
-func (m DefaultManager) Nodes() ([]*shipyard.Node, error) {
+func (m DefaultManager) Nodes() ([]*model.Node, error) {
 	info, err := m.client.Info()
 	if err != nil {
 		return nil, err
@@ -745,7 +744,7 @@ func (m DefaultManager) Nodes() ([]*shipyard.Node, error) {
 	return nodes, nil
 }
 
-func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
+func (m DefaultManager) Node(name string) (*model.Node, error) {
 	nodes, err := m.Nodes()
 	if err != nil {
 		return nil, err
@@ -1508,7 +1507,7 @@ func (m DefaultManager) DeleteAllProviders() error {
 
 // end methods related to the Image structure
 
-func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
+func (m DefaultManager) AddRegistry(registry *model.Registry) error {
 
 	// TODO: Please note the trailing forward slash / which is needed for Artifactory, else you get a 404.
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v2/", registry.Addr), nil)
@@ -1551,7 +1550,7 @@ func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 	return nil
 }
 
-func (m DefaultManager) RemoveRegistry(registry *shipyard.Registry) error {
+func (m DefaultManager) RemoveRegistry(registry *model.Registry) error {
 	res, err := r.Table(tblNameRegistries).Get(registry.ID).Delete().Run(m.session)
 	if err != nil {
 		return err
@@ -1566,20 +1565,20 @@ func (m DefaultManager) RemoveRegistry(registry *shipyard.Registry) error {
 	return nil
 }
 
-func (m DefaultManager) Registries() ([]*shipyard.Registry, error) {
+func (m DefaultManager) Registries() ([]*model.Registry, error) {
 	res, err := r.Table(tblNameRegistries).OrderBy(r.Asc("name")).Run(m.session)
 	if err != nil {
 		return nil, err
 	}
 
-	regs := []*shipyard.Registry{}
+	regs := []*model.Registry{}
 	if err := res.All(&regs); err != nil {
 		return nil, err
 	}
 
-	registries := []*shipyard.Registry{}
+	registries := []*model.Registry{}
 	for _, r := range regs {
-		reg, err := shipyard.NewRegistry(r.ID, r.Name, r.Addr, r.Username, r.Password, r.TlsSkipVerify)
+		reg, err := model.NewRegistry(r.ID, r.Name, r.Addr, r.Username, r.Password, r.TlsSkipVerify)
 		if err != nil {
 			return nil, err
 		}
@@ -1590,7 +1589,7 @@ func (m DefaultManager) Registries() ([]*shipyard.Registry, error) {
 	return registries, nil
 }
 
-func (m DefaultManager) Registry(name string) (*shipyard.Registry, error) {
+func (m DefaultManager) Registry(name string) (*model.Registry, error) {
 	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"name": name}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -1599,12 +1598,12 @@ func (m DefaultManager) Registry(name string) (*shipyard.Registry, error) {
 	if res.IsNil() {
 		return nil, ErrRegistryDoesNotExist
 	}
-	var reg *shipyard.Registry
+	var reg *model.Registry
 	if err := res.One(&reg); err != nil {
 		return nil, err
 	}
 
-	registry, err := shipyard.NewRegistry(reg.ID, reg.Name, reg.Addr, reg.Username, reg.Password, reg.TlsSkipVerify)
+	registry, err := model.NewRegistry(reg.ID, reg.Name, reg.Addr, reg.Username, reg.Password, reg.TlsSkipVerify)
 	if err != nil {
 		return nil, err
 	}
@@ -1612,7 +1611,7 @@ func (m DefaultManager) Registry(name string) (*shipyard.Registry, error) {
 	return registry, nil
 }
 
-func (m DefaultManager) RegistryByAddress(addr string) (*shipyard.Registry, error) {
+func (m DefaultManager) RegistryByAddress(addr string) (*model.Registry, error) {
 	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"addr": addr}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -1621,13 +1620,13 @@ func (m DefaultManager) RegistryByAddress(addr string) (*shipyard.Registry, erro
 		log.Debugf("its nil!! it found nothing")
 		return nil, ErrRegistryDoesNotExist
 	}
-	var reg *shipyard.Registry
+	var reg *model.Registry
 	if err := res.One(&reg); err != nil {
 		log.Debugf("problem with res.One")
 		return nil, err
 	}
 
-	registry, err := shipyard.NewRegistry(reg.ID, reg.Name, reg.Addr, reg.Username, reg.Password, reg.TlsSkipVerify)
+	registry, err := model.NewRegistry(reg.ID, reg.Name, reg.Addr, reg.Username, reg.Password, reg.TlsSkipVerify)
 	if err != nil {
 		log.Debugf("Problem creating new registry")
 		return nil, err
@@ -1636,7 +1635,7 @@ func (m DefaultManager) RegistryByAddress(addr string) (*shipyard.Registry, erro
 	return registry, nil
 }
 
-func (m DefaultManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {
+func (m DefaultManager) CreateConsoleSession(c *model.ConsoleSession) error {
 	if _, err := r.Table(tblNameConsole).Insert(c).RunWrite(m.session); err != nil {
 		return err
 	}
@@ -1646,7 +1645,7 @@ func (m DefaultManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {
 	return nil
 }
 
-func (m DefaultManager) RemoveConsoleSession(c *shipyard.ConsoleSession) error {
+func (m DefaultManager) RemoveConsoleSession(c *model.ConsoleSession) error {
 	res, err := r.Table(tblNameConsole).Get(c.ID).Delete().Run(m.session)
 	if err != nil {
 		return err
@@ -1659,7 +1658,7 @@ func (m DefaultManager) RemoveConsoleSession(c *shipyard.ConsoleSession) error {
 	return nil
 }
 
-func (m DefaultManager) ConsoleSession(token string) (*shipyard.ConsoleSession, error) {
+func (m DefaultManager) ConsoleSession(token string) (*model.ConsoleSession, error) {
 	res, err := r.Table(tblNameConsole).Filter(map[string]string{"token": token}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -1669,7 +1668,7 @@ func (m DefaultManager) ConsoleSession(token string) (*shipyard.ConsoleSession, 
 		return nil, ErrConsoleSessionDoesNotExist
 	}
 
-	var c *shipyard.ConsoleSession
+	var c *model.ConsoleSession
 	if err := res.One(&c); err != nil {
 		return nil, err
 	}

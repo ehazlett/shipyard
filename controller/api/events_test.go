@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/model"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,7 +25,7 @@ func TestApiGetEvents(t *testing.T) {
 	}
 
 	assert.Equal(t, res.StatusCode, 200, "expected response code 200")
-	events := []*shipyard.Event{}
+	events := []*model.Event{}
 
 	if err := json.NewDecoder(res.Body).Decode(&events); err != nil {
 		t.Fatal(err)

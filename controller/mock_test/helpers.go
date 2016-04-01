@@ -4,17 +4,17 @@ import (
 	"time"
 
 	"github.com/samalba/dockerclient"
-	"github.com/shipyard/shipyard"
-	"github.com/shipyard/shipyard/auth"
-	"github.com/shipyard/shipyard/dockerhub"
-	registry "github.com/shipyard/shipyard/registry/v1"
+	"github.com/shipyard/shipyard/model"
+	"github.com/shipyard/shipyard/model/dockerhub"
+	registry "github.com/shipyard/shipyard/model/registry/v1"
+	"github.com/shipyard/shipyard/utils/auth"
 )
 
 var (
 	TestContainerId    = "1234567890abcdefg"
 	TestContainerName  = "test-container"
 	TestContainerImage = "test-image"
-	TestRegistry       = &shipyard.Registry{
+	TestRegistry       = &model.Registry{
 		ID:            "0",
 		Name:          "test-registry",
 		Addr:          "http://localhost:5000",
@@ -33,7 +33,7 @@ var (
 		Name:    TestContainerName,
 		Image:   TestContainerImage,
 	}
-	TestNode = &shipyard.Node{
+	TestNode = &model.Node{
 		ID:   "0",
 		Name: "testnode",
 		Addr: "tcp://127.0.0.1:3375",
@@ -43,7 +43,7 @@ var (
 		Username: "testuser",
 		Password: "test",
 	}
-	TestEvent = &shipyard.Event{
+	TestEvent = &model.Event{
 		Type:          "test-event",
 		ContainerInfo: TestContainerInfo,
 		Message:       "test message",
@@ -58,7 +58,7 @@ var (
 		Image: "ehazlett/test",
 		Key:   "abcdefg",
 	}
-	TestConsoleSession = &shipyard.ConsoleSession{
+	TestConsoleSession = &model.ConsoleSession{
 		ID:          "0",
 		ContainerID: "abcdefg",
 		Token:       "1234567890",
@@ -80,8 +80,8 @@ func getTestContainers() []*dockerclient.ContainerInfo {
 	}
 }
 
-func getTestEvents() []*shipyard.Event {
-	return []*shipyard.Event{
+func getTestEvents() []*model.Event {
+	return []*model.Event{
 		TestEvent,
 	}
 }

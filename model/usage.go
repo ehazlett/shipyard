@@ -1,4 +1,4 @@
-package shipyard
+package model
 
 type (
 	Usage struct {
