@@ -6,3 +6,4 @@ bower_components
 .idea/
 *.iml
 docker-compose.override.yml
+shipyard
