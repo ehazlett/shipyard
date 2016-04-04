@@ -31,6 +31,7 @@ const (
 	tblNameResults   = "results"
 	tblNameTests     = "tests"
 	tblNameProviders = "providers"
+	tblNameBuilds    = "builds"
 
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
@@ -57,6 +58,9 @@ var (
 
 	ErrResultExists       = errors.New("result already exists")
 	ErrResultDoesNotExist = errors.New("result does not exist")
+
+	ErrBuildExists       = errors.New("build already exists")
+	ErrBuildDoesNotExist = errors.New("build does not exist")
 
 	ErrTestExists          = errors.New("test already exists")
 	ErrTestDoesNotExist    = errors.New("test does not exist")
@@ -130,6 +134,14 @@ type (
 		DeleteResult(projectId string, resultId string) error
 		DeleteAllResults() error
 
+		/*
+			GetBuilds(projectId string, testId string) ([]*model.Build, error)
+			GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
+			CreateBuild(projectId string, testId string, build *model.Build) error
+			UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error
+			DeleteBuild(projectId string, testId string, buildId string) error
+			DeleteAllBuilds() error
+		*/
 		GetProviders() ([]*model.Provider, error)
 		GetProvider(providerId string) (*model.Provider, error)
 		CreateProvider(provider *model.Provider) error
@@ -222,7 +234,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages, tblNameResults, tblNameTests, tblNameProviders}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages, tblNameResults, tblNameTests, tblNameProviders, tblNameBuilds}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {

@@ -12,9 +12,10 @@ type Build struct {
 	Config    *BuildConfig   `json:"config" gorethink:"config"`
 	Status    *BuildStatus   `json:"status" gorethink:"status"`
 	Results   []*BuildResult `json:"results" gorethink:"results"`
+	TestId    string         `json:"testId" gorethink:"testId"`
 }
 
-func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildConfig, status *BuildStatus, results []*BuildResult) *Build {
+func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildConfig, status *BuildStatus, results []*BuildResult, testId string) *Build {
 
 	return &Build{
 		StartTime: startTime,
@@ -22,6 +23,7 @@ func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildCo
 		Config:    config,
 		Status:    status,
 		Results:   results,
+		TestId:    testId,
 	}
 }
 
