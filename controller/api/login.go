@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/shipyard/shipyard/auth"
-	"github.com/shipyard/shipyard/auth/ldap"
 	"github.com/shipyard/shipyard/controller/manager"
+	"github.com/shipyard/shipyard/utils/auth"
+	"github.com/shipyard/shipyard/utils/auth/ldap"
 )
 
 func (a *Api) login(w http.ResponseWriter, r *http.Request) {

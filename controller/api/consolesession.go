@@ -7,7 +7,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/nu7hatch/gouuid"
-	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/model"
 )
 
 func (a *Api) createConsoleSession(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +24,7 @@ func (a *Api) createConsoleSession(w http.ResponseWriter, r *http.Request) {
 	}
 	token := u4.String()
 
-	cs := &shipyard.ConsoleSession{
+	cs := &model.ConsoleSession{
 		ContainerID: containerId,
 		Token:       token,
 	}

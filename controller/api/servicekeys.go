@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/shipyard/shipyard/auth"
+	"github.com/shipyard/shipyard/utils/auth"
 )
 
 func (a *Api) addServiceKey(w http.ResponseWriter, r *http.Request) {

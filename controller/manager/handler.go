@@ -5,7 +5,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/samalba/dockerclient"
-	"github.com/shipyard/shipyard"
+	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/utils"
 )
 
@@ -32,7 +32,7 @@ func (h *EventHandler) logDockerEvent(e *dockerclient.Event) error {
 		return err
 	}
 
-	evt := &shipyard.Event{
+	evt := &model.Event{
 		Type: e.Status,
 		Message: fmt.Sprintf("action=%s container=%s",
 			e.Status, e.Id[:12]),
