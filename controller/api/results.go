@@ -41,6 +41,7 @@ func (a *Api) createResult(w http.ResponseWriter, r *http.Request) {
 	log.Debugf("saved result: id=%s", result.ID)
 	w.WriteHeader(http.StatusCreated)
 }
+
 func (a *Api) updateResult(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
@@ -67,6 +68,7 @@ func (a *Api) updateResult(w http.ResponseWriter, r *http.Request) {
 	log.Debugf("updated result: id=%s", result.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
+
 func (a *Api) getResult(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projId := vars["projectId"]

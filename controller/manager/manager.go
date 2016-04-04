@@ -134,14 +134,13 @@ type (
 		DeleteResult(projectId string, resultId string) error
 		DeleteAllResults() error
 
-		/*
-			GetBuilds(projectId string, testId string) ([]*model.Build, error)
-			GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
-			CreateBuild(projectId string, testId string, build *model.Build) error
-			UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error
-			DeleteBuild(projectId string, testId string, buildId string) error
-			DeleteAllBuilds() error
-		*/
+		GetBuilds(projectId string, testId string) ([]*model.Build, error)
+		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
+		CreateBuild(projectId string, testId string, build *model.Build) error
+		UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error
+		DeleteBuild(projectId string, testId string, buildId string) error
+		DeleteAllBuilds() error
+
 		GetProviders() ([]*model.Provider, error)
 		GetProvider(providerId string) (*model.Provider, error)
 		CreateProvider(provider *model.Provider) error
@@ -1231,6 +1230,123 @@ func (m DefaultManager) DeleteTest(projectId string, testId string) error {
 }
 func (m DefaultManager) DeleteAllTests() error {
 	_, err := r.Table(tblNameTests).Delete().Run(m.session)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//methods related to the Build structure
+func (m DefaultManager) GetBuilds(projectId string, testId string) ([]*model.Build, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	builds := []*model.Build{}
+	if err := res.All(&builds); err != nil {
+		return nil, err
+	}
+	return builds, nil
+}
+
+func (m DefaultManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrImageDoesNotExist
+	}
+	var build *model.Build
+	if err := res.One(&build); err != nil {
+		return nil, err
+	}
+	return build, nil
+}
+
+func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build) error {
+	var eventType string
+	build, err := m.GetBuild(projectId, testId, build.ID)
+	if err != nil && err != ErrBuildDoesNotExist {
+		return err
+	}
+
+	if build != nil {
+		return ErrBuildExists
+	}
+
+	build.ProjectId = projectId
+	response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
+
+	if err != nil {
+		return err
+	}
+	eventType = "add-build"
+
+	build.ID = func() string {
+		if len(response.GeneratedKeys) > 0 {
+			return string(response.GeneratedKeys[0])
+		}
+		return ""
+	}()
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
+
+	return nil
+
+}
+
+func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error {
+	var eventType string
+
+	// check if exists; if so, update
+	tmpBuild, err := m.GetBuild(projectId, testId, build.ID)
+	if err != nil && err != ErrBuildDoesNotExist {
+		return err
+	}
+	// update
+	if tmpBuild != nil {
+		updates := map[string]interface{}{
+			"startTime": build.StartTime,
+			"endTime":   build.EndTime,
+			"config":    build.Config,
+			"status":    build.Status,
+			"results":   build.Results,
+			"testId":    build.TestId,
+			"projectId": build.ProjectId,
+		}
+
+		if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": build.ID}).Update(updates).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-build"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteBuild(projectId string, testId string, buildId string) error {
+	build, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if build.IsNil() {
+		return ErrBuildDoesNotExist
+	}
+
+	m.logEvent("delete-build", fmt.Sprintf("id=%s", buildId), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteAllBuilds() error {
+	_, err := r.Table(tblNameBuilds).Delete().Run(m.session)
 
 	if err != nil {
 		return err

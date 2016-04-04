@@ -13,6 +13,7 @@ type Build struct {
 	Status    *BuildStatus   `json:"status" gorethink:"status"`
 	Results   []*BuildResult `json:"results" gorethink:"results"`
 	TestId    string         `json:"testId" gorethink:"testId"`
+	ProjectId string         `json:"projectId" gorethink:"projectId"`
 }
 
 func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildConfig, status *BuildStatus, results []*BuildResult, testId string) *Build {
