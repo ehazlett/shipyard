@@ -113,7 +113,10 @@
             });
         $('.ui.search').search({
             apiSettings: {
-                url: 'https://index.docker.io/v1/search?q={query}',
+                url: '/api/v1/search?q={query}',
+                beforeXHR: function(xhr) {
+                    xhr.setRequestHeader('X-Access-Token', localStorage.getItem('X-Access-Token'))
+                },
                 // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
                 successTest: function(response) {
                     $.each(response.results, function(index,item) {
@@ -141,7 +144,10 @@
         });
         $('.ui.search.edit').search({
             apiSettings: {
-                url: 'https://index.docker.io/v1/search?q={query}',
+                url: '/api/v1/search?q={query}',
+                beforeXHR: function(xhr) {
+                    xhr.setRequestHeader('X-Access-Token', localStorage.getItem('X-Access-Token'))
+                },
                 // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
                 successTest: function(response) {
                     $.each(response.results, function(index,item) {

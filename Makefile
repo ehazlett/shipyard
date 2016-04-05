@@ -11,7 +11,8 @@ clean:
 	@rm -rf controller/controller
 
 build:
-	@cd controller && go build -a -tags "netgo static_build" -installsuffix netgo -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit=$(COMMIT)" .
+	@go build -a -tags "netgo static_build" -installsuffix netgo -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit=$(COMMIT)" .
+	@mv shipyard controller/controller
 
 remote-build:
 	@docker build -t shipyard-build -f Dockerfile.build .
@@ -23,10 +24,10 @@ media:
 
 image: media build
 	@echo Building Shipyard image $(TAG)
-	@cd controller && docker build -t shipyard/shipyard:$(TAG) .
+	@cd controller && docker build -t shipyard/shipyard:$TAG .
 
 release: build image
-	@docker push shipyard/shipyard:$(TAG)
+	@docker push shipyard/shipyard:$TAG
 
 test: clean
  	# TODO: enable registry e2e when they use httptest e2e server instead of external container.
