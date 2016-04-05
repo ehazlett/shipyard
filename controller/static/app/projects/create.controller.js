@@ -39,6 +39,7 @@
         vm.providers = [];
         vm.providerTests = [];
 
+
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
@@ -65,10 +66,16 @@
 
         vm.buttonStyle = "disabled";
 
+        vm.code = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( var i=0; i < 16; i++ )
+            vm.code += possible.charAt(Math.floor(Math.random() * possible.length));
+        
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    $('#image-create-modal').find("input").val("");
+                    $('#image-create-modal-'+vm.code).find("input").val("");
                     $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
                     $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                     vm.createImage.name = "";
@@ -187,7 +194,7 @@
             vm.createImage.tag = "";
             vm.createImage.description = "";
             vm.buttonStyle = "disabled";
-            $('#image-create-modal').find("input").val("");
+            $('#image-create-modal-'+vm.code).find("input").val("");
             $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
@@ -225,10 +232,11 @@
 
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#image-create-modal')
+
+            $('#image-create-modal-'+vm.code)
                 .modal({
                     onHidden: function() {
-                        $('#image-create-modal').find("input").val("");
+                        $('#image-create-modal-'+vm.code).find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createImage.location = "";
                     },
@@ -293,12 +301,14 @@
             vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
-            ProjectService.getPublicRegistryTags(image.name)
-                .then(function(data) {
-                    vm.publicRegistryTags = data;
-                }, function(data) {
-                    vm.error = data;
-                });
+            if(image.location === "Public Registry") {
+                ProjectService.getPublicRegistryTags(image.name)
+                    .then(function(data) {
+                        vm.publicRegistryTags = data;
+                    }, function(data) {
+                        vm.error = data;
+                    });
+            }
             $('#image-edit-modal')
                 .modal({
                     closable: false

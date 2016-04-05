@@ -1,4 +1,4 @@
-<div id="image-create-modal" class="ui fullscreen modal transition">
+<div id="image-create-modal-{{vm.code}}" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         Create Image
@@ -16,6 +16,11 @@
                         <div class="ui toggle checkbox" ng-click="vm.createImage.skipImageBuild=!vm.createImage.skipImageBuild">
                             <input type="checkbox" name="public" ng-model="vm.createImage.skipImageBuild">
                             <label>Skip Image Building</label>
+                        </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Skip Image Building</h5>
+                            <p>Click the slider to skip image building.</p>
                         </div>
                         <div class="ui two column grid">
                             <div class="column">
@@ -173,6 +178,11 @@
                             <input type="checkbox" name="public" ng-model="vm.editImage.skipImageBuild">
                             <label>Skip Image Building</label>
                         </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Skip Image Building</h5>
+                            <p>Click the slider to skip image building.</p>
+                        </div>
                         <div class="ui two column grid">
                             <div class="column">
 
@@ -326,6 +336,11 @@
                             <input type="checkbox" name="public" ng-model="vm.createTest.skipTest">
                             <label>Skip Test</label>
                         </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Skip Test</h5>
+                            <p>Click the slider to skip test.</p>
+                        </div>
                         <div class="ui two column grid">
                             <div class="column">
 
@@ -373,6 +388,11 @@
                                     <div class="ui toggle checkbox" ng-click="vm.createTest.blocker=!vm.createTest.blocker">
                                         <input type="checkbox" name="public" ng-model="vm.createTest.blocker">
                                         <label>Blocker</label>
+                                    </div>
+                                    <i class="blue help circle icon"></i>
+                                    <div class="ui popup" style="max-width: 450px;">
+                                        <h5>Blocker</h5>
+                                        <p>Click the slider.</p>
                                     </div>
                                 </div>
 
@@ -454,6 +474,11 @@
                             <input type="checkbox" name="public" ng-model="vm.editTest.skipTest">
                             <label>Skip Test</label>
                         </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Skip Test</h5>
+                            <p>Click the slider to skip test.</p>
+                        </div>
                         <div class="ui two column grid">
                             <div class="column">
 
@@ -499,6 +524,11 @@
                                     <div class="ui toggle checkbox" ng-click="vm.editTest.blocker=!vm.editTest.blocker">
                                         <input type="checkbox" name="public" ng-model="vm.editTest.blocker">
                                         <label>Blocker</label>
+                                    </div>
+                                    <i class="blue help circle icon"></i>
+                                    <div class="ui popup" style="max-width: 450px;">
+                                        <h5>Blocker</h5>
+                                        <p>Click the slider.</p>
                                     </div>
                                 </div>
 
