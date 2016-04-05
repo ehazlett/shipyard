@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/shipyard/shipyard/model"
-	"image"
 	"io/ioutil"
 	"net/http"
 	"time"
