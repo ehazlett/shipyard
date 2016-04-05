@@ -23,9 +23,9 @@
                                 <div class="fields">
                                     <div class="four wide field">
                                         <label>Location</label>
-                                        <select id="imageLocation" name="location" ng-model="vm.createImage.location" class="ui search fluid dropdown" ng-change="vm.resetValues()">
+                                        <select id="imageLocation" name="location" ng-model="vm.createImage.location" class="ui search fluid dropdown location" ng-change="vm.resetValues()">
                                             <option value="">Choose Location</option>
-                                            <option value="Shipyard Registry" ng-click="console.log('clicked')">Shipyard Registry</option>
+                                            <option value="Shipyard Registry">Shipyard Registry</option>
                                             <option value="Public Registry">Public Registry</option>
                                             <!--<option value="File">File</option>-->
                                         </select>
@@ -584,18 +584,18 @@
                                     <div class="four fields">
                                         <div class="field">
                                             <label>Project Name</label>
-                                            <input name="hostname" class="input" type="text" ng-model="vm.project.name" placeholder="Project name..."></input>
+                                            <input name="hostname" class="input" type="text" ng-model="vm.project.name" placeholder="Project name..." />
                                         </div>
                                         <div class="field">
                                             <label>Author</label>
-                                            <input disabled name="domainname" class="input" type="text" ng-model="vm.project.author" placeholder="Author"></input>
+                                            <input disabled name="domainname" class="input" type="text" ng-model="vm.project.author" placeholder="Author" />
                                         </div>
                                     </div>
 
                                     <div class="two fields">
                                         <div class="field">
                                             <label>Project Description</label>
-                                            <input name="command" class="input" type="text" ng-model="vm.project.description" placeholder="Description..."></input>
+                                            <input name="command" class="input" type="text" ng-model="vm.project.description" placeholder="Description..." />
                                         </div>
                                     </div>
 
