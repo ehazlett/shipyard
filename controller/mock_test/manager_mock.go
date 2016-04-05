@@ -279,3 +279,18 @@ func (m MockManager) GetJobsByProviderId(providerId string) ([]*model.ProviderJo
 }
 func (m MockManager) AddJobToProviderId(providerId string, job *model.ProviderJob) error { return nil }
 func (m MockManager) DeleteAllProviders() error                                          { return nil }
+
+func (m MockManager) GetBuilds(projectId string, testId string) ([]*model.Build, error) {
+	return nil, nil
+}
+func (m MockManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
+	return nil, nil
+}
+func (m MockManager) CreateBuild(projectId string, testId string, build *model.Build) error {
+	return nil
+}
+func (m MockManager) UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error {
+	return nil
+}
+func (m MockManager) DeleteBuild(projectId string, testId string, buildId string) error { return nil }
+func (m MockManager) DeleteAllBuilds() error                                            { return nil }

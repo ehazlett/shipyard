@@ -27,7 +27,7 @@ func GetBuilds(authHeader, url string, projectId string, testId string) ([]model
 	return builds, nil
 }
 
-func CreateBuild(authHeader string, url string, projectId string, testId string, startTime time.Time, endTime time.Time, cfg *model.BuildConfig, status model.BuildStatus, res []model.BuildResult) (string, error) {
+func CreateBuild(authHeader string, url string, projectId string, testId string, startTime time.Time, endTime time.Time, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) (string, error) {
 	var build *model.Build
 	startTime = time.Now()
 	build = build.NewBuild(startTime, endTime, cfg, status, res, testId, projectId)
@@ -53,7 +53,7 @@ func CreateBuild(authHeader string, url string, projectId string, testId string,
 	}
 }
 
-func UpdateBuild(authHeader string, url string, projectId string, testId string, buildId string, startTime time.Time, endTime time.Time, cfg *model.BuildConfig, status model.BuildStatus, res []model.BuildResult) error {
+func UpdateBuild(authHeader string, url string, projectId string, testId string, buildId string, startTime time.Time, endTime time.Time, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) error {
 	var build *model.Build
 	build = build.NewBuild(startTime, endTime, cfg, status, res, testId, projectId)
 	data, err := json.Marshal(build)
@@ -72,8 +72,8 @@ func UpdateBuild(authHeader string, url string, projectId string, testId string,
 	return nil
 }
 
-func GetBuild(authHeader, url, projectId string, testId string, buildId string) (model.Image, error) {
-	var build model.Build
+func GetBuild(authHeader, url, projectId string, testId string, buildId string) (*model.Build, error) {
+	var build *model.Build
 	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds/%s", url, projectId, testId, buildId), "")
 	if err != nil {
 		return build, err
