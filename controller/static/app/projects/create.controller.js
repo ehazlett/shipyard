@@ -256,7 +256,7 @@
             placeholder: 'All images',
             onInitialize: function(selectize){
                 // receives the selectize object as an argument
-            },
+            }
             // maxItems: 1
         };
 
@@ -277,7 +277,8 @@
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createTest.provider.type = "";
                         vm.parameters = [];
-                    }
+                    },
+                    closable: false
                 })
                 .modal('show');
         }
@@ -447,8 +448,9 @@
             });
         }
 
-        function removeParameter() {
-            vm.parameters.splice();
+        function removeParameter(index) {
+            console.log(index);
+            vm.parameters.splice(index, 1);
         }
     }
 })();

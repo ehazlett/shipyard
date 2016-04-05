@@ -44,6 +44,8 @@
         vm.providers = [];
         vm.providerTests = [];
 
+        vm.parameters = [];
+
         vm.buttonStyle = "disabled";
 
         vm.createSaveImage = createSaveImage;
@@ -73,6 +75,8 @@
         vm.deleteTest = deleteTest;
         vm.editSaveTest = editSaveTest;
         vm.setTargets = setTargets;
+        vm.addParameter = addParameter;
+        vm.removeParameter = removeParameter;
 
         vm.getRegistries();
 
@@ -253,8 +257,10 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider.type ="";
-                    }
+                        vm.createTest.provider.type = "";
+                        vm.parameters = [];
+                    },
+                    closable: false
                 })
                 .modal('show');
         }
@@ -530,5 +536,15 @@
                     vm.error = data;
                 });
         }
+
+        function addParameter() {
+            vm.parameters.push({});
+        }
+
+        function removeParameter(index) {
+            console.log(index);
+            vm.parameters.splice(index, 1);
+        }
+
     }
 })();
