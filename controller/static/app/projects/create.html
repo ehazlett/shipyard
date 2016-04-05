@@ -396,6 +396,53 @@
                                     </div>
                                 </div>
 
+                                <div class="fields" ng-show="vm.createTest.provider.type">
+                                    <div class="seven wide field">
+                                        <label>Parameters</label>
+                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="vm.createTest.parameterName">
+                                            <option value="">Search Name</option>
+                                        </select>
+                                    </div>
+                                    <i class="blue help circle icon"></i>
+                                    <div class="ui popup" style="max-width: 450px;">
+                                        <h5>Parameters</h5>
+                                        <p>Parameters should be identical to the one in the provider.</p>
+                                    </div>
+                                    <div class="seven wide field">
+                                        <label>&nbsp;</label>
+                                        <select name="ilmData" class="ui search fluid dropdown" ng-model="vm.createTest.ilmData">
+                                            <option value="">Select ILM Data</option>
+                                        </select>
+                                    </div>
+                                    <div class="one wide field" ng-click="vm.addParameter()">
+                                        <label>&nbsp;</label>
+                                        <button class="right floated ui positive icon button">
+                                            <i class="plus icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="fields" ng-show="vm.createTest.provider.type" ng-repeat="parameter in vm.parameters">
+                                    <div class="seven wide field">
+                                        <label>&nbsp;</label>
+                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="parameter.parameterName">
+                                            <option value="">Search Name</option>
+                                        </select>
+                                    </div>
+                                    <div class="seven wide field">
+                                        <label>&nbsp;</label>
+                                        <select name="ilmData" class="ui search fluid dropdown" ng-model="parameter.ilmData">
+                                            <option value="">Select ILM Data</option>
+                                        </select>
+                                    </div>
+                                    <div class="one wide field">
+                                        <label>&nbsp;</label>
+                                        <button class="right floated ui negative icon button"  ng-click="vm.removeParameter()">
+                                            <i class="x icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div class="two fields">
 
                                     <div class="field">

@@ -39,6 +39,7 @@
         vm.providers = [];
         vm.providerTests = [];
 
+        vm.parameters = [];
 
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
@@ -61,6 +62,8 @@
         vm.getJobs = getJobs;
         vm.checkProviderTest = checkProviderTest;
         vm.setTargets = setTargets;
+        vm.addParameter = addParameter;
+        vm.removeParameter = removeParameter;
 
         vm.getRegistries();
 
@@ -71,7 +74,7 @@
 
         for( var i=0; i < 16; i++ )
             vm.code += possible.charAt(Math.floor(Math.random() * possible.length));
-        
+
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
@@ -272,7 +275,8 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider.type ="";
+                        vm.createTest.provider.type = "";
+                        vm.parameters = [];
                     }
                 })
                 .modal('show');
@@ -435,6 +439,16 @@
                     });
                 }
             });
+        }
+
+        function addParameter() {
+            vm.parameters.push({
+
+            });
+        }
+
+        function removeParameter() {
+            vm.parameters.splice();
         }
     }
 })();
