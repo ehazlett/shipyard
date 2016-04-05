@@ -16,7 +16,7 @@ type Build struct {
 	ProjectId string         `json:"projectId" gorethink:"projectId"`
 }
 
-func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildConfig, status *BuildStatus, results []*BuildResult, testId string) *Build {
+func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildConfig, status *BuildStatus, results []*BuildResult, testId string, projectId string) *Build {
 
 	return &Build{
 		StartTime: startTime,
@@ -25,6 +25,7 @@ func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildCo
 		Status:    status,
 		Results:   results,
 		TestId:    testId,
+		ProjectId: projectId,
 	}
 }
 
