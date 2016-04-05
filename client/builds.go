@@ -7,11 +7,10 @@ import (
 	"github.com/shipyard/shipyard/model"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
-func GetBuilds(authHeader, url string, projectId string, testId string) ([]model.Build, error) {
-	var builds []model.Build
+func GetBuilds(authHeader, url string, projectId string, testId string) ([]*model.Build, error) {
+	var builds []*model.Build
 	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds", url, projectId, testId), "")
 	if nil == err {
 		defer resp.Body.Close()
@@ -27,35 +26,40 @@ func GetBuilds(authHeader, url string, projectId string, testId string) ([]model
 	return builds, nil
 }
 
-func CreateBuild(authHeader string, url string, projectId string, testId string, startTime time.Time, endTime time.Time, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) (string, error) {
+func CreateBuild(authHeader string, url string, projectId string, testId string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) (string, int, error) {
 	var build *model.Build
-	startTime = time.Now()
-	build = build.NewBuild(startTime, endTime, cfg, status, res, testId, projectId)
+	if status == nil {
+		panic("Status is nil")
+	}
+	if cfg == nil {
+		panic("Config is nil")
+	}
+	build = build.NewBuild(cfg, status, res, testId, projectId)
 	//make a request to create it
 	data, err := json.Marshal(build)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	resp, err := sendRequest(authHeader, "POST", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds", url, projectId, testId), string(data))
 	if err != nil {
-		return "", err
-	} else {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", err
-		}
-		err = json.Unmarshal(body, &build)
-		if err != nil {
-			return "", err
-		} else {
-			return build.ID, nil
-		}
+		return "", resp.StatusCode, err
 	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", resp.StatusCode, err
+	}
+	err = json.Unmarshal(body, &build)
+	if err != nil {
+		return "", resp.StatusCode, err
+	} else {
+		return build.ID, resp.StatusCode, nil
+	}
+
 }
 
-func UpdateBuild(authHeader string, url string, projectId string, testId string, buildId string, startTime time.Time, endTime time.Time, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) error {
+func UpdateBuild(authHeader string, url string, projectId string, testId string, buildId string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) error {
 	var build *model.Build
-	build = build.NewBuild(startTime, endTime, cfg, status, res, testId, projectId)
+	build = build.NewBuild(cfg, status, res, testId, projectId)
 	data, err := json.Marshal(build)
 	if err != nil {
 		return err

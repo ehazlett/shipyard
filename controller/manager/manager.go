@@ -1257,7 +1257,7 @@ func (m DefaultManager) GetBuild(projectId string, testId string, buildId string
 		return nil, err
 	}
 	if res.IsNil() {
-		return nil, ErrImageDoesNotExist
+		return nil, ErrBuildDoesNotExist
 	}
 	var build *model.Build
 	if err := res.One(&build); err != nil {
@@ -1276,8 +1276,9 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 	if build != nil {
 		return ErrBuildExists
 	}
-
+	build.TestId = testId
 	build.ProjectId = projectId
+	build.StartTime = time.Now()
 	response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
 
 	if err != nil {

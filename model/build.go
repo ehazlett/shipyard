@@ -1,26 +1,23 @@
 package model
 
 import (
-	"go/types"
 	"time"
 )
 
 type Build struct {
 	ID        string         `json:"id,omitempty" gorethink:"id,omitempty"`
-	StartTime time.Time      `json:"startTime" gorethink:"startTime"`
-	EndTime   time.Time      `json:"endTime" gorethink:"endTime"`
+	StartTime time.Time      `json:"startTime,omitempty" gorethink:"startTime,omitempty"`
+	EndTime   time.Time      `json:"endTime,omitempty" gorethink:"endTime,omitempty"`
 	Config    *BuildConfig   `json:"config" gorethink:"config"`
 	Status    *BuildStatus   `json:"status" gorethink:"status"`
-	Results   []*BuildResult `json:"results" gorethink:"results"`
+	Results   []*BuildResult `json:"results,omitempty" gorethink:"results,omitempty"`
 	TestId    string         `json:"testId" gorethink:"testId"`
 	ProjectId string         `json:"projectId" gorethink:"projectId"`
 }
 
-func (b *Build) NewBuild(startTime time.Time, endTime time.Time, config *BuildConfig, status *BuildStatus, results []*BuildResult, testId string, projectId string) *Build {
+func (b *Build) NewBuild(config *BuildConfig, status *BuildStatus, results []*BuildResult, testId string, projectId string) *Build {
 
 	return &Build{
-		StartTime: startTime,
-		EndTime:   endTime,
 		Config:    config,
 		Status:    status,
 		Results:   results,
@@ -62,14 +59,14 @@ func (b *BuildConfig) NewBuildConfig(name string, description string, targets []
 }
 
 type BuildResult struct {
-	ID             string          `json:"id,omitempty" gorethink:"id,omitempty"`
-	BuildId        string          `json:"buildId" gorethink:"buildId"`
-	TargetArtifact *TargetArtifact `json:"targetArtifact" gorethink:"targetArtifact"`
-	ResultEntries  []*types.Object `json:"resultEntries" gorethink:"resultEntries"`
-	TimeStamp      time.Time       `json:"timeStamp" gorethink:"timeStamp"`
+	ID             string             `json:"id,omitempty" gorethink:"id,omitempty"`
+	BuildId        string             `json:"buildId" gorethink:"buildId"`
+	TargetArtifact *TargetArtifact    `json:"targetArtifact" gorethink:"targetArtifact"`
+	ResultEntries  *map[string]string `json:"resultEntries" gorethink:"resultEntries"`
+	TimeStamp      time.Time          `json:"timeStamp" gorethink:"timeStamp"`
 }
 
-func (b *BuildResult) NewBuildResult(buildId string, artifact *TargetArtifact, results []*types.Object, time time.Time) *BuildResult {
+func (b *BuildResult) NewBuildResult(buildId string, artifact *TargetArtifact, results *map[string]string, time time.Time) *BuildResult {
 
 	return &BuildResult{
 		BuildId:        buildId,

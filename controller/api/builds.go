@@ -62,7 +62,20 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Debugf("saved build: id=%s", build.ID)
+	tempResponse := map[string]string{
+		"id": build.ID,
+	}
+
+	jsonResponse, err := json.Marshal(tempResponse)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNoContent)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	w.Write(jsonResponse)
+	return
 }
 
 func (a *Api) updateBuild(w http.ResponseWriter, r *http.Request) {
