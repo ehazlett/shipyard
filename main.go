@@ -1,4 +1,4 @@
-package shipyard
+package main
 
 import (
 	"os"

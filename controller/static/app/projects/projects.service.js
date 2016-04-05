@@ -76,7 +76,7 @@
             },
             getPublicRegistryTags: function(imageName) {
                 var promise = $http
-                    .get('https://registry.hub.docker.com/v1/repositories/'+imageName+'/tags')
+                    .get('/api/v1/repositories/'+imageName+'/tags')
                     .then(function(response) {
                         return response.data;
                     });
