@@ -1252,7 +1252,7 @@ func (m DefaultManager) GetBuilds(projectId string, testId string) ([]*model.Bui
 }
 
 func (m DefaultManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
-	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Run(m.session)
 	if err != nil {
 		return nil, err
 	}
