@@ -77,6 +77,8 @@
         vm.setTargets = setTargets;
         vm.addParameter = addParameter;
         vm.removeParameter = removeParameter;
+        vm.addParameterEditTest = addParameterEditTest;
+        vm.removeParameterEditTest = removeParameterEditTest;
 
         vm.getRegistries();
 
@@ -239,6 +241,18 @@
             onInitialize: function(selectize){
                 // receives the selectize object as an argument
             },
+            // maxItems: 1
+        };
+
+        vm.myIlmData = {
+            create: true,
+            valueField: 'data',
+            labelField: 'data',
+            delimiter: '|',
+            placeholder: 'Select ILM Data',
+            onInitialize: function(selectize){
+                // receives the selectize object as an argument
+            }
             // maxItems: 1
         };
 
@@ -525,6 +539,7 @@
             vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
             vm.selectedEditTest.blocker = vm.editTest.blocker;
             vm.selectedEditTest.targets = vm.editTest.targets;
+            vm.selectedEditTest.parameters = vm.editTest.parameters;
         }
 
         function updateProject(project) {
@@ -544,6 +559,14 @@
         function removeParameter(index) {
             console.log(index);
             vm.parameters.splice(index, 1);
+        }
+
+        function addParameterEditTest() {
+            vm.editTest.parameters.push({});
+        }
+
+        function removeParameterEditTest(index) {
+            vm.editTest.parameters.splice(index, 1);
         }
 
     }

@@ -147,7 +147,12 @@
                                 </div>
 
                                 <div ng-show="vm.createImage.location && vm.createImage.location != 'File'" class="field">
-                                    <label>Additional Image Tag</label>
+                                    <label>Additional Image Tag <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="max-width: 450px;">
+                                            <h5>Additional Image Tag</h5>
+                                            <p>Tags that have the same layer as the chosen one.</p>
+                                        </div>
+                                    </label>
                                     <input ng-show="!vm.createImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
                                     <i ng-show="vm.createImage.location === 'Shipyard Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.createImage.name }">
                                         {{a.tag}}
@@ -305,7 +310,12 @@
                                 </div>
 
                                 <div ng-show="vm.editImage.location && vm.editImage.location != 'File'" class="field">
-                                    <label>Additional Image Tag</label>
+                                    <label>Additional Image Tag <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="max-width: 450px;">
+                                            <h5>Additional Image Tag</h5>
+                                            <p>Tags that have the same layer as the chosen one.</p>
+                                        </div>
+                                    </label>
                                     <input ng-show="!vm.editImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
                                     <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.project.images | filter: { name: vm.editImage.name }">
                                         {{a.tag}}
@@ -383,8 +393,8 @@
                         <div class="ui two column grid">
                             <div class="column">
 
-                                <div class="four fields">
-                                    <div class="four wide field">
+                                <div class="fields">
+                                    <div class="five wide field">
                                         <label>Test Provider</label>
                                         <select name="testProvider" ng-model="vm.createTest.provider.type" class="ui search fluid dropdown testProvider" ng-change="vm.resetTestValues()">
                                             <option value="">Select</option>
@@ -393,7 +403,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
                                         <label>Provider Name</label>
                                         <select name="providerName" ng-model="vm.createTest.provider.name" class="ui search fluid dropdown providerName" ng-change="vm.createTest.provider.test='';vm.getJobs(vm.createTest.provider.name);vm.checkProviderTest(vm.createTest.provider.name,vm.createTest.provider.test)">
                                             <option value="">Name</option>
@@ -401,7 +411,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
                                         <label>Test</label>
                                         <select name="test" ng-model="vm.createTest.provider.test" class="ui search fluid dropdown providerTest" ng-change="vm.checkProviderTest(vm.createTest.provider.name,vm.createTest.provider.test)">
                                             <option value="">Test</option>
@@ -409,7 +419,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="eight wide field" ng-show="vm.createTest.provider.type === 'Clair [Internal]'">
+                                    <div class="eleven wide field" ng-show="vm.createTest.provider.type === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
                                         <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
                                     </div>
@@ -437,21 +447,19 @@
 
                                 <div class="fields" ng-show="vm.createTest.provider.type">
                                     <div class="seven wide field">
-                                        <label>Parameters</label>
-                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="vm.createTest.parameterName">
+                                        <label>Parameters <i class="blue help circle icon"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Parameters</h5>
+                                                <p>Parameter should be identical to the one in the provider.</p>
+                                            </div>
+                                        </label>
+                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="vm.createTest.paramName">
                                             <option value="">Search Name</option>
                                         </select>
                                     </div>
-                                    <i class="blue help circle icon"></i>
-                                    <div class="ui popup" style="max-width: 450px;">
-                                        <h5>Parameters</h5>
-                                        <p>Parameters should be identical to the one in the provider.</p>
-                                    </div>
-                                    <div class="seven wide field">
+                                    <div class="eight wide field">
                                         <label>&nbsp;</label>
-                                        <select name="ilmData" class="ui search fluid dropdown" ng-model="vm.createTest.ilmData">
-                                            <option value="">Select ILM Data</option>
-                                        </select>
+                                        <selectize config='vm.myIlmData' options='vm.ilmData' ng-model="vm.createTest.paramValue"></selectize>
                                     </div>
                                     <div class="one wide field" ng-click="vm.addParameter()">
                                         <label>&nbsp;</label>
@@ -463,19 +471,14 @@
 
                                 <div class="fields" ng-show="vm.createTest.provider.type" ng-repeat="parameter in vm.parameters">
                                     <div class="seven wide field">
-                                        <label>&nbsp;</label>
-                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="parameter.parameterName">
+                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="parameter.paramName">
                                             <option value="">Search Name</option>
                                         </select>
                                     </div>
-                                    <div class="seven wide field">
-                                        <label>&nbsp;</label>
-                                        <select name="ilmData" class="ui search fluid dropdown" ng-model="parameter.ilmData">
-                                            <option value="">Select ILM Data</option>
-                                        </select>
+                                    <div class="eight wide field">
+                                        <selectize config='vm.myIlmData' options='vm.ilmData' ng-model="parameter.paramValue"></selectize>
                                     </div>
                                     <div class="one wide field">
-                                        <label>&nbsp;</label>
                                         <button class="right floated ui negative icon button"  ng-click="vm.removeParameter($index)">
                                             <i class="x icon"></i>
                                         </button>
@@ -568,15 +571,15 @@
                         <div class="ui two column grid">
                             <div class="column">
 
-                                <div class="four fields">
-                                    <div class="four wide field">
+                                <div class="fields">
+                                    <div class="five wide field">
                                         <label>Test Provider</label>
                                         <div class="ui input">
                                             <input type="text" ng-model="vm.editTest.provider.type" disabled>
                                         </div>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">
                                         <label>Provider Name</label>
                                         <select name="providerName" ng-model="vm.editTest.provider.name" class="ui search fluid dropdown" ng-change="vm.editTest.provider.test = '';vm.getJobs(vm.editTest.provider.name);vm.checkProviderTest(vm.editTest.provider.name,vm.editTest.provider.test)">
                                             <option value="">{{vm.editTest.provider.name}}</option>
@@ -584,7 +587,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">
                                         <label>Test</label>
                                         <select name="test" ng-model="vm.editTest.provider.test" class="ui search fluid dropdown" ng-change="vm.checkProviderTest(vm.editTest.provider.name,vm.editTest.provider.test)">
                                             <option value="">{{vm.editTest.provider.test}}</option>
@@ -592,7 +595,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="eight wide field" ng-show="vm.editTest.provider.type === 'Clair [Internal]'">
+                                    <div class="eleven wide field" ng-show="vm.editTest.provider.type === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
                                         <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
                                     </div>
@@ -615,6 +618,46 @@
                                     <div class="ui popup" style="max-width: 450px;">
                                         <h5>Blocker</h5>
                                         <p>Click the slider.</p>
+                                    </div>
+                                </div>
+
+                                <div class="fields" ng-show="vm.editTest.provider.type">
+                                    <div class="seven wide field">
+                                        <label>Parameters <i class="blue help circle icon"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Parameter</h5>
+                                                <p>Parameter should be identical to the one in the provider.</p>
+                                            </div>
+                                        </label>
+                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="vm.editTest.parameters[0].paramName">
+                                            <option value="">{{vm.editTest.parameters[0].paramName}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="eight wide field">
+                                        <label>&nbsp;</label>
+                                        <selectize config='vm.myIlmData' options='vm.ilmData' ng-model="vm.editTest.parameters[0].paramValue"></selectize>
+                                    </div>
+                                    <div class="one wide field" ng-click="vm.addParameterEditTest()">
+                                        <label>&nbsp;</label>
+                                        <button class="right floated ui positive icon button">
+                                            <i class="plus icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="fields" ng-show="vm.editTest.provider.type" ng-repeat="parameter in vm.editTest.parameters" ng-if="$index>0">
+                                    <div class="seven wide field">
+                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="parameter.paramName">
+                                            <option value="">{{parameter.paramName}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="eight wide field">
+                                        <selectize config='vm.myIlmData' options='vm.ilmData' ng-model="parameter.paramValue"></selectize>
+                                    </div>
+                                    <div class="one wide field">
+                                        <button class="right floated ui negative icon button"  ng-click="vm.removeParameterEditTest($index)">
+                                            <i class="x icon"></i>
+                                        </button>
                                     </div>
                                 </div>
 

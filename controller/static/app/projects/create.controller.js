@@ -260,6 +260,18 @@
             // maxItems: 1
         };
 
+        vm.myIlmData = {
+            create: true,
+            valueField: 'data',
+            labelField: 'data',
+            delimiter: '|',
+            placeholder: 'Select ILM Data',
+            onInitialize: function(selectize){
+                // receives the selectize object as an argument
+            }
+            // maxItems: 1
+        };
+
         function showTestCreateDialog() {
             vm.createTest = {};
             vm.createTest.tagging = {};
