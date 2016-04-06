@@ -227,7 +227,7 @@
             console.log(project);
             ProjectService.create(project)
                 .then(function(data) {
-                    $state.transitionTo('dashboard.projects');
+                    $state.transitionTo('dashboard.edit_project', {id: data.id});
                 }, function(data) {
                     vm.error = data;
                 });

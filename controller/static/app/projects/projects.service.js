@@ -66,14 +66,14 @@
                 });
                 return promise;
             },
-            getImages: function() {
-                var promise = $http
-                    .get('/api/projects/location')
-                    .then(function(response) {
-                        return response.data;
-                    });
-                return promise;
-            },
+            //getImages: function() {
+            //    var promise = $http
+            //        .get('/api/projects/location')
+            //        .then(function(response) {
+            //            return response.data;
+            //        });
+            //    return promise;
+            //},
             getPublicRegistryTags: function(imageName) {
                 var promise = $http
                     .get('/api/v1/repositories/tags?r='+imageName)
@@ -93,6 +93,38 @@
             deleteTest: function(projectId, testId) {
                 var promise = $http
                     .delete('/api/projects/' + projectId + '/tests/' + testId)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            getTests: function(projectId) {
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/tests')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            getImages: function(projectId) {
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/images')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            addImage: function(projectId, image) {
+                var promise = $http
+                    .post('/api/projects/' + projectId + '/images', image)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            addTest: function(projectId, test) {
+                var promise = $http
+                    .post('/api/projects/' + projectId + '/tests', test)
                     .then(function(response) {
                         return response.data;
                     });

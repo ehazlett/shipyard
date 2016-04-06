@@ -92,14 +92,14 @@
                                         <label>Image Name </label>
                                         <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown image" ng-change="vm.checkImage(vm.createImage)">
                                             <option value="">Name</option>
-                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.createImage.location === 'Shipyard Registry'" class="three wide field" >
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkImage(vm.createImage)">
                                             <option value="">Tag</option>
-                                            <option ng-repeat="a in vm.images | filter: { name: vm.createImage.name }" value="{{a.tag}}">{{a.tag}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages | filter: { name: vm.createImage.name }" value="{{a.tag}}">{{a.tag}}</option>
                                         </select>
                                     </div>
 
@@ -154,7 +154,7 @@
                                         </div>
                                     </label>
                                     <input ng-show="!vm.createImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
-                                    <i ng-show="vm.createImage.location === 'Shipyard Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.createImage.name }">
+                                    <i ng-show="vm.createImage.location === 'Shipyard Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.shipyardImages | filter: { name: vm.createImage.name }">
                                         {{a.tag}}
                                     </i>
                                     <i ng-show="vm.createImage.location === 'Public Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.createImage.tagLayer }">
@@ -255,14 +255,14 @@
                                         <label>Image Name </label>
                                         <select name="image" ng-model="vm.editImage.name" class="ui search fluid dropdown image" ng-change="vm.checkImage(vm.editImage)">
                                             <option value="">{{vm.editImage.name}}</option>
-                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="three wide field" >
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.editImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkImage(vm.editImage)">
                                             <option value="">{{vm.editImage.tag}}</option>
-                                            <option ng-repeat="a in vm.images | filter: { name: vm.editImage.name }" value="{{a.tag}}">{{a.tag}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages | filter: { name: vm.editImage.name }" value="{{a.tag}}">{{a.tag}}</option>
                                         </select>
                                     </div>
 
@@ -317,7 +317,7 @@
                                         </div>
                                     </label>
                                     <input ng-show="!vm.editImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
-                                    <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.project.images | filter: { name: vm.editImage.name }">
+                                    <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.editImage.name }">
                                         {{a.tag}}
                                     </i>
                                     <i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.editImage.tagLayer }">
@@ -720,7 +720,6 @@
     </div>
 </div>
 
-
 <div class="ui padded grid">
     <div class="row">
         <div class="column">
@@ -792,6 +791,15 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="field">
+                                        <div class="row">
+                                            <div class="column">
+                                                <div ng-click='vm.updateProject(vm.project)' class="ui small gray button">
+                                                    Save Project
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -840,7 +848,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="image in vm.project.images" jquery>
+                                    <tr ng-repeat="image in vm.images" jquery>
                                         <td class="collapsing">
                                             <div class="positive ui fitted checkbox">
                                                 <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[image.id].Selected">
@@ -908,7 +916,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="test in vm.project.tests" jquery>
+                                    <tr ng-repeat="test in vm.tests" jquery>
                                         <td class="collapsing">
                                             <div class="positive ui fitted checkbox">
                                                 <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[test.id].Selected">
@@ -922,6 +930,9 @@
                                             <div ng-click="vm.showTestEditDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="pencil icon"></i>
                                             </div>
+                                            <div ng-click="vm.showImageEditDialog(image)" class="basic compact blue ui icon button">
+                                                <i class="play icon"></i>
+                                            </div>
                                             <div ng-click="vm.showDeleteTestDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="trash icon"></i>
                                             </div>
@@ -933,15 +944,6 @@
                         </div>
                     </div>
 
-                    <div class="ui padded grid">
-                        <div class="row">
-                            <div class="column">
-                                <div ng-click='vm.updateProject(vm.project)' class="ui small gray button">
-                                    Save Project
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

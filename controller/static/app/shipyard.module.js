@@ -225,6 +225,59 @@
                  return [200, angular.toJson(results), {}];
              });
 
+             $httpBackend.whenRoute('POST', '/api/projects/:id/tests').respond(function(method, url, data, headers, params) {
+                 var test = angular.fromJson(data);
+                 var indexToEdit = ids.indexOf(params.id);
+
+                 if (indexToEdit === -1) {
+                     return [404, {}, {}];
+                 }
+
+                 test.id = makeid();
+
+                 projects[indexToEdit].tests.push(test);
+
+                 return [201, angular.toJson(test), {}];
+             });
+
+            $httpBackend.whenRoute('GET', '/api/projects/:id/tests').respond(function(method, url, data, headers, params) {
+                var test = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [500, {}, {}];
+                }
+
+                return [200, angular.toJson(projects[indexToEdit].tests), {}];
+            });
+
+             $httpBackend.whenRoute('GET', '/api/projects/:id/images').respond(function(method, url, data, headers, params) {
+                 var test = angular.fromJson(data);
+                 var indexToEdit = ids.indexOf(params.id);
+
+                 if (indexToEdit === -1) {
+                     return [500, {}, {}];
+                 }
+
+                 return [200, angular.toJson(projects[indexToEdit].images), {}];
+             });
+
+            $httpBackend.whenRoute('POST', '/api/projects/:id/images').respond(function(method, url, data, headers, params) {
+                var image = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [404, {}, {}];
+                }
+
+                image.id = makeid();
+
+                projects[indexToEdit].images.push(image);
+
+                return [201, angular.toJson(image), {}];
+             });
+
+
              $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
                  console.log(params);
                  return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];

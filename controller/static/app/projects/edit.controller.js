@@ -39,6 +39,7 @@
 
         vm.registries = [];
         vm.images = [];
+        vm.shipyardImages = [];
         vm.publicRegistryTags = [];
 
         vm.providers = [];
@@ -65,7 +66,7 @@
         vm.getRegistries = getRegistries;
         vm.checkImage = checkImage;
         vm.checkImagePublicRepository = checkImagePublicRepository;
-        vm.getImages = getImages;
+        vm.getShipyardImages = getShipyardImages;
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.getTestsProviders = getTestsProviders;
         vm.getJobs = getJobs;
@@ -79,8 +80,12 @@
         vm.removeParameter = removeParameter;
         vm.addParameterEditTest = addParameterEditTest;
         vm.removeParameterEditTest = removeParameterEditTest;
+        vm.getTests = getTests;
+        vm.getImages = getImages;
 
         vm.getRegistries();
+        vm.getImages(vm.project.id);
+        vm.getTests(vm.project.id);
 
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
@@ -130,7 +135,7 @@
                     vm.editImage.name = "";
                     vm.editImage.tag = "";
                     vm.editImage.description = "";
-                    getImages(text);
+                    getShipyardImages(text);
                 }
             });
         $(".ui.search.fluid.dropdown.tag")
@@ -261,7 +266,7 @@
             vm.createTest.tagging = {};
             vm.createTest.provider = {};
             vm.imagesSelectize = [];
-            angular.forEach(vm.project.images, function (image) {
+            angular.forEach(vm.images, function (image) {
                 vm.imagesSelectize.push(image.name);
             });
             vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
@@ -282,7 +287,7 @@
         function setTargets(data) {
             vm.createTest.targets=[];
             angular.forEach(data, function (target) {
-                angular.forEach(vm.project.images, function (image) {
+                angular.forEach(vm.images, function (image) {
                     if(image.name === target) {
                         vm.createTest.targets.push({id: image.id,type: target});
                     }
@@ -307,7 +312,7 @@
             }
             if(test.provider.type === "Clair [Internal]") {
                 vm.imagesSelectize = [];
-                angular.forEach(vm.project.images, function (image) {
+                angular.forEach(vm.images, function (image) {
                     vm.imagesSelectize.push(image.name);
                 });
                 vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
@@ -384,7 +389,7 @@
                     });
             }
             if(image.location === "Shipyard Registry") {
-                getImages(image.registry);
+                getShipyardImages(image.registry);
             }
             $('#edit-project-image-edit-modal-'+vm.project.id)
                 .remove()
@@ -437,13 +442,38 @@
 
         }
 
-        function getImages(registry) {
+        function getTests(projectId) {
+            console.log("project id");
+            console.log(projectId);
+            ProjectService.getTests(projectId)
+                .then(function(data) {
+                    console.log(data);
+                    vm.tests = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+
+        }
+
+        function getImages(projectId) {
             console.log("get images");
-            vm.images = [];
-            RegistryService.listRepositories(registry)
+            console.log(projectId);
+            ProjectService.getImages(projectId)
                 .then(function(data) {
                     console.log(data);
                     vm.images = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+
+        }
+
+        function getShipyardImages(registry) {
+            vm.shipyardImages = [];
+            RegistryService.listRepositories(registry)
+                .then(function(data) {
+                    console.log(data);
+                    vm.shipyardImages = data;
                 }, function(data) {
                     vm.error = data;
                 })
@@ -474,7 +504,7 @@
         function checkImage(imageData) {
             vm.buttonStyle = "disabled";
             console.log(" check image " + imageData.name + " with tag " + imageData.tag);
-            angular.forEach(vm.images, function (image) {
+            angular.forEach(vm.shipyardImages, function (image) {
                 if(image.name === imageData.name && image.tag === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }
@@ -506,17 +536,23 @@
         }
 
         function createSaveImage(image) {
-            if (vm.project.images == null) {
-                vm.project.images = [];
-            }
-            vm.project.images.push($.extend(true,{},image));
+            console.log("save image");
+            console.log(image);
+            ProjectService.addImage(vm.project.id, image)
+                .then(function(data) {
+                    vm.getImages(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function createSaveTest(test) {
-            if (vm.project.tests == null) {
-                vm.project.tests = [];
-            }
-            vm.project.tests.push($.extend(true,{},test));
+            ProjectService.addTest(vm.project.id, test)
+                .then(function(data) {
+                    vm.getTests(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function editSaveImage() {
@@ -567,6 +603,10 @@
 
         function removeParameterEditTest(index) {
             vm.editTest.parameters.splice(index, 1);
+        }
+
+        function safeApply(scope, fn) {
+            (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
         }
 
     }
