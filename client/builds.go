@@ -26,14 +26,8 @@ func GetBuilds(authHeader, url string, projectId string, testId string) ([]*mode
 	return builds, nil
 }
 
-func CreateBuild(authHeader string, url string, projectId string, testId string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) (string, int, error) {
+func CreateBuild(authHeader string, url string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult, testId string, projectId string) (string, int, error) {
 	var build *model.Build
-	if status == nil {
-		panic("Status is nil")
-	}
-	if cfg == nil {
-		panic("Config is nil")
-	}
 	build = build.NewBuild(cfg, status, res, testId, projectId)
 	//make a request to create it
 	data, err := json.Marshal(build)
@@ -76,23 +70,29 @@ func UpdateBuild(authHeader string, url string, projectId string, testId string,
 	return nil
 }
 
-func GetBuild(authHeader, url, projectId string, testId string, buildId string) (*model.Build, error) {
+func GetBuild(authHeader, url, projectId string, testId string, buildId string) (*model.Build, int, error) {
 	var build *model.Build
 	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds/%s", url, projectId, testId, buildId), "")
 	if err != nil {
-		return build, err
-	} else {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return build, err
-		}
-
-		err = json.Unmarshal([]byte(body), &build)
-		if err != nil {
-			return build, err
-		}
+		return build, resp.StatusCode, err
 	}
-	return build, nil
+
+	// If we get an error status code we should not try to unmarshall body, since it will come empty from server.
+	if resp.StatusCode != http.StatusOK {
+		return nil, resp.StatusCode, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return build, resp.StatusCode, err
+	}
+
+	err = json.Unmarshal([]byte(body), &build)
+	if err != nil {
+		return build, resp.StatusCode, errors.New("Error, could not unmarshall build body")
+	}
+
+	return build, resp.StatusCode, nil
 }
 
 func DeleteBuild(authHeader, url, projectId string, testId string, buildId string) error {

@@ -1252,7 +1252,7 @@ func (m DefaultManager) GetBuilds(projectId string, testId string) ([]*model.Bui
 }
 
 func (m DefaultManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
-	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Run(m.session)
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
 	if err != nil {
 		return nil, err
 	}
@@ -1332,7 +1332,7 @@ func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId str
 }
 
 func (m DefaultManager) DeleteBuild(projectId string, testId string, buildId string) error {
-	build, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Delete().Run(m.session)
+	build, err := r.Table(tblNameBuilds).Get(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Delete().Run(m.session)
 	if err != nil {
 		return err
 	}
@@ -1376,7 +1376,7 @@ func (m DefaultManager) GetResult(projectId, resultId string) (*model.Result, er
 		return nil, err
 	}
 	if res.IsNil() {
-		return nil, ErrImageDoesNotExist
+		return nil, ErrResultDoesNotExist
 	}
 	var result *model.Result
 	if err := res.One(&result); err != nil {

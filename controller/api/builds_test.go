@@ -17,10 +17,8 @@ import (
 )
 
 const (
-	SYUSER     = "admin"
-	SYPASS     = "shipyard"
-	PROJECT_ID = "projectId"
-	TEST_ID    = "testId"
+	SYUSER = "admin"
+	SYPASS = "shipyard"
 )
 
 var (
@@ -29,7 +27,7 @@ var (
 		Description: "description",
 		Targets: []*model.TargetArtifact{
 			&model.TargetArtifact{
-				ArtifactId:   "",
+				ArtifactId:   "id",
 				ArtifactType: "image",
 			},
 		},
@@ -48,7 +46,7 @@ var (
 		&model.BuildResult{
 			BuildId: "",
 			TargetArtifact: &model.TargetArtifact{
-				ArtifactId:   "",
+				ArtifactId:   "id",
 				ArtifactType: "image",
 			},
 			ResultEntries: &map[string]string{
@@ -63,6 +61,9 @@ var (
 	BUILD1_SAVED_ID string
 	BUILD2_SAVED_ID string
 	BUILD3_SAVED_ID string
+
+	PROJECT_ID string
+	TEST_ID    string
 
 	SY_AUTHTOKEN string //the authentication header to use with all requests
 	api          *Api
@@ -116,6 +117,8 @@ func init() {
 	globalMux = localMux
 
 	cleanupBuilds()
+	cleanup()
+	cleanupTests()
 
 	// Instantiate test server with Gorilla Mux Router enabled.
 	// If you don't wrap the mux with the context.ClearHandler(),
@@ -154,12 +157,38 @@ func TestBuildsGetAuthToken(t *testing.T) {
 	})
 }
 
+func TestSaveProjectAndTestForBuild(t *testing.T) {
+	Convey("Given that we have a valid token", t, func() {
+		So(SY_AUTHTOKEN, ShouldNotBeNil)
+		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
+		Convey("When we make a request to create a new project", func() {
+			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, false)
+			Convey("Then we get back a successful response", func() {
+				So(id, ShouldNotBeEmpty)
+				So(err, ShouldBeNil)
+				So(code, ShouldEqual, http.StatusCreated)
+				PROJECT_ID = id
+			})
+		})
+	})
+	Convey("When we make a request to create a new test", t, func() {
+
+		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, TEST1_PROVIDERID, PROJECT_ID)
+		Convey("Then we get back a successful response", func() {
+			So(err, ShouldBeNil)
+			So(code, ShouldEqual, http.StatusCreated)
+			So(id, ShouldNotBeEmpty)
+			TEST_ID = id
+		})
+	})
+}
+
 func TestCreateNewBuild(t *testing.T) {
 	Convey("Given that we have a valid token", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		Convey("When we make a request to create a new build", func() {
-			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD1_CONFIG, BUILD1_STATUS, BUILD1_RESULTS)
+			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD1_CONFIG, BUILD1_STATUS, BUILD1_RESULTS, TEST_ID, PROJECT_ID)
 			Convey("Then we get back a successful response", func() {
 
 				So(id, ShouldNotBeEmpty)
@@ -179,11 +208,13 @@ func TestGetBuild(t *testing.T) {
 		So(BUILD1_SAVED_ID, ShouldNotBeEmpty)
 
 		Convey("When we make a request to retrieve it using its id", func() {
-			build, err := apiClient.GetBuild(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD1_SAVED_ID)
+			build, code, err := apiClient.GetBuild(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD1_SAVED_ID)
 			Convey("Then the server should return OK", func() {
-				fmt.Printf("err = %s\nsent %s %s %s %s %s\n", err.Error(), SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD1_SAVED_ID)
+				So(code, ShouldNotBeNil)
 				So(err, ShouldBeNil)
-
+				fmt.Print("\nError ", err)
+				fmt.Print("\nBuild ", build)
+				fmt.Print("\nCode ", code)
 				Convey("Then the returned build should have the expected values", func() {
 					So(build.ID, ShouldEqual, BUILD1_SAVED_ID)
 					So(build.ProjectId, ShouldEqual, PROJECT_ID)
@@ -444,9 +475,11 @@ func TestGetProviderJobs(t *testing.T) {
 // This is a hack to ensure teardown / cleanup after this test suite ends.
 func TestCleanupBuildTests(t *testing.T) {
 	// Cleanup all the state in the database
-	Convey("Given that we have finished our provider test suite", t, func() {
+	Convey("Given that we have finished our builds test suite", t, func() {
 		Convey("Then we can cleanup", func() {
 			err := cleanupBuilds()
+			err = cleanup()
+			err = cleanupTests()
 			So(err, ShouldBeNil)
 		})
 	})
