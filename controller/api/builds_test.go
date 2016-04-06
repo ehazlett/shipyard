@@ -17,6 +17,8 @@ import (
 )
 
 const (
+	SYUSER     = "admin"
+	SYPASS     = "shipyard"
 	PROJECT_ID = "projectId"
 	TEST_ID    = "testId"
 )
@@ -61,7 +63,11 @@ var (
 	BUILD1_SAVED_ID string
 	BUILD2_SAVED_ID string
 	BUILD3_SAVED_ID string
-	ts5000          *httptest.Server
+
+	SY_AUTHTOKEN string //the authentication header to use with all requests
+	api          *Api
+	globalMux    *http.ServeMux
+	ts           *httptest.Server
 )
 
 func init() {
@@ -114,7 +120,7 @@ func init() {
 	// Instantiate test server with Gorilla Mux Router enabled.
 	// If you don't wrap the mux with the context.ClearHandler(),
 	// then the server request cycle won't go through GorillaMux routing.
-	ts5000 = httptest.NewServer(context.ClearHandler(globalMux))
+	ts = httptest.NewServer(context.ClearHandler(globalMux))
 
 }
 
@@ -132,7 +138,7 @@ func TestBuildsGetAuthToken(t *testing.T) {
 
 	Convey("Given a valid set of credentials", t, func() {
 		Convey("When we make a successful request for an auth token", func() {
-			header, err := apiClient.GetAuthToken(ts5000.URL, SYUSER, SYPASS)
+			header, err := apiClient.GetAuthToken(ts.URL, SYUSER, SYPASS)
 			So(err, ShouldBeNil)
 
 			Convey("Then we get a valid authentication header\n", func() {
@@ -153,7 +159,7 @@ func TestCreateNewBuild(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		Convey("When we make a request to create a new build", func() {
-			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts5000.URL, PROJECT_ID, TEST_ID, BUILD1_CONFIG, BUILD1_STATUS, BUILD1_RESULTS)
+			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD1_CONFIG, BUILD1_STATUS, BUILD1_RESULTS)
 			Convey("Then we get back a successful response", func() {
 
 				So(id, ShouldNotBeEmpty)
