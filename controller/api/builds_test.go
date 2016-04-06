@@ -179,9 +179,9 @@ func TestGetBuild(t *testing.T) {
 		So(BUILD1_SAVED_ID, ShouldNotBeEmpty)
 
 		Convey("When we make a request to retrieve it using its id", func() {
-			build, err := apiClient.GetBuild(SY_AUTHTOKEN, ts5000.URL, PROJECT_ID, TEST_ID, BUILD1_SAVED_ID)
+			build, err := apiClient.GetBuild(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD1_SAVED_ID)
 			Convey("Then the server should return OK", func() {
-				fmt.Printf("err = %s\nsent %s %s %s %s %s\n", err.Error(), SY_AUTHTOKEN, ts5000.URL, PROJECT_ID, TEST_ID, BUILD1_SAVED_ID)
+				fmt.Printf("err = %s\nsent %s %s %s %s %s\n", err.Error(), SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD1_SAVED_ID)
 				So(err, ShouldBeNil)
 
 				Convey("Then the returned build should have the expected values", func() {
