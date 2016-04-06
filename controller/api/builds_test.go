@@ -32,13 +32,13 @@ var (
 			},
 		},
 		SelectedTestType: "selectedTestType",
-		ProviderId:       "",
+		ProviderId:       "providerId",
 	}
 	BUILD2_CONFIG = &model.BuildConfig{}
 	BUILD3_CONFIG = &model.BuildConfig{}
 	BUILD1_STATUS = &model.BuildStatus{
 		BuildId: "",
-		Status:  "",
+		Status:  "ok",
 	}
 	BUILD2_STATUS  = &model.BuildStatus{}
 	BUILD3_STATUS  = &model.BuildStatus{}
@@ -62,8 +62,9 @@ var (
 	BUILD2_SAVED_ID string
 	BUILD3_SAVED_ID string
 
-	PROJECT_ID string
-	TEST_ID    string
+	PROJECT_ID  string
+	TEST_ID     string
+	PROVIDER_ID string
 
 	SY_AUTHTOKEN string //the authentication header to use with all requests
 	api          *Api
@@ -157,7 +158,16 @@ func TestBuildsGetAuthToken(t *testing.T) {
 	})
 }
 
-func TestSaveProjectAndTestForBuild(t *testing.T) {
+func TestCreateDependenciesForBuilds(t *testing.T) {
+	Convey("When we make a request to create a new provider", func() {
+		id, code, err := apiClient.CreateProvider(SY_AUTHTOKEN, ts.URL, PROVIDER1_NAME, PROVIDER1_JOB_TYPES, PROVIDER1_CONFIG, PROVIDER1_URL, PROVIDER1_JOBS)
+		Convey("Then we get back a successful response", func() {
+			So(err, ShouldBeNil)
+			So(code, ShouldEqual, http.StatusCreated)
+			So(id, ShouldNotBeEmpty)
+			PROVIDER_ID = id
+		})
+	})
 	Convey("Given that we have a valid token", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
@@ -173,7 +183,7 @@ func TestSaveProjectAndTestForBuild(t *testing.T) {
 	})
 	Convey("When we make a request to create a new test", t, func() {
 
-		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, TEST1_PROVIDERID, PROJECT_ID)
+		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, PROVIDER_ID, PROJECT_ID)
 		Convey("Then we get back a successful response", func() {
 			So(err, ShouldBeNil)
 			So(code, ShouldEqual, http.StatusCreated)
