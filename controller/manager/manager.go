@@ -1252,7 +1252,7 @@ func (m DefaultManager) GetBuilds(projectId string, testId string) ([]*model.Bui
 }
 
 func (m DefaultManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
-	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Run(m.session)
 	if err != nil {
 		return nil, err
 	}
@@ -1268,12 +1268,12 @@ func (m DefaultManager) GetBuild(projectId string, testId string, buildId string
 
 func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build) error {
 	var eventType string
-	build, err := m.GetBuild(projectId, testId, build.ID)
+	tmpBuild, err := m.GetBuild(projectId, testId, build.ID)
 	if err != nil && err != ErrBuildDoesNotExist {
 		return err
 	}
 
-	if build != nil {
+	if tmpBuild != nil {
 		return ErrBuildExists
 	}
 	build.TestId = testId
@@ -1388,12 +1388,12 @@ func (m DefaultManager) GetResult(projectId, resultId string) (*model.Result, er
 func (m DefaultManager) CreateResult(projectId string, result *model.Result) error {
 	var eventType string
 
-	result, err := m.GetResult(projectId, result.ID)
+	tmpResult, err := m.GetResult(projectId, result.ID)
 	if err != nil && err != ErrResultDoesNotExist {
 		return err
 	}
 
-	if result != nil {
+	if tmpResult != nil {
 		return ErrResultExists
 	}
 
