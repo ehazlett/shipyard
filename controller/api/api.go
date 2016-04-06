@@ -167,8 +167,7 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 
 	//Public Registry Proxy
 	apiRouter.HandleFunc("/api/v1/search", a.dockerhubSearch).Methods("GET")
-	apiRouter.HandleFunc("/api/v1/search", a.dockerhubSearch).Methods("POST")
-	apiRouter.HandleFunc("/api/v1/repositories/{image}/tags", a.dockerhubTags).Methods("GET")
+	apiRouter.HandleFunc("/api/v1/repositories/tags", a.dockerhubTags).Methods("GET")
 
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")

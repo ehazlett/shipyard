@@ -76,7 +76,7 @@
             },
             getPublicRegistryTags: function(imageName) {
                 var promise = $http
-                    .get('/api/v1/repositories/'+imageName+'/tags')
+                    .get('/api/v1/repositories/tags?r='+imageName)
                     .then(function(response) {
                         return response.data;
                     });
