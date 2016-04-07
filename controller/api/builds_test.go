@@ -478,6 +478,34 @@ func TestGetProviderJobs(t *testing.T) {
 }
 */
 // TODO: test all routes for providers and jobs
+func TestCleanupBuildDependenciesTests(t *testing.T) {
+	Convey("When we request to delete the provider created for the build testing", t, func() {
+		//delete the provider created for build testing
+		code, err := apiClient.DeleteProvider(SY_AUTHTOKEN, ts.URL, PROVIDER_ID)
+		Convey("Then we get confirmation that it was deleted.", func() {
+			So(err, ShouldBeNil)
+			So(code, ShouldEqual, http.StatusNoContent)
+		})
+	})
+
+	Convey("When we request to delete the test created for the build testing", t, func() {
+		//delete the test created for build testing
+		code, err := apiClient.DeleteTest(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID)
+		Convey("Then we get confirmation that it was deleted.", func() {
+			So(err, ShouldBeNil)
+			So(code, ShouldEqual, http.StatusNoContent)
+		})
+	})
+
+	Convey("When we request to delete the project created for the build testing", t, func() {
+		//delete the project created for build testing
+		code, err := apiClient.DeleteProject(SY_AUTHTOKEN, ts.URL, PROJECT_ID)
+		Convey("Then we get confirmation that it was deleted.", func() {
+			So(err, ShouldBeNil)
+			So(code, ShouldEqual, http.StatusNoContent)
+		})
+	})
+}
 
 // This is a hack to ensure teardown / cleanup after this test suite ends.
 func TestCleanupBuildTests(t *testing.T) {
@@ -485,8 +513,6 @@ func TestCleanupBuildTests(t *testing.T) {
 	Convey("Given that we have finished our builds test suite", t, func() {
 		Convey("Then we can cleanup", func() {
 			err := cleanupBuilds()
-			err = cleanup()
-			err = cleanupTests()
 			So(err, ShouldBeNil)
 		})
 	})
