@@ -38,6 +38,13 @@
                  return text;
              }
 
+            function arrayObjectIndexOf(myArray, searchTerm, property) {
+                for(var i = 0, len = myArray.length; i < len; i++) {
+                    if (myArray[i][property] === searchTerm) return i;
+                }
+                return -1;
+            }
+
              // TODO: Remove once the endpoint is implemented
              var ids = ["54b6354t65rtv54t", "4h565e4tw45bw45b", "dsfsdvfasdfdsfsd", "asverea4vawrwveb", "12345436b4w54w67"];
              var projects = [
@@ -216,9 +223,111 @@
                  ]
             };
 
+            var build = {
+                id: 'dsvfsdvsd',
+                test: {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"rethinkdb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":[]},{"paramName":"","paramValue":[]}],"tagging":{"onSuccess":"","onFailure":""}},
+                startTime: '08:10:22 2016-02-26 AD',
+                endTime: '08:10:22 2016-02-26 AD',
+                status: 'stopped', //["running", "stopped", "finished_success","finished_failed"]
+                statusLastUpdated: '08:10:22 2016-02-26 AD',
+                results: [
+                    {id: 'sdasdfsdfsd', buildId: 'sawdefrewafer', target: {id: 'sasfsdgfsd', type: 'Image'}, resultEntries: [{},{}], timeStamp: 'sdfagrwegwer'},
+                    {id: 'sdasdfsdfsd', buildId: 'sawdefrewafer', target: {id: 'sasfsdgfsd', type: 'Image'}, resultEntries: [{},{}], timeStamp: 'sdfagrwegwer'}
+                ]
+            };
+
              $httpBackend.whenGET('/api/providers').respond(providers);
 
              $httpBackend.whenGET('/api/projects').respond(projects);
+
+            $httpBackend.whenRoute('POST', '/api/projects/:id/tests/:testId/builds').respond(function(method, url, data, headers, params) {
+                build.status = "running";
+                build.test.id = params.testId;
+
+                setTimeout(function(){ build.status = "finished_success"; }, 15000);
+
+                return [202, angular.toJson(build), {}];
+            });
+
+            $httpBackend.whenRoute('GET', '/api/projects/:id/tests/:testId/:buildId').respond(function(method, url, data, headers, params) {
+                return [200, angular.toJson(build), {}];
+            });
+
+            $httpBackend.whenRoute('PUT', '/api/projects/:id/tests/:testId').respond(function(method, url, data, headers, params) {
+                var test = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var testIndex = arrayObjectIndexOf(projects[indexToEdit].tests, params.testId, "id");
+
+                if (testIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                projects[indexToEdit].tests[testIndex] = test;
+
+                return [200, angular.toJson(test), {}];
+            });
+
+            $httpBackend.whenRoute('PUT', '/api/projects/:id/images/:imageId').respond(function(method, url, data, headers, params) {
+                var image = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var imageIndex = arrayObjectIndexOf(projects[indexToEdit].images, params.imageId, "id");
+
+                if (imageIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                projects[indexToEdit].images[imageIndex] = image;
+
+                return [200, angular.toJson(image), {}];
+            });
+
+            $httpBackend.whenRoute('DELETE', '/api/projects/:id/images/:imageId').respond(function(method, url, data, headers, params) {
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var imageIndex = arrayObjectIndexOf(projects[indexToEdit].images, params.imageId, "id");
+
+                if (imageIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                // Overwrite old project (this might not be how the api behaves)
+                projects[indexToEdit].images.splice(imageIndex, 1);
+
+                return [200, {}, {}];
+            });
+
+            $httpBackend.whenRoute('DELETE', '/api/projects/:id/tests/:testId').respond(function(method, url, data, headers, params) {
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var imageIndex = arrayObjectIndexOf(projects[indexToEdit].tests, params.testId, "id");
+
+                if (imageIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                // Overwrite old project (this might not be how the api behaves)
+                projects[indexToEdit].tests.splice(imageIndex, 1);
+
+                return [200, {}, {}];
+            });
 
              $httpBackend.whenRoute('GET', '/api/projects/:id/results').respond(function(method, url, data, headers, params) {
                  results.projectId = params.id;

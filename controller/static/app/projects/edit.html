@@ -107,7 +107,7 @@
                                         <label>Image Name </label>
                                         <div class="ui search">
                                             <div class="ui icon input">
-                                                <input class="prompt" type="text" placeholder="Name" ng-model="vm.createImage.name" />
+                                                <input class="prompt" type="text" placeholder="Name" />
                                                 <i class="search icon"></i>
                                             </div>
                                             <div class="results"></div>
@@ -930,8 +930,11 @@
                                             <div ng-click="vm.showTestEditDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="pencil icon"></i>
                                             </div>
-                                            <div ng-click="vm.showImageEditDialog(image)" class="basic compact blue ui icon button">
+                                            <div ng-class="{'loading': vm.buttonLoadStatus(test.id)}" ng-click="vm.startBuild(test.id)" class="basic compact blue ui icon button">
                                                 <i class="play icon"></i>
+                                            </div>
+                                            <div ng-click="vm.showBuildResults(image)" class="basic compact blue ui icon button">
+                                                <i class="search icon"></i>
                                             </div>
                                             <div ng-click="vm.showDeleteTestDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="trash icon"></i>

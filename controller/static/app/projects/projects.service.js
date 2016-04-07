@@ -63,7 +63,7 @@
                     .delete('/api/projects/' + projectId + '/images/' + imageId)
                     .then(function(response) {
                         return response.data;
-                });
+                    });
                 return promise;
             },
             //getImages: function() {
@@ -106,6 +106,22 @@
                     });
                 return promise;
             },
+            updateTest: function(projectId, test) {
+                var promise = $http
+                    .put('/api/projects/' + projectId + '/tests/' + test.id, test)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            updateImage: function(projectId, image) {
+                var promise = $http
+                    .put('/api/projects/' + projectId + '/images/' + image.id, image)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
             getImages: function(projectId) {
                 var promise = $http
                     .get('/api/projects/' + projectId + '/images')
@@ -125,6 +141,25 @@
             addTest: function(projectId, test) {
                 var promise = $http
                     .post('/api/projects/' + projectId + '/tests', test)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+        ///api/projects/:id/tests/:testId/builds
+            //BuildAction action: enum: ["start", "restart", "stop"]
+            executeBuild: function(projectId, testId, buildAction) {
+                var promise = $http
+                    .post('/api/projects/' + projectId + '/tests/' + testId + '/builds', buildAction)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+        ///api/projects/:id/tests/:testId/:buildId
+            pollBuild: function(projectId, testId, buildID) {
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/tests/' + testId + '/' + buildID)
                     .then(function(response) {
                         return response.data;
                     });

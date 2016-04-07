@@ -37,6 +37,8 @@
 
         vm.createImage.additionalTags = [];
 
+        var buildResults = {};
+
         vm.registries = [];
         vm.images = [];
         vm.shipyardImages = [];
@@ -82,6 +84,8 @@
         vm.removeParameterEditTest = removeParameterEditTest;
         vm.getTests = getTests;
         vm.getImages = getImages;
+        vm.buttonLoadStatus = buttonLoadStatus;
+        vm.startBuild = startBuild;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -105,7 +109,7 @@
         $scope.$watchCollection('imageList()', function () {
             angular.forEach(vm.selected, function (s) {
                 if(vm.selected[s.Id].Selected == true) {
-                    var isVisible = false
+                    var isVisible = false;
                     angular.forEach($scope.imageList(), function(c) {
                         if(c.Id == s.Id) {
                             isVisible = true;
@@ -413,7 +417,7 @@
             console.log("delete image " + image.id + " from project " + vm.project.id);
             ProjectService.delete(vm.project.id,image.id)
                 .then(function(data) {
-                    vm.project.images.splice(vm.project.images.indexOf(image), 1);
+                    vm.getImages(vm.project.id);
                 }, function (data) {
                     vm.error = data;
                 });
@@ -423,7 +427,7 @@
             console.log("delete test " + test.id + " from project " + vm.project.id);
             ProjectService.deleteTest(vm.project.id,test.id)
                 .then(function(data) {
-                    vm.project.tests.splice(vm.project.tests.indexOf(test), 1);
+                    vm.getTests(vm.project.id);
                 }, function (data) {
                     vm.error = data;
                 });
@@ -556,26 +560,38 @@
         }
 
         function editSaveImage() {
-            vm.selectedEditImage.location = vm.editImage.location;
-            vm.selectedEditImage.name = vm.editImage.name;
-            vm.selectedEditImage.registry = vm.selectedEditImage.registry;
-            vm.selectedEditImage.tag = vm.editImage.tag;
-            vm.selectedEditImage.description = vm.editImage.description;
-            console.log(vm.selectedEditImage);
+            //vm.selectedEditImage.location = vm.editImage.location;
+            //vm.selectedEditImage.name = vm.editImage.name;
+            //vm.selectedEditImage.registry = vm.selectedEditImage.registry;
+            //vm.selectedEditImage.tag = vm.editImage.tag;
+            //vm.selectedEditImage.description = vm.editImage.description;
+            //console.log(vm.selectedEditImage);
+            ProjectService.updateImage(vm.project.id, $.extend(true, {}, vm.selectedEditImage))
+                .then(function(data) {
+                    vm.getImages(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function editSaveTest() {
-            vm.selectedEditTest.provider.type = vm.editTest.provider.type;
-            vm.selectedEditTest.provider.name = vm.editTest.provider.name;
-            vm.selectedEditTest.provider.test = vm.editTest.provider.test;
-            vm.selectedEditTest.name = vm.editTest.name;
-            vm.selectedEditTest.fromTag = vm.editTest.fromTag;
-            vm.selectedEditTest.description = vm.editTest.description;
-            vm.selectedEditTest.tagging.onFailure = vm.editTest.tagging.onFailure;
-            vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
-            vm.selectedEditTest.blocker = vm.editTest.blocker;
-            vm.selectedEditTest.targets = vm.editTest.targets;
-            vm.selectedEditTest.parameters = vm.editTest.parameters;
+            //vm.selectedEditTest.provider.type = vm.editTest.provider.type;
+            //vm.selectedEditTest.provider.name = vm.editTest.provider.name;
+            //vm.selectedEditTest.provider.test = vm.editTest.provider.test;
+            //vm.selectedEditTest.name = vm.editTest.name;
+            //vm.selectedEditTest.fromTag = vm.editTest.fromTag;
+            //vm.selectedEditTest.description = vm.editTest.description;
+            //vm.selectedEditTest.tagging.onFailure = vm.editTest.tagging.onFailure;
+            //vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
+            //vm.selectedEditTest.blocker = vm.editTest.blocker;
+            //vm.selectedEditTest.targets = vm.editTest.targets;
+            //vm.selectedEditTest.parameters = vm.editTest.parameters;
+            ProjectService.updateTest(vm.project.id, $.extend(true, {}, vm.editTest))
+                .then(function(data) {
+                    vm.getTests(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function updateProject(project) {
@@ -607,6 +623,51 @@
 
         function safeApply(scope, fn) {
             (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
+        }
+
+        function startBuild(testId) {
+            ProjectService.executeBuild(vm.project.id, testId, {action: 'start'})
+                .then(function(data) {
+                    buildResults[testId] = data;
+                    pollBuild(vm.project.id, testId, buildResults[testId].id);
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function pollBuild(projectId, testId, buildId) {
+            ProjectService.pollBuild(projectId, testId, buildId)
+                .then(function(data) {
+                    if (data.status === 'finished_success'
+                        || data.status === 'finished_failed') {
+                        buildResults[testId].status = data.status;
+                    } else {
+                        setTimeout(function(){ pollBuild(projectId, testId, buildId); }, 2000);
+                    }
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function showBuildResults(testId) {
+            ProjectService.pollBuild(project.id, testId, buildResults[testId])
+                .then(function(data) {
+                    $state.transitionTo('dashboard.projects');
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function buttonLoadStatus(testId) {
+            if (!buildResults.hasOwnProperty(testId)) {
+                return false;
+            }
+
+            if (buildResults[testId].status === 'running') {
+                return true;
+            }
+
+            return false;
         }
 
     }
