@@ -127,7 +127,7 @@ type (
 		DeleteTest(projectId string, testId string) error
 		DeleteAllTests() error
 
-		GetResults(projectId string) ([]*model.Result, error)
+		GetResults(projectId string) (*model.Result, error)
 		GetResult(projectId, resultId string) (*model.Result, error)
 		CreateResult(projectId string, result *model.Result) error
 		UpdateResult(projectId string, result *model.Result) error
@@ -1357,17 +1357,17 @@ func (m DefaultManager) DeleteAllBuilds() error {
 }
 
 // Methods related to the results structure
-func (m DefaultManager) GetResults(projectId string) ([]*model.Result, error) {
+func (m DefaultManager) GetResults(projectId string) (*model.Result, error) {
 
 	res, err := r.Table(tblNameResults).Filter(map[string]string{"projectId": projectId}).Run(m.session)
 	if err != nil {
 		return nil, err
 	}
-	results := []*model.Result{}
-	if err := res.All(&results); err != nil {
+	var result *model.Result
+	if err := res.One(&result); err != nil {
 		return nil, err
 	}
-	return results, nil
+	return result, nil
 }
 
 func (m DefaultManager) GetResult(projectId, resultId string) (*model.Result, error) {

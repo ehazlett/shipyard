@@ -262,7 +262,7 @@ func (m MockManager) UpdateTest(projectId string, test *model.Test) error   { re
 func (m MockManager) DeleteTest(projectId string, testId string) error      { return nil }
 func (m MockManager) DeleteAllTests() error                                 { return nil }
 
-func (m MockManager) GetResults(projectId string) ([]*model.Result, error)        { return nil, nil }
+func (m MockManager) GetResults(projectId string) (*model.Result, error)          { return nil, nil }
 func (m MockManager) GetResult(projectId, resultId string) (*model.Result, error) { return nil, nil }
 func (m MockManager) CreateResult(projectId string, result *model.Result) error   { return nil }
 func (m MockManager) UpdateResult(projectId string, result *model.Result) error   { return nil }
