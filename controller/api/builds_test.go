@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"github.com/gorilla/context"
 	apiClient "github.com/shipyard/shipyard/client"
-
-	. "github.com/smartystreets/goconvey/convey"
-
 	"github.com/shipyard/shipyard/model"
+	. "github.com/smartystreets/goconvey/convey"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -43,20 +41,17 @@ var (
 	}
 	BUILD2_STATUS  = &model.BuildStatus{}
 	BUILD3_STATUS  = &model.BuildStatus{}
-	BUILD2_RESULTS = []*model.BuildResult{
+	BUILD1_RESULTS = []*model.BuildResult{
 		&model.BuildResult{
 			BuildId: "buildId",
 			TargetArtifact: &model.TargetArtifact{
 				ArtifactId:   "id",
 				ArtifactType: "image",
 			},
-			ResultEntries: &map[string]string{
-				"key1": "result1",
-			},
-			TimeStamp: time.Now(),
+			ResultEntries: []string{"this is a result entry"},
 		},
 	}
-	BUILD1_RESULTS = []*model.BuildResult{
+	BUILD2_RESULTS = []*model.BuildResult{
 		&model.BuildResult{},
 	}
 	BUILD3_RESULTS = []*model.BuildResult{}
