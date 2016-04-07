@@ -8,8 +8,8 @@ type Build struct {
 	ID        string         `json:"id,omitempty" gorethink:"id,omitempty"`
 	StartTime time.Time      `json:"startTime,omitempty" gorethink:"startTime,omitempty"`
 	EndTime   time.Time      `json:"endTime,omitempty" gorethink:"endTime,omitempty"`
-	Config    *BuildConfig   `json:"config" gorethink:"config"`
-	Status    *BuildStatus   `json:"status" gorethink:"status"`
+	Config    *BuildConfig   `json:"config,omitempty" gorethink:"config,omitempty"`
+	Status    *BuildStatus   `json:"status,omitempty" gorethink:"status,omitempty"`
 	Results   []*BuildResult `json:"results,omitempty" gorethink:"results,omitempty"`
 	TestId    string         `json:"testId" gorethink:"testId"`
 	ProjectId string         `json:"projectId" gorethink:"projectId"`
@@ -39,7 +39,7 @@ func (b *BuildAction) NewBuildAction(action string) *BuildAction {
 }
 
 type BuildConfig struct {
-	ID               string            `json:"id,omitempty" gorethink:"id,omitempty"`
+	ID               string            `json:"-" gorethink:"id,omitempty"`
 	Name             string            `json:"name" gorethink:"name"`
 	Description      string            `json:"description" gorethink:"description"`
 	Targets          []*TargetArtifact `json:"targets" gorethink:"targets"`
@@ -59,11 +59,11 @@ func (b *BuildConfig) NewBuildConfig(name string, description string, targets []
 }
 
 type BuildResult struct {
-	ID             string             `json:"id,omitempty" gorethink:"id,omitempty"`
+	ID             string             `json:"-" gorethink:"id,omitempty"`
 	BuildId        string             `json:"buildId" gorethink:"buildId"`
 	TargetArtifact *TargetArtifact    `json:"targetArtifact" gorethink:"targetArtifact"`
 	ResultEntries  *map[string]string `json:"resultEntries" gorethink:"resultEntries"`
-	TimeStamp      time.Time          `json:"timeStamp" gorethink:"timeStamp"`
+	TimeStamp      time.Time          `json:"-" gorethink:"timeStamp,omitempty"`
 }
 
 func (b *BuildResult) NewBuildResult(buildId string, artifact *TargetArtifact, results *map[string]string, time time.Time) *BuildResult {
@@ -77,7 +77,7 @@ func (b *BuildResult) NewBuildResult(buildId string, artifact *TargetArtifact, r
 }
 
 type BuildStatus struct {
-	ID      string `json:"id,omitempty" gorethink:"id,omitempty"`
+	ID      string `json:"-" gorethink:"id,omitempty"`
 	BuildId string `json:"buildId" gorethink:"buildId"`
 	Status  string `json:"status" gorethink:"status"`
 }

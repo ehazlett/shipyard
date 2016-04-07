@@ -22,6 +22,7 @@ const (
 )
 
 var (
+	CURRENT_TIME  = time.Now().UTC()
 	BUILD1_CONFIG = &model.BuildConfig{
 		Name:        "Name",
 		Description: "description",
@@ -37,14 +38,14 @@ var (
 	BUILD2_CONFIG = &model.BuildConfig{}
 	BUILD3_CONFIG = &model.BuildConfig{}
 	BUILD1_STATUS = &model.BuildStatus{
-		BuildId: "",
+		BuildId: "buildId",
 		Status:  "ok",
 	}
 	BUILD2_STATUS  = &model.BuildStatus{}
 	BUILD3_STATUS  = &model.BuildStatus{}
-	BUILD1_RESULTS = []*model.BuildResult{
+	BUILD2_RESULTS = []*model.BuildResult{
 		&model.BuildResult{
-			BuildId: "",
+			BuildId: "buildId",
 			TargetArtifact: &model.TargetArtifact{
 				ArtifactId:   "id",
 				ArtifactType: "image",
@@ -55,7 +56,9 @@ var (
 			TimeStamp: time.Now(),
 		},
 	}
-	BUILD2_RESULTS = []*model.BuildResult{}
+	BUILD1_RESULTS = []*model.BuildResult{
+		&model.BuildResult{},
+	}
 	BUILD3_RESULTS = []*model.BuildResult{}
 
 	BUILD1_SAVED_ID string
@@ -159,18 +162,19 @@ func TestBuildsGetAuthToken(t *testing.T) {
 }
 
 func TestCreateDependenciesForBuilds(t *testing.T) {
-	Convey("When we make a request to create a new provider", func() {
-		id, code, err := apiClient.CreateProvider(SY_AUTHTOKEN, ts.URL, PROVIDER1_NAME, PROVIDER1_JOB_TYPES, PROVIDER1_CONFIG, PROVIDER1_URL, PROVIDER1_JOBS)
-		Convey("Then we get back a successful response", func() {
-			So(err, ShouldBeNil)
-			So(code, ShouldEqual, http.StatusCreated)
-			So(id, ShouldNotBeEmpty)
-			PROVIDER_ID = id
-		})
-	})
+
 	Convey("Given that we have a valid token", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
+		Convey("When we make a request to create a new provider", func() {
+			id, code, err := apiClient.CreateProvider(SY_AUTHTOKEN, ts.URL, PROVIDER1_NAME, PROVIDER1_JOB_TYPES, PROVIDER1_CONFIG, PROVIDER1_URL, PROVIDER1_JOBS)
+			Convey("Then we get back a successful response", func() {
+				So(err, ShouldBeNil)
+				So(code, ShouldEqual, http.StatusCreated)
+				So(id, ShouldNotBeEmpty)
+				PROVIDER_ID = id
+			})
+		})
 		Convey("When we make a request to create a new project", func() {
 			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, false)
 			Convey("Then we get back a successful response", func() {
@@ -180,17 +184,18 @@ func TestCreateDependenciesForBuilds(t *testing.T) {
 				PROJECT_ID = id
 			})
 		})
-	})
-	Convey("When we make a request to create a new test", t, func() {
+		Convey("When we make a request to create a new test", func() {
 
-		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, PROVIDER_ID, PROJECT_ID)
-		Convey("Then we get back a successful response", func() {
-			So(err, ShouldBeNil)
-			So(code, ShouldEqual, http.StatusCreated)
-			So(id, ShouldNotBeEmpty)
-			TEST_ID = id
+			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, PROVIDER_ID, PROJECT_ID)
+			Convey("Then we get back a successful response", func() {
+				So(err, ShouldBeNil)
+				So(code, ShouldEqual, http.StatusCreated)
+				So(id, ShouldNotBeEmpty)
+				TEST_ID = id
+			})
 		})
 	})
+
 }
 
 func TestCreateNewBuild(t *testing.T) {
@@ -222,9 +227,6 @@ func TestGetBuild(t *testing.T) {
 			Convey("Then the server should return OK", func() {
 				So(code, ShouldNotBeNil)
 				So(err, ShouldBeNil)
-				fmt.Print("\nError ", err)
-				fmt.Print("\nBuild ", build)
-				fmt.Print("\nCode ", code)
 				Convey("Then the returned build should have the expected values", func() {
 					So(build.ID, ShouldEqual, BUILD1_SAVED_ID)
 					So(build.ProjectId, ShouldEqual, PROJECT_ID)
