@@ -63,7 +63,7 @@ func UpdateBuild(authHeader string, url string, projectId string, testId string,
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode != 200 { //not ok
+	if resp.StatusCode != 204 { //not ok
 		err = errors.New(resp.Status)
 		return err
 	}

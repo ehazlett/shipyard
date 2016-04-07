@@ -1332,7 +1332,7 @@ func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId str
 }
 
 func (m DefaultManager) DeleteBuild(projectId string, testId string, buildId string) error {
-	build, err := r.Table(tblNameBuilds).Get(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Delete().Run(m.session)
+	build, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Delete().Run(m.session)
 	if err != nil {
 		return err
 	}
