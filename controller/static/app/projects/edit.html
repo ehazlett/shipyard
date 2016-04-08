@@ -723,7 +723,44 @@
 <div class="ui padded grid">
     <div class="row">
         <div class="column">
+            <!--Build info Bar-->
+            <div ng-class="{'positive': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success', 'negative': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed', 'hidden': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'none'}"
+                 class="ui icon message">
+                <i ng-class="{'circle loading': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'running', 'check': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success', 'remove': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed'}"
+                   class="notched icon"></i>
+                <div class="content">
+                    <div class="header">
+                        <span ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success'">Test Ran Successfully</span>
+                        <span ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed'">Test Failed</span>
+                        <span ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'running'">Running Test</span>
+                    </div>
+                    <p ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success'">Test {{vm.buildMessageConfig.testId}} ran successfully. <a>See logs</a></p>
+                    <p ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed'">Test {{vm.buildMessageConfig.testId}} failed. <a>See logs</a></p>
+                    <p ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'running'">We're running {{vm.buildMessageConfig.testId}} for you. We'll notify you when it completes.</p>
+                </div>
+            </div>
+            <!--<div class="ui positive message">-->
+                <!--<i class="close icon"></i>-->
+                <!--<div class="content">-->
+                    <!--<div class="header">-->
+                        <!--You are eligible for a reward-->
+                    <!--</div>-->
+                    <!--<p>Go to your <b>special offers</b> page to see now.</p>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="ui negative message">-->
+                <!--<i class="close icon"></i>-->
+                <!--<div class="content">-->
+                    <!--<div class="header">-->
+                        <!--We're sorry we can't apply that discount-->
+                    <!--</div>-->
+                    <!--<p>That offer has expired</p>-->
+                <!--</div>-->
+            <!--</div>-->
             <div class="ui segment page">
+                <span style="float: right">
+                    <a>Go To Projects <i class="sign out icon"></i></a>
+                </span>
                 <div class="ui grid">
                     <div class="two column row">
                         <div class="column">

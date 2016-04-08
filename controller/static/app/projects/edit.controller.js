@@ -86,6 +86,7 @@
         vm.getImages = getImages;
         vm.buttonLoadStatus = buttonLoadStatus;
         vm.startBuild = startBuild;
+        vm.messageLoadStatus = messageLoadStatus;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -624,10 +625,16 @@
             (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
         }
 
+        vm.buildMessageConfig = {
+            testId: ''
+        };
+
         function startBuild(testId) {
             ProjectService.executeBuild(vm.project.id, testId, {action: 'start'})
                 .then(function(data) {
+                    console.log("starting build");
                     buildResults[testId] = data;
+                    vm.buildMessageConfig.testId = testId;
                     pollBuild(vm.project.id, testId, buildResults[testId].id);
                 }, function(data) {
                     vm.error = data;
@@ -636,13 +643,10 @@
 
         function pollBuild(projectId, testId, buildId) {
             ProjectService.pollBuild(projectId, testId, buildId)
-                .then(function(data) {
-                    if (data.status === 'finished_success'
-                        || data.status === 'finished_failed') {
-                        buildResults[testId].status = data.status;
-                    } else {
-                        setTimeout(function(){ pollBuild(projectId, testId, buildId); }, 2000);
-                    }
+                .then(function(status) {
+                    console.log("polls done");
+                    console.log(status);
+                    buildResults[testId].status = status;
                 }, function(data) {
                     vm.error = data;
                 });
@@ -667,6 +671,28 @@
             }
 
             return false;
+        }
+
+        function messageLoadStatus(testId) {
+            if (!buildResults.hasOwnProperty(testId) || !testId) {
+                return 'none';
+            }
+
+            if (buildResults[testId].status === 'running') {
+                return 'running';
+            }
+
+            if (buildResults[testId].status === 'stopped') {
+                return 'stopped';
+            }
+
+            if (buildResults[testId].status === 'finished_success') {
+                return 'finished_success';
+            }
+
+            if (buildResults[testId].status === 'finished_failed') {
+                return 'finished_failed';
+            }
         }
 
     }
