@@ -48,9 +48,11 @@ var (
 	BUILD3_CONFIG = &model.BuildConfig{}
 	BUILD1_STATUS = &model.BuildStatus{
 		BuildId: "buildId",
-		Status:  "ok",
+		Status:  "new",
 	}
-	BUILD2_STATUS  = &model.BuildStatus{}
+	BUILD2_STATUS = &model.BuildStatus{
+		BuildId: "buildId",
+		Status:  "new"}
 	BUILD3_STATUS  = &model.BuildStatus{}
 	BUILD1_RESULTS = []*model.BuildResult{
 		&model.BuildResult{
@@ -222,9 +224,8 @@ func TestCreateNewBuild(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		Convey("When we make a request to create a new build", func() {
-			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD1_CONFIG, BUILD1_STATUS, BUILD1_RESULTS, TEST_ID, PROJECT_ID)
+			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD1_CONFIG, BUILD1_STATUS, BUILD1_RESULTS, TEST_ID, PROJECT_ID, nil)
 			Convey("Then we get back a successful response", func() {
-
 				So(id, ShouldNotBeEmpty)
 				So(code, ShouldEqual, http.StatusCreated)
 				So(err, ShouldBeNil)
@@ -264,7 +265,7 @@ func TestGetAllBuilds(t *testing.T) {
 	Convey("Given that we have created an additional build", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
-		id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD2_CONFIG, BUILD2_STATUS, BUILD2_RESULTS, TEST_ID, PROJECT_ID)
+		id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD2_CONFIG, BUILD2_STATUS, BUILD2_RESULTS, TEST_ID, PROJECT_ID, nil)
 
 		BUILD2_SAVED_ID = id
 

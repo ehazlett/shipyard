@@ -286,7 +286,7 @@ func (m MockManager) GetBuilds(projectId string, testId string) ([]*model.Build,
 func (m MockManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
 	return nil, nil
 }
-func (m MockManager) CreateBuild(projectId string, testId string, build *model.Build) error {
+func (m MockManager) CreateBuild(projectId string, testId string, build *model.Build, action *model.BuildAction) error {
 	return nil
 }
 func (m MockManager) UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error {
@@ -294,3 +294,6 @@ func (m MockManager) UpdateBuild(projectId string, testId string, buildId string
 }
 func (m MockManager) DeleteBuild(projectId string, testId string, buildId string) error { return nil }
 func (m MockManager) DeleteAllBuilds() error                                            { return nil }
+func (m MockManager) GetBuildStatus(projectId string, testId string, buildId string) (string, error) {
+	return "", nil
+}

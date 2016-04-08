@@ -26,18 +26,6 @@ func (b *Build) NewBuild(config *BuildConfig, status *BuildStatus, results []*Bu
 	}
 }
 
-type BuildAction struct {
-	ID     string `json:"id,omitempty" gorethink:"id,omitempty"`
-	Action string `json:"action" gorethink:"status"`
-}
-
-func (b *BuildAction) NewBuildAction(action string) *BuildAction {
-
-	return &BuildAction{
-		Action: action,
-	}
-}
-
 type BuildConfig struct {
 	ID               string            `json:"-" gorethink:"id,omitempty"`
 	Name             string            `json:"name" gorethink:"name"`
@@ -94,7 +82,7 @@ type BuildAction struct {
 	Action string `json:"action" gorethink:"action"`
 }
 
-func (b *BuildStatus) NewBuildAction(action string) *BuildStatus {
+func (b *BuildStatus) NewBuildAction(action string) *BuildAction {
 
 	return &BuildAction{
 		Action: action,

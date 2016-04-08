@@ -64,14 +64,19 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projId := vars["projectId"]
 	testId := vars["testId"]
+	action := vars["action"]
 	var build *model.Build
-
+	var status *model.BuildStatus
 	if err := json.NewDecoder(r.Body).Decode(&build); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	//hardcode action to start, temporarily
+	//this needs to be removed before going to production
+	action = "start"
+	buildAction := status.NewBuildAction(action)
 
-	if err := a.manager.CreateBuild(projId, testId, build); err != nil {
+	if err := a.manager.CreateBuild(projId, testId, build, buildAction); err != nil {
 		log.Errorf("error creating build: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -26,7 +26,7 @@ func GetBuilds(authHeader, url string, projectId string, testId string) ([]*mode
 	return builds, nil
 }
 
-func CreateBuild(authHeader string, url string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult, testId string, projectId string) (string, int, error) {
+func CreateBuild(authHeader string, url string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult, testId string, projectId string, action *model.BuildAction) (string, int, error) {
 	var build *model.Build
 	build = build.NewBuild(cfg, status, res, testId, projectId)
 	//make a request to create it
