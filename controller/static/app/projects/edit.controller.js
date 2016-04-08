@@ -396,7 +396,6 @@
                 getShipyardImages(image.registry);
             }
             $('#edit-project-image-edit-modal-'+vm.project.id)
-                .remove()
                 .modal({
                     closable: false
                 })
