@@ -88,3 +88,15 @@ func (b *BuildStatus) NewBuildStatus(buildId string, status string) *BuildStatus
 		Status:  status,
 	}
 }
+
+type BuildAction struct {
+	ID     string `json:"-" gorethink:"id,omitempty"`
+	Action string `json:"action" gorethink:"action"`
+}
+
+func (b *BuildStatus) NewBuildAction(action string) *BuildStatus {
+
+	return &BuildAction{
+		Action: action,
+	}
+}

@@ -137,7 +137,7 @@ type (
 		GetBuilds(projectId string, testId string) ([]*model.Build, error)
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
-		CreateBuild(projectId string, testId string, build *model.Build) error
+		CreateBuild(projectId string, testId string, build *model.Build, buildAction model.BuildAction) error
 		UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error
 		DeleteBuild(projectId string, testId string, buildId string) error
 		DeleteAllBuilds() error
@@ -1282,81 +1282,83 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 	return build.Status.Status, nil
 }
 
-func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build) error {
+func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build, buildAction model.BuildAction) error {
 	var eventType string
-	tmpBuild, err := m.GetBuild(projectId, testId, build.ID)
-	if err != nil && err != ErrBuildDoesNotExist {
-		return err
-	}
+	if buildAction.Action == "start" {
+		tmpBuild, err := m.GetBuild(projectId, testId, build.ID)
+		if err != nil && err != ErrBuildDoesNotExist {
+			return err
+		}
 
-	if tmpBuild != nil {
-		return ErrBuildExists
-	}
-	build.TestId = testId
-	build.ProjectId = projectId
-	build.StartTime = time.Now()
+		if tmpBuild != nil {
+			return ErrBuildExists
+		}
+		build.TestId = testId
+		build.ProjectId = projectId
+		build.StartTime = time.Now()
 
-	// we get the test and its targetArtifacts
+		// we get the test and its targetArtifacts
 
-	test, err := m.GetTest(projectId, testId)
-	if err != nil && err != ErrTestDoesNotExist {
-		return err
-	}
-	targetArtifacts := test.Targets
+		test, err := m.GetTest(projectId, testId)
+		if err != nil && err != ErrTestDoesNotExist {
+			return err
+		}
+		targetArtifacts := test.Targets
 
-	// we get the ids for the targets we want to test
+		// we get the ids for the targets we want to test
 
-	targetIds := []string{}
-	for _, target := range targetArtifacts {
-		targetIds = append(targetIds, target.ArtifactId)
+		targetIds := []string{}
+		for _, target := range targetArtifacts {
+			targetIds = append(targetIds, target.ArtifactId)
 
-	}
+		}
 
-	// we retrieve the images from the projectId
+		// we retrieve the images from the projectId
 
-	projectImages, err := m.ImagesByProjectId(projectId)
-	if err != nil && err != ErrProjectImagesProblem {
-		return err
-	}
+		projectImages, err := m.ImagesByProjectId(projectId)
+		if err != nil && err != ErrProjectImagesProblem {
+			return err
+		}
 
-	//we add the names of the matching images by comparing the ImageID with the ArtifactId
-	imageNames := []string{}
-	for _, image := range projectImages {
-		for _, artifactId := range targetIds {
-			if image.ID == artifactId {
-				imageNames = append(imageNames, image.Name)
+		//we add the names of the matching images by comparing the ImageID with the ArtifactId
+		imageNames := []string{}
+		for _, image := range projectImages {
+			for _, artifactId := range targetIds {
+				if image.ID == artifactId {
+					imageNames = append(imageNames, image.Name)
+				}
+
 			}
-
 		}
-	}
-	// for each name we start clair verification
-	for _, name := range imageNames {
-		//go run clairMethodForChecking(name)
-		fmt.Print(name)
-	}
-
-	// we change the build's buildStatus to submitted
-	build.Status.Status = "submitted"
-
-	// we add the build to the table in rethink db
-	response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
-
-	if err != nil {
-		return err
-	}
-	eventType = "add-build"
-
-	build.ID = func() string {
-		if len(response.GeneratedKeys) > 0 {
-			return string(response.GeneratedKeys[0])
+		// for each name we start clair verification
+		for _, name := range imageNames {
+			//go run clairMethodForChecking(name)
+			fmt.Print(name)
 		}
-		return ""
-	}()
 
-	m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
+		// we change the build's buildStatus to submitted
+		build.Status.Status = "submitted"
 
+		// we add the build to the table in rethink db
+		response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
+
+		if err != nil {
+			return err
+		}
+		eventType = "add-build"
+
+		build.ID = func() string {
+			if len(response.GeneratedKeys) > 0 {
+				return string(response.GeneratedKeys[0])
+			}
+			return ""
+		}()
+
+		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
+
+		return nil
+	}
 	return nil
-
 }
 
 func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error {
