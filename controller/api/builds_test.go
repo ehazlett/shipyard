@@ -59,7 +59,10 @@ var (
 				ArtifactId:   "id",
 				ArtifactType: "image",
 			},
-			ResultEntries: []string{"this is a result entry"},
+			ResultEntries: map[string]interface{}{
+				"key1": "val1",
+				"key2": "val2",
+			},
 		},
 	}
 	BUILD2_RESULTS = []*model.BuildResult{
@@ -69,7 +72,10 @@ var (
 				ArtifactId:   "id2",
 				ArtifactType: "image2",
 			},
-			ResultEntries: []string{"this is a result entry2"},
+			ResultEntries: map[string]interface{}{
+				"key1": "val1",
+				"key2": "val2",
+			},
 		},
 	}
 	BUILD3_RESULTS = []*model.BuildResult{}

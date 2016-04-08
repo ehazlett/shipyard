@@ -59,14 +59,14 @@ func (b *BuildConfig) NewBuildConfig(name string, description string, targets []
 }
 
 type BuildResult struct {
-	ID             string          `json:"-" gorethink:"id,omitempty"`
-	BuildId        string          `json:"buildId" gorethink:"buildId"`
-	TargetArtifact *TargetArtifact `json:"targetArtifact" gorethink:"targetArtifact"`
-	ResultEntries  []string        `json:"resultEntries" gorethink:"resultEntries"`
-	TimeStamp      time.Time       `json:"-" gorethink:"timeStamp,omitempty"`
+	ID             string                 `json:"-" gorethink:"id,omitempty"`
+	BuildId        string                 `json:"buildId" gorethink:"buildId"`
+	TargetArtifact *TargetArtifact        `json:"targetArtifact" gorethink:"targetArtifact"`
+	ResultEntries  map[string]interface{} `json:"resultEntries" gorethink:"resultEntries"`
+	TimeStamp      time.Time              `json:"-" gorethink:"timeStamp,omitempty"`
 }
 
-func (b *BuildResult) NewBuildResult(buildId string, artifact *TargetArtifact, results []string) *BuildResult {
+func (b *BuildResult) NewBuildResult(buildId string, artifact *TargetArtifact, results map[string]interface{}) *BuildResult {
 
 	return &BuildResult{
 		BuildId:        buildId,
