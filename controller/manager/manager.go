@@ -1325,7 +1325,11 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 		}
 		// for each name we start clair verification
 		for _, name := range imageNames {
-			//go run clairMethodForChecking(name)
+			//go run clairMethodForChecking(buildId, name)
+			// in the clair method
+			// update the build by Id and put results in it
+			// when there are no more results change build status to done/err/fail/stuff
+
 			fmt.Print(name)
 		}
 
