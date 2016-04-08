@@ -136,6 +136,7 @@ type (
 
 		GetBuilds(projectId string, testId string) ([]*model.Build, error)
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
+		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
 		CreateBuild(projectId string, testId string, build *model.Build) error
 		UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error
 		DeleteBuild(projectId string, testId string, buildId string) error
@@ -1264,6 +1265,21 @@ func (m DefaultManager) GetBuild(projectId string, testId string, buildId string
 		return nil, err
 	}
 	return build, nil
+}
+
+func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId string) (string, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	if err != nil {
+		return "", err
+	}
+	if res.IsNil() {
+		return "", ErrBuildDoesNotExist
+	}
+	var build *model.Build
+	if err := res.One(&build); err != nil {
+		return "", err
+	}
+	return build.Status.Status, nil
 }
 
 func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build) error {

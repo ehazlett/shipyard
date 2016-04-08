@@ -2,11 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"net/http"
-
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/shipyard/shipyard/model"
+	"net/http"
 )
 
 func (a *Api) getBuilds(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +38,23 @@ func (a *Api) getBuild(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(build); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+func (a *Api) getBuildStatus(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectId := vars["projectId"]
+	testId := vars["testId"]
+	buildId := vars["buildId"]
+
+	buildStatus, err := a.manager.GetBuildStatus(projectId, testId, buildId)
+	if err != nil {
+		log.Errorf("error retrieving build status: %s", err)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(buildStatus); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -122,7 +138,6 @@ func (a *Api) deleteBuild(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	log.Infof("deleted build: id=%s", build.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
