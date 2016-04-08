@@ -1279,6 +1279,50 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 	build.TestId = testId
 	build.ProjectId = projectId
 	build.StartTime = time.Now()
+
+	// we get the test and its targetArtifacts
+
+	test, err := m.GetTest(projectId, testId)
+	if err != nil && err != ErrTestDoesNotExist {
+		return err
+	}
+	targetArtifacts := test.Targets
+
+	// we get the ids for the targets we want to test
+
+	targetIds := []string{}
+	for _, target := range targetArtifacts {
+		targetIds = append(targetIds, target.ArtifactId)
+
+	}
+
+	// we retrieve the images from the projectId
+
+	projectImages, err := m.ImagesByProjectId(projectId)
+	if err != nil && err != ErrProjectImagesProblem {
+		return err
+	}
+
+	//we add the names of the matching images by comparing the ImageID with the ArtifactId
+	imageNames := []string{}
+	for _, image := range projectImages {
+		for _, artifactId := range targetIds {
+			if image.ID == artifactId {
+				imageNames = append(imageNames, image.Name)
+			}
+
+		}
+	}
+	// for each name we start clair verification
+	for _, name := range imageNames {
+		//go run clairMethodForChecking(name)
+		fmt.Print(name)
+	}
+
+	// we change the build's buildStatus to submitted
+	build.Status.Status = "submitted"
+
+	// we add the build to the table in rethink db
 	response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
 
 	if err != nil {
