@@ -1285,14 +1285,7 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build, buildAction model.BuildAction) error {
 	var eventType string
 	if buildAction.Action == "start" {
-		tmpBuild, err := m.GetBuild(projectId, testId, build.ID)
-		if err != nil && err != ErrBuildDoesNotExist {
-			return err
-		}
 
-		if tmpBuild != nil {
-			return ErrBuildExists
-		}
 		build.TestId = testId
 		build.ProjectId = projectId
 		build.StartTime = time.Now()
@@ -1337,7 +1330,8 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 		}
 
 		// we change the build's buildStatus to submitted
-		build.Status.Status = "submitted"
+		build.Status.Status = "new"
+		// create a new build object with fields from the Test object
 
 		// we add the build to the table in rethink db
 		response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
