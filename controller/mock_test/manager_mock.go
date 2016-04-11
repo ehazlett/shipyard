@@ -297,3 +297,8 @@ func (m MockManager) DeleteAllBuilds() error                                    
 func (m MockManager) GetBuildStatus(projectId string, testId string, buildId string) (string, error) {
 	return "", nil
 }
+func (m MockManager) GetBuildById(buildId string) (*model.Build, error) {
+	return nil, nil
+}
+func (m MockManager) UpdateBuildResults(buildId string, result *model.BuildResult) error { return nil }
+func (m MockManager) VerifyIfImageExistsLocally(name string, tag string) bool            { return false }

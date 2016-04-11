@@ -40,9 +40,12 @@ func CheckImage(buildId string, name string) (*model.BuildResult, error) {
 	//in the end
 
 	endpoint_value := "http://clair:6060"
-	myAddress_value := "controller"
+	//	myAddress_value := "controller"
+	myAddress_value, _ := exec.Command("sh", "-c", "cat /etc/hosts |grep `cat /etc/hostname`|awk '{print $1}'").Output()
 	endpoint := &endpoint_value
-	myAddress := &myAddress_value
+	myAddress_value2 := strings.TrimSpace(fmt.Sprintf("%s", myAddress_value))
+
+	myAddress := &myAddress_value2
 	imageName := name
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)
@@ -97,7 +100,8 @@ func CheckImage(buildId string, name string) (*model.BuildResult, error) {
 		if err != nil {
 			fmt.Printf("- Could not analyze layer: %s\n", err)
 			report.Message = fmt.Sprintf("- Could not analyze layer: %s\n", err)
-			return &buildResult, errors.New(fmt.Sprintf("- Could not analyze layer: %s\n", err))
+			return &buildResult, errors.New(fmt.Sprintf("- Could not analyze layer: %s\nusing %s %s %s",
+				err, *endpoint, path, layerIDs[i]))
 		}
 	}
 

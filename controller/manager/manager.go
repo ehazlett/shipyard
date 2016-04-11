@@ -1413,27 +1413,29 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 			m.UpdateBuildResults(build.ID, result)
 
 		}
-		/*build, err := m.GetBuildById(build.ID)
+		build, err := m.GetBuildById(build.ID)
 		if err != nil {
 			return err
 		}
-		result := model.Result{}
-		testResult := model.TestResult{}
+
+		var result *model.Result
+		var testResult *model.TestResult
 		result.BuildId = build.ID
 		result.Author = "author"
 		result.ProjectId = projectId
 
-		for _, rez := range build.Results{
-			testResult.ImageName =
+		for _, rez := range build.Results {
+			rez = rez
+			//testResult.ImageName =
 			testResult.TestId = test.ID
 			testResult.EndDate = time.Now()
-			testResult.
+			//testResult.
 			result.TestResults = append(result.TestResults, testResult)
 		}
 		err = m.CreateResult(projectId, result)
 		if err != nil {
 			return err
-		}*/
+		}
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 
 		return nil
