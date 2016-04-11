@@ -624,7 +624,7 @@
 
         function removeParameter(index) {
             console.log(index);
-            vm.parameters.splice(index, 1);
+            vm.createTest.parameters.splice(index, 1);
         }
 
         function addParameterEditTest() {
