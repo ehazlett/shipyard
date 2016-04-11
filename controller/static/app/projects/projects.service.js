@@ -5,8 +5,8 @@
         .module('shipyard.projects')
         .factory('ProjectService', ProjectService)
 
-    ProjectService.$inject = ['$http'];
-    function ProjectService($http) {
+    ProjectService.$inject = ['$http', '$q'];
+    function ProjectService($http, $q) {
         return {
             list: function() {
                 var promise = $http
@@ -166,12 +166,23 @@
             },
         ///api/projects/:id/tests/:testId/:buildId
             pollBuild: function(projectId, testId, buildID) {
-                var promise = $http
-                    .get('/api/projects/' + projectId + '/tests/' + testId + '/' + buildID)
-                    .then(function(response) {
-                        return response.data;
-                    });
-                return promise;
+                var deferred = $q.defer();
+
+                (function poll() {
+                    $http
+                        .get('/api/projects/' + projectId + '/tests/' + testId + '/' + buildID)
+                        .then(function(response) {
+                            console.log("completed poll");
+                            if (response.data.status === 'finished_success'
+                                || response.data.status === 'finished_failed') {
+                                deferred.resolve(response.data.status)
+                            } else {
+                                setTimeout(function(){ poll(); }, 2000);
+                            }
+                        });
+                })();
+
+                return deferred.promise;
             }
         }
     }

@@ -87,6 +87,7 @@
         vm.buttonLoadStatus = buttonLoadStatus;
         vm.startBuild = startBuild;
         vm.getParameters = getParameters;
+        vm.messageLoadStatus = messageLoadStatus;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -244,6 +245,7 @@
         $(".ui.search.fluid.dropdown.parameter")
             .dropdown({
                onChange: function(value, text, $selectedItem) {
+                   vm.ilmData = [];
                    angular.forEach(vm.allParameters, function (param) {
                        if(param.paramName === value) {
                            vm.ilmData = param.paramValue.map(function(x) { return {data: x};});
@@ -315,6 +317,7 @@
             vm.editTest = $.extend(true, {}, test);
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
+            vm.getParameters();
             if(test.provider.type === "Predefined Provider") {
                 vm.providers = [];
                 ProjectService.getProviders()
@@ -610,7 +613,13 @@
         }
 
         function addParameter() {
-            vm.parameters.push({});
+            if(!vm.createTest.parameters) {
+                vm.createTest.parameters = [];
+            }
+            var param = {'paramName': vm.createTest.paramName, 'paramValue': vm.createTest.paramValue};
+            vm.createTest.parameters.push(param);
+            vm.createTest.paramName = "";
+            vm.createTest.paramValue = "";
         }
 
         function removeParameter(index) {
@@ -619,7 +628,10 @@
         }
 
         function addParameterEditTest() {
-            vm.editTest.parameters.push({});
+            var param = {'paramName': vm.editTest.paramName, 'paramValue': vm.editTest.paramValue};
+            vm.editTest.parameters.push(param);
+            vm.editTest.paramName = "";
+            vm.editTest.paramValue = "";
         }
 
         function removeParameterEditTest(index) {
@@ -630,10 +642,16 @@
             (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
         }
 
+        vm.buildMessageConfig = {
+            testId: ''
+        };
+
         function startBuild(testId) {
             ProjectService.executeBuild(vm.project.id, testId, {action: 'start'})
                 .then(function(data) {
+                    console.log("starting build");
                     buildResults[testId] = data;
+                    vm.buildMessageConfig.testId = testId;
                     pollBuild(vm.project.id, testId, buildResults[testId].id);
                 }, function(data) {
                     vm.error = data;
@@ -642,13 +660,10 @@
 
         function pollBuild(projectId, testId, buildId) {
             ProjectService.pollBuild(projectId, testId, buildId)
-                .then(function(data) {
-                    if (data.status === 'finished_success'
-                        || data.status === 'finished_failed') {
-                        buildResults[testId].status = data.status;
-                    } else {
-                        setTimeout(function(){ pollBuild(projectId, testId, buildId); }, 2000);
-                    }
+                .then(function(status) {
+                    console.log("polls done");
+                    console.log(status);
+                    buildResults[testId].status = status;
                 }, function(data) {
                     vm.error = data;
                 });
@@ -673,6 +688,28 @@
             }
 
             return false;
+        }
+
+        function messageLoadStatus(testId) {
+            if (!buildResults.hasOwnProperty(testId) || !testId) {
+                return 'none';
+            }
+
+            if (buildResults[testId].status === 'running') {
+                return 'running';
+            }
+
+            if (buildResults[testId].status === 'stopped') {
+                return 'stopped';
+            }
+
+            if (buildResults[testId].status === 'finished_success') {
+                return 'finished_success';
+            }
+
+            if (buildResults[testId].status === 'finished_failed') {
+                return 'finished_failed';
+            }
         }
 
     }
