@@ -27,11 +27,17 @@ const (
 	httpPort            = 9279
 )
 
-func CheckImage(name string) (model.Report, error) {
+func CheckImage(buildId string, name string) (*model.BuildResult, error) {
 	// TODO: parse first./ 2 params from config file
 	var report model.Report
 	var myFeature model.Feature
 	var myVulnerability model.Vulnerability
+
+	//create a new buildResult object
+	buildResult := model.BuildResult{}
+
+	// add stuff to the buildresult
+	//in the end
 
 	endpoint_value := "http://clair:6060"
 	myAddress_value := "controller"
@@ -46,7 +52,7 @@ func CheckImage(name string) (model.Report, error) {
 	if err != nil {
 		fmt.Printf("- Could not save image: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not save image: %s\n", err)
-		return report, errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
+		return &buildResult, errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
 	}
 
 	// Retrieve history.
@@ -58,7 +64,7 @@ func CheckImage(name string) (model.Report, error) {
 	if err != nil || len(layerIDs) == 0 {
 		fmt.Printf("- Could not get image's history: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get image's history: %s\n", err)
-		return report, errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
+		return &buildResult, errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
 	}
 
 	//Setup a simple HTTP server if Clair is not local.
@@ -91,7 +97,7 @@ func CheckImage(name string) (model.Report, error) {
 		if err != nil {
 			fmt.Printf("- Could not analyze layer: %s\n", err)
 			report.Message = fmt.Sprintf("- Could not analyze layer: %s\n", err)
-			return report, errors.New(fmt.Sprintf("- Could not analyze layer: %s\n", err))
+			return &buildResult, errors.New(fmt.Sprintf("- Could not analyze layer: %s\n", err))
 		}
 	}
 
@@ -101,7 +107,7 @@ func CheckImage(name string) (model.Report, error) {
 	if err != nil {
 		fmt.Printf("- Could not get layer information: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get layer information: %s\n", err)
-		return report, errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
+		return &buildResult, errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
 	}
 
 	// Print report.
@@ -111,7 +117,7 @@ func CheckImage(name string) (model.Report, error) {
 		fmt.Println("No feature has been detected on the image.")
 		fmt.Println("This usually means that the image isn't supported by Clair.")
 		report.Message = fmt.Sprintf("No feature has been detected on the image.\nThis usually means that the image isn't supported by Clair.\n")
-		return report, nil
+		return &buildResult, nil
 	}
 
 	isSafe := true
@@ -161,7 +167,14 @@ func CheckImage(name string) (model.Report, error) {
 		fmt.Println("\nBravo, your image looks SAFE !")
 		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")
 	}
-	return report, nil
+	// what we know
+	buildResult.BuildId = buildId
+	buildResult.TimeStamp = time.Now()
+	buildResult.ResultEntries = map[string]interface{}{
+		report.ImageName: report,
+	}
+
+	return &buildResult, nil
 }
 
 func save(imageName string) (string, error) {

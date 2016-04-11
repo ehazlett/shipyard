@@ -134,11 +134,6 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.image).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.addImageToProjectId).Methods("POST", "PUT")
 
-	// Test a single image for a given id
-	apiRouter.HandleFunc("/api/test_image/{id}", a.testImage).Methods("POST")
-	// Test all images for a given project
-	apiRouter.HandleFunc("/api/test_images/{project_id}", a.testImagesForProjectId).Methods("POST")
-
 	//ILM related routes
 	apiRouter.HandleFunc("/api/ilm_images", a.images).Methods("GET")
 	apiRouter.HandleFunc("/api/ilm_images", a.saveImage).Methods("POST")

@@ -139,8 +139,10 @@ type (
 
 		GetBuilds(projectId string, testId string) ([]*model.Build, error)
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
+		GetBuildById(buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
 		CreateBuild(projectId string, testId string, build *model.Build, buildAction *model.BuildAction) error
+		UpdateBuildResults(buildId string, result *model.BuildResult) error
 		UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error
 		DeleteBuild(projectId string, testId string, buildId string) error
 		DeleteAllBuilds() error
@@ -153,9 +155,6 @@ type (
 		GetJobsByProviderId(providerId string) ([]*model.ProviderJob, error)
 		AddJobToProviderId(providerId string, job *model.ProviderJob) error
 		DeleteAllProviders() error
-
-		TestImage(id string) (model.Report, error)
-		TestImagesForProjectId(id string) ([]model.Report, error)
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -1062,66 +1061,6 @@ func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool
 	return true
 }
 
-// begin methods for verifying images using clair
-func (m DefaultManager) TestImage(id string) (model.Report, error) {
-	//get an image by id
-	var image *model.Image
-	var report model.Report
-	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
-
-	if err != nil {
-		return report, err
-	}
-	if res.IsNil() {
-		report.Message = "Image not found"
-		return report, ErrImageDoesNotExist
-	}
-	if err := res.One(&image); err != nil {
-		return report, err
-	}
-	// check the image with clair
-	name := image.Name
-	result := m.VerifyIfImageExistsLocally(image.Name, image.Tag)
-	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
-	if result == true {
-		report, err = c.CheckImage(name)
-	}
-	m.logEvent("test-image", fmt.Sprintf("id=%s, name=%s", image.Name, image.Tag), []string{"security"})
-	return report, err
-}
-func (m DefaultManager) TestImagesForProjectId(id string) ([]model.Report, error) {
-	var the_error error
-	var report model.Report
-	var reports []model.Report
-	the_error = nil
-	//get all the images by a project id
-	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
-	if err != nil {
-		return reports, err
-	}
-	imagesToCheck := []*model.Image{}
-	if err := res.All(&imagesToCheck); err != nil {
-		return reports, err
-	}
-	// check each image with clair
-	for _, imageToCheck := range imagesToCheck {
-
-		fmt.Printf("Calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
-		result := m.VerifyIfImageExistsLocally(imageToCheck.Name, imageToCheck.Tag)
-		if result == true {
-			report, err = c.CheckImage(imageToCheck.Name)
-			reports = append(reports, report)
-		}
-		if err != nil {
-			the_error = err
-		}
-	}
-
-	m.logEvent("test-images-for-project", fmt.Sprintf("id=%s, name=%s", id), []string{"security"})
-
-	return reports, the_error
-}
-
 //methods related to the Image structure
 func (m DefaultManager) Images() ([]*model.Image, error) {
 	// TODO: sort by datetime once it is implemented
@@ -1371,6 +1310,20 @@ func (m DefaultManager) GetBuild(projectId string, testId string, buildId string
 	}
 	return build, nil
 }
+func (m DefaultManager) GetBuildById(buildId string) (*model.Build, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrBuildDoesNotExist
+	}
+	var build *model.Build
+	if err := res.One(&build); err != nil {
+		return nil, err
+	}
+	return build, nil
+}
 
 func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId string) (string, error) {
 	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
@@ -1428,14 +1381,9 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 
 			}
 		}
-		// for each name we start clair verification
-		for _, name := range imageNames {
-			//go run clairMethodForChecking(buildId, name)
-			// in the clair method
-			// update the build by Id and put results in it
-			// when there are no more results change build status to done/err/fail/stuff
-
-			fmt.Print(name)
+		// for each image we check if it exists locally
+		for _, image := range projectImages {
+			m.VerifyIfImageExistsLocally(image.Name, image.Tag)
 		}
 
 		// we change the build's buildStatus to submitted
@@ -1456,6 +1404,15 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 			}
 			return ""
 		}()
+
+		for _, name := range imageNames {
+			result, err := c.CheckImage(build.ID, name)
+			if err != nil {
+				return err
+			}
+			m.UpdateBuildResults(build.ID, result)
+
+		}
 
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 
@@ -1507,7 +1464,24 @@ func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId str
 	return nil
 
 }
+func (m DefaultManager) UpdateBuildResults(buildId string, result *model.BuildResult) error {
+	var eventType string
+	build, err := m.GetBuildById(buildId)
+	if err != nil {
+		return err
+	}
+	build.Results = append(build.Results, result)
 
+	if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Update(build).RunWrite(m.session); err != nil {
+		return err
+	}
+
+	eventType = "update-build-results"
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", buildId), []string{"security"})
+
+	return nil
+}
 func (m DefaultManager) DeleteBuild(projectId string, testId string, buildId string) error {
 	build, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Delete().Run(m.session)
 	if err != nil {
