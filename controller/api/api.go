@@ -134,6 +134,11 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.image).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.addImageToProjectId).Methods("POST", "PUT")
 
+	// Test a single image for a given id
+	apiRouter.HandleFunc("/api/test_image/{id}", a.testImage).Methods("POST")
+	// Test all images for a given project
+	apiRouter.HandleFunc("/api/test_images/{project_id}", a.testImagesForProjectId).Methods("POST")
+
 	//ILM related routes
 	apiRouter.HandleFunc("/api/ilm_images", a.images).Methods("GET")
 	apiRouter.HandleFunc("/api/ilm_images", a.saveImage).Methods("POST")
@@ -180,7 +185,6 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/v1/repositories/{image}/tags", a.dockerhubTags).Methods("GET")
 
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
-	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/scale", a.scaleContainer).Methods("POST")

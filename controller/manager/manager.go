@@ -6,19 +6,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net"
-	"net/http"
-	"strings"
-	"time"
-
 	log "github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
+	c "github.com/shipyard/shipyard/checker"
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/model/dockerhub"
 	"github.com/shipyard/shipyard/utils/auth"
 	"github.com/shipyard/shipyard/version"
+	"net"
+	"net/http"
+	"regexp"
+	"strings"
+	"time"
 )
 
 const (
@@ -112,6 +113,8 @@ type (
 		DeleteProject(project *model.Project) error
 		DeleteAllProjects() error
 
+		VerifyIfImageExistsLocally(name string, tag string) bool
+
 		Images() ([]*model.Image, error)
 		ImagesByProjectId(projectId string) ([]*model.Image, error)
 		Image(name string) (*model.Image, error)
@@ -150,6 +153,9 @@ type (
 		GetJobsByProviderId(providerId string) ([]*model.ProviderJob, error)
 		AddJobToProviderId(providerId string, job *model.ProviderJob) error
 		DeleteAllProviders() error
+
+		TestImage(id string) (model.Report, error)
+		TestImagesForProjectId(id string) ([]model.Report, error)
 
 		Roles() ([]*auth.ACL, error)
 		Role(name string) (*auth.ACL, error)
@@ -1016,6 +1022,105 @@ func (m DefaultManager) DeleteAllProjects() error {
 }
 
 // end methods related to the project structure
+
+// check if an image exists
+func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool {
+	images, err := m.client.ListImages(true)
+	imageToCheck := name + ":" + tag
+	auth := dockerclient.AuthConfig{"", "", ""}
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, img := range images {
+		imageRepoTags := img.RepoTags
+		for _, imageRepoTag := range imageRepoTags {
+			if strings.Contains(imageRepoTag, imageToCheck) {
+				fmt.Printf("Image %s exists locally ... Proceeding to check with clair ... \n", imageToCheck)
+				return true
+			}
+		}
+
+	}
+	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageToCheck)
+	//get registry
+	match, _ := regexp.MatchString(":[0-9]{4}/", imageToCheck)
+	if match {
+		parts := strings.Split(imageToCheck, "/")
+		address := "https://" + parts[0]
+
+		registry, err := m.RegistryByAddress(address)
+		auth = dockerclient.AuthConfig{registry.Username, registry.Password, ""}
+		err = err //TODO: must manage the error
+	}
+	error := m.client.PullImage(imageToCheck, &auth)
+
+	if error != nil {
+		fmt.Printf("Could not pull image %s ... \n%s \n", imageToCheck, error)
+		return false
+
+	}
+	return true
+}
+
+// begin methods for verifying images using clair
+func (m DefaultManager) TestImage(id string) (model.Report, error) {
+	//get an image by id
+	var image *model.Image
+	var report model.Report
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
+
+	if err != nil {
+		return report, err
+	}
+	if res.IsNil() {
+		report.Message = "Image not found"
+		return report, ErrImageDoesNotExist
+	}
+	if err := res.One(&image); err != nil {
+		return report, err
+	}
+	// check the image with clair
+	name := image.Name
+	result := m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+	fmt.Printf("calling clair to check %s:%s\n", image.Name, image.Tag)
+	if result == true {
+		report, err = c.CheckImage(name)
+	}
+	m.logEvent("test-image", fmt.Sprintf("id=%s, name=%s", image.Name, image.Tag), []string{"security"})
+	return report, err
+}
+func (m DefaultManager) TestImagesForProjectId(id string) ([]model.Report, error) {
+	var the_error error
+	var report model.Report
+	var reports []model.Report
+	the_error = nil
+	//get all the images by a project id
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": id}).Run(m.session)
+	if err != nil {
+		return reports, err
+	}
+	imagesToCheck := []*model.Image{}
+	if err := res.All(&imagesToCheck); err != nil {
+		return reports, err
+	}
+	// check each image with clair
+	for _, imageToCheck := range imagesToCheck {
+
+		fmt.Printf("Calling clair to check %s:%s\n", imageToCheck.Name, imageToCheck.Tag)
+		result := m.VerifyIfImageExistsLocally(imageToCheck.Name, imageToCheck.Tag)
+		if result == true {
+			report, err = c.CheckImage(imageToCheck.Name)
+			reports = append(reports, report)
+		}
+		if err != nil {
+			the_error = err
+		}
+	}
+
+	m.logEvent("test-images-for-project", fmt.Sprintf("id=%s, name=%s", id), []string{"security"})
+
+	return reports, the_error
+}
 
 //methods related to the Image structure
 func (m DefaultManager) Images() ([]*model.Image, error) {
