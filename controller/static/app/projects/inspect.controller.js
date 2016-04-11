@@ -9,8 +9,14 @@
     function InspectController(resolvedResults, $scope, ProjectService, RegistryService, $stateParams) {
         var vm = this;
 
+        vm.showProjectHistory = showProjectHistory;
+
         vm.results = resolvedResults;
 
-
+        function showProjectHistory() {
+            $('#inspect-project-history-' + vm.results.projectId)
+                .sidebar('toggle')
+            ;
+        }
     }
 })();
