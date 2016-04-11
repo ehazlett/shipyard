@@ -138,7 +138,7 @@ type (
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
 		CreateBuild(projectId string, testId string, build *model.Build, buildAction *model.BuildAction) error
-		UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error
+		UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error
 		DeleteBuild(projectId string, testId string, buildId string) error
 		DeleteAllBuilds() error
 
@@ -1359,36 +1359,48 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 	return nil
 }
 
-func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error {
+func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error {
 	var eventType string
 
 	// check if exists; if so, update
-	tmpBuild, err := m.GetBuild(projectId, testId, build.ID)
+	tmpBuild, err := m.GetBuild(projectId, testId, buildId)
 	if err != nil && err != ErrBuildDoesNotExist {
 		return err
 	}
 	// update
 	if tmpBuild != nil {
-		updates := map[string]interface{}{
+		if buildAction.Action == "stop" {
+			tmpBuild.Status.Status = "stopped"
+			tmpBuild.EndTime = time.Now()
+			// go StopCurrentBuildFromClair
+		}
+		if buildAction.Action == "restart" {
+			tmpBuild.Status.Status = "restarted"
+			tmpBuild.EndTime = time.Now()
+			// go RestartCurrentBuildFromClair
+
+		}
+
+		/*	updates := map[string]interface{}{
 			"startTime": build.StartTime,
 			"endTime":   build.EndTime,
 			"config":    build.Config,
-			"status":    build.Status,
 			"results":   build.Results,
 			"testId":    build.TestId,
 			"projectId": build.ProjectId,
-		}
+		}*/
 
-		if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": build.ID}).Update(updates).RunWrite(m.session); err != nil {
+		if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Update(tmpBuild).RunWrite(m.session); err != nil {
 			return err
 		}
 
 		eventType = "update-build"
 	}
 
-	m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
+	m.logEvent(eventType, fmt.Sprintf("id=%s", buildId), []string{"security"})
 
 	return nil
+
 }
 
 func (m DefaultManager) DeleteBuild(projectId string, testId string, buildId string) error {

@@ -51,7 +51,7 @@ func CreateBuild(authHeader string, url string, cfg *model.BuildConfig, status *
 
 }
 
-func UpdateBuild(authHeader string, url string, projectId string, testId string, buildId string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult) error {
+func UpdateBuild(authHeader string, url string, projectId string, testId string, buildId string, cfg *model.BuildConfig, status *model.BuildStatus, res []*model.BuildResult, action *model.BuildAction) error {
 	var build *model.Build
 	build = build.NewBuild(cfg, status, res, testId, projectId)
 	data, err := json.Marshal(build)
@@ -59,7 +59,7 @@ func UpdateBuild(authHeader string, url string, projectId string, testId string,
 		return err
 	}
 
-	resp, err := sendRequest(authHeader, "PUT", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds/%s", url, projectId, testId, buildId), string(data))
+	resp, err := sendRequest(authHeader, "PUT", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds/%s/%s", url, projectId, testId, buildId, "stop"), string(data))
 	if err != nil {
 		return err
 	}

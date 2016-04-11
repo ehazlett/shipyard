@@ -289,7 +289,7 @@ func (m MockManager) GetBuild(projectId string, testId string, buildId string) (
 func (m MockManager) CreateBuild(projectId string, testId string, build *model.Build, action *model.BuildAction) error {
 	return nil
 }
-func (m MockManager) UpdateBuild(projectId string, testId string, buildId string, build *model.Build) error {
+func (m MockManager) UpdateBuild(projectId string, testId string, buildId string, action *model.BuildAction) error {
 	return nil
 }
 func (m MockManager) DeleteBuild(projectId string, testId string, buildId string) error { return nil }

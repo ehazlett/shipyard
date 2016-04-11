@@ -315,7 +315,7 @@ func TestGetAllBuilds(t *testing.T) {
 func TestUpdateBuild(t *testing.T) {
 	Convey("Given that we have a build created already.", t, func() {
 		Convey("When we request to update that build.", func() {
-			err := apiClient.UpdateBuild(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD2_SAVED_ID, BUILD2_CONFIG, BUILD2_STATUS, BUILD2_RESULTS)
+			err := apiClient.UpdateBuild(SY_AUTHTOKEN, ts.URL, PROJECT_ID, TEST_ID, BUILD2_SAVED_ID, BUILD2_CONFIG, BUILD2_STATUS, BUILD2_RESULTS, nil)
 
 			Convey("Then we get an appropriate response back", func() {
 				So(err, ShouldBeNil)
@@ -325,7 +325,7 @@ func TestUpdateBuild(t *testing.T) {
 					So(build.ID, ShouldEqual, BUILD2_SAVED_ID)
 					So(build.ProjectId, ShouldEqual, PROJECT_ID)
 					So(build.TestId, ShouldEqual, TEST_ID)
-					So(build.Status, ShouldResemble, BUILD2_STATUS)
+					So(build.Status.Status, ShouldEqual, "stopped")
 					So(build.Config, ShouldResemble, BUILD2_CONFIG)
 					So(build.Results, ShouldResemble, BUILD2_RESULTS)
 				})

@@ -105,6 +105,9 @@ func (a *Api) updateBuild(w http.ResponseWriter, r *http.Request) {
 	projId := vars["projectId"]
 	testId := vars["testId"]
 	buildId := vars["buildId"]
+	action := vars["action"]
+	var status *model.BuildStatus
+	buildAction := status.NewBuildAction(action)
 	build, err := a.manager.GetBuild(projId, testId, buildId)
 	if err != nil {
 		log.Errorf("error updating build: %s", err)
@@ -116,7 +119,7 @@ func (a *Api) updateBuild(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.manager.UpdateBuild(projId, testId, buildId, build); err != nil {
+	if err := a.manager.UpdateBuild(projId, testId, buildId, buildAction); err != nil {
 		log.Errorf("error updating build: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
