@@ -453,8 +453,9 @@
                                                 <p>Parameter should be identical to the one in the provider.</p>
                                             </div>
                                         </label>
-                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="vm.createTest.paramName">
+                                        <select name="parameterName" class="ui search fluid dropdown parameter" ng-model="vm.createTest.paramName">
                                             <option value="">Search Name</option>
+                                            <option ng-repeat="a in vm.allParameters" data-value="{{a.paramName}}">{{a.paramName}}</option>
                                         </select>
                                     </div>
                                     <div class="eight wide field">
@@ -471,8 +472,9 @@
 
                                 <div class="fields" ng-show="vm.createTest.provider.type" ng-repeat="parameter in vm.parameters">
                                     <div class="seven wide field">
-                                        <select name="parameterName" class="ui search fluid dropdown" ng-model="parameter.paramName">
+                                        <select name="parameterName" class="ui search fluid dropdown parameter" ng-model="parameter.paramName">
                                             <option value="">Search Name</option>
+                                            <option ng-repeat="a in vm.allParameters" data-value="{{a.paramName}}">{{a.paramName}}</option>
                                         </select>
                                     </div>
                                     <div class="eight wide field">
@@ -631,6 +633,7 @@
                                         </label>
                                         <select name="parameterName" class="ui search fluid dropdown" ng-model="vm.editTest.parameters[0].paramName">
                                             <option value="">{{vm.editTest.parameters[0].paramName}}</option>
+                                            <option ng-repeat="a in vm.allParameters" data-value="{{a.paramName}}">{{a.paramName}}</option>
                                         </select>
                                     </div>
                                     <div class="eight wide field">
@@ -744,26 +747,21 @@
                                     <h5 class="ui dividing header">Project Configuration</h5>
                                     <div class="six fields">
                                         <div class="field">
-                                            <label>Project ID</label>
-                                            <input disabled name="projectID" class="input" type="text" ng-model="vm.project.id" placeholder="Project ID..."></input>
+                                            <label>Project ID <span style="font-weight: normal">{{vm.project.id || '...'}}</span></label>
                                         </div>
                                     </div>
                                     <div class="five fields">
                                         <div class="field">
-                                            <label>Author</label>
-                                            <input disabled name="author" class="input" type="text" ng-model="vm.project.author" placeholder="Author"></input>
-                                            </div>
-                                        <div class="field">
-                                            <label>Creation Time</label>
-                                            <input disabled name="createTime" class="input" type="text" ng-model="vm.project.creationTime" placeholder="Creation Time..."></input>
+                                            <label>Author <span style="font-weight: normal">{{vm.project.author || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Update Time</label>
-                                            <input disabled name="updateTime" class="input" type="text" ng-model="vm.project.updateTime" placeholder="Update Time..."></input>
+                                            <label>Creation Time <span style="font-weight: normal">{{vm.project.creationTime || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Updated By</label>
-                                            <input disabled name="updateAuthor" class="input" type="text" ng-model="vm.project.updatedBy" placeholder="Update By..."></input>
+                                            <label>Update Time <span style="font-weight: normal">{{vm.project.updateTime || '...'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Update By <span style="font-weight: normal">{{vm.project.updatedBy || '...'}}</span></label>
                                         </div>
                                     </div>
                                     <div class="four fields">

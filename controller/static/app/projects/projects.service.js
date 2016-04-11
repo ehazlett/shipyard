@@ -114,6 +114,14 @@
                     });
                 return promise;
             },
+            getParameters: function() {
+                var promise = $http
+                    .get('/api/parameters')
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
             updateImage: function(projectId, image) {
                 var promise = $http
                     .put('/api/projects/' + projectId + '/images/' + image.id, image)

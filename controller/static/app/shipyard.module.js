@@ -59,9 +59,9 @@
                          {"id":"bf4d022972f1","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false}
                      ],
                      tests: [
-                         {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"busybox","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_2","ILM Data_4","ILM Data_5"]},{"paramName":"Parameter2","paramValue":["ILM Data_1","ILM Data_3"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2","ILM Data_3"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"tomcat","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                         {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"busybox","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.2","ILM Data_1.4","ILM Data_1.3"]},{"paramName":"Parameter2","paramValue":["ILM Data_2.1","ILM Data_2.3"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.1","ILM Data_2.3"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"tomcat","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.1"]}],"tagging":{"onSuccess":"","onFailure":""}}
                      ],
                      needsBuild: false,
                      lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -81,9 +81,9 @@
                          {"id":"sagfegfrefg","name":"java","tag":"7","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                      ],
                      tests: [
-                         {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_1","ILM Data_3"]},{"paramName":"Parameter1","paramValue":["ILM Data_2"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                         {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.1","ILM Data_3.3"]},{"paramName":"Parameter1","paramValue":["ILM Data_1.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.3"]}],"tagging":{"onSuccess":"","onFailure":""}}
                      ],
                      needsBuild: false,
                      lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -103,9 +103,9 @@
                          {"id":"567j67w45yg4w","name":"shipyard/shipyard","tag":"2.0.0","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                      ],
                      tests: [
-                         {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"ertehgfhsg","name":"test2.2","description":"test2_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"hkfgohkfog","name":"test2.3","description":"test3_description","targets":"mongodb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                         {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"ertehgfhsg","name":"test2.2","description":"test2_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"hkfgohkfog","name":"test2.3","description":"test3_description","targets":"mongodb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.2"]}],"tagging":{"onSuccess":"","onFailure":""}}
                      ],
                      needsBuild: false,
                      lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -125,9 +125,9 @@
                          {"id":"8i5tryw456w","name":"mongo","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                      ],
                      tests: [
-                         {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3"]},{"paramName":"Parameter1","paramValue":["ILM Data_2"]},{"paramName":"Parameter2","paramValue":["ILM Data_1"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2"]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"ubuntu","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1"]},{"paramName":"Parameter2","paramValue":["ILM Data_1"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                         {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.3"]},{"paramName":"Parameter1","paramValue":["ILM Data_2"]},{"paramName":"Parameter2","paramValue":["ILM Data_1"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_3.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"ubuntu","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.1"]},{"paramName":"Parameter2","paramValue":["ILM Data_2.1"]}],"tagging":{"onSuccess":"","onFailure":""}}
                      ],
                      needsBuild: false,
                      lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -147,9 +147,9 @@
                          {"id":"8i5tryw456w","name":"busybox","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
                      ],
                      tests: [
-                         {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"rethinkdb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":[]},{"paramName":"","paramValue":[]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"uyiyuyukku","name":"test4.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":[]}],"tagging":{"onSuccess":"","onFailure":""}},
-                         {"id":"tyrtyrthjy","name":"test4.3","description":"test3_description","targets":"soninob/soninob","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":[]}],"tagging":{"onSuccess":"","onFailure":""}}
+                         {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"rethinkdb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter4","paramValue":["ILM Data_4.2"]},{"paramName":"","paramValue":[]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"uyiyuyukku","name":"test4.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"tyrtyrthjy","name":"test4.3","description":"test3_description","targets":"soninob/soninob","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.1"]}],"tagging":{"onSuccess":"","onFailure":""}}
                      ],
                      needsBuild: true,
                      lastRun: "Wednesday, February 24, 2016 at 00:00:00",
@@ -236,9 +236,18 @@
                 ]
             };
 
-             $httpBackend.whenGET('/api/providers').respond(providers);
+            var parameters = [
+                {"paramName":"Parameter1","paramValue":["ILM Data_1.1","ILM Data_1.2","ILM Data_1.3","ILM Data_1.4"]},
+                {"paramName":"Parameter2","paramValue":["ILM Data_2.1","ILM Data_2.2","ILM Data_2.3","ILM Data_2.4"]},
+                {"paramName":"Parameter3","paramValue":["ILM Data_3.1","ILM Data_3.2","ILM Data_3.3","ILM Data_3.4"]},
+                {"paramName":"Parameter4","paramValue":["ILM Data_4.1","ILM Data_4.2","ILM Data_4.3","ILM Data_4.4"]}
+            ];
 
-             $httpBackend.whenGET('/api/projects').respond(projects);
+            $httpBackend.whenGET('/api/parameters').respond(parameters);
+
+            $httpBackend.whenGET('/api/providers').respond(providers);
+
+            $httpBackend.whenGET('/api/projects').respond(projects);
 
             $httpBackend.whenRoute('POST', '/api/projects/:id/tests/:testId/builds').respond(function(method, url, data, headers, params) {
                 build.status = "running";

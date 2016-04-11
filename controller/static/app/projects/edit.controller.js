@@ -86,6 +86,7 @@
         vm.getImages = getImages;
         vm.buttonLoadStatus = buttonLoadStatus;
         vm.startBuild = startBuild;
+        vm.getParameters = getParameters;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -240,6 +241,16 @@
                         getTestsProviders();
                 }
             });
+        $(".ui.search.fluid.dropdown.parameter")
+            .dropdown({
+               onChange: function(value, text, $selectedItem) {
+                   angular.forEach(vm.allParameters, function (param) {
+                       if(param.paramName === value) {
+                           vm.ilmData = param.paramValue.map(function(x) { return {data: x};});
+                       }
+                   });
+               }
+            });
 
         vm.myConfig = {
             create: true,
@@ -274,6 +285,7 @@
                 vm.imagesSelectize.push(image.name);
             });
             vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
+            vm.getParameters();
             $('#edit-project-test-create-modal')
                 .modal({
                     onHidden: function() {
@@ -559,12 +571,6 @@
         }
 
         function editSaveImage() {
-            //vm.selectedEditImage.location = vm.editImage.location;
-            //vm.selectedEditImage.name = vm.editImage.name;
-            //vm.selectedEditImage.registry = vm.selectedEditImage.registry;
-            //vm.selectedEditImage.tag = vm.editImage.tag;
-            //vm.selectedEditImage.description = vm.editImage.description;
-            //console.log(vm.selectedEditImage);
             ProjectService.updateImage(vm.project.id, $.extend(true, {}, vm.selectedEditImage))
                 .then(function(data) {
                     vm.getImages(vm.project.id);
@@ -574,17 +580,6 @@
         }
 
         function editSaveTest() {
-            //vm.selectedEditTest.provider.type = vm.editTest.provider.type;
-            //vm.selectedEditTest.provider.name = vm.editTest.provider.name;
-            //vm.selectedEditTest.provider.test = vm.editTest.provider.test;
-            //vm.selectedEditTest.name = vm.editTest.name;
-            //vm.selectedEditTest.fromTag = vm.editTest.fromTag;
-            //vm.selectedEditTest.description = vm.editTest.description;
-            //vm.selectedEditTest.tagging.onFailure = vm.editTest.tagging.onFailure;
-            //vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
-            //vm.selectedEditTest.blocker = vm.editTest.blocker;
-            //vm.selectedEditTest.targets = vm.editTest.targets;
-            //vm.selectedEditTest.parameters = vm.editTest.parameters;
             ProjectService.updateTest(vm.project.id, $.extend(true, {}, vm.editTest))
                 .then(function(data) {
                     vm.getTests(vm.project.id);
@@ -601,6 +596,17 @@
                 }, function(data) {
                     vm.error = data;
                 });
+        }
+
+        function getParameters(){
+            vm.allParameters = [];
+            ProjectService.getParameters()
+                .then(function(data) {
+                    console.log(data);
+                    vm.allParameters = data;
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function addParameter() {
