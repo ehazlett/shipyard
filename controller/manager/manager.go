@@ -1247,7 +1247,13 @@ func (m DefaultManager) UpdateTest(projectId string, test *model.Test) error {
 			"name":             test.Name,
 			"targets":          test.Targets,
 			"selectedTestType": test.SelectedTestType,
-			"providerId":       test.ProviderId,
+			"ProviderType":     test.Provider.ProviderType,
+			"providerName":     test.Provider.ProviderName,
+			"providerTest":     test.Provider.ProviderTest,
+			"onSuccess":        test.Tagging.OnSuccess,
+			"onFailure":        test.Tagging.OnFailure,
+			"fromTag":          test.FromTag,
+			"parameters":       test.Parameters,
 		}
 		if _, err := r.Table(tblNameTests).Filter(map[string]string{"id": test.ID}).Update(updates).RunWrite(m.session); err != nil {
 			return err

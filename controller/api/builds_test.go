@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/coreos/clair/api"
 	"github.com/gorilla/context"
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
@@ -80,6 +81,19 @@ var (
 			},
 		},
 	}
+	TEST_ARTIFACTS = []*model.TargetArtifact{
+		&model.TargetArtifact{
+			ArtifactId:   "imageId1",
+			ArtifactType: "image",
+		},
+	}
+	PROJECT_IMAGES = []*model.Image{
+		&model.Image{
+			ID:   "imageId1",
+			Name: "busybox",
+			Tag:  "latest",
+		},
+	}
 	BUILD3_RESULTS = []*model.BuildResult{}
 
 	BUILD1_SAVED_ID string
@@ -142,8 +156,6 @@ func init() {
 	globalMux = localMux
 
 	cleanupBuilds()
-	cleanup()
-	cleanupTests()
 
 	// Instantiate test server with Gorilla Mux Router enabled.
 	// If you don't wrap the mux with the context.ClearHandler(),
@@ -197,7 +209,7 @@ func TestCreateDependenciesForBuilds(t *testing.T) {
 			})
 		})
 		Convey("When we make a request to create a new project", func() {
-			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, false)
+			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, PROJECT_IMAGES, nil, false)
 			Convey("Then we get back a successful response", func() {
 				So(id, ShouldNotBeEmpty)
 				So(err, ShouldBeNil)
@@ -207,7 +219,7 @@ func TestCreateDependenciesForBuilds(t *testing.T) {
 		})
 		Convey("When we make a request to create a new test", func() {
 
-			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, PROVIDER_ID, PROJECT_ID)
+			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, PROVIDER_ID, PROJECT_ID)
 			Convey("Then we get back a successful response", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusCreated)

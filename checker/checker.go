@@ -40,12 +40,13 @@ func CheckImage(buildId string, name string) (*model.BuildResult, error) {
 	//in the end
 
 	endpoint_value := "http://clair:6060"
-	//	myAddress_value := "controller"
-	myAddress_value, _ := exec.Command("sh", "-c", "cat /etc/hosts |grep `cat /etc/hostname`|awk '{print $1}'").Output()
+	myAddress_value := "controller"
+	//myAddress_value, _ := exec.Command("sh", "-c", "cat /etc/hosts |grep `cat /etc/hostname`|awk '{print $1}'").Output()
+	//endpoint := &endpoint_value
+	//myAddress_value2 := strings.TrimSpace(fmt.Sprintf("%s", myAddress_value))
 	endpoint := &endpoint_value
-	myAddress_value2 := strings.TrimSpace(fmt.Sprintf("%s", myAddress_value))
-
-	myAddress := &myAddress_value2
+	myAddress := &myAddress_value
+	//myAddress := &myAddress_value2
 	imageName := name
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)
