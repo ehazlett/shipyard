@@ -66,12 +66,13 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	testId := vars["testId"]
 	action := vars["action"]
 	var status *model.BuildStatus
+	var buildId string
 	//hardcode action to start, temporarily
 	//this needs to be removed before going to production
 	action = "start"
 	buildAction := status.NewBuildAction(action)
-
-	if buildId, err := a.manager.CreateBuild(projId, testId, buildAction); err != nil {
+	buildId, err := a.manager.CreateBuild(projId, testId, buildAction)
+	if err != nil {
 		log.Errorf("error creating build: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -87,10 +88,10 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNoContent)
 	}
-
+	jsonResponse = jsonResponse
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(jsonResponse)
+	//w.Write(jsonResponse)
 	return
 }
 

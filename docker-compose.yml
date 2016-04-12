@@ -78,11 +78,12 @@ postgres:
    - "5432:5432"
 
 clair:
-  image: quay.io/coreos/clair
+  image: quay.io/coreos/clair:master
   environment:
      http_proxy: "http://web-proxy.bbn.hp.com:8080"
      https_proxy: "http://web-proxy.bbn.hp.com:8080"
-     no_proxy: "127.0.0.1,localhost,mydyumserver,.hp.com,.hpe.com,.hpecorp.net,.hpeswlab.net,.hpqcorp.net,16.59.0.0"
+     no_proxy: "127.0.0.1,localhost,mydyumserver,.hp.com,.hpe.com,.hpecorp.net,.hpeswlab.net,.hpqcorp.net,16.59.0.0,172.18.0.9"
+     NO_PROXY: "127.0.0.1,localhost,mydyumserver,.hp.com,.hpe.com,.hpecorp.net,.hpeswlab.net,.hpqcorp.net,16.59.0.0,172.18.0.9"
   links:    
    - postgres
 #   - controller

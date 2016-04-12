@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/coreos/clair/api/v1"
 	"github.com/shipyard/shipyard/model"
 	"io/ioutil"
@@ -33,6 +34,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	var myFeature model.Feature
 	var myVulnerability model.Vulnerability
 
+	log.Errorf("starting checker...")
 	//create a new buildResult object
 	buildResult := model.BuildResult{}
 
@@ -40,13 +42,14 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	//in the end
 
 	endpoint_value := "http://clair:6060"
-	myAddress_value := "controller"
-	//myAddress_value, _ := exec.Command("sh", "-c", "cat /etc/hosts |grep `cat /etc/hostname`|awk '{print $1}'").Output()
-	//endpoint := &endpoint_value
-	//myAddress_value2 := strings.TrimSpace(fmt.Sprintf("%s", myAddress_value))
+	//endpoint_value := "http://172.18.0.8:6060"
+	//myAddress_value := "controller"
+	//myAddress_value := "127.0.0.1"
+	myAddress_value, _ := exec.Command("sh", "-c", "cat /etc/hosts |grep `cat /etc/hostname`|awk '{print $1}'").Output()
 	endpoint := &endpoint_value
-	myAddress := &myAddress_value
-	//myAddress := &myAddress_value2
+	myAddress_value2 := strings.TrimSpace(fmt.Sprintf("%s", myAddress_value))
+	//myAddress := &myAddress_value
+	myAddress := &myAddress_value2
 	imageName := name
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)

@@ -141,6 +141,7 @@ type (
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
 		GetBuildById(buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
+
 		CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error)
 		UpdateBuildResults(buildId string, result model.BuildResult) error
 		UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error
@@ -1348,15 +1349,18 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 	var eventType string
+	eventType = eventType
+	var build *model.Build
 	if buildAction.Action == "start" {
 		var testResult *model.TestResult
 		var build *model.Build
+		testResult = &model.TestResult{}
+		build = &model.Build{}
 		build.TestId = testId
 		build.ProjectId = projectId
 		build.StartTime = time.Now()
 
 		// we get the test and its targetArtifacts
-
 		test, err := m.GetTest(projectId, testId)
 		if err != nil && err != ErrTestDoesNotExist {
 			return "", err
@@ -1367,17 +1371,15 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 		targetIds := []string{}
 		for _, target := range targetArtifacts {
-			targetIds = append(targetIds, target.ArtifactId)
+			targetIds = append(targetIds, target.ID)
 
 		}
-
 		// we retrieve the images from the projectId
 
 		projectImages, err := m.ImagesByProjectId(projectId)
 		if err != nil && err != ErrProjectImagesProblem {
 			return "", err
 		}
-
 		//we add the names of the matching images by comparing the ImageID with the ArtifactId
 		imageNames := []string{}
 		for _, image := range projectImages {
@@ -1395,7 +1397,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		}
 
 		// we change the build's buildStatus to submitted
-		build.Status.Status = "new"
+		build.Status = &model.BuildStatus{Status: "new"}
 		// create a new build object with fields from the Test object
 
 		// we add the build to the table in rethink db
@@ -1413,7 +1415,6 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			}
 			return ""
 		}()
-
 		for _, name := range imageNames {
 			result, err := c.CheckImage(build.ID, name)
 			if err != nil {
@@ -1428,11 +1429,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			return "", err
 		}
 
-		var result *model.Result
-
-		result.BuildId = build.ID
-		result.Author = "author"
-		result.ProjectId = projectId
+		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId}
 
 		for _, rez := range build.Results {
 			rez = rez
@@ -1448,7 +1445,6 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			return "", err
 		}
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
-
 		return build.ID, nil
 	}
 	return build.ID, nil
