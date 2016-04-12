@@ -20,15 +20,15 @@
             'angular-jwt',
             'base64',
             'selectize',
-            'ui.router',
-            'ngMockE2E'
+            'ui.router'
+            //'ngMockE2E'
         ])
 
         //Configure HttpBackend to mock requests to ILM endpoints
         //Take a look at https://docs.angularjs.org/api/ngMockE2E/service/$httpBackend
         .run(function($httpBackend, $filter) {
 
-             function makeid() {
+            /* function makeid() {
                  var text = "";
                  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -449,13 +449,13 @@
              $httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
 
              //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
-             $httpBackend.whenGET(/.*/).passThrough();
-             $httpBackend.whenPOST(/.*/).passThrough();
-             $httpBackend.whenDELETE(/.*/).passThrough();
-             $httpBackend.whenPUT(/.*/).passThrough();
-             $httpBackend.whenPATCH(/.*/).passThrough();
-             $httpBackend.whenDELETE(/.*/).passThrough();
-             $httpBackend.whenJSONP(/.*/).passThrough();
-             $httpBackend.whenRoute(/.*/).passThrough();
+             $httpBackend.whenGET(/.*!/).passThrough();
+             $httpBackend.whenPOST(/.*!/).passThrough();
+             $httpBackend.whenDELETE(/.*!/).passThrough();
+             $httpBackend.whenPUT(/.*!/).passThrough();
+             $httpBackend.whenPATCH(/.*!/).passThrough();
+             $httpBackend.whenDELETE(/.*!/).passThrough();
+             $httpBackend.whenJSONP(/.*!/).passThrough();
+             $httpBackend.whenRoute(/.*!/).passThrough();*/
         })
 })();

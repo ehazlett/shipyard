@@ -294,7 +294,7 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider.type = "";
+                        vm.createTest.provider.providerType = "";
                         vm.parameters = [];
                     },
                     closable: false
@@ -307,7 +307,7 @@
             angular.forEach(data, function (target) {
                 angular.forEach(vm.images, function (image) {
                     if(image.name === target) {
-                        vm.createTest.targets.push({id: image.id,type: target});
+                        vm.createTest.targets.push({id: image.id,type: "image"});
                     }
                 });
             });
@@ -318,18 +318,18 @@
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
             vm.getParameters();
-            if(test.provider.type === "Predefined Provider") {
+            if(test.provider.providerType === "Predefined Provider") {
                 vm.providers = [];
                 ProjectService.getProviders()
                     .then(function(data) {
                         console.log(data);
                         vm.providers = data;
-                        getJobs(test.provider.name);
+                        getJobs(test.provider.providerName);
                     }, function(data) {
                         vm.error = data;
                     })
             }
-            if(test.provider.type === "Clair [Internal]") {
+            if(test.provider.providerType === "Clair [Internal]") {
                 vm.imagesSelectize = [];
                 angular.forEach(vm.images, function (image) {
                     vm.imagesSelectize.push(image.name);
@@ -356,8 +356,8 @@
         }
 
         function resetTestValues() {
-            vm.createTest.provider.name = "";
-            vm.createTest.provider.test = "";
+            vm.createTest.provider.providerName = "";
+            vm.createTest.provider.ProviderTest = "";
             vm.createTest.targets = "";
             vm.createTest.blocker = "";
             vm.createTest.name = "";
@@ -366,7 +366,7 @@
             vm.createTest.tagging.onSuccess = "";
             vm.createTest.tagging.onFailure = "";
             vm.buttonStyle = "disabled";
-            if(vm.createTest.provider.type === "Clair [Internal]") {
+            if(vm.createTest.provider.providerType === "Clair [Internal]") {
                 vm.buttonStyle = "positive";
             }
             $('#test-create-modal').find("input").val("");
@@ -513,7 +513,7 @@
             vm.providerTests = [];
             $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
             angular.forEach(vm.providers, function(provider) {
-                if(provider.name === testProvider) {
+                if(provider.providerName === testProvider) {
                     vm.providerTests = provider.providerJobs;
                 }
             });
@@ -543,7 +543,7 @@
             vm.buttonStyle = "disabled";
             console.log(" check provider name " + providerName + " with tag " + providerTest);
             angular.forEach(vm.providers, function (provider) {
-                if(provider.name === providerName) {
+                if(provider.providerName === providerName) {
                     angular.forEach(provider.providerJobs, function (test) {
                         if(test.name === providerTest) {
                             vm.buttonStyle = "positive";
