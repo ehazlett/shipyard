@@ -6,6 +6,7 @@ import (
 )
 
 func TestImage(t *testing.T) {
+
 	message, err := CheckImage("", "marvambass/nginx-registry-proxy")
 	fmt.Printf("checker message = (%s)\n", message)
 	if err != nil {
