@@ -45,17 +45,52 @@ media:
 controller:
     restart: always
     build: .
+    ports:
+      - "92"
+      - "9279"
     dockerfile: Dockerfile.build
     entrypoint: /bin/bash
     command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
     links:
         - rethinkdb
         - swarm
+        - clair
     volumes:
-        - .:/go/src/github.com/shipyard/shipyard
+        - .:/go/src/github.com/shipyard/shipyard 
+        - "/var/run/docker.sock:/var/run/docker.sock" 
+
     volumes_from:
         - media
     ports:
         - "8082:8080"
     environment:
-        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
+        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com,clair"
+
+postgres:
+  hostname: postgres
+  image: postgres:9.4.5
+  environment:
+    - PGDATA=/var/lib/postgresql/data/pgdata
+    - POSTGRES_PASSWORD=postgres
+  volumes:
+   - /DATA/postgres/pgdata:/var/lib/postgresql/data/pgdata
+  ports:
+   - "5432:5432"
+
+clair:
+  image: quay.io/coreos/clair
+  environment:
+     http_proxy: "http://web-proxy.bbn.hp.com:8080"
+     https_proxy: "http://web-proxy.bbn.hp.com:8080"
+     no_proxy: "127.0.0.1,localhost,mydyumserver,.hp.com,.hpe.com,.hpecorp.net,.hpeswlab.net,.hpqcorp.net,16.59.0.0"
+  links:    
+   - postgres
+#   - controller
+  volumes: 
+    - ./clair_config:/config:ro
+    - /tmp:/tmp
+  command: "--config=/config/config.yaml" 
+  ports:
+   - "6060:6060"
+   - "6061:6061"
+   - "9279:9279"
