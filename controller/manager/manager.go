@@ -1343,7 +1343,7 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build, buildAction *model.BuildAction) error {
 	var eventType string
 	if buildAction.Action == "start" {
-
+		var testResult *model.TestResult
 		build.TestId = testId
 		build.ProjectId = projectId
 		build.StartTime = time.Now()
@@ -1384,6 +1384,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 		// for each image we check if it exists locally
 		for _, image := range projectImages {
 			m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+			testResult.DockerImageId = image.ImageId
 		}
 
 		// we change the build's buildStatus to submitted
@@ -1411,6 +1412,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 				return err
 			}
 			m.UpdateBuildResults(build.ID, result)
+			testResult.ImageName = name
 
 		}
 		build, err := m.GetBuildById(build.ID)
@@ -1419,17 +1421,18 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 		}
 
 		var result *model.Result
-		var testResult *model.TestResult
+
 		result.BuildId = build.ID
 		result.Author = "author"
 		result.ProjectId = projectId
 
 		for _, rez := range build.Results {
 			rez = rez
-			//testResult.ImageName =
-			testResult.TestId = test.ID
+			testResult.TestId = testId
 			testResult.EndDate = time.Now()
-			//testResult.
+			testResult.Blocker = false
+			testResult.SimpleResult.Status = "tested"
+
 			result.TestResults = append(result.TestResults, testResult)
 		}
 		err = m.CreateResult(projectId, result)
