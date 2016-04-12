@@ -65,26 +65,21 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	projId := vars["projectId"]
 	testId := vars["testId"]
 	action := vars["action"]
-	var build *model.Build
 	var status *model.BuildStatus
-	if err := json.NewDecoder(r.Body).Decode(&build); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	//hardcode action to start, temporarily
 	//this needs to be removed before going to production
 	action = "start"
 	buildAction := status.NewBuildAction(action)
 
-	if err := a.manager.CreateBuild(projId, testId, build, buildAction); err != nil {
+	if buildId, err := a.manager.CreateBuild(projId, testId, buildAction); err != nil {
 		log.Errorf("error creating build: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Debugf("saved build: id=%s", build.ID)
+	log.Debugf("saved build: id=%s", buildId)
 	tempResponse := map[string]string{
-		"id": build.ID,
+		"id": buildId,
 	}
 
 	jsonResponse, err := json.Marshal(tempResponse)

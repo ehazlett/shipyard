@@ -141,8 +141,8 @@ type (
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
 		GetBuildById(buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
-		CreateBuild(projectId string, testId string, build *model.Build, buildAction *model.BuildAction) error
-		UpdateBuildResults(buildId string, result *model.BuildResult) error
+		CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error)
+		UpdateBuildResults(buildId string, result model.BuildResult) error
 		UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error
 		DeleteBuild(projectId string, testId string, buildId string) error
 		DeleteAllBuilds() error
@@ -1346,10 +1346,11 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 	return build.Status.Status, nil
 }
 
-func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build, buildAction *model.BuildAction) error {
+func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 	var eventType string
 	if buildAction.Action == "start" {
 		var testResult *model.TestResult
+		var build *model.Build
 		build.TestId = testId
 		build.ProjectId = projectId
 		build.StartTime = time.Now()
@@ -1358,7 +1359,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 
 		test, err := m.GetTest(projectId, testId)
 		if err != nil && err != ErrTestDoesNotExist {
-			return err
+			return "", err
 		}
 		targetArtifacts := test.Targets
 
@@ -1374,7 +1375,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 
 		projectImages, err := m.ImagesByProjectId(projectId)
 		if err != nil && err != ErrProjectImagesProblem {
-			return err
+			return "", err
 		}
 
 		//we add the names of the matching images by comparing the ImageID with the ArtifactId
@@ -1398,10 +1399,11 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 		// create a new build object with fields from the Test object
 
 		// we add the build to the table in rethink db
+
 		response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
 
 		if err != nil {
-			return err
+			return "", err
 		}
 		eventType = "add-build"
 
@@ -1415,15 +1417,15 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 		for _, name := range imageNames {
 			result, err := c.CheckImage(build.ID, name)
 			if err != nil {
-				return err
+				return "", err
 			}
 			m.UpdateBuildResults(build.ID, result)
 			testResult.ImageName = name
 
 		}
-		build, err := m.GetBuildById(build.ID)
+		build, err = m.GetBuildById(build.ID)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		var result *model.Result
@@ -1443,13 +1445,13 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, build *mode
 		}
 		err = m.CreateResult(projectId, result)
 		if err != nil {
-			return err
+			return "", err
 		}
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 
-		return nil
+		return build.ID, nil
 	}
-	return nil
+	return build.ID, nil
 }
 
 func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error {
@@ -1495,13 +1497,13 @@ func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId str
 	return nil
 
 }
-func (m DefaultManager) UpdateBuildResults(buildId string, result *model.BuildResult) error {
+func (m DefaultManager) UpdateBuildResults(buildId string, result model.BuildResult) error {
 	var eventType string
 	build, err := m.GetBuildById(buildId)
 	if err != nil {
 		return err
 	}
-	build.Results = append(build.Results, result)
+	build.Results = append(build.Results, &result)
 
 	if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Update(build).RunWrite(m.session); err != nil {
 		return err
