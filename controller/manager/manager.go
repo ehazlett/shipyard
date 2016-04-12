@@ -141,7 +141,7 @@ type (
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
 		GetBuildById(buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
-		CreateBuild(projectId string, testId string, build *model.Build, buildAction *model.BuildAction) error
+		CreateBuild(projectId string, testId string, buildAction *model.BuildAction) error
 		UpdateBuildResults(buildId string, result *model.BuildResult) error
 		UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error
 		DeleteBuild(projectId string, testId string, buildId string) error
@@ -1346,8 +1346,9 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 	return build.Status.Status, nil
 }
 
-func (m DefaultManager) CreateBuild(projectId string, testId string, build *model.Build, buildAction *model.BuildAction) error {
+func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) error {
 	var eventType string
+	var build *model.Build
 	if buildAction.Action == "start" {
 		var testResult *model.TestResult
 		build.TestId = testId
