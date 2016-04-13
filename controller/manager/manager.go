@@ -1351,6 +1351,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 	var eventType string
 	eventType = eventType
 	var build *model.Build
+	existingResult, _ := m.GetResults(projectId)
 	if buildAction.Action == "start" {
 		var testResult *model.TestResult
 		var build *model.Build
@@ -1434,11 +1435,20 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 				testResult.Blocker = false
 				result.TestResults = append(result.TestResults, testResult)
 				result.LastUpdate = time.Now()
-				err = m.CreateResult(projectId, result)
-				if err != nil {
+				if existingResult != nil {
+					err = m.UpdateResult(projectId, result)
+					if err != nil {
+						return "", err
+					}
 					return "", err
 				}
-				return "", err
+				if existingResult == nil {
+					err = m.CreateResult(projectId, result)
+					if err != nil {
+						return "", err
+					}
+					return "", err
+				}
 			}
 			m.UpdateBuildResults(build.ID, buildResult)
 
@@ -1450,8 +1460,18 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		testResult.Blocker = false
 		result.TestResults = append(result.TestResults, testResult)
 		result.LastUpdate = time.Now()
-		err = m.CreateResult(projectId, result)
-		if err != nil {
+		if existingResult != nil {
+			err = m.UpdateResult(projectId, result)
+			if err != nil {
+				return "", err
+			}
+			return "", err
+		}
+		if existingResult == nil {
+			err = m.CreateResult(projectId, result)
+			if err != nil {
+				return "", err
+			}
 			return "", err
 		}
 
@@ -1607,39 +1627,28 @@ func (m DefaultManager) CreateResult(projectId string, result *model.Result) err
 
 	return nil
 }
-func (m DefaultManager) UpdateResult(projectId string, result *model.Result) error {
+func (m DefaultManager) UpdateResult(projectId string, inputResult *model.Result) error {
 	var eventType string
 
 	// check if exists; if so, update
-	rez, err := m.GetResult(projectId, result.ID)
+	existingResult, err := m.GetResults(projectId)
 	if err != nil && err != ErrResultDoesNotExist {
 		return err
 	}
 	// update
-	if rez != nil {
-		updates := map[string]interface{}{
-			"projectId":      result.ProjectId,
-			"description":    result.Description,
-			"buildId":        result.BuildId,
-			"runDate":        result.RunDate,
-			"endDate":        result.EndDate,
-			"createDate":     result.CreateDate,
-			"author":         result.Author,
-			"projectVersion": result.ProjectVersion,
-			"lastTagApplied": result.LastTagApplied,
-			"lastUpdate":     result.LastUpdate,
-			"updater":        result.Updater,
-			"testResults":    result.TestResults,
+	if existingResult != nil {
+		for _, result := range inputResult.TestResults {
+			existingResult.TestResults = append(existingResult.TestResults, result)
 		}
 
-		if _, err := r.Table(tblNameResults).Filter(map[string]string{"id": result.ID}).Update(updates).RunWrite(m.session); err != nil {
+		if _, err := r.Table(tblNameResults).Filter(map[string]string{"projectId": projectId}).Update(existingResult).RunWrite(m.session); err != nil {
 			return err
 		}
 
 		eventType = "update-result"
 	}
 
-	m.logEvent(eventType, fmt.Sprintf("id=%s", result.ID), []string{"security"})
+	m.logEvent(eventType, fmt.Sprintf("id=%s", existingResult.ID), []string{"security"})
 
 	return nil
 }
