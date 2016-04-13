@@ -282,11 +282,11 @@ func listenHTTP(path, allowedHost string) {
 
 	restrictedFileServer := func(path, allowedHost string) http.Handler {
 		fc := func(w http.ResponseWriter, r *http.Request) {
-			if r.Host == allowedHost {
-				http.FileServer(http.Dir(path)).ServeHTTP(w, r)
-				return
-			}
-			w.WriteHeader(403)
+			//if r.Host == allowedHost {
+			http.FileServer(http.Dir(path)).ServeHTTP(w, r)
+			return
+			//}
+			//w.WriteHeader(403)
 		}
 		return http.HandlerFunc(fc)
 	}
