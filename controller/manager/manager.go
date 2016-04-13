@@ -1359,7 +1359,11 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		build.TestId = testId
 		build.ProjectId = projectId
 		build.StartTime = time.Now()
-
+		// we get the project
+		project, err := m.Project(projectId)
+		if err != nil && err != ErrProjectDoesNotExist {
+			return "", err
+		}
 		// we get the test and its targetArtifacts
 		test, err := m.GetTest(projectId, testId)
 		if err != nil && err != ErrTestDoesNotExist {
@@ -1416,7 +1420,8 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			}
 			return ""
 		}()
-		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId}
+		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
+		result.CreateDate = time.Now()
 
 		for _, name := range imageNames {
 			testResult.ImageName = name
