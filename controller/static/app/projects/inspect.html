@@ -138,33 +138,33 @@
                                     </div>
                                     <div class="six fields">
                                         <div class="field">
-                                            <label>Build ID: <span style="font-weight: normal">{{vm.results.buildId || 'Not implemented'}}</span></label>
+                                            <label>Build ID: <span style="font-weight: normal">{{vm.results.buildId || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Run Date: <span style="font-weight: normal">{{vm.results.runDate || 'Not implemented'}}</span></label>
+                                            <label>Run Date: <span style="font-weight: normal">{{vm.results.runDate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>End Date: <span style="font-weight: normal">{{vm.results.endDate || 'Not implemented'}}</span></label>
+                                            <label>End Date: <span style="font-weight: normal">{{vm.results.endDate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Create Date: <span style="font-weight: normal">{{vm.results.createDate || 'Not implemented'}}</span></label>
+                                            <label>Create Date: <span style="font-weight: normal">{{vm.results.createDate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Author: <span style="font-weight: normal">{{vm.results.author || 'Not implemented'}}</span></label>
+                                            <label>Author: <span style="font-weight: normal">{{vm.results.author || '...'}}</span></label>
                                         </div>
                                     </div>
                                     <div class="six fields">
                                         <div class="field">
-                                            <label>Project Version: <span style="font-weight: normal">{{vm.results.projectVersion || 'Not implemented'}}</span></label>
+                                            <label>Project Version: <span style="font-weight: normal">{{vm.results.projectVersion || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Last Tag Applied: <span style="font-weight: normal">{{vm.results.lastTagApplied || 'Not implemented'}}</span></label>
+                                            <label>Last Tag Applied: <span style="font-weight: normal">{{vm.results.lastTagApplied || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Last Update: <span style="font-weight: normal">{{vm.results.lastUpdate || 'Not implemented'}}</span></label>
+                                            <label>Last Update: <span style="font-weight: normal">{{vm.results.lastUpdate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Last Update Name: <span style="font-weight: normal">{{vm.results.lastUpdate || 'Not implemented'}}</span></label>
+                                            <label>Last Update Name: <span style="font-weight: normal">{{vm.results.updater || '...'}}</span></label>
                                         </div>
                                     </div>
                                 </div>
@@ -197,7 +197,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="test in vm.results.testsResults" jquery>
+                                    <tr ng-repeat="test in vm.results.testResults" jquery>
                                         <td>
                                             <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>
                                             <span class="hidden">{{test.status}}</span>
