@@ -9,9 +9,9 @@
     <div class="item">
         <div class="column" style="overflow-y:scroll; height: 550px">
         <div class="active item">
-            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>{{vm.results.buildId}}
         </div>
-        <div class="item">
+<!--        <div class="item">
             <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
         </div>
         <div class="item">
@@ -94,7 +94,7 @@
         </div>
         <div class="item">
             <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
-        </div>
+        </div>-->
 </div>
 
     </div>
@@ -199,7 +199,7 @@
                                     <tbody>
                                     <tr ng-repeat="test in vm.results.testResults" jquery>
                                         <td>
-                                            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>
+                                            <i class="circle icon" ng-class="test.status == 'finished_success' ? 'green' : 'red'"></i>
                                             <span class="hidden">{{test.status}}</span>
                                         </td>
                                         <td>{{test.testId}}</td>
