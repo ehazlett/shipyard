@@ -78,7 +78,7 @@ postgres:
    - "5432:5432"
 
 clair:
-  image: quay.io/coreos/clair:master
+  image: quay.io/coreos/clair:v1.0.0
   environment:
      http_proxy: "http://web-proxy.bbn.hp.com:8080"
      https_proxy: "http://web-proxy.bbn.hp.com:8080"
