@@ -1422,7 +1422,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			testResult.ImageName = name
 			buildResult, err := c.CheckImage(build.ID, name)
 			if err != nil {
-
+				testResult.TestName = test.Name
 				testResult.SimpleResult.Status = "finished_failed"
 				testResult.TestId = testId
 				testResult.EndDate = time.Now()
@@ -1438,7 +1438,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			m.UpdateBuildResults(build.ID, buildResult)
 
 		}
-
+		testResult.TestName = test.Name
 		testResult.SimpleResult.Status = "finished_success"
 		testResult.TestId = testId
 		testResult.EndDate = time.Now()
