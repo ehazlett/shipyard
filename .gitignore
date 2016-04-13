@@ -7,3 +7,4 @@ bower_components
 *.iml
 docker-compose.override.yml
 shipyard
+.env
