@@ -1393,6 +1393,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		// for each image we check if it exists locally
 		for _, image := range projectImages {
 			m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+			testResult.ImageId = image.ID
 			testResult.DockerImageId = image.ImageId
 		}
 
@@ -1415,35 +1416,40 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			}
 			return ""
 		}()
-		for _, name := range imageNames {
-			result, err := c.CheckImage(build.ID, name)
-			if err != nil {
-				return "", err
-			}
-			m.UpdateBuildResults(build.ID, result)
-			testResult.ImageName = name
-
-		}
-		build, err = m.GetBuildById(build.ID)
-		if err != nil {
-			return "", err
-		}
-
 		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId}
 
-		for _, rez := range build.Results {
-			rez = rez
-			testResult.TestId = testId
-			testResult.EndDate = time.Now()
-			testResult.Blocker = false
-			testResult.SimpleResult.Status = "tested"
+		for _, name := range imageNames {
+			testResult.ImageName = name
+			buildResult, err := c.CheckImage(build.ID, name)
+			if err != nil {
 
-			result.TestResults = append(result.TestResults, testResult)
+				testResult.SimpleResult.Status = "finished_failed"
+				testResult.TestId = testId
+				testResult.EndDate = time.Now()
+				testResult.Blocker = false
+				result.TestResults = append(result.TestResults, testResult)
+				result.LastUpdate = time.Now()
+				err = m.CreateResult(projectId, result)
+				if err != nil {
+					return "", err
+				}
+				return "", err
+			}
+			m.UpdateBuildResults(build.ID, buildResult)
+
 		}
+
+		testResult.SimpleResult.Status = "finished_success"
+		testResult.TestId = testId
+		testResult.EndDate = time.Now()
+		testResult.Blocker = false
+		result.TestResults = append(result.TestResults, testResult)
+		result.LastUpdate = time.Now()
 		err = m.CreateResult(projectId, result)
 		if err != nil {
 			return "", err
 		}
+
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 		return build.ID, nil
 	}

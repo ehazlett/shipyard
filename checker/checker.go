@@ -34,7 +34,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	var myFeature model.Feature
 	var myVulnerability model.Vulnerability
 
-	log.Errorf("starting checker...")
+	log.Debugf("starting checker...")
 	//create a new buildResult object
 	buildResult := model.BuildResult{}
 
