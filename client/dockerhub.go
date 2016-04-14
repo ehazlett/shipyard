@@ -1,9 +1,9 @@
 package ilm_client
 
 import (
-	"io/ioutil"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 
 	"github.com/shipyard/shipyard/model/dockerhub"
 )
