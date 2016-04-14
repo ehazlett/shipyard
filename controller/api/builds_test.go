@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"github.com/coreos/clair/api"
 	"github.com/gorilla/context"
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
@@ -27,7 +26,7 @@ var (
 		Description: "description",
 		Targets: []*model.TargetArtifact{
 			&model.TargetArtifact{
-				ArtifactId:   "id",
+				ID:           "id",
 				ArtifactType: "image",
 			},
 		},
@@ -39,7 +38,7 @@ var (
 		Description: "description2",
 		Targets: []*model.TargetArtifact{
 			&model.TargetArtifact{
-				ArtifactId:   "id2",
+				ID:           "id2",
 				ArtifactType: "image2",
 			},
 		},
@@ -59,7 +58,7 @@ var (
 		&model.BuildResult{
 			BuildId: "buildId",
 			TargetArtifact: &model.TargetArtifact{
-				ArtifactId:   "id",
+				ID:           "id",
 				ArtifactType: "image",
 			},
 			ResultEntries: map[string]interface{}{
@@ -72,7 +71,7 @@ var (
 		&model.BuildResult{
 			BuildId: "buildId2",
 			TargetArtifact: &model.TargetArtifact{
-				ArtifactId:   "id2",
+				ID:           "id2",
 				ArtifactType: "image2",
 			},
 			ResultEntries: map[string]interface{}{
@@ -83,7 +82,7 @@ var (
 	}
 	TEST_ARTIFACTS = []*model.TargetArtifact{
 		&model.TargetArtifact{
-			ArtifactId:   "imageId1",
+			ID:           "imageId1",
 			ArtifactType: "image",
 		},
 	}
@@ -219,7 +218,8 @@ func TestCreateDependenciesForBuilds(t *testing.T) {
 		})
 		Convey("When we make a request to create a new test", func() {
 
-			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, PROVIDER_ID, PROJECT_ID)
+			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag")
+
 			Convey("Then we get back a successful response", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusCreated)
