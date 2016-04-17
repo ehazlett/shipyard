@@ -115,7 +115,7 @@
                     <td>{{i.Id.substring(0,12)}}</td>
                     <td>{{i.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
                     <td>{{i.Engine.Name}}</td>
-                    <td>{{i.VirtualSize / 1048576 | number:2}} MB</td>
+                    <td ng-attr-data-sort-value="{{i.VirtualSize}}">{{i.VirtualSize / 1048576 | number:2}} MB</td>
                     <td class="collapsing">
                         <div ng-click="vm.showRemoveImageDialog(i)" class="compact ui icon button red">
                             <i class="trash icon"></i>
