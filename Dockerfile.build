@@ -1,6 +1,6 @@
 FROM golang:1.5
 
-ADD https://get.docker.com/builds/Linux/x86_64/docker-1.9.1 /usr/local/bin/docker
+ADD https://get.docker.com/builds/Linux/x86_64/docker-1.10.3 /usr/local/bin/docker
 
 RUN chmod +x /usr/local/bin/docker
 RUN curl -sL https://deb.nodesource.com/setup | bash -
