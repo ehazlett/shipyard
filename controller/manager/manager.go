@@ -1025,9 +1025,11 @@ func (m DefaultManager) DeleteAllProjects() error {
 
 // check if an image exists
 func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool {
-	images, err := m.client.ListImages(true)
 	imageToCheck := name + ":" + tag
 	auth := dockerclient.AuthConfig{"", "", ""}
+
+	images, err := m.client.ListImages(true)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -1050,7 +1052,9 @@ func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool
 
 		registry, err := m.RegistryByAddress(address)
 		auth = dockerclient.AuthConfig{registry.Username, registry.Password, ""}
-		err = err //TODO: must manage the error
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	error := m.client.PullImage(imageToCheck, &auth)
 
