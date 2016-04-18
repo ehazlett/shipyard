@@ -268,7 +268,6 @@
             }
         };
 
-        // Is this needed? if not, let's delete it.
         vm.myIlmData = {
             create: true,
             valueField: 'data',
@@ -286,11 +285,11 @@
             vm.createTest = {};
             vm.createTest.tagging = {};
             vm.createTest.provider = {};
-            vm.imagesSelectize = [];
+            var imagesSelectize = [];
             angular.forEach(vm.images, function (image) {
-                vm.imagesSelectize.push(image.name+":"+image.tag);
+                imagesSelectize.push(image.name+":"+image.tag);
             });
-            vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
+            vm.items = imagesSelectize.map(function(x) { return {item: x};});
             vm.getParameters();
             $('#edit-project-test-create-modal')
                 .modal({
@@ -310,19 +309,29 @@
                 .modal('show');
         }
 
+        // TODO: Handle setting target for editTestModal
         function setTargets(data) {
+            // If data is empty, skip setTargets
+            // This is to selectize's cleanup from modifying vm.creatTest.targets
+            if (data.length == 0) {
+                return;
+            }
             vm.createTest.targets=[];
             angular.forEach(data, function (target) {
                 angular.forEach(vm.images, function (image) {
-                    if(image.name === target) {
+                    if(image.name + ':' + image.tag === target) {
                         vm.createTest.targets.push({id: image.id,type: "image"});
                     }
+                    // TODO: Shouldn't the "else" case issue an error/warning?
                 });
             });
         }
 
         function showTestEditDialog(test) {
             vm.editTest = $.extend(true, {}, test);
+            vm.editTest.imagesSelectizeVal = []; // Selectize Image Values
+            console.log("this is our test");
+            console.log(test);
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
             vm.getParameters();
@@ -338,13 +347,18 @@
                     })
             }
             if(test.provider.providerType === "Clair [Internal]") {
-                vm.imagesSelectize = [];
+                var targetIds = vm.editTest.targets.map(function(x) { return x.id;});
+
+                var imagesSelectize = [];
                 angular.forEach(vm.images, function (image) {
-                    vm.imagesSelectize.push(image.name+":"+image.tag);
+                    if ($.inArray(image.id, targetIds) != -1) {
+                        vm.editTest.imagesSelectizeVal.push(image.name+":"+image.tag);
+                    } else {
+                        imagesSelectize.push(image.name+":"+image.tag);
+                    }
                 });
-                vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
+                vm.items = imagesSelectize.map(function(x) { return {item: x};});
             }
-            console.log(test);
             $('#edit-project-test-edit-modal-'+vm.project.id)
                 .modal({
                     closable: false
@@ -573,6 +587,8 @@
         }
 
         function createSaveTest(test) {
+            console.log("data rdy for saving");
+            console.log(test);
             ProjectService.addTest(vm.project.id, test)
                 .then(function(data) {
                     vm.getTests(vm.project.id);

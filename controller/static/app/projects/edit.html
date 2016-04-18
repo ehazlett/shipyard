@@ -576,7 +576,7 @@
 
                                     <div class="eleven wide field" ng-show="vm.editTest.provider.providerType === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
+                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.editTest.imagesSelectizeVal" ng-change="vm.setTargets(vm.editTest.imagesSelectizeVal)"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.editTest.provider.providerType === 'Predefined Provider'">
