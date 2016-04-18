@@ -228,7 +228,6 @@ func TestCreateDependenciesForBuilds(t *testing.T) {
 			})
 		})
 	})
-
 }
 
 func TestCreateNewBuild(t *testing.T) {
