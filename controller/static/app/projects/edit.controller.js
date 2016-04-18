@@ -254,23 +254,27 @@
                }
             });
 
+        var selectizeObj = null;
+
         vm.myConfig = {
             create: true,
             valueField: 'item',
             labelField: 'item',
             delimiter: '|',
+            persist: false,
             placeholder: 'All images',
             onInitialize: function(selectize){
-                // receives the selectize object as an argument
-            },
-            // maxItems: 1
+                selectizeObj = selectize;
+            }
         };
 
+        // Is this needed? if not, let's delete it.
         vm.myIlmData = {
             create: true,
             valueField: 'data',
             labelField: 'data',
             delimiter: '|',
+            persist: false,
             placeholder: 'Select ILM Data',
             onInitialize: function(selectize){
                 // receives the selectize object as an argument
@@ -295,6 +299,10 @@
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createTest.provider.providerType = "";
+                        if (selectizeObj) {
+                            console.log("cleaned up selectize");
+                            selectizeObj.clear();
+                        }
                         vm.parameters = [];
                     },
                     closable: false
