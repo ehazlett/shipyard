@@ -284,7 +284,7 @@
             vm.createTest.provider = {};
             vm.imagesSelectize = [];
             angular.forEach(vm.images, function (image) {
-                vm.imagesSelectize.push(image.name);
+                vm.imagesSelectize.push(image.name+":"+image.tag);
             });
             vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
             vm.getParameters();
@@ -332,7 +332,7 @@
             if(test.provider.providerType === "Clair [Internal]") {
                 vm.imagesSelectize = [];
                 angular.forEach(vm.images, function (image) {
-                    vm.imagesSelectize.push(image.name);
+                    vm.imagesSelectize.push(image.name+":"+image.tag);
                 });
                 vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
             }
