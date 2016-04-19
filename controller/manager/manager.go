@@ -144,6 +144,7 @@ type (
 
 		CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error)
 		UpdateBuildResults(buildId string, result model.BuildResult) error
+		UpdateBuildStatus(buildId string, status string) error
 		UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error
 		DeleteBuild(projectId string, testId string, buildId string) error
 		DeleteAllBuilds() error
@@ -1380,7 +1381,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 		targetIds := []string{}
 		for _, target := range targetArtifacts {
-			targetIds = append(targetIds, target.ID)
+			targetIds = append(targetIds, target.ArtifactId)
 
 		}
 		// we retrieve the images from the projectId
@@ -1399,17 +1400,8 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 			}
 		}
-		// for each image we check if it exists locally
-		for _, image := range projectImages {
-			m.VerifyIfImageExistsLocally(image.Name, image.Tag)
-			testResult.ImageId = image.ID
-			testResult.DockerImageId = image.ImageId
-		}
-
 		// we change the build's buildStatus to submitted
 		build.Status = &model.BuildStatus{Status: "new"}
-		// create a new build object with fields from the Test object
-
 		// we add the build to the table in rethink db
 
 		response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
@@ -1427,14 +1419,35 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		}()
 		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
 		result.CreateDate = time.Now()
-
+		done := make(chan bool)
 		for _, name := range imageNames {
+			// we instantiate fields for the testResult
 			testResult.ImageName = name
-			buildResult, err := c.CheckImage(build.ID, name)
+			testResult.TestName = test.Name
+			testResult.TestId = testId
+
+			//we check if the image(s) we want to test exist(s) locally and pull them if not
+			for _, image := range projectImages {
+				if image.Name == name {
+					go m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+					testResult.ImageId = image.ID
+					testResult.DockerImageId = image.ImageId
+				}
+			}
+
+			buildResult := model.BuildResult{}
+			// we launch a go routine which checks the image
+			go func() {
+				buildResult, err = c.CheckImage(build.ID, name)
+				// in the end we update the build results
+				m.UpdateBuildResults(build.ID, buildResult)
+				m.UpdateBuildStatus(build.ID, "running")
+				done <- true
+			}()
+			// if we get an error we mark the test for the image as failed
 			if err != nil {
-				testResult.TestName = test.Name
+				m.UpdateBuildStatus(build.ID, "finished_failed")
 				testResult.SimpleResult.Status = "finished_failed"
-				testResult.TestId = testId
 				testResult.EndDate = time.Now()
 				testResult.Blocker = false
 				result.TestResults = append(result.TestResults, testResult)
@@ -1444,7 +1457,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					if err != nil {
 						return "", err
 					}
-					return "", err
+					return build.ID, err
 				}
 				if existingResult == nil {
 					err = m.CreateResult(projectId, result)
@@ -1454,31 +1467,30 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					return build.ID, err
 				}
 			}
-			m.UpdateBuildResults(build.ID, buildResult)
-
-		}
-		testResult.TestName = test.Name
-		testResult.SimpleResult.Status = "finished_success"
-		testResult.TestId = testId
-		testResult.EndDate = time.Now()
-		testResult.Blocker = false
-		result.TestResults = append(result.TestResults, testResult)
-		result.LastUpdate = time.Now()
-		if existingResult != nil {
-			err = m.UpdateResult(projectId, result)
-			if err != nil {
-				return "", err
+			// if we don't get an error we mark the test for the image as successful
+			if err == nil {
+				m.UpdateBuildStatus(build.ID, "finished_success")
+				testResult.SimpleResult.Status = "finished_success"
+				testResult.EndDate = time.Now()
+				testResult.Blocker = false
+				result.TestResults = append(result.TestResults, testResult)
+				result.LastUpdate = time.Now()
+				if existingResult != nil {
+					err = m.UpdateResult(projectId, result)
+					if err != nil {
+						return "", err
+					}
+					return build.ID, err
+				}
+				if existingResult == nil {
+					err = m.CreateResult(projectId, result)
+					if err != nil {
+						return "", err
+					}
+					return build.ID, err
+				}
 			}
-			return "", err
 		}
-		if existingResult == nil {
-			err = m.CreateResult(projectId, result)
-			if err != nil {
-				return "", err
-			}
-			return build.ID, err
-		}
-
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 		return build.ID, nil
 	}
@@ -1541,6 +1553,24 @@ func (m DefaultManager) UpdateBuildResults(buildId string, result model.BuildRes
 	}
 
 	eventType = "update-build-results"
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", buildId), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) UpdateBuildStatus(buildId string, status string) error {
+	var eventType string
+	build, err := m.GetBuildById(buildId)
+	if err != nil {
+		return err
+	}
+	build.Status.Status = status
+
+	if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Update(build).RunWrite(m.session); err != nil {
+		return err
+	}
+
+	eventType = "update-build-status"
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s", buildId), []string{"security"})
 
