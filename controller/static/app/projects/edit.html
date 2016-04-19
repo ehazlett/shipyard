@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<div id="edit-project-image-create-modal" class="ui fullscreen modal transition">
+<div id="edit-project-image-create-modal-{{vm.project.id}}" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         Create Image
@@ -409,7 +409,7 @@
 
                                     <div class="eleven wide field" ng-show="vm.createTest.provider.providerType === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
+                                        <selectize config='vm.createTest.selectizeConfig' options='vm.createTest.selectizeItems' ng-model="vm.createTest.selectizeData" ng-change="vm.setTargetsCreateTest(vm.createTest.selectizeData)"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.createTest.provider.providerType === 'Predefined Provider'">
@@ -576,7 +576,7 @@
 
                                     <div class="eleven wide field" ng-show="vm.editTest.provider.providerType === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.editTest.imagesSelectizeVal" ng-change="vm.setTargetsEditTest(vm.editTest.imagesSelectizeVal)"></selectize>
+                                        <selectize config='vm.editTest.selectizeConfig' options='vm.editTest.selectizeItems' ng-model="vm.editTest.selectizeData" ng-change="vm.setTargetsEditTest(vm.editTest.selectizeData)"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.editTest.provider.providerType === 'Predefined Provider'">

@@ -77,7 +77,7 @@
         vm.showDeleteTestDialog = showDeleteTestDialog;
         vm.deleteTest = deleteTest;
         vm.editSaveTest = editSaveTest;
-        vm.setTargets = setTargets;
+        vm.setTargetsCreateTest = setTargetsCreateTest;
         vm.setTargetsEditTest = setTargetsEditTest;
         vm.addParameter = addParameter;
         vm.removeParameter = removeParameter;
@@ -132,7 +132,7 @@
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    $('#edit-project-image-create-modal').find("input").val("");
+                    $('#edit-project-image-create-modal-'+vm.project.id).find("input").val("");
                     $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
                     $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                     vm.createImage.name = "";
@@ -255,29 +255,17 @@
                }
             });
 
-        var selectizeObj = null;
-
-        vm.myConfig = {
+        
+        var createSelectizeObj = null;
+        vm.createTest.selectizeConfig = {
             create: true,
             valueField: 'item',
             labelField: 'item',
             delimiter: '|',
             placeholder: 'All images',
             onInitialize: function(selectize){
-                selectizeObj = selectize;
+                createSelectizeObj = selectize;
             }
-        };
-
-        vm.myIlmData = {
-            create: true,
-            valueField: 'data',
-            labelField: 'data',
-            delimiter: '|',
-            placeholder: 'Select ILM Data',
-            onInitialize: function(selectize){
-                // receives the selectize object as an argument
-            }
-            // maxItems: 1
         };
 
         function showTestCreateDialog() {
@@ -288,7 +276,7 @@
             angular.forEach(vm.images, function (image) {
                 imagesSelectize.push(image.name+":"+image.tag);
             });
-            vm.items = imagesSelectize.map(function(x) { return {item: x};});
+            vm.createTest.selectizeItems = imagesSelectize.map(function(x) { return {item: x};});
             vm.getParameters();
             $('#edit-project-test-create-modal')
                 .modal({
@@ -297,9 +285,10 @@
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createTest.provider.providerType = "";
-                        if (selectizeObj) {
+                        if (createSelectizeObj) {
                             console.log("cleaned up selectize");
-                            selectizeObj.clear();
+                            createSelectizeObj.clear();
+                            vm.items = [];
                         }
                         vm.parameters = [];
                     },
@@ -309,7 +298,7 @@
         }
 
         // TODO: Handle setting target for editTestModal
-        function setTargets(data) {
+        function setTargetsCreateTest(data) {
             // If data is empty, skip setTargets
             // This is to selectize's cleanup from modifying vm.creatTest.targets
             if (data.length == 0) {
@@ -341,11 +330,21 @@
             });
         }
 
+        vm.editTest.selectizeConfig = {
+            create: true,
+            valueField: 'item',
+            labelField: 'item',
+            delimiter: '|',
+            placeholder: 'Select ILM Data',
+            onInitialize: function(selectize){
+                // receives the selectize object as an argument
+            }
+            // maxItems: 1
+        };
+
         function showTestEditDialog(test) {
             vm.editTest = $.extend(true, {}, test);
-            vm.editTest.imagesSelectizeVal = []; // Selectize Image Values
-            console.log("this is our test");
-            console.log(test);
+            vm.editTest.selectizeData = [];
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
             vm.getParameters();
@@ -369,10 +368,10 @@
                 });
                 angular.forEach(vm.images, function (image) {
                     if ($.inArray(image.id, targetIds) != -1) {
-                        vm.editTest.imagesSelectizeVal.push(image.name+":"+image.tag);
+                        vm.editTest.selectizeData.push(image.name+":"+image.tag);
                     }
                 });
-                vm.items = imagesSelectize.map(function(x) { return {item: x};});
+                vm.editTest.selectizeItems = imagesSelectize.map(function(x) { return {item: x};});
             }
             $('#edit-project-test-edit-modal-'+vm.project.id)
                 .modal({
@@ -386,7 +385,7 @@
             vm.createImage.tag = "";
             vm.createImage.description = "";
             vm.buttonStyle = "disabled";
-            $('#edit-project-image-create-modal').find("input").val("");
+            $('#edit-project-image-create-modal-'+vm.project.id).find("input").val("");
             $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
@@ -413,10 +412,11 @@
 
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#edit-project-image-create-modal')
+            $('#edit-project-image-create-modal-'+vm.project.id)
                 .modal({
                     onHidden: function() {
-                        $('#edit-project-image-create-modal').find("input").val("");
+                        $('#edit-project-image-create-modal-'+vm.project.id).find("input").val("");
+                        // $('#edit-project-image-create-modal-'+vm.project.id).modal('destroy');
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createImage.location = "";
                     },
@@ -449,6 +449,9 @@
             }
             $('#edit-project-image-edit-modal-'+vm.project.id)
                 .modal({
+                    onHidden: function() {
+                        // $('#edit-project-image-edit-modal-'+vm.project.id).modal('destroy');
+                    },
                     closable: false
                 })
                 .modal('show');
