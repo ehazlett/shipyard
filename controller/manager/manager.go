@@ -1451,7 +1451,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					if err != nil {
 						return "", err
 					}
-					return "", err
+					return build.ID, err
 				}
 			}
 			m.UpdateBuildResults(build.ID, buildResult)
@@ -1476,7 +1476,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			if err != nil {
 				return "", err
 			}
-			return "", err
+			return build.ID, err
 		}
 
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
