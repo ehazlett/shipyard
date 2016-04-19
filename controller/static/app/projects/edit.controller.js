@@ -78,6 +78,7 @@
         vm.deleteTest = deleteTest;
         vm.editSaveTest = editSaveTest;
         vm.setTargets = setTargets;
+        vm.setTargetsEditTest = setTargetsEditTest;
         vm.addParameter = addParameter;
         vm.removeParameter = removeParameter;
         vm.addParameterEditTest = addParameterEditTest;
@@ -261,7 +262,6 @@
             valueField: 'item',
             labelField: 'item',
             delimiter: '|',
-            persist: false,
             placeholder: 'All images',
             onInitialize: function(selectize){
                 selectizeObj = selectize;
@@ -273,7 +273,6 @@
             valueField: 'data',
             labelField: 'data',
             delimiter: '|',
-            persist: false,
             placeholder: 'Select ILM Data',
             onInitialize: function(selectize){
                 // receives the selectize object as an argument
@@ -327,6 +326,21 @@
             });
         }
 
+        function setTargetsEditTest(data) {
+            if (data.length == 0) {
+                return;
+            }
+            vm.editTest.targets=[];
+            angular.forEach(data, function (target) {
+                angular.forEach(vm.images, function (image) {
+                    if(image.name + ':' + image.tag === target) {
+                        vm.editTest.targets.push({id: image.id,type: "image"});
+                    }
+                    // TODO: Shouldn't the "else" case issue an error/warning?
+                });
+            });
+        }
+
         function showTestEditDialog(test) {
             vm.editTest = $.extend(true, {}, test);
             vm.editTest.imagesSelectizeVal = []; // Selectize Image Values
@@ -351,10 +365,11 @@
 
                 var imagesSelectize = [];
                 angular.forEach(vm.images, function (image) {
+                    imagesSelectize.push(image.name+":"+image.tag);
+                });
+                angular.forEach(vm.images, function (image) {
                     if ($.inArray(image.id, targetIds) != -1) {
                         vm.editTest.imagesSelectizeVal.push(image.name+":"+image.tag);
-                    } else {
-                        imagesSelectize.push(image.name+":"+image.tag);
                     }
                 });
                 vm.items = imagesSelectize.map(function(x) { return {item: x};});
