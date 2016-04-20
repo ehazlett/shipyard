@@ -46,6 +46,12 @@
             <div class="row" ng-hide="vm.deploying">
                 <div class="column">
                     <div class="ui form" ng-submit="vm.deploy()">
+                        <div ng-show="vm.createImage.location === 'Public Registry' && (!vm.createImage.name || !vm.createImage.tag)" class="ui info message">
+                            <ul class="list">
+                                <li ng-show="!vm.createImage.name">Choose an Image from the dropdown.</li>
+                                <li ng-show="!vm.createImage.tag">Choose Tag from the dropdown.</li>
+                            </ul>
+                        </div>
                         <h5 style="display: inline">Image Configuration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
                         <div class="ui toggle checkbox" ng-click="vm.createImage.skipImageBuild=!vm.createImage.skipImageBuild">
                             <input type="checkbox" name="public" ng-model="vm.createImage.skipImageBuild">
