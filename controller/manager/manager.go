@@ -1355,9 +1355,6 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 	var eventType string
 
-	//var wg sync.WaitGroup
-	//wg.Add(1)
-
 	eventType = eventType
 	var build *model.Build
 	existingResult, _ := m.GetResults(projectId)
@@ -1407,9 +1404,10 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		for _, image := range projectImages {
 			for _, name := range imageNames {
 				if image.Name == name {
-					go m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+					m.VerifyIfImageExistsLocally(image.Name, image.Tag)
 					testResult.ImageId = image.ID
 					testResult.DockerImageId = image.ImageId
+
 				}
 			}
 		}
@@ -1430,6 +1428,17 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			}
 			return ""
 		}()
+		for _, image := range projectImages {
+			for _, name := range imageNames {
+				if image.Name == name {
+					m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+					m.UpdateBuildStatus(build.ID, "running")
+					testResult.ImageId = image.ID
+					testResult.DockerImageId = image.ImageId
+
+				}
+			}
+		}
 		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
 		result.CreateDate = time.Now()
 		for _, name := range imageNames {
