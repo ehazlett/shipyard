@@ -181,7 +181,6 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	buildResult.ResultEntries = map[string]interface{}{
 		report.ImageName: report,
 	}
-
 	return buildResult, nil
 }
 

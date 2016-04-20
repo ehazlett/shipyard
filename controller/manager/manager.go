@@ -18,9 +18,7 @@ import (
 	"net"
 	"net/http"
 	"regexp"
-	"runtime"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -1356,11 +1354,6 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 	var eventType string
-	runtime.GOMAXPROCS(1)
-
-	var wg sync.WaitGroup
-	wg.Add(2)
-
 	eventType = eventType
 	var build *model.Build
 	existingResult, _ := m.GetResults(projectId)
@@ -1446,7 +1439,6 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			buildResult := model.BuildResult{}
 			// we launch a go routine which checks the image
 			go func() {
-				//	defer wg.Done()
 				buildResult, err = c.CheckImage(build.ID, name)
 				// in the end we update the build results
 
