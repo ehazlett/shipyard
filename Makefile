@@ -31,7 +31,8 @@ release: build image
 
 test: clean
  	# TODO: enable registry e2e when they use httptest e2e server instead of external container.
-	@go test -v `go list ./... | grep -v /vendor | grep -v /test-assets`
+#	@go test -v `go list ./... | grep -v /vendor | grep -v /test-assets`
+	@go test -tags "netgo static_build" -installsuffix netgo -v `go list ./... | grep -v /vendor | grep -v /test-assets`
 
 # For dev purposes
 docker-build-controller:

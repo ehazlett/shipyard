@@ -344,6 +344,9 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	globalMux.Handle("/v1.18/", swarmAuthRouter)
 	globalMux.Handle("/v1.19/", swarmAuthRouter)
 	globalMux.Handle("/v1.20/", swarmAuthRouter)
+	globalMux.Handle("/v1.21/", swarmAuthRouter)
+	globalMux.Handle("/v1.22/", swarmAuthRouter)
+	globalMux.Handle("/v1.23/", swarmAuthRouter)
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
