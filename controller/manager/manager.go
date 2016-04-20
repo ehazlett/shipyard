@@ -18,7 +18,9 @@ import (
 	"net"
 	"net/http"
 	"regexp"
+	"runtime"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -1354,6 +1356,10 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 	var eventType string
+	runtime.GOMAXPROCS(1)
+
+	var wg sync.WaitGroup
+	wg.Add(2)
 
 	eventType = eventType
 	var build *model.Build
@@ -1401,16 +1407,6 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			}
 		}
 		//we check if the image(s) we want to test exist(s) locally and pull them if not
-		for _, image := range projectImages {
-			for _, name := range imageNames {
-				if image.Name == name {
-					m.VerifyIfImageExistsLocally(image.Name, image.Tag)
-					testResult.ImageId = image.ID
-					testResult.DockerImageId = image.ImageId
-
-				}
-			}
-		}
 		// we change the build's buildStatus to submitted
 		build.Status = &model.BuildStatus{Status: "new"}
 		// we add the build to the table in rethink db
