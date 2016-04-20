@@ -56,7 +56,7 @@
 
         vm.createSaveTest = createSaveTest;
 
-        vm.imageList = imageList;
+        vm.list = list;
         vm.showImageEditDialog = showImageEditDialog;
         vm.showImageCreateDialog = showImageCreateDialog;
         vm.showTestEditDialog = showTestEditDialog;
@@ -109,11 +109,11 @@
         });
 
         // Remove selected items that are no longer visible
-        $scope.$watchCollection('imageList()', function () {
+        $scope.$watchCollection('list()', function () {
             angular.forEach(vm.selected, function (s) {
                 if(vm.selected[s.Id].Selected == true) {
                     var isVisible = false;
-                    angular.forEach($scope.imageList(), function(c) {
+                    angular.forEach($scope.list(), function(c) {
                         if(c.Id == s.Id) {
                             isVisible = true;
                             return;
@@ -125,8 +125,8 @@
             return;
         });
 
-        function imageList() {
-            return Object.keys(vm.project.image_list)
+        function list() {
+            return Object.keys(vm.project)
         }
 
         $(".ui.search.fluid.dropdown.registry")

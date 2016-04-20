@@ -839,8 +839,8 @@
                                     <tr ng-repeat="image in vm.images" jquery>
                                         <td class="collapsing">
                                             <div class="positive ui fitted checkbox">
-                                                <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[image.id].Selected">
-                                                <label for="{{$index}}-cb"></label>
+                                                <input type="checkbox" id="{{$index}}" ng-model="vm.selected[image.id].Selected">
+                                                <label for="{{$index}}"></label>
                                             </div>
                                         </td>
                                         <td>{{image.id}}</td>
