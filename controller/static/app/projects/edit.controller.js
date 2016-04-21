@@ -94,6 +94,19 @@
         vm.getImages(vm.project.id);
         vm.getTests(vm.project.id);
 
+        vm.randomCreateId = null;
+        vm.randomEditId = null;
+
+        function makeId() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for( var i=0; i < 16; i++ )
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
         });
@@ -412,10 +425,15 @@
 
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#edit-project-image-create-modal-'+vm.project.id)
+            vm.randomCreateId = makeId();
+            // safeApply($scope, function(){
+            //     vm.randomCreateId = makeId();
+            // });
+            $scope.$apply();
+            $('#edit-project-image-create-modal-'+vm.randomCreateId)
                 .modal({
                     onHidden: function() {
-                        $('#edit-project-image-create-modal-'+vm.project.id).find("input").val("");
+                        $('#edit-project-image-create-modal-'+vm.randomCreateId).find("input").val("");
                         // $('#edit-project-image-create-modal-'+vm.project.id).modal('destroy');
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createImage.location = "";
@@ -429,6 +447,8 @@
             vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
+            vm.randomEditId = vm.editImage.id;
+            $scope.$apply();
             if(image.location === "Public Registry") {
                 ProjectService.getPublicRegistryTags(image.name)
                     .then(function(data) {
@@ -447,7 +467,7 @@
             if(image.location === "Shipyard Registry") {
                 getShipyardImages(image.registry);
             }
-            $('#edit-project-image-edit-modal-'+vm.project.id)
+            $('#edit-project-image-edit-modal-'+vm.randomEditId)
                 .modal({
                     onHidden: function() {
                         // $('#edit-project-image-edit-modal-'+vm.project.id).modal('destroy');
