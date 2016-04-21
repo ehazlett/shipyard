@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -1057,13 +1058,22 @@ func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool
 			log.Fatal(err)
 		}
 	}
+	ticker := time.NewTicker(time.Second * 15)
+	go func() {
+		for t := range ticker.C {
+			fmt.Print("Time: ", t.UTC())
+			fmt.Printf(" Pulling image: %s. Please be patient while the process finishes ... \n", imageToCheck)
+		}
+	}()
 	error := m.client.PullImage(imageToCheck, &auth)
 
 	if error != nil {
 		fmt.Printf("Could not pull image %s ... \n%s \n", imageToCheck, error)
 		return false
+		ticker.Stop()
 
 	}
+	ticker.Stop()
 	return true
 }
 
@@ -1353,6 +1363,8 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 }
 
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
+
+	var wg sync.WaitGroup
 	var eventType string
 	eventType = eventType
 	var build *model.Build
@@ -1420,7 +1432,11 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		for _, image := range projectImages {
 			for _, name := range imageNames {
 				if image.Name == name {
-					m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+					}()
 					m.UpdateBuildStatus(build.ID, "running")
 					testResult.ImageId = image.ID
 					testResult.DockerImageId = image.ImageId
@@ -1428,8 +1444,10 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 				}
 			}
 		}
+		wg.Wait()
 		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
 		result.CreateDate = time.Now()
+
 		for _, name := range imageNames {
 			// we instantiate fields for the testResult
 			testResult.ImageName = name
@@ -1481,7 +1499,9 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		}
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 		return build.ID, nil
+
 	}
+
 	return build.ID, nil
 }
 
