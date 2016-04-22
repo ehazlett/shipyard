@@ -117,10 +117,16 @@
                                     </div>
                                     <div ng-show="vm.createImage.location === 'Public Registry'" class="four wide field">
                                         <label>Tag</label>
-                                        <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkImagePublicRepository(vm.createImage)">
-                                            <option value="">Tag</option>
-                                            <option ng-repeat="a in vm.publicRegistryTags" data-value="{{a.name}}">{{a.name}}</option>
-                                        </select>
+                                        <div id="createImageTag" class="ui selection fluid dropdown tag create">
+                                            <input type="hidden" name="tag">
+                                            <i ng-if="!vm.createImageTagSpin" class="dropdown icon"></i>
+                                            <i ng-if="vm.createImageTagSpin" class="repeat icon spin" aria-hidden="true" style="float: right; position: relative; width: auto; font-size: 0.85714286; margin: 0em 0em 0em 1em;"></i>
+                                            <div class="default text">Tag</div>
+                                            <div class="menu">
+                                                <div ng-repeat="a in vm.publicRegistryTags"
+                                                     class="item" data-value="{{a.name}}">{{a.name}}</div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div ng-show="vm.createImage.location === 'File'" class="four wide field">
@@ -276,10 +282,15 @@
                                     </div>
                                     <div ng-show="vm.editImage.location === 'Public Registry'" class="four wide field">
                                         <label>Tag</label>
-                                        <select name="tag" ng-model="vm.editImage.tag" id="editImageTag" class="ui search fluid dropdown edit tag editImageTag" ng-change="vm.checkImagePublicRepository(vm.editImage)">
-                                            <option value="">{{vm.editImage.tag}}</option>
-                                            <option ng-repeat="a in vm.publicRegistryTags" data-value="{{a.name}}">{{a.name}}</option>
-                                        </select>
+                                        <div class="ui selection fluid dropdown edit tag" id="editImageTag">
+                                            <input type="hidden" name="tag">
+                                            <i class="dropdown icon"></i>
+                                            <div id="editImageTagDefault" class="default text"></div>
+                                            <div class="menu">
+                                                <div ng-repeat="a in vm.publicRegistryTags"
+                                                     class="item" data-value="{{a.name}}">{{a.name}}</div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div ng-show="vm.editImage.location === 'File'" class="four wide field">

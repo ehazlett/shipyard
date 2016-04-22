@@ -51,6 +51,8 @@
 
         vm.buttonStyle = "disabled";
 
+        vm.createImageTagSpin = false;
+
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
 
@@ -160,24 +162,30 @@
                     getShipyardImages(text);
                 }
             });
-        $(".ui.search.fluid.dropdown.tag")
+        $(".ui.selection.fluid.dropdown.tag.create")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
+                    vm.createImage.tag = $("#createImageTag").dropdown("get value");
+                    checkImagePublicRepository(vm.createImage);
+
                     // Search for the image layer of the chosen tag
                     // TODO: find a way to save the layer when the user clicks on the tag name
                     var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
                         return tag.name == value;
                     })[0];
-
+                    
                     if (tagObject)
                         vm.createImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
 
                     $scope.$apply();
                 }
             });
-        $(".ui.search.fluid.dropdown.edit.tag")
+        $(".ui.selection.fluid.dropdown.edit.tag")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
+                    vm.editImage.tag = $("#editImageTag").dropdown("get value");
+                    vm.checkImage(vm.editImage);
+                    
                     // Search for the image layer of the chosen tag
                     // TODO: find a way to save the layer when the user clicks on the tag name
                     var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
@@ -212,6 +220,7 @@
                 }
             },
             onSelect: function(result,response) {
+                vm.createImageTagSpin = true;
                 vm.createImage.name = result.title;
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
@@ -220,6 +229,7 @@
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
                         vm.publicRegistryTags = data;
+                        vm.createImageTagSpin = false;
                     }, function(data) {
                         vm.error = data;
                     });
@@ -450,6 +460,7 @@
                         // $('#edit-project-image-create-modal-'+vm.project.id).modal('destroy');
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createImage.location = "";
+                        vm.publicRegistryTags = [];
                     },
                     closable: false
                 })
@@ -461,6 +472,7 @@
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
             vm.randomEditId = vm.editImage.id;
+            $('#editImageTagDefault').html(image.tag);
             $scope.$apply();
             if(image.location === "Public Registry") {
                 ProjectService.getPublicRegistryTags(image.name)
@@ -490,6 +502,14 @@
                 .modal({
                     onHidden: function() {
                         // $('#edit-project-image-edit-modal-'+vm.project.id).modal('destroy');
+                    },
+                    onShow: function () {
+                        $("#editImageTag").dropdown("refresh");
+                        $("#editImageTag").dropdown("set selected", image.tag);
+                    },
+                    onVisible: function () {
+                        $("#editImageTag").dropdown("refresh");
+                        $("#editImageTag").dropdown("set selected", image.tag);
                     },
                     closable: false
                 })
@@ -601,7 +621,7 @@
         function checkImage(imageData) {
             vm.buttonStyle = "disabled";
             console.log(" check image " + imageData.name + " with tag " + imageData.tag);
-            angular.forEach(vm.shipyardImages, function (image) {
+            angular.forEach(vm.images, function (image) {
                 if(image.name === imageData.name && image.tag === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }
