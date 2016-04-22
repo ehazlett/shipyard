@@ -1429,74 +1429,75 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			}
 			return ""
 		}()
-		for _, image := range projectImages {
+		go func() {
+			for _, image := range projectImages {
+				for _, name := range imageNames {
+					if image.Name == name {
+						wg.Add(1)
+						go func() {
+							defer wg.Done()
+							m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+						}()
+						m.UpdateBuildStatus(build.ID, "running")
+						testResult.ImageId = image.ID
+						testResult.DockerImageId = image.ImageId
+
+					}
+				}
+			}
+			wg.Wait()
+			result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
+			result.CreateDate = time.Now()
+
 			for _, name := range imageNames {
-				if image.Name == name {
-					wg.Add(1)
-					go func() {
-						defer wg.Done()
-						m.VerifyIfImageExistsLocally(image.Name, image.Tag)
-					}()
-					m.UpdateBuildStatus(build.ID, "running")
-					testResult.ImageId = image.ID
-					testResult.DockerImageId = image.ImageId
+				// we instantiate fields for the testResult
+				testResult.ImageName = name
+				testResult.TestName = test.Name
+				testResult.TestId = testId
 
+				buildResult := model.BuildResult{}
+				// we launch a go routine which checks the image
+				go func() {
+					buildResult, err = c.CheckImage(build.ID, name)
+					// in the end we update the build results
+
+				}()
+				if err != nil {
+					m.UpdateBuildStatus(build.ID, "finished_failed")
+					testResult.SimpleResult.Status = "finished_failed"
+					testResult.EndDate = time.Now()
+					testResult.Blocker = false
+					result.TestResults = append(result.TestResults, testResult)
+					result.LastUpdate = time.Now()
+					if existingResult != nil {
+						m.UpdateResult(projectId, result)
+
+					}
+					if existingResult == nil {
+						m.CreateResult(projectId, result)
+					}
 				}
+				// if we don't get an error we mark the test for the image as successful
+				if err == nil {
+					m.UpdateBuildStatus(build.ID, "finished_success")
+					testResult.SimpleResult.Status = "finished_success"
+					testResult.EndDate = time.Now()
+					testResult.Blocker = false
+					result.TestResults = append(result.TestResults, testResult)
+					result.LastUpdate = time.Now()
+					if existingResult != nil {
+						m.UpdateResult(projectId, result)
+					}
+					if existingResult == nil {
+						m.CreateResult(projectId, result)
+					}
+				}
+				m.UpdateBuildResults(build.ID, buildResult)
+				m.UpdateBuildStatus(build.ID, "running")
+				//wg.Wait()
+				// if we get an error we mark the test for the image as failed
 			}
-		}
-		wg.Wait()
-		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
-		result.CreateDate = time.Now()
-
-		for _, name := range imageNames {
-			// we instantiate fields for the testResult
-			testResult.ImageName = name
-			testResult.TestName = test.Name
-			testResult.TestId = testId
-
-			buildResult := model.BuildResult{}
-			// we launch a go routine which checks the image
-			go func() {
-				buildResult, err = c.CheckImage(build.ID, name)
-				// in the end we update the build results
-
-			}()
-			if err != nil {
-				m.UpdateBuildStatus(build.ID, "finished_failed")
-				testResult.SimpleResult.Status = "finished_failed"
-				testResult.EndDate = time.Now()
-				testResult.Blocker = false
-				result.TestResults = append(result.TestResults, testResult)
-				result.LastUpdate = time.Now()
-				if existingResult != nil {
-					m.UpdateResult(projectId, result)
-
-				}
-				if existingResult == nil {
-					m.CreateResult(projectId, result)
-				}
-			}
-			// if we don't get an error we mark the test for the image as successful
-			if err == nil {
-				m.UpdateBuildStatus(build.ID, "finished_success")
-				testResult.SimpleResult.Status = "finished_success"
-				testResult.EndDate = time.Now()
-				testResult.Blocker = false
-				result.TestResults = append(result.TestResults, testResult)
-				result.LastUpdate = time.Now()
-				if existingResult != nil {
-					m.UpdateResult(projectId, result)
-				}
-				if existingResult == nil {
-					m.CreateResult(projectId, result)
-				}
-			}
-			m.UpdateBuildResults(build.ID, buildResult)
-			m.UpdateBuildStatus(build.ID, "running")
-			//wg.Wait()
-			// if we get an error we mark the test for the image as failed
-
-		}
+		}()
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 		return build.ID, nil
 
