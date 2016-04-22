@@ -185,6 +185,14 @@
                     if (tagObject)
                         vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
 
+
+                    vm.editImage.additionalTags = [];
+                    $.each(vm.publicRegistryTags, function(index,item) {
+                        if(vm.publicRegistryTags[index].layer === vm.editImage.tagLayer) {
+                            vm.editImage.additionalTags.push(vm.publicRegistryTags[index].name);
+                        }
+                    });
+
                     $scope.$apply();
                 }
             });
@@ -460,6 +468,12 @@
                             vm.editImage.tagLayer = tagObject.layer;
                             vm.publicRegistryTags = data;
                         }
+                        vm.editImage.additionalTags = [];
+                        $.each(vm.publicRegistryTags, function(index,item) {
+                            if(vm.publicRegistryTags[index].layer === vm.editImage.tagLayer) {
+                                vm.editImage.additionalTags.push(vm.publicRegistryTags[index].name);
+                            }
+                        });
                     }, function(data) {
                         vm.error = data;
                     });
