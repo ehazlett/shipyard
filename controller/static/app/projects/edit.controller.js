@@ -96,6 +96,8 @@
 
         vm.randomCreateId = null;
         vm.randomEditId = null;
+        vm.randomCreateTestId = null;
+        vm.randomEditTestId = null;
 
         function makeId() {
             var text = "";
@@ -185,7 +187,6 @@
                     if (tagObject)
                         vm.editImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
 
-
                     vm.editImage.additionalTags = [];
                     $.each(vm.publicRegistryTags, function(index,item) {
                         if(vm.publicRegistryTags[index].layer === vm.editImage.tagLayer) {
@@ -259,7 +260,7 @@
         $(".ui.search.fluid.dropdown.testProvider")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    $('#edit-project-test-create-modal').find("input").val("");
+                    $('#edit-project-test-create-modal-'+vm.randomCreateTestId).find("input").val("");
                     if(value === "Predefined Provider")
                         getTestsProviders();
                 }
@@ -294,12 +295,14 @@
             vm.createTest.tagging = {};
             vm.createTest.provider = {};
             var imagesSelectize = [];
+            vm.randomCreateTestId = makeId();
+            $scope.$apply();
             angular.forEach(vm.images, function (image) {
                 imagesSelectize.push(image.name+":"+image.tag);
             });
             vm.createTest.selectizeItems = imagesSelectize.map(function(x) { return {item: x};});
             vm.getParameters();
-            $('#edit-project-test-create-modal')
+            $('#edit-project-test-create-modal-'+vm.randomCreateTestId)
                 .modal({
                     onHidden: function() {
                         vm.buttonStyle = "disabled";
@@ -368,6 +371,8 @@
             vm.editTest.selectizeData = [];
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
+            vm.randomEditTestId = vm.editTest.id;
+            $scope.$apply();
             vm.getParameters();
             if(test.provider.providerType === "Predefined Provider") {
                 vm.providers = [];
@@ -394,7 +399,7 @@
                 });
                 vm.editTest.selectizeItems = imagesSelectize.map(function(x) { return {item: x};});
             }
-            $('#edit-project-test-edit-modal-'+vm.project.id)
+            $('#edit-project-test-edit-modal-'+vm.randomEditTestId)
                 .modal({
                     closable: false
                 })
@@ -406,7 +411,7 @@
             vm.createImage.tag = "";
             vm.createImage.description = "";
             vm.buttonStyle = "disabled";
-            $('#edit-project-image-create-modal-'+vm.project.id).find("input").val("");
+            $('#edit-project-image-create-modal-'+vm.randomCreateId).find("input").val("");
             $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
