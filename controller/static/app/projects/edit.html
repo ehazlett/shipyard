@@ -45,15 +45,16 @@
         <div class="ui grid">
             <div class="row" ng-hide="vm.deploying">
                 <div class="column">
-                    <div class="ui error message" ng-show="vm.error">
-                        <div class="header">Error...</div>
-                        <p>{{vm.error}}</p>
-                    </div>
                     <div class="ui form" ng-submit="vm.deploy()">
                         <h5 style="display: inline">Image Configuration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
                         <div class="ui toggle checkbox" ng-click="vm.createImage.skipImageBuild=!vm.createImage.skipImageBuild">
                             <input type="checkbox" name="public" ng-model="vm.createImage.skipImageBuild">
-                            <label>Skip Image Building</label>
+                            <label>Disable image verification</label>
+                        </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Disable image verification</h5>
+                            <p>Click the slider to disable image verification.</p>
                         </div>
                         <div class="ui two column grid">
                             <div class="column">
@@ -87,14 +88,14 @@
                                         <label>Image Name </label>
                                         <select name="image" ng-model="vm.createImage.name" class="ui search fluid dropdown image" ng-change="vm.checkImage(vm.createImage)">
                                             <option value="">Name</option>
-                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.createImage.location === 'Shipyard Registry'" class="three wide field" >
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkImage(vm.createImage)">
                                             <option value="">Tag</option>
-                                            <option ng-repeat="a in vm.images | filter: { name: vm.createImage.name }" value="{{a.tag}}">{{a.tag}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages | filter: { name: vm.createImage.name }" value="{{a.tag}}">{{a.tag}}</option>
                                         </select>
                                     </div>
 
@@ -102,7 +103,7 @@
                                         <label>Image Name </label>
                                         <div class="ui search">
                                             <div class="ui icon input">
-                                                <input class="prompt" type="text" placeholder="Name" ng-model="vm.createImage.name" />
+                                                <input class="prompt" type="text" placeholder="Name" />
                                                 <i class="search icon"></i>
                                             </div>
                                             <div class="results"></div>
@@ -142,9 +143,14 @@
                                 </div>
 
                                 <div ng-show="vm.createImage.location && vm.createImage.location != 'File'" class="field">
-                                    <label>Additional Image Tag</label>
+                                    <label>Additional Image Tag <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="max-width: 450px;">
+                                            <h5>Additional Image Tag</h5>
+                                            <p>Tags that have the same layer as the chosen one.</p>
+                                        </div>
+                                    </label>
                                     <input ng-show="!vm.createImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
-                                    <i ng-show="vm.createImage.location === 'Shipyard Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.createImage.name }">
+                                    <i ng-show="vm.createImage.location === 'Shipyard Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.shipyardImages | filter: { name: vm.createImage.name }">
                                         {{a.tag}}
                                     </i>
                                     <i ng-show="vm.createImage.location === 'Public Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.createImage.tagLayer }">
@@ -201,15 +207,16 @@
         <div class="ui grid">
             <div class="row">
                 <div class="column">
-                    <div class="ui error message" ng-show="vm.error">
-                        <div class="header">Error...</div>
-                        <p>{{vm.error}}</p>
-                    </div>
                     <div class="ui form">
                         <h5 style="display: inline">Image Configuration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
                         <div class="ui toggle checkbox" ng-click="vm.editImage.skipImageBuild=!vm.editImage.skipImageBuild">
                             <input type="checkbox" name="public" ng-model="vm.editImage.skipImageBuild">
-                            <label>Skip Image Building</label>
+                            <label>Disable image verification</label>
+                        </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Disable image verification</h5>
+                            <p>Click the slider to disable image verification.</p>
                         </div>
                         <div class="ui two column grid">
                             <div class="column">
@@ -240,14 +247,14 @@
                                         <label>Image Name </label>
                                         <select name="image" ng-model="vm.editImage.name" class="ui search fluid dropdown image" ng-change="vm.checkImage(vm.editImage)">
                                             <option value="">{{vm.editImage.name}}</option>
-                                            <option ng-repeat="a in vm.images" value="{{a.name}}">{{a.name}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages" value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="three wide field" >
                                         <label>Tag</label>
                                         <select name="tag" ng-model="vm.editImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkImage(vm.editImage)">
                                             <option value="">{{vm.editImage.tag}}</option>
-                                            <option ng-repeat="a in vm.images | filter: { name: vm.editImage.name }" value="{{a.tag}}">{{a.tag}}</option>
+                                            <option ng-repeat="a in vm.shipyardImages | filter: { name: vm.editImage.name }" value="{{a.tag}}">{{a.tag}}</option>
                                         </select>
                                     </div>
 
@@ -295,9 +302,14 @@
                                 </div>
 
                                 <div ng-show="vm.editImage.location && vm.editImage.location != 'File'" class="field">
-                                    <label>Additional Image Tag</label>
+                                    <label>Additional Image Tag <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="max-width: 450px;">
+                                            <h5>Additional Image Tag</h5>
+                                            <p>Tags that have the same layer as the chosen one.</p>
+                                        </div>
+                                    </label>
                                     <input ng-show="!vm.editImage.tag" disabled name="additionalTag" class="input" type="text" placeholder="Tags" >
-                                    <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.project.images | filter: { name: vm.editImage.name }">
+                                    <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.editImage.name }">
                                         {{a.tag}}
                                     </i>
                                     <i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.editImage.tagLayer }">
@@ -355,51 +367,52 @@
         <div class="ui grid">
             <div class="row">
                 <div class="column">
-                    <div class="ui error message" ng-show="vm.error">
-                        <div class="header">Error...</div>
-                        <p>{{vm.error}}</p>
-                    </div>
                     <div class="ui form">
                         <h5 style="display: inline">Test Configuration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
                         <div class="ui toggle checkbox" ng-click="vm.createTest.skipTest=!vm.createTest.skipTest">
                             <input type="checkbox" name="public" ng-model="vm.createTest.skipTest">
-                            <label>Skip Test</label>
+                            <label>Disable test verification</label>
+                        </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Disable test verification</h5>
+                            <p>Click the slider to disable test verification.</p>
                         </div>
                         <div class="ui two column grid">
                             <div class="column">
 
-                                <div class="four fields">
-                                    <div class="four wide field">
+                                <div class="fields">
+                                    <div class="five wide field">
                                         <label>Test Provider</label>
-                                        <select name="testProvider" ng-model="vm.createTest.provider.type" class="ui search fluid dropdown testProvider" ng-change="vm.resetTestValues()">
+                                        <select name="testProvider" ng-model="vm.createTest.provider.providerType" class="ui search fluid dropdown testProvider" ng-change="vm.resetTestValues()">
                                             <option value="">Select</option>
                                             <option value="Predefined Provider">Predefined Provider</option>
                                             <option value="Clair [Internal]">Clair [Internal]</option>
                                         </select>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.createTest.provider.providerType === 'Predefined Provider'">
                                         <label>Provider Name</label>
-                                        <select name="providerName" ng-model="vm.createTest.provider.name" class="ui search fluid dropdown providerName" ng-change="vm.createTest.provider.test='';vm.getJobs(vm.createTest.provider.name);vm.checkProviderTest(vm.createTest.provider.name,vm.createTest.provider.test)">
+                                        <select name="providerName" ng-model="vm.createTest.provider.providerName" class="ui search fluid dropdown providerName" ng-change="vm.createTest.provider.ProviderTest='';vm.getJobs(vm.createTest.provider.providerName);vm.checkProviderTest(vm.createTest.provider.providerName,vm.createTest.provider.ProviderTest)">
                                             <option value="">Name</option>
                                             <option ng-repeat="a in vm.providers" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.createTest.provider.providerType === 'Predefined Provider'">
                                         <label>Test</label>
-                                        <select name="test" ng-model="vm.createTest.provider.test" class="ui search fluid dropdown providerTest" ng-change="vm.checkProviderTest(vm.createTest.provider.name,vm.createTest.provider.test)">
+                                        <select name="test" ng-model="vm.createTest.provider.ProviderTest" class="ui search fluid dropdown providerTest" ng-change="vm.checkProviderTest(vm.createTest.provider.providerName,vm.createTest.provider.ProviderTest)">
                                             <option value="">Test</option>
                                             <option ng-repeat="a in vm.providerTests" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
 
-                                    <div class="eight wide field" ng-show="vm.createTest.provider.type === 'Clair [Internal]'">
+                                    <div class="eleven wide field" ng-show="vm.createTest.provider.providerType === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
                                         <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
                                     </div>
 
-                                    <div class="one wide field" ng-show="vm.createTest.provider.type === 'Predefined Provider'">
+                                    <div class="one wide field" ng-show="vm.createTest.provider.providerType === 'Predefined Provider'">
                                         <label>&nbsp;</label>
                                         <button class="right floated ui icon button {{vm.buttonStyle}}">
                                             <i class="check icon"></i>
@@ -408,10 +421,15 @@
 
                                 </div>
 
-                                <div class="field" ng-show="vm.createTest.provider.type">
+                                <div class="field" ng-show="vm.createTest.provider.providerType">
                                     <div class="ui toggle checkbox" ng-click="vm.createTest.blocker=!vm.createTest.blocker">
                                         <input type="checkbox" name="public" ng-model="vm.createTest.blocker">
                                         <label>Blocker</label>
+                                    </div>
+                                    <i class="blue help circle icon"></i>
+                                    <div class="ui popup" style="max-width: 450px;">
+                                        <h5>Blocker</h5>
+                                        <p>Click the slider.</p>
                                     </div>
                                 </div>
 
@@ -429,20 +447,6 @@
 
                                 </div>
 
-                            </div>
-
-                            <div class="column">
-
-                                <div class="field">
-                                    <label>Test Description</label>
-                                    <input name="testDescription" class="input" type="text" ng-model="vm.createTest.description" placeholder="Add Description" />
-                                </div>
-
-                                <div class="field" ng-show="vm.createTest.testProvider">
-                                    <div>
-                                    </div>
-                                </div>
-
                                 <div class="two fields">
 
                                     <div class="field">
@@ -456,6 +460,55 @@
                                     </div>
 
                                 </div>
+
+                                <div class="field">
+                                    <label>Test Description</label>
+                                    <input name="testDescription" class="input" type="text" ng-model="vm.createTest.description" placeholder="Add Description" />
+                                </div>
+
+                            </div>
+
+                            <div class="column" style="overflow-y:scroll; height:340px;">
+
+                                <div class="fields">
+                                    <div class="seven wide field">
+                                        <label>Parameters <i class="blue help circle icon parameters"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Parameters</h5>
+                                                <p>Parameter should be identical to the one in the provider.</p>
+                                            </div>
+                                        </label>
+                                        <select name="parameterName" class="ui search fluid dropdown parameter" ng-model="vm.createTest.paramName">
+                                            <option value="">Search Name</option>
+                                            <option ng-repeat="a in vm.allParameters" data-value="{{a.paramName}}">{{a.paramName}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="eight wide field">
+                                        <label>&nbsp;</label>
+                                        <selectize config='vm.myIlmData' options='vm.ilmData' ng-model="vm.createTest.paramValue"></selectize>
+                                    </div>
+                                    <div class="one wide field" ng-click="vm.addParameter()">
+                                        <label>&nbsp;</label>
+                                        <button class="ui green icon button">
+                                            <i class="add icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="fields" ng-repeat="parameter in vm.createTest.parameters">
+                                    <div class="seven wide field">
+                                        <input class="input" type="text" ng-model="parameter.paramName"></input>
+                                    </div>
+                                    <div class="eight wide field">
+                                        <selectize ng-model="parameter.paramValue"></selectize>
+                                    </div>
+                                    <div class="one wide field">
+                                        <button class="ui red icon button"  ng-click="vm.removeParameter($index)">
+                                            <i class="delete icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -483,49 +536,50 @@
         <div class="ui grid">
             <div class="row">
                 <div class="column">
-                    <div class="ui error message" ng-show="vm.error">
-                        <div class="header">Error...</div>
-                        <p>{{vm.error}}</p>
-                    </div>
                     <div class="ui form">
                         <h5 style="display: inline">Test Configuration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
                         <div class="ui toggle checkbox" ng-click="vm.editTest.skipTest=!vm.editTest.skipTest">
                             <input type="checkbox" name="public" ng-model="vm.editTest.skipTest">
-                            <label>Skip Test</label>
+                            <label>Disable test verification</label>
+                        </div>
+                        <i class="blue help circle icon"></i>
+                        <div class="ui popup" style="max-width: 450px;">
+                            <h5>Disable test verification</h5>
+                            <p>Click the slider to disable test verification.</p>
                         </div>
                         <div class="ui two column grid">
                             <div class="column">
 
-                                <div class="four fields">
-                                    <div class="four wide field">
+                                <div class="fields">
+                                    <div class="five wide field">
                                         <label>Test Provider</label>
                                         <div class="ui input">
-                                            <input type="text" ng-model="vm.editTest.provider.type" disabled>
+                                            <input type="text" ng-model="vm.editTest.provider.providerType" disabled>
                                         </div>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.editTest.provider.providerType === 'Predefined Provider'">
                                         <label>Provider Name</label>
-                                        <select name="providerName" ng-model="vm.editTest.provider.name" class="ui search fluid dropdown" ng-change="vm.editTest.provider.test = '';vm.getJobs(vm.editTest.provider.name);vm.checkProviderTest(vm.editTest.provider.name,vm.editTest.provider.test)">
-                                            <option value="">{{vm.editTest.provider.name}}</option>
+                                        <select name="providerName" ng-model="vm.editTest.provider.providerName" class="ui search fluid dropdown" ng-change="vm.editTest.provider.ProviderTest = '';vm.getJobs(vm.editTest.provider.providerName);vm.checkProviderTest(vm.editTest.provider.providerName,vm.editTest.provider.ProviderTest)">
+                                            <option value="">{{vm.editTest.provider.providerName}}</option>
                                             <option ng-repeat="a in vm.providers" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
 
-                                    <div class="four wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">
+                                    <div class="five wide field" ng-show="vm.editTest.provider.providerType === 'Predefined Provider'">
                                         <label>Test</label>
-                                        <select name="test" ng-model="vm.editTest.provider.test" class="ui search fluid dropdown" ng-change="vm.checkProviderTest(vm.editTest.provider.name,vm.editTest.provider.test)">
-                                            <option value="">{{vm.editTest.provider.test}}</option>
+                                        <select name="test" ng-model="vm.editTest.provider.ProviderTest" class="ui search fluid dropdown" ng-change="vm.checkProviderTest(vm.editTest.provider.providerName,vm.editTest.provider.ProviderTest)">
+                                            <option value="">{{vm.editTest.provider.ProviderTest}}</option>
                                             <option ng-repeat="a in vm.providerTests" data-value="{{a.name}}">{{a.name}}</option>
                                         </select>
                                     </div>
 
-                                    <div class="eight wide field" ng-show="vm.editTest.provider.type === 'Clair [Internal]'">
+                                    <div class="eleven wide field" ng-show="vm.editTest.provider.providerType === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
                                         <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
                                     </div>
 
-                                    <div class="one wide field" ng-show="vm.editTest.provider.type === 'Predefined Provider'">
+                                    <div class="one wide field" ng-show="vm.editTest.provider.providerType === 'Predefined Provider'">
                                         <label>&nbsp;</label>
                                         <button class="right floated ui icon button {{vm.buttonStyle}}">
                                             <i class="check icon"></i>
@@ -534,10 +588,15 @@
 
                                 </div>
 
-                                <div class="field" ng-show="vm.editTest.provider.type">
+                                <div class="field" ng-show="vm.editTest.provider.providerType">
                                     <div class="ui toggle checkbox" ng-click="vm.editTest.blocker=!vm.editTest.blocker">
                                         <input type="checkbox" name="public" ng-model="vm.editTest.blocker">
                                         <label>Blocker</label>
+                                    </div>
+                                    <i class="blue help circle icon"></i>
+                                    <div class="ui popup" style="max-width: 450px;">
+                                        <h5>Blocker</h5>
+                                        <p>Click the slider.</p>
                                     </div>
                                 </div>
 
@@ -555,20 +614,6 @@
 
                                 </div>
 
-                            </div>
-
-                            <div class="column">
-
-                                <div class="field">
-                                    <label>Test Description</label>
-                                    <input name="testDescription" class="input" type="text" ng-model="vm.editTest.description" placeholder="Add Description" />
-                                </div>
-
-                                <div class="field" ng-show="vm.editTest.testProvider">
-                                    <div>
-                                    </div>
-                                </div>
-
                                 <div class="two fields">
 
                                     <div class="field">
@@ -582,6 +627,55 @@
                                     </div>
 
                                 </div>
+
+                                <div class="field">
+                                    <label>Test Description</label>
+                                    <input name="testDescription" class="input" type="text" ng-model="vm.editTest.description" placeholder="Add Description" />
+                                </div>
+
+                            </div>
+
+                            <div class="column" style="overflow-y:scroll; height:340px;">
+
+                                <div class="fields">
+                                    <div class="seven wide field">
+                                        <label>Parameters <i class="blue help circle icon parameters"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Parameter</h5>
+                                                <p>Parameter should be identical to the one in the provider.</p>
+                                            </div>
+                                        </label>
+                                        <select name="parameterName" class="ui search fluid dropdown parameter" ng-model="vm.editTest.paramName">
+                                            <option value="">Search Name</option>
+                                            <option ng-repeat="a in vm.allParameters" data-value="{{a.paramName}}">{{a.paramName}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="eight wide field">
+                                        <label>&nbsp;</label>
+                                        <selectize config='vm.myIlmData' options='vm.ilmData' ng-model="vm.editTest.paramValue"></selectize>
+                                    </div>
+                                    <div class="one wide field" ng-click="vm.addParameterEditTest()">
+                                        <label>&nbsp;</label>
+                                        <button class="ui green icon button">
+                                            <i class="add icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="fields" ng-repeat="parameter in vm.editTest.parameters">
+                                    <div class="seven wide field">
+                                        <input class="input" type="text" ng-model="parameter.paramName"></input>
+                                    </div>
+                                    <div class="eight wide field">
+                                        <selectize ng-model="parameter.paramValue"></selectize>
+                                    </div>
+                                    <div class="one wide field">
+                                        <button class="ui red icon button"  ng-click="vm.removeParameterEditTest($index)">
+                                            <i class="delete icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -600,11 +694,29 @@
     </div>
 </div>
 
-
 <div class="ui padded grid">
     <div class="row">
         <div class="column">
+            <!--Build info Bar-->
+            <div ng-class="{'positive': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success', 'negative': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed', 'hidden': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'none'}"
+                 class="ui icon message">
+                <i ng-class="{'circle loading': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'running', 'check': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success', 'remove': vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed'}"
+                   class="notched icon"></i>
+                <div class="content">
+                    <div class="header">
+                        <span ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success'">Test Ran Successfully</span>
+                        <span ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed'">Test Failed</span>
+                        <span ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'running'">Running Test</span>
+                    </div>
+                    <p ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_success'">Test {{vm.buildMessageConfig.testId}} ran successfully. <a>See logs</a></p>
+                    <p ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'finished_failed'">Test {{vm.buildMessageConfig.testId}} failed. <a>See logs</a></p>
+                    <p ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'running'">We're running {{vm.buildMessageConfig.testId}} for you. We'll notify you when it completes.</p>
+                </div>
+            </div>
             <div class="ui segment page">
+                <span style="float: right">
+                    <a>Go To Projects <i class="sign out icon"></i></a>
+                </span>
                 <div class="ui grid">
                     <div class="two column row">
                         <div class="column">
@@ -625,26 +737,21 @@
                                     <h5 class="ui dividing header">Project Configuration</h5>
                                     <div class="six fields">
                                         <div class="field">
-                                            <label>Project ID</label>
-                                            <input disabled name="projectID" class="input" type="text" ng-model="vm.project.id" placeholder="Project ID..."></input>
+                                            <label>Project ID <span style="font-weight: normal">{{vm.project.id || '...'}}</span></label>
                                         </div>
                                     </div>
                                     <div class="five fields">
                                         <div class="field">
-                                            <label>Author</label>
-                                            <input disabled name="author" class="input" type="text" ng-model="vm.project.author" placeholder="Author"></input>
-                                            </div>
-                                        <div class="field">
-                                            <label>Creation Time</label>
-                                            <input disabled name="createTime" class="input" type="text" ng-model="vm.project.creationTime" placeholder="Creation Time..."></input>
+                                            <label>Author <span style="font-weight: normal">{{vm.project.author || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Update Time</label>
-                                            <input disabled name="updateTime" class="input" type="text" ng-model="vm.project.updateTime" placeholder="Update Time..."></input>
+                                            <label>Creation Time <span style="font-weight: normal">{{vm.project.creationTime || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Updated By</label>
-                                            <input disabled name="updateAuthor" class="input" type="text" ng-model="vm.project.updatedBy" placeholder="Update By..."></input>
+                                            <label>Update Time <span style="font-weight: normal">{{vm.project.updateTime || '...'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Update By <span style="font-weight: normal">{{vm.project.updatedBy || '...'}}</span></label>
                                         </div>
                                     </div>
                                     <div class="four fields">
@@ -672,6 +779,15 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="field">
+                                        <div class="row">
+                                            <div class="column">
+                                                <div ng-click='vm.updateProject(vm.project)' class="ui small gray button">
+                                                    Save Project
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -679,21 +795,35 @@
 
                     <div class="ui padded grid">
                         <div class="row">
-                            <div class="left floated column">
-                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
-                                    <i class="plus icon"></i>Add Image
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="column">
-                                <h4 class="ui dividing header">Images Details</h4>
-                                <div class="item">
-                                    <div class="ui toggle checkbox" ng-click="vm.skipImages=!vm.skipImages">
-                                        <input type="checkbox" name="public" ng-model="vm.skipImages">
-                                        <label>Skip images</label>
+                                <h4 class="ui dividing header"></h4>
+                                <h4 class="ui header">Images Details &nbsp &nbsp &nbsp
+                                    <div class="field" style="display: inline-block">
+                                        <div class="item">
+                                            <div class="ui toggle checkbox" ng-click="vm.skipImages=!vm.skipImages">
+                                                <input type="checkbox" name="public" ng-model="vm.skipImages">
+                                                <label style="font-weight: lighter">Disable image verification</label>
+                                            </div>
+                                            <i class="blue help circle icon"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Disable image verification</h5>
+                                                <p>Click the slider to disable image verification.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h4>
+                                <div class="field">
+                                    <div class="item">
+                                        <div class="row">
+                                            <div class="left column">
+                                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
+                                                    <i class="plus icon"></i>Add Image
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <table class="ui sortable celled table">
                                     <thead>
                                     <tr>
@@ -706,7 +836,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="image in vm.project.images" jquery>
+                                    <tr ng-repeat="image in vm.images" jquery>
                                         <td class="collapsing">
                                             <div class="positive ui fitted checkbox">
                                                 <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[image.id].Selected">
@@ -734,21 +864,35 @@
 
                     <div class="ui padded grid">
                         <div class="row">
-                            <div class="left floated column">
-                                <div ng-click="vm.showTestCreateDialog()" class="ui small green labeled icon button">
-                                    <i class="plus icon"></i>Add Test
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="column">
-                                <h4 class="ui dividing header">Tests Details</h4>
-                                <div class="item">
-                                    <div class="ui toggle checkbox" ng-click="vm.skipTests=!vm.skipTests">
-                                        <input type="checkbox" name="public" ng-model="vm.skipTests">
-                                        <label>Skip Tests</label>
+                                <h4 class="ui dividing header"></h4>
+                                <h4 class="ui header">Tests Details &nbsp &nbsp &nbsp
+                                    <div class="field" style="display: inline-block">
+                                        <div class="item">
+                                            <div class="ui toggle checkbox" ng-click="vm.skipTests=!vm.skipTests">
+                                                <input type="checkbox" name="public" ng-model="vm.skipTests">
+                                                <label style="font-weight: lighter">Disable test verification</label>
+                                            </div>
+                                            <i class="blue help circle icon"></i>
+                                            <div class="ui popup" style="max-width: 450px;">
+                                                <h5>Disable test verification</h5>
+                                                <p>Click the slider to disable test verification.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h4>
+                                <div class="field">
+                                    <div class="item">
+                                        <div class="row">
+                                            <div class="left column">
+                                                <div ng-click="vm.showTestCreateDialog()" class="ui small green labeled icon button">
+                                                    <i class="plus icon"></i>Add Test
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <table class="ui sortable celled table">
                                     <thead>
                                     <tr>
@@ -760,7 +904,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="test in vm.project.tests" jquery>
+                                    <tr ng-repeat="test in vm.tests" jquery>
                                         <td class="collapsing">
                                             <div class="positive ui fitted checkbox">
                                                 <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[test.id].Selected">
@@ -774,6 +918,12 @@
                                             <div ng-click="vm.showTestEditDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="pencil icon"></i>
                                             </div>
+                                            <div ng-class="{'loading': vm.buttonLoadStatus(test.id)}" ng-click="vm.startBuild(test.id)" class="basic compact blue ui icon button">
+                                                <i class="play icon"></i>
+                                            </div>
+                                            <div ng-click="vm.showBuildResults(image)" class="basic compact blue ui icon button">
+                                                <i class="search icon"></i>
+                                            </div>
                                             <div ng-click="vm.showDeleteTestDialog(test)" class="basic compact blue ui icon button">
                                                 <i class="trash icon"></i>
                                             </div>
@@ -785,15 +935,6 @@
                         </div>
                     </div>
 
-                    <div class="ui padded grid">
-                        <div class="row">
-                            <div class="column">
-                                <div ng-click='vm.updateProject(vm.project)' class="ui small gray button">
-                                    Save Project
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -843,6 +984,15 @@
         $('.help.circle.icon').popup({
             inline: true,
             hoverable: true,
+            delay: {
+                show: 150,
+                hide: 400
+            }
+        });
+        $('.help.circle.icon.parameters').popup({
+            inline: true,
+            hoverable: true,
+            position : 'bottom left',
             delay: {
                 show: 150,
                 hide: 400

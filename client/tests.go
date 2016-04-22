@@ -48,9 +48,20 @@ func GetTest(authHeader string, url string, projectId string, testId string) (*m
 	return test, resp.StatusCode, nil
 }
 
-func CreateTest(authHeader string, url string, name string, description string, targets []*model.TargetArtifact, selectedTestType string, providerId string, projectId string) (string, int, error) {
+func CreateTest(authHeader string, url string, name string, description string, targets []*model.TargetArtifact, selectedTestType string, providerType string, providerName string, providerTest string, projectId string, params []*model.Parameter, successTag string, failTag string, fromTag string) (string, int, error) {
 	var test *model.Test
-	test = test.NewTest(name, description, targets, selectedTestType, providerId, projectId)
+	test = test.NewTest(name,
+		description,
+		targets,
+		selectedTestType,
+		projectId,
+		providerType,
+		providerName,
+		providerTest,
+		params,
+		successTag,
+		failTag,
+		fromTag)
 
 	data, err := json.Marshal(test)
 	if err != nil {
@@ -77,9 +88,20 @@ func CreateTest(authHeader string, url string, name string, description string, 
 
 }
 
-func UpdateTest(authHeader string, url string, name string, description string, targets []*model.TargetArtifact, selectedTestType string, providerId string, projectId string, testId string) (int, error) {
+func UpdateTest(authHeader string, url string, testId string, name string, description string, targets []*model.TargetArtifact, selectedTestType string, projectId string, providerType string, providerName string, providerTest string, params []*model.Parameter, successTag string, failTag string, fromTag string) (int, error) {
 	var test *model.Test
-	test = test.NewTest(name, description, targets, selectedTestType, providerId, projectId)
+	test = test.NewTest(name,
+		description,
+		targets,
+		selectedTestType,
+		projectId,
+		providerType,
+		providerName,
+		providerTest,
+		params,
+		successTag,
+		failTag,
+		fromTag)
 	test.ID = testId
 	data, err := json.Marshal(test)
 	if err != nil {

@@ -1,9 +1,9 @@
 package ilm_client
 
 import (
-	"io/ioutil"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 
 	"github.com/shipyard/shipyard/model/dockerhub"
 )
@@ -31,7 +31,7 @@ func DockerHubSearchImage(authHeader, url string, imageName string) ([]dockerhub
 }
 
 func DockerHubSearchImageTags(authHeader, url string, imageName string) ([]dockerhub.Tag, int, error) {
-	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/v1/repositories/%s/tags", url, imageName), "")
+	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/v1/repositories/tags?r=%s", url, imageName), "")
 	if err != nil {
 		return nil, resp.StatusCode, err
 	} else {

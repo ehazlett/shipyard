@@ -262,7 +262,7 @@ func (m MockManager) UpdateTest(projectId string, test *model.Test) error   { re
 func (m MockManager) DeleteTest(projectId string, testId string) error      { return nil }
 func (m MockManager) DeleteAllTests() error                                 { return nil }
 
-func (m MockManager) GetResults(projectId string) ([]*model.Result, error)        { return nil, nil }
+func (m MockManager) GetResults(projectId string) (*model.Result, error)          { return nil, nil }
 func (m MockManager) GetResult(projectId, resultId string) (*model.Result, error) { return nil, nil }
 func (m MockManager) CreateResult(projectId string, result *model.Result) error   { return nil }
 func (m MockManager) UpdateResult(projectId string, result *model.Result) error   { return nil }
@@ -277,5 +277,40 @@ func (m MockManager) DeleteProvider(providerId string) error                 { r
 func (m MockManager) GetJobsByProviderId(providerId string) ([]*model.ProviderJob, error) {
 	return nil, nil
 }
-func (m MockManager) AddJobToProviderId(providerId string, job *model.ProviderJob) error { return nil }
-func (m MockManager) DeleteAllProviders() error                                          { return nil }
+func (m MockManager) AddJobToProviderId(providerId string, job *model.ProviderJob) error {
+	return nil
+}
+func (m MockManager) DeleteAllProviders() error {
+	return nil
+}
+func (m MockManager) GetBuilds(projectId string, testId string) ([]*model.Build, error) {
+	return nil, nil
+}
+func (m MockManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
+	return nil, nil
+}
+func (m MockManager) UpdateBuild(projectId string, testId string, buildId string, action *model.BuildAction) error {
+	return nil
+}
+func (m MockManager) DeleteBuild(projectId string, testId string, buildId string) error {
+	return nil
+}
+
+func (m MockManager) DeleteAllBuilds() error {
+	return nil
+}
+func (m MockManager) GetBuildStatus(projectId string, testId string, buildId string) (string, error) {
+	return "", nil
+}
+func (m MockManager) GetBuildById(buildId string) (*model.Build, error) {
+	return nil, nil
+}
+func (m MockManager) UpdateBuildResults(buildId string, result model.BuildResult) error {
+	return nil
+}
+func (m MockManager) VerifyIfImageExistsLocally(name string, tag string) bool {
+	return false
+}
+func (m MockManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
+	return "", nil
+}

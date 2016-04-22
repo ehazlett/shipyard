@@ -6,19 +6,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net"
-	"net/http"
-	"strings"
-	"time"
-
 	log "github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
+	c "github.com/shipyard/shipyard/checker"
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/model/dockerhub"
 	"github.com/shipyard/shipyard/utils/auth"
 	"github.com/shipyard/shipyard/version"
+	"net"
+	"net/http"
+	"regexp"
+	"strings"
+	"time"
 )
 
 const (
@@ -31,6 +32,7 @@ const (
 	tblNameResults   = "results"
 	tblNameTests     = "tests"
 	tblNameProviders = "providers"
+	tblNameBuilds    = "builds"
 
 	tblNameRoles       = "roles"
 	tblNameServiceKeys = "service_keys"
@@ -57,6 +59,9 @@ var (
 
 	ErrResultExists       = errors.New("result already exists")
 	ErrResultDoesNotExist = errors.New("result does not exist")
+
+	ErrBuildExists       = errors.New("build already exists")
+	ErrBuildDoesNotExist = errors.New("build does not exist")
 
 	ErrTestExists          = errors.New("test already exists")
 	ErrTestDoesNotExist    = errors.New("test does not exist")
@@ -108,6 +113,8 @@ type (
 		DeleteProject(project *model.Project) error
 		DeleteAllProjects() error
 
+		VerifyIfImageExistsLocally(name string, tag string) bool
+
 		Images() ([]*model.Image, error)
 		ImagesByProjectId(projectId string) ([]*model.Image, error)
 		Image(name string) (*model.Image, error)
@@ -123,12 +130,23 @@ type (
 		DeleteTest(projectId string, testId string) error
 		DeleteAllTests() error
 
-		GetResults(projectId string) ([]*model.Result, error)
+		GetResults(projectId string) (*model.Result, error)
 		GetResult(projectId, resultId string) (*model.Result, error)
 		CreateResult(projectId string, result *model.Result) error
 		UpdateResult(projectId string, result *model.Result) error
 		DeleteResult(projectId string, resultId string) error
 		DeleteAllResults() error
+
+		GetBuilds(projectId string, testId string) ([]*model.Build, error)
+		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
+		GetBuildById(buildId string) (*model.Build, error)
+		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
+
+		CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error)
+		UpdateBuildResults(buildId string, result model.BuildResult) error
+		UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error
+		DeleteBuild(projectId string, testId string, buildId string) error
+		DeleteAllBuilds() error
 
 		GetProviders() ([]*model.Provider, error)
 		GetProvider(providerId string) (*model.Provider, error)
@@ -222,7 +240,7 @@ func (m DefaultManager) StoreKey() string {
 
 func (m DefaultManager) initdb() {
 	// create tables if needed
-	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages, tblNameResults, tblNameTests, tblNameProviders}
+	tables := []string{tblNameConfig, tblNameEvents, tblNameAccounts, tblNameRoles, tblNameConsole, tblNameServiceKeys, tblNameRegistries, tblNameExtensions, tblNameWebhookKeys, tblNameProjects, tblNameImages, tblNameResults, tblNameTests, tblNameProviders, tblNameBuilds}
 	for _, tbl := range tables {
 		_, err := r.Table(tbl).Run(m.session)
 		if err != nil {
@@ -1005,6 +1023,45 @@ func (m DefaultManager) DeleteAllProjects() error {
 
 // end methods related to the project structure
 
+// check if an image exists
+func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool {
+	images, err := m.client.ListImages(true)
+	imageToCheck := name + ":" + tag
+	auth := dockerclient.AuthConfig{"", "", ""}
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, img := range images {
+		imageRepoTags := img.RepoTags
+		for _, imageRepoTag := range imageRepoTags {
+			if strings.Contains(imageRepoTag, imageToCheck) {
+				fmt.Printf("Image %s exists locally ... Proceeding to check with clair ... \n", imageToCheck)
+				return true
+			}
+		}
+
+	}
+	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageToCheck)
+	//get registry
+	match, _ := regexp.MatchString(":[0-9]{4}/", imageToCheck)
+	if match {
+		parts := strings.Split(imageToCheck, "/")
+		address := "https://" + parts[0]
+
+		registry, err := m.RegistryByAddress(address)
+		auth = dockerclient.AuthConfig{registry.Username, registry.Password, ""}
+		err = err //TODO: must manage the error
+	}
+	error := m.client.PullImage(imageToCheck, &auth)
+
+	if error != nil {
+		fmt.Printf("Could not pull image %s ... \n%s \n", imageToCheck, error)
+		return false
+
+	}
+	return true
+}
+
 //methods related to the Image structure
 func (m DefaultManager) Images() ([]*model.Image, error) {
 	// TODO: sort by datetime once it is implemented
@@ -1191,7 +1248,13 @@ func (m DefaultManager) UpdateTest(projectId string, test *model.Test) error {
 			"name":             test.Name,
 			"targets":          test.Targets,
 			"selectedTestType": test.SelectedTestType,
-			"providerId":       test.ProviderId,
+			"ProviderType":     test.Provider.ProviderType,
+			"providerName":     test.Provider.ProviderName,
+			"providerTest":     test.Provider.ProviderTest,
+			"onSuccess":        test.Tagging.OnSuccess,
+			"onFailure":        test.Tagging.OnFailure,
+			"fromTag":          test.FromTag,
+			"parameters":       test.Parameters,
 		}
 		if _, err := r.Table(tblNameTests).Filter(map[string]string{"id": test.ID}).Update(updates).RunWrite(m.session); err != nil {
 			return err
@@ -1227,18 +1290,295 @@ func (m DefaultManager) DeleteAllTests() error {
 	return nil
 }
 
+//methods related to the Build structure
+func (m DefaultManager) GetBuilds(projectId string, testId string) ([]*model.Build, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	builds := []*model.Build{}
+	if err := res.All(&builds); err != nil {
+		return nil, err
+	}
+	return builds, nil
+}
+
+func (m DefaultManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrBuildDoesNotExist
+	}
+	var build *model.Build
+	if err := res.One(&build); err != nil {
+		return nil, err
+	}
+	return build, nil
+}
+func (m DefaultManager) GetBuildById(buildId string) (*model.Build, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrBuildDoesNotExist
+	}
+	var build *model.Build
+	if err := res.One(&build); err != nil {
+		return nil, err
+	}
+	return build, nil
+}
+
+func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId string) (string, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	if err != nil {
+		return "", err
+	}
+	if res.IsNil() {
+		return "", ErrBuildDoesNotExist
+	}
+	var build *model.Build
+	if err := res.One(&build); err != nil {
+		return "", err
+	}
+	return build.Status.Status, nil
+}
+
+func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
+	var eventType string
+	eventType = eventType
+	var build *model.Build
+	existingResult, _ := m.GetResults(projectId)
+	if buildAction.Action == "start" {
+		var testResult *model.TestResult
+		var build *model.Build
+		testResult = &model.TestResult{}
+		build = &model.Build{}
+		build.TestId = testId
+		build.ProjectId = projectId
+		build.StartTime = time.Now()
+		// we get the project
+		project, err := m.Project(projectId)
+		if err != nil && err != ErrProjectDoesNotExist {
+			return "", err
+		}
+		// we get the test and its targetArtifacts
+		test, err := m.GetTest(projectId, testId)
+		if err != nil && err != ErrTestDoesNotExist {
+			return "", err
+		}
+		targetArtifacts := test.Targets
+
+		// we get the ids for the targets we want to test
+
+		targetIds := []string{}
+		for _, target := range targetArtifacts {
+			targetIds = append(targetIds, target.ID)
+
+		}
+		// we retrieve the images from the projectId
+
+		projectImages, err := m.ImagesByProjectId(projectId)
+		if err != nil && err != ErrProjectImagesProblem {
+			return "", err
+		}
+		//we add the names of the matching images by comparing the ImageID with the ArtifactId
+		imageNames := []string{}
+		for _, image := range projectImages {
+			for _, artifactId := range targetIds {
+				if image.ID == artifactId {
+					imageNames = append(imageNames, image.Name)
+				}
+
+			}
+		}
+		// for each image we check if it exists locally
+		for _, image := range projectImages {
+			m.VerifyIfImageExistsLocally(image.Name, image.Tag)
+			testResult.ImageId = image.ID
+			testResult.DockerImageId = image.ImageId
+		}
+
+		// we change the build's buildStatus to submitted
+		build.Status = &model.BuildStatus{Status: "new"}
+		// create a new build object with fields from the Test object
+
+		// we add the build to the table in rethink db
+
+		response, err := r.Table(tblNameBuilds).Insert(build).RunWrite(m.session)
+
+		if err != nil {
+			return "", err
+		}
+		eventType = "add-build"
+
+		build.ID = func() string {
+			if len(response.GeneratedKeys) > 0 {
+				return string(response.GeneratedKeys[0])
+			}
+			return ""
+		}()
+		result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
+		result.CreateDate = time.Now()
+
+		for _, name := range imageNames {
+			testResult.ImageName = name
+			buildResult, err := c.CheckImage(build.ID, name)
+			if err != nil {
+				testResult.TestName = test.Name
+				testResult.SimpleResult.Status = "finished_failed"
+				testResult.TestId = testId
+				testResult.EndDate = time.Now()
+				testResult.Blocker = false
+				result.TestResults = append(result.TestResults, testResult)
+				result.LastUpdate = time.Now()
+				if existingResult != nil {
+					err = m.UpdateResult(projectId, result)
+					if err != nil {
+						return "", err
+					}
+					return "", err
+				}
+				if existingResult == nil {
+					err = m.CreateResult(projectId, result)
+					if err != nil {
+						return "", err
+					}
+					return "", err
+				}
+			}
+			m.UpdateBuildResults(build.ID, buildResult)
+
+		}
+		testResult.TestName = test.Name
+		testResult.SimpleResult.Status = "finished_success"
+		testResult.TestId = testId
+		testResult.EndDate = time.Now()
+		testResult.Blocker = false
+		result.TestResults = append(result.TestResults, testResult)
+		result.LastUpdate = time.Now()
+		if existingResult != nil {
+			err = m.UpdateResult(projectId, result)
+			if err != nil {
+				return "", err
+			}
+			return "", err
+		}
+		if existingResult == nil {
+			err = m.CreateResult(projectId, result)
+			if err != nil {
+				return "", err
+			}
+			return "", err
+		}
+
+		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
+		return build.ID, nil
+	}
+	return build.ID, nil
+}
+
+func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId string, buildAction *model.BuildAction) error {
+	var eventType string
+
+	// check if exists; if so, update
+	tmpBuild, err := m.GetBuild(projectId, testId, buildId)
+	if err != nil && err != ErrBuildDoesNotExist {
+		return err
+	}
+	// update
+	if tmpBuild != nil {
+		if buildAction.Action == "stop" {
+			tmpBuild.Status.Status = "stopped"
+			tmpBuild.EndTime = time.Now()
+			// go StopCurrentBuildFromClair
+		}
+		if buildAction.Action == "restart" {
+			tmpBuild.Status.Status = "restarted"
+			tmpBuild.EndTime = time.Now()
+			// go RestartCurrentBuildFromClair
+
+		}
+
+		/*	updates := map[string]interface{}{
+			"startTime": build.StartTime,
+			"endTime":   build.EndTime,
+			"config":    build.Config,
+			"results":   build.Results,
+			"testId":    build.TestId,
+			"projectId": build.ProjectId,
+		}*/
+
+		if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Update(tmpBuild).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-build"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", buildId), []string{"security"})
+
+	return nil
+
+}
+func (m DefaultManager) UpdateBuildResults(buildId string, result model.BuildResult) error {
+	var eventType string
+	build, err := m.GetBuildById(buildId)
+	if err != nil {
+		return err
+	}
+	build.Results = append(build.Results, &result)
+
+	if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Update(build).RunWrite(m.session); err != nil {
+		return err
+	}
+
+	eventType = "update-build-results"
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", buildId), []string{"security"})
+
+	return nil
+}
+func (m DefaultManager) DeleteBuild(projectId string, testId string, buildId string) error {
+	build, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Delete().Run(m.session)
+	if err != nil {
+		return err
+	}
+
+	if build.IsNil() {
+		return ErrBuildDoesNotExist
+	}
+
+	m.logEvent("delete-build", fmt.Sprintf("id=%s", buildId), []string{"security"})
+
+	return nil
+}
+
+func (m DefaultManager) DeleteAllBuilds() error {
+	_, err := r.Table(tblNameBuilds).Delete().Run(m.session)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Methods related to the results structure
-func (m DefaultManager) GetResults(projectId string) ([]*model.Result, error) {
+func (m DefaultManager) GetResults(projectId string) (*model.Result, error) {
 
 	res, err := r.Table(tblNameResults).Filter(map[string]string{"projectId": projectId}).Run(m.session)
 	if err != nil {
 		return nil, err
 	}
-	results := []*model.Result{}
-	if err := res.All(&results); err != nil {
+	var result *model.Result
+	if err := res.One(&result); err != nil {
 		return nil, err
 	}
-	return results, nil
+	return result, nil
 }
 
 func (m DefaultManager) GetResult(projectId, resultId string) (*model.Result, error) {
@@ -1247,7 +1587,7 @@ func (m DefaultManager) GetResult(projectId, resultId string) (*model.Result, er
 		return nil, err
 	}
 	if res.IsNil() {
-		return nil, ErrImageDoesNotExist
+		return nil, ErrResultDoesNotExist
 	}
 	var result *model.Result
 	if err := res.One(&result); err != nil {
@@ -1259,12 +1599,12 @@ func (m DefaultManager) GetResult(projectId, resultId string) (*model.Result, er
 func (m DefaultManager) CreateResult(projectId string, result *model.Result) error {
 	var eventType string
 
-	result, err := m.GetResult(projectId, result.ID)
+	tmpResult, err := m.GetResult(projectId, result.ID)
 	if err != nil && err != ErrResultDoesNotExist {
 		return err
 	}
 
-	if result != nil {
+	if tmpResult != nil {
 		return ErrResultExists
 	}
 
@@ -1287,39 +1627,28 @@ func (m DefaultManager) CreateResult(projectId string, result *model.Result) err
 
 	return nil
 }
-func (m DefaultManager) UpdateResult(projectId string, result *model.Result) error {
+func (m DefaultManager) UpdateResult(projectId string, inputResult *model.Result) error {
 	var eventType string
 
 	// check if exists; if so, update
-	rez, err := m.GetResult(projectId, result.ID)
+	existingResult, err := m.GetResults(projectId)
 	if err != nil && err != ErrResultDoesNotExist {
 		return err
 	}
 	// update
-	if rez != nil {
-		updates := map[string]interface{}{
-			"projectId":      result.ProjectId,
-			"description":    result.Description,
-			"buildId":        result.BuildId,
-			"runDate":        result.RunDate,
-			"endDate":        result.EndDate,
-			"createDate":     result.CreateDate,
-			"author":         result.Author,
-			"projectVersion": result.ProjectVersion,
-			"lastTagApplied": result.LastTagApplied,
-			"lastUpdate":     result.LastUpdate,
-			"updater":        result.Updater,
-			"testResults":    result.TestResults,
+	if existingResult != nil {
+		for _, result := range inputResult.TestResults {
+			existingResult.TestResults = append(existingResult.TestResults, result)
 		}
 
-		if _, err := r.Table(tblNameResults).Filter(map[string]string{"id": result.ID}).Update(updates).RunWrite(m.session); err != nil {
+		if _, err := r.Table(tblNameResults).Filter(map[string]string{"projectId": projectId}).Update(existingResult).RunWrite(m.session); err != nil {
 			return err
 		}
 
 		eventType = "update-result"
 	}
 
-	m.logEvent(eventType, fmt.Sprintf("id=%s", result.ID), []string{"security"})
+	m.logEvent(eventType, fmt.Sprintf("id=%s", existingResult.ID), []string{"security"})
 
 	return nil
 }

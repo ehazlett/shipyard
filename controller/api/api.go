@@ -156,6 +156,15 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.updateTest).Methods("PUT")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.deleteTest).Methods("DELETE")
 
+	//Build Related routes
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds", a.createBuild).Methods("POST")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds", a.getBuilds).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}", a.getBuild).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}", a.getBuildStatus).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}/{action}", a.updateBuild).Methods("PUT")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}", a.deleteBuild).Methods("DELETE")
+	//end Build related routes
+
 	//Provider related routes
 	apiRouter.HandleFunc("/api/providers", a.createProvider).Methods("POST")
 	apiRouter.HandleFunc("/api/providers", a.getProviders).Methods("GET")
@@ -167,11 +176,9 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 
 	//Public Registry Proxy
 	apiRouter.HandleFunc("/api/v1/search", a.dockerhubSearch).Methods("GET")
-	apiRouter.HandleFunc("/api/v1/search", a.dockerhubSearch).Methods("POST")
-	apiRouter.HandleFunc("/api/v1/repositories/{image}/tags", a.dockerhubTags).Methods("GET")
+	apiRouter.HandleFunc("/api/v1/repositories/tags", a.dockerhubTags).Methods("GET")
 
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
-	apiRouter.HandleFunc("/api/roles/{name}", a.role).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes/{name}", a.node).Methods("GET")
 	apiRouter.HandleFunc("/api/containers/{id}/scale", a.scaleContainer).Methods("POST")
@@ -196,7 +203,7 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/consolesession/{token}", a.removeConsoleSession).Methods("DELETE")
 
 	// global handler
-	globalMux.Handle("/", http.FileServer(http.Dir("static")))
+	globalMux.Handle("/", http.FileServer(http.Dir("controller/static")))
 
 	auditExcludes := []string{
 		"^/containers/json",

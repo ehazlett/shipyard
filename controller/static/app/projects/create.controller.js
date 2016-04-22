@@ -39,6 +39,8 @@
         vm.providers = [];
         vm.providerTests = [];
 
+        vm.parameters = [];
+
         vm.saveProject = saveProject;
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
@@ -60,15 +62,23 @@
         vm.getJobs = getJobs;
         vm.checkProviderTest = checkProviderTest;
         vm.setTargets = setTargets;
+        vm.addParameter = addParameter;
+        vm.removeParameter = removeParameter;
 
         vm.getRegistries();
 
         vm.buttonStyle = "disabled";
 
+        vm.code = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( var i=0; i < 16; i++ )
+            vm.code += possible.charAt(Math.floor(Math.random() * possible.length));
+
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    $('#image-create-modal').find("input").val("");
+                    $('#image-create-modal-'+vm.code).find("input").val("");
                     $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
                     $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
                     vm.createImage.name = "";
@@ -187,7 +197,7 @@
             vm.createImage.tag = "";
             vm.createImage.description = "";
             vm.buttonStyle = "disabled";
-            $('#image-create-modal').find("input").val("");
+            $('#image-create-modal-'+vm.code).find("input").val("");
             $('.ui.search.fluid.dropdown.registry').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
             $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
@@ -217,7 +227,7 @@
             console.log(project);
             ProjectService.create(project)
                 .then(function(data) {
-                    $state.transitionTo('dashboard.projects');
+                    $state.transitionTo('dashboard.edit_project', {id: data.id});
                 }, function(data) {
                     vm.error = data;
                 });
@@ -225,10 +235,11 @@
 
         function showImageCreateDialog() {
             vm.createImage = {};
-            $('#image-create-modal')
+
+            $('#image-create-modal-'+vm.code)
                 .modal({
                     onHidden: function() {
-                        $('#image-create-modal').find("input").val("");
+                        $('#image-create-modal-'+vm.code).find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
                         vm.createImage.location = "";
                     },
@@ -245,7 +256,19 @@
             placeholder: 'All images',
             onInitialize: function(selectize){
                 // receives the selectize object as an argument
-            },
+            }
+            // maxItems: 1
+        };
+
+        vm.myIlmData = {
+            create: true,
+            valueField: 'data',
+            labelField: 'data',
+            delimiter: '|',
+            placeholder: 'Select ILM Data',
+            onInitialize: function(selectize){
+                // receives the selectize object as an argument
+            }
             // maxItems: 1
         };
 
@@ -264,8 +287,10 @@
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider.type ="";
-                    }
+                        vm.createTest.provider.type = "";
+                        vm.parameters = [];
+                    },
+                    closable: false
                 })
                 .modal('show');
         }
@@ -293,12 +318,14 @@
             vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
-            ProjectService.getPublicRegistryTags(image.name)
-                .then(function(data) {
-                    vm.publicRegistryTags = data;
-                }, function(data) {
-                    vm.error = data;
-                });
+            if(image.location === "Public Registry") {
+                ProjectService.getPublicRegistryTags(image.name)
+                    .then(function(data) {
+                        vm.publicRegistryTags = data;
+                    }, function(data) {
+                        vm.error = data;
+                    });
+            }
             $('#image-edit-modal')
                 .modal({
                     closable: false
@@ -425,6 +452,17 @@
                     });
                 }
             });
+        }
+
+        function addParameter() {
+            vm.parameters.push({
+
+            });
+        }
+
+        function removeParameter(index) {
+            console.log(index);
+            vm.parameters.splice(index, 1);
         }
     }
 })();

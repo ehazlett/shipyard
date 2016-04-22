@@ -37,12 +37,17 @@
 
         vm.createImage.additionalTags = [];
 
+        var buildResults = {};
+
         vm.registries = [];
         vm.images = [];
+        vm.shipyardImages = [];
         vm.publicRegistryTags = [];
 
         vm.providers = [];
         vm.providerTests = [];
+
+        vm.parameters = [];
 
         vm.buttonStyle = "disabled";
 
@@ -63,7 +68,7 @@
         vm.getRegistries = getRegistries;
         vm.checkImage = checkImage;
         vm.checkImagePublicRepository = checkImagePublicRepository;
-        vm.getImages = getImages;
+        vm.getShipyardImages = getShipyardImages;
         vm.showTestCreateDialog = showTestCreateDialog;
         vm.getTestsProviders = getTestsProviders;
         vm.getJobs = getJobs;
@@ -73,8 +78,20 @@
         vm.deleteTest = deleteTest;
         vm.editSaveTest = editSaveTest;
         vm.setTargets = setTargets;
+        vm.addParameter = addParameter;
+        vm.removeParameter = removeParameter;
+        vm.addParameterEditTest = addParameterEditTest;
+        vm.removeParameterEditTest = removeParameterEditTest;
+        vm.getTests = getTests;
+        vm.getImages = getImages;
+        vm.buttonLoadStatus = buttonLoadStatus;
+        vm.startBuild = startBuild;
+        vm.getParameters = getParameters;
+        vm.messageLoadStatus = messageLoadStatus;
 
         vm.getRegistries();
+        vm.getImages(vm.project.id);
+        vm.getTests(vm.project.id);
 
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
@@ -94,7 +111,7 @@
         $scope.$watchCollection('imageList()', function () {
             angular.forEach(vm.selected, function (s) {
                 if(vm.selected[s.Id].Selected == true) {
-                    var isVisible = false
+                    var isVisible = false;
                     angular.forEach($scope.imageList(), function(c) {
                         if(c.Id == s.Id) {
                             isVisible = true;
@@ -124,7 +141,7 @@
                     vm.editImage.name = "";
                     vm.editImage.tag = "";
                     vm.editImage.description = "";
-                    getImages(text);
+                    getShipyardImages(text);
                 }
             });
         $(".ui.search.fluid.dropdown.tag")
@@ -225,6 +242,17 @@
                         getTestsProviders();
                 }
             });
+        $(".ui.search.fluid.dropdown.parameter")
+            .dropdown({
+               onChange: function(value, text, $selectedItem) {
+                   vm.ilmData = [];
+                   angular.forEach(vm.allParameters, function (param) {
+                       if(param.paramName === value) {
+                           vm.ilmData = param.paramValue.map(function(x) { return {data: x};});
+                       }
+                   });
+               }
+            });
 
         vm.myConfig = {
             create: true,
@@ -238,23 +266,38 @@
             // maxItems: 1
         };
 
+        vm.myIlmData = {
+            create: true,
+            valueField: 'data',
+            labelField: 'data',
+            delimiter: '|',
+            placeholder: 'Select ILM Data',
+            onInitialize: function(selectize){
+                // receives the selectize object as an argument
+            }
+            // maxItems: 1
+        };
+
         function showTestCreateDialog() {
             vm.createTest = {};
             vm.createTest.tagging = {};
             vm.createTest.provider = {};
             vm.imagesSelectize = [];
-            angular.forEach(vm.project.images, function (image) {
+            angular.forEach(vm.images, function (image) {
                 vm.imagesSelectize.push(image.name);
             });
             vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
+            vm.getParameters();
             $('#edit-project-test-create-modal')
                 .modal({
                     onHidden: function() {
                         vm.buttonStyle = "disabled";
                         $('#test-create-modal').find("input").val("");
                         $('.ui.dropdown').dropdown('restore defaults');
-                        vm.createTest.provider.type ="";
-                    }
+                        vm.createTest.provider.providerType = "";
+                        vm.parameters = [];
+                    },
+                    closable: false
                 })
                 .modal('show');
         }
@@ -262,9 +305,9 @@
         function setTargets(data) {
             vm.createTest.targets=[];
             angular.forEach(data, function (target) {
-                angular.forEach(vm.project.images, function (image) {
+                angular.forEach(vm.images, function (image) {
                     if(image.name === target) {
-                        vm.createTest.targets.push({id: image.id,type: target});
+                        vm.createTest.targets.push({id: image.id,type: "image"});
                     }
                 });
             });
@@ -274,20 +317,21 @@
             vm.editTest = $.extend(true, {}, test);
             vm.selectedEditTest = test;
             vm.buttonStyle = "positive";
-            if(test.provider.type === "Predefined Provider") {
+            vm.getParameters();
+            if(test.provider.providerType === "Predefined Provider") {
                 vm.providers = [];
                 ProjectService.getProviders()
                     .then(function(data) {
                         console.log(data);
                         vm.providers = data;
-                        getJobs(test.provider.name);
+                        getJobs(test.provider.providerName);
                     }, function(data) {
                         vm.error = data;
                     })
             }
-            if(test.provider.type === "Clair [Internal]") {
+            if(test.provider.providerType === "Clair [Internal]") {
                 vm.imagesSelectize = [];
-                angular.forEach(vm.project.images, function (image) {
+                angular.forEach(vm.images, function (image) {
                     vm.imagesSelectize.push(image.name);
                 });
                 vm.items = vm.imagesSelectize.map(function(x) { return {item: x};});
@@ -312,8 +356,8 @@
         }
 
         function resetTestValues() {
-            vm.createTest.provider.name = "";
-            vm.createTest.provider.test = "";
+            vm.createTest.provider.providerName = "";
+            vm.createTest.provider.ProviderTest = "";
             vm.createTest.targets = "";
             vm.createTest.blocker = "";
             vm.createTest.name = "";
@@ -322,7 +366,7 @@
             vm.createTest.tagging.onSuccess = "";
             vm.createTest.tagging.onFailure = "";
             vm.buttonStyle = "disabled";
-            if(vm.createTest.provider.type === "Clair [Internal]") {
+            if(vm.createTest.provider.providerType === "Clair [Internal]") {
                 vm.buttonStyle = "positive";
             }
             $('#test-create-modal').find("input").val("");
@@ -364,10 +408,9 @@
                     });
             }
             if(image.location === "Shipyard Registry") {
-                getImages(image.registry);
+                getShipyardImages(image.registry);
             }
             $('#edit-project-image-edit-modal-'+vm.project.id)
-                .remove()
                 .modal({
                     closable: false
                 })
@@ -388,7 +431,7 @@
             console.log("delete image " + image.id + " from project " + vm.project.id);
             ProjectService.delete(vm.project.id,image.id)
                 .then(function(data) {
-                    vm.project.images.splice(vm.project.images.indexOf(image), 1);
+                    vm.getImages(vm.project.id);
                 }, function (data) {
                     vm.error = data;
                 });
@@ -398,7 +441,7 @@
             console.log("delete test " + test.id + " from project " + vm.project.id);
             ProjectService.deleteTest(vm.project.id,test.id)
                 .then(function(data) {
-                    vm.project.tests.splice(vm.project.tests.indexOf(test), 1);
+                    vm.getTests(vm.project.id);
                 }, function (data) {
                     vm.error = data;
                 });
@@ -417,13 +460,38 @@
 
         }
 
-        function getImages(registry) {
+        function getTests(projectId) {
+            console.log("project id");
+            console.log(projectId);
+            ProjectService.getTests(projectId)
+                .then(function(data) {
+                    console.log(data);
+                    vm.tests = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+
+        }
+
+        function getImages(projectId) {
             console.log("get images");
-            vm.images = [];
-            RegistryService.listRepositories(registry)
+            console.log(projectId);
+            ProjectService.getImages(projectId)
                 .then(function(data) {
                     console.log(data);
                     vm.images = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+
+        }
+
+        function getShipyardImages(registry) {
+            vm.shipyardImages = [];
+            RegistryService.listRepositories(registry)
+                .then(function(data) {
+                    console.log(data);
+                    vm.shipyardImages = data;
                 }, function(data) {
                     vm.error = data;
                 })
@@ -445,7 +513,7 @@
             vm.providerTests = [];
             $('.ui.search.fluid.dropdown.providerTest').dropdown('restore defaults');
             angular.forEach(vm.providers, function(provider) {
-                if(provider.name === testProvider) {
+                if(provider.providerName === testProvider) {
                     vm.providerTests = provider.providerJobs;
                 }
             });
@@ -454,7 +522,7 @@
         function checkImage(imageData) {
             vm.buttonStyle = "disabled";
             console.log(" check image " + imageData.name + " with tag " + imageData.tag);
-            angular.forEach(vm.images, function (image) {
+            angular.forEach(vm.shipyardImages, function (image) {
                 if(image.name === imageData.name && image.tag === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }
@@ -475,7 +543,7 @@
             vm.buttonStyle = "disabled";
             console.log(" check provider name " + providerName + " with tag " + providerTest);
             angular.forEach(vm.providers, function (provider) {
-                if(provider.name === providerName) {
+                if(provider.providerName === providerName) {
                     angular.forEach(provider.providerJobs, function (test) {
                         if(test.name === providerTest) {
                             vm.buttonStyle = "positive";
@@ -486,39 +554,41 @@
         }
 
         function createSaveImage(image) {
-            if (vm.project.images == null) {
-                vm.project.images = [];
-            }
-            vm.project.images.push($.extend(true,{},image));
+            console.log("save image");
+            console.log(image);
+            ProjectService.addImage(vm.project.id, image)
+                .then(function(data) {
+                    vm.getImages(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function createSaveTest(test) {
-            if (vm.project.tests == null) {
-                vm.project.tests = [];
-            }
-            vm.project.tests.push($.extend(true,{},test));
+            ProjectService.addTest(vm.project.id, test)
+                .then(function(data) {
+                    vm.getTests(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function editSaveImage() {
-            vm.selectedEditImage.location = vm.editImage.location;
-            vm.selectedEditImage.name = vm.editImage.name;
-            vm.selectedEditImage.registry = vm.selectedEditImage.registry;
-            vm.selectedEditImage.tag = vm.editImage.tag;
-            vm.selectedEditImage.description = vm.editImage.description;
-            console.log(vm.selectedEditImage);
+            ProjectService.updateImage(vm.project.id, $.extend(true, {}, vm.selectedEditImage))
+                .then(function(data) {
+                    vm.getImages(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function editSaveTest() {
-            vm.selectedEditTest.provider.type = vm.editTest.provider.type;
-            vm.selectedEditTest.provider.name = vm.editTest.provider.name;
-            vm.selectedEditTest.provider.test = vm.editTest.provider.test;
-            vm.selectedEditTest.name = vm.editTest.name;
-            vm.selectedEditTest.fromTag = vm.editTest.fromTag;
-            vm.selectedEditTest.description = vm.editTest.description;
-            vm.selectedEditTest.tagging.onFailure = vm.editTest.tagging.onFailure;
-            vm.selectedEditTest.tagging.onSuccess = vm.editTest.tagging.onSuccess;
-            vm.selectedEditTest.blocker = vm.editTest.blocker;
-            vm.selectedEditTest.targets = vm.editTest.targets;
+            ProjectService.updateTest(vm.project.id, $.extend(true, {}, vm.editTest))
+                .then(function(data) {
+                    vm.getTests(vm.project.id);
+                }, function(data) {
+                    vm.error = data;
+                })
         }
 
         function updateProject(project) {
@@ -530,5 +600,117 @@
                     vm.error = data;
                 });
         }
+
+        function getParameters(){
+            vm.allParameters = [];
+            ProjectService.getParameters()
+                .then(function(data) {
+                    console.log(data);
+                    vm.allParameters = data;
+                }, function(data) {
+                    vm.error = data;
+                })
+        }
+
+        function addParameter() {
+            if(!vm.createTest.parameters) {
+                vm.createTest.parameters = [];
+            }
+            var param = {'paramName': vm.createTest.paramName, 'paramValue': vm.createTest.paramValue};
+            vm.createTest.parameters.push(param);
+            vm.createTest.paramName = "";
+            vm.createTest.paramValue = "";
+        }
+
+        function removeParameter(index) {
+            console.log(index);
+            vm.createTest.parameters.splice(index, 1);
+        }
+
+        function addParameterEditTest() {
+            var param = {'paramName': vm.editTest.paramName, 'paramValue': vm.editTest.paramValue};
+            vm.editTest.parameters.push(param);
+            vm.editTest.paramName = "";
+            vm.editTest.paramValue = "";
+        }
+
+        function removeParameterEditTest(index) {
+            vm.editTest.parameters.splice(index, 1);
+        }
+
+        function safeApply(scope, fn) {
+            (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
+        }
+
+        vm.buildMessageConfig = {
+            testId: ''
+        };
+
+        function startBuild(testId) {
+            ProjectService.executeBuild(vm.project.id, testId, {action: 'start'})
+                .then(function(data) {
+                    console.log("starting build");
+                    buildResults[testId] = data;
+                    vm.buildMessageConfig.testId = testId;
+                    pollBuild(vm.project.id, testId, buildResults[testId].id);
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function pollBuild(projectId, testId, buildId) {
+            ProjectService.pollBuild(projectId, testId, buildId)
+                .then(function(status) {
+                    console.log("polls done");
+                    console.log(status);
+                    buildResults[testId].status = status;
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function showBuildResults(testId) {
+            ProjectService.pollBuild(project.id, testId, buildResults[testId])
+                .then(function(data) {
+                    $state.transitionTo('dashboard.projects');
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function buttonLoadStatus(testId) {
+            if (!buildResults.hasOwnProperty(testId)) {
+                return false;
+            }
+
+            if (buildResults[testId].status === 'running') {
+                return true;
+            }
+
+            return false;
+        }
+
+        function messageLoadStatus(testId) {
+            if (!buildResults.hasOwnProperty(testId) || !testId) {
+                return 'none';
+            }
+
+            if (buildResults[testId].status === 'running') {
+                return 'running';
+            }
+
+            if (buildResults[testId].status === 'stopped') {
+                return 'stopped';
+            }
+
+            if (buildResults[testId].status === 'finished_success') {
+                return 'finished_success';
+            }
+
+            if (buildResults[testId].status === 'finished_failed') {
+                return 'finished_failed';
+            }
+        }
+
     }
 })();

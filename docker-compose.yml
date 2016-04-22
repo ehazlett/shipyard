@@ -1,61 +1,82 @@
-rethinkdb:
-    restart: always
-    image: rethinkdb:2.2
-    ports:
-        - "8083:8080"
-        - "8084:28015"
-        - "8085:29015"
-    environment:
-        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
+version: '2'
 
-proxy:
-    restart: always
-    image: ehazlett/docker-proxy:latest
+services:
+  rethinkdb:
+      env_file: .env
+      restart: always
+      image: rethinkdb:2.2
+      ports:
+          - "8083:8080"
+          - "8084:28015"
+          - "8085:29015"
+      networks:
+        - sy_network
+
+  proxy:
+      env_file: .env
+      restart: always
+      image: ehazlett/docker-proxy:latest
+      volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+      ports:
+          - "2375"
+      command: -D
+      networks:
+        - sy_network
+  swarm:
+      env_file: .env
+      restart: always
+      image: swarm:1.1.3
+      command: m --host tcp://0.0.0.0:2375 proxy:2375
+      ports:
+          - "2375"
+      networks:
+        - sy_network
+
+  controller:
+      env_file: .env
+      restart: always
+      build:
+        context: .
+        dockerfile: Dockerfile.build
+      entrypoint: /bin/bash
+      command: -c "make all && ./shipyard -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+      volumes:
+          - .:/go/src/github.com/shipyard/shipyard
+      volumes_from:
+          - proxy
+      ports:
+          - "8082:8080"
+          - "9279"
+      networks:
+        - sy_network
+
+  postgres:
+    hostname: postgres
+    image: postgres:9.4.5
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_PASSWORD=postgres
     volumes:
-        - "/var/run/docker.sock:/var/run/docker.sock"
+     - /DATA/postgres/pgdata:/var/lib/postgresql/data/pgdata
     ports:
-        - "2375"
-    command: -D
-    environment:
-        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
+     - "5432:5432"
+    networks:
+      - sy_network
 
-swarm:
-    restart: always
-    image: swarm:1.1.3
-    command: m --host tcp://0.0.0.0:2375 proxy:2375
-    links:
-        - "proxy:proxy"
-    ports:
-        - "2375"
-    environment:
-        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
-
-media:
-    restart: always
-    build: .
-    entrypoint: /bin/bash
-    dockerfile: Dockerfile.build
-    command: -c "make media && sleep infinity"
-    working_dir: /go/src/github.com/shipyard/shipyard
+  clair:
+    env_file: .env
+    image: quay.io/coreos/clair:v1.0.0
     volumes:
-        - "./controller/static:/go/src/github.com/shipyard/shipyard/controller/static"
-    environment:
-        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
-
-controller:
-    restart: always
-    build: .
-    dockerfile: Dockerfile.build
-    entrypoint: /bin/bash
-    command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
-    links:
-        - rethinkdb
-        - swarm
-    volumes:
-        - .:/go/src/github.com/shipyard/shipyard
-    volumes_from:
-        - media
+      - ./clair_config:/config:ro
+      - /tmp:/tmp
+    command: "--config=/config/config.yaml"
     ports:
-        - "8082:8080"
-    environment:
-        no_proxy: "localhost,127.0.0.1,proxy,swarm,media,rethinkdb,myd-vm23183.hpswlabs.adapps.hp.com"
+     - "6060:6060"
+     - "6061:6061"
+     - "9279:9279"
+    networks:
+      - sy_network
+
+networks:
+  sy_network:

@@ -1,3 +1,109 @@
+<div id="inspect-project-history-{{vm.results.projectId}}" class="ui blue vertical demo sidebar menu">
+    <a class="item" style="background-color: #006E93">
+        <h4 class="ui header" style="color: white"><i class="clock icon"></i>Project History For:</h4>
+        <h4 class="ui header" style="color: white">
+            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>
+            {{vm.results.projectId}}
+        </h4>
+    </a>
+    <div class="item">
+        <div class="column" style="overflow-y:scroll; height: 550px">
+        <div class="active item">
+            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>{{vm.results.buildId}}
+        </div>
+<!--        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+<div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+<div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+<div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+<div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+<div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+<div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="'Success' == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>
+        <div class="item">
+            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>08:10:22 2016-02-26
+        </div>-->
+</div>
+
+    </div>
+</div>
+<!--Leaving pusher in case we need it-->
+<div class="pusher">
+    <!-- Site content !-->
+</div>
+
 <div class="ui padded grid">
     <div class="row">
         <div class="column">
@@ -5,6 +111,9 @@
                 <div class="ui grid">
                     <div class="two column row">
                         <div class="column">
+                            <div ng-click="vm.showProjectHistory()" class="ui small blue labeled icon button">
+                                <i class="clock icon"></i> Project History
+                            </div>
                             <h3 class="ui header">
                                 <div class="content">
                                     <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>
@@ -29,33 +138,33 @@
                                     </div>
                                     <div class="six fields">
                                         <div class="field">
-                                            <label>Build ID: <span style="font-weight: normal">{{vm.results.buildId || 'Not implemented'}}</span></label>
+                                            <label>Build ID: <span style="font-weight: normal">{{vm.results.buildId || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Run Date: <span style="font-weight: normal">{{vm.results.runDate || 'Not implemented'}}</span></label>
+                                            <label>Run Date: <span style="font-weight: normal">{{vm.results.runDate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>End Date: <span style="font-weight: normal">{{vm.results.endDate || 'Not implemented'}}</span></label>
+                                            <label>End Date: <span style="font-weight: normal">{{vm.results.endDate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Create Date: <span style="font-weight: normal">{{vm.results.createDate || 'Not implemented'}}</span></label>
+                                            <label>Create Date: <span style="font-weight: normal">{{vm.results.createDate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Author: <span style="font-weight: normal">{{vm.results.author || 'Not implemented'}}</span></label>
+                                            <label>Author: <span style="font-weight: normal">{{vm.results.author || '...'}}</span></label>
                                         </div>
                                     </div>
                                     <div class="six fields">
                                         <div class="field">
-                                            <label>Project Version: <span style="font-weight: normal">{{vm.results.projectVersion || 'Not implemented'}}</span></label>
+                                            <label>Project Version: <span style="font-weight: normal">{{vm.results.projectVersion || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Last Tag Applied: <span style="font-weight: normal">{{vm.results.lastTagApplied || 'Not implemented'}}</span></label>
+                                            <label>Last Tag Applied: <span style="font-weight: normal">{{vm.results.lastTagApplied || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Last Update: <span style="font-weight: normal">{{vm.results.lastUpdate || 'Not implemented'}}</span></label>
+                                            <label>Last Update: <span style="font-weight: normal">{{vm.results.lastUpdate || '...'}}</span></label>
                                         </div>
                                         <div class="field">
-                                            <label>Last Update Name: <span style="font-weight: normal">{{vm.results.lastUpdate || 'Not implemented'}}</span></label>
+                                            <label>Last Update Name: <span style="font-weight: normal">{{vm.results.updater || '...'}}</span></label>
                                         </div>
                                     </div>
                                 </div>
@@ -88,9 +197,9 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr ng-repeat="test in vm.results.testsResults" jquery>
+                                    <tr ng-repeat="test in vm.results.testResults" jquery>
                                         <td>
-                                            <i class="circle icon" ng-class="test.status == 'Success' ? 'green' : 'red'"></i>
+                                            <i class="circle icon" ng-class="test.status == 'finished_success' ? 'green' : 'red'"></i>
                                             <span class="hidden">{{test.status}}</span>
                                         </td>
                                         <td>{{test.testId}}</td>

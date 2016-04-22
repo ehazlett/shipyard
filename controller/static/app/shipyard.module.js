@@ -20,172 +20,179 @@
             'angular-jwt',
             'base64',
             'selectize',
-            'ui.router',
-            'ngMockE2E'
+            'ui.router'
+            //'ngMockE2E'
         ])
 
         //Configure HttpBackend to mock requests to ILM endpoints
         //Take a look at https://docs.angularjs.org/api/ngMockE2E/service/$httpBackend
         .run(function($httpBackend, $filter) {
 
-        //     function makeid() {
-        //         var text = "";
-        //         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            /* function makeid() {
+                 var text = "";
+                 var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-        //         for( var i=0; i < 16; i++ )
-        //             text += possible.charAt(Math.floor(Math.random() * possible.length));
+                 for( var i=0; i < 16; i++ )
+                     text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-        //         return text;
-        //     }
+                 return text;
+             }
 
-        //     // TODO: Remove once the endpoint is implemented
-        //     var ids = ["54b6354t65rtv54t", "4h565e4tw45bw45b", "dsfsdvfasdfdsfsd", "asverea4vawrwveb", "12345436b4w54w67"];
-        //     var projects = [
-        //         {
-        //             id: ids[0],
-        //             name: "SecurityProjectZ",
-        //             description: "Security project level A",
-        //             status: "Published",
-        //             images: [
-        //                 {"id":"c51f86c28340","name":"busybox","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
-        //                 {"id":"e8353be55900","name":"tomcat","tag":"6-jre7","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-        //                 {"id":"bf4d022972f1","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false}
-        //             ],
-        //             tests: [
-        //                 {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"busybox","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"tomcat","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}}
-        //             ],
-        //             needsBuild: false,
-        //             lastRun: "Wednesday, February 24, 2016 at 00:00:00",
-        //             creationTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             updateTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             author: "admin",
-        //             updatedBy: "admin"
-        //         },
-        //         {
-        //             id: ids[1],
-        //             name: "SecurityProjectB",
-        //             description: "Security project level A",
-        //             status: "Tested",
-        //             images: [
-        //                 {"id":"sdghsertewrg","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
-        //                 {"id":"asdgfagsfga","name":"rethinkdb","tag":"1","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-        //                 {"id":"sagfegfrefg","name":"java","tag":"7","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
-        //             ],
-        //             tests: [
-        //                 {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}}
-        //             ],
-        //             needsBuild: false,
-        //             lastRun: "Wednesday, February 24, 2016 at 00:00:00",
-        //             creationTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             updateTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             author: "admin",
-        //             updatedBy: "admin"
-        //         },
-        //         {
-        //             id: ids[2],
-        //             name: "SecurityProjectC",
-        //             description: "Security project level A",
-        //             status: "Published",
-        //             images: [
-        //                 {"id":"asdfawfgreg","name":"mongo","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-        //                 {"id":"asdgfag66sfga","name":"verigreen/vg-collector","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-        //                 {"id":"567j67w45yg4w","name":"shipyard/shipyard","tag":"2.0.0","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
-        //             ],
-        //             tests: [
-        //                 {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"ertehgfhsg","name":"test2.2","description":"test2_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"hkfgohkfog","name":"test2.3","description":"test3_description","targets":"mongodb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}}
-        //             ],
-        //             needsBuild: false,
-        //             lastRun: "Wednesday, February 24, 2016 at 00:00:00",
-        //             creationTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             updateTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             author: "admin",
-        //             updatedBy: "admin"
-        //         },
-        //         {
-        //             id: ids[3],
-        //             name: "SecurityProjectA",
-        //             description: "Security project level A",
-        //             status: "Published",
-        //             images: [
-        //                 {"id":"4y56ujty6h6ew","name":"busybox","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-        //                 {"id":"tyujk67rj7j65","name":"ubuntu","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-        //                 {"id":"8i5tryw456w","name":"mongo","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
-        //             ],
-        //             tests: [
-        //                 {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"ubuntu","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}}
-        //             ],
-        //             needsBuild: false,
-        //             lastRun: "Wednesday, February 24, 2016 at 00:00:00",
-        //             creationTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             updateTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             author: "admin",
-        //             updatedBy: "admin"
-        //         },
-        //         {
-        //             id: ids[4],
-        //             name: "SecurityProjectD",
-        //             description: "Security project level A",
-        //             status: "Published",
-        //             images: [
-        //                 {"id":"4y56ujty6h6ew","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
-        //                 {"id":"tyujk67rj7j65","name":"rethinkdb","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
-        //                 {"id":"8i5tryw456w","name":"busybox","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
-        //             ],
-        //             tests: [
-        //                 {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"rethinkdb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"uyiyuyukku","name":"test4.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}},
-        //                 {"id":"tyrtyrthjy","name":"test4.3","description":"test3_description","targets":"soninob/soninob","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":""}],"tagging":{"onSuccess":"","onFailure":""}}
-        //             ],
-        //             needsBuild: true,
-        //             lastRun: "Wednesday, February 24, 2016 at 00:00:00",
-        //             creationTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             updateTime: "Wednesday, February 24, 2016 at 00:00:00",
-        //             author: "admin",
-        //             updatedBy: "admin"
-        //         }
-        //     ];
+            function arrayObjectIndexOf(myArray, searchTerm, property) {
+                for(var i = 0, len = myArray.length; i < len; i++) {
+                    if (myArray[i][property] === searchTerm) return i;
+                }
+                return -1;
+            }
 
-        //     var shipyard_registry = [
-        //         {id:"4y56ujty6h6ew",name:"trapsin",tag:"latest",description:"..."},
-        //         {id:"tyujk67rj7j65",name:"hammerdin",tag:"",description:"..."},
-        //         {id:"8i5tryw456w",name:"lightsorc",tag:"",description:"..."},
-        //         {id:"4y56ujty6h6ew",name:"assasin",tag:"latest",description:"..."},
-        //         {id:"tyujk67rj7j65",name:"hammerdin",tag:"",description:"..."},
-        //         {id:"8i5tryw456w",name:"paladin",tag:"",description:"..."}
-        //     ];
+             // TODO: Remove once the endpoint is implemented
+             var ids = ["54b6354t65rtv54t", "4h565e4tw45bw45b", "dsfsdvfasdfdsfsd", "asverea4vawrwveb", "12345436b4w54w67"];
+             var projects = [
+                 {
+                     id: ids[0],
+                     name: "SecurityProjectZ",
+                     description: "Security project level A",
+                     status: "Published",
+                     images: [
+                         {"id":"c51f86c28340","name":"busybox","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
+                         {"id":"e8353be55900","name":"tomcat","tag":"6-jre7","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                         {"id":"bf4d022972f1","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false}
+                     ],
+                     tests: [
+                         {"id":"fghdfghfgh","name":"test1","description":"test1_description","targets":"busybox","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.2","ILM Data_1.4","ILM Data_1.3"]},{"paramName":"Parameter2","paramValue":["ILM Data_2.1","ILM Data_2.3"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"mnmjvbjjlj","name":"test2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.1","ILM Data_2.3"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"cvxfhznbgj","name":"test3","description":"test3_description","targets":"tomcat","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.1"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                     ],
+                     needsBuild: false,
+                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     author: "admin",
+                     updatedBy: "admin"
+                 },
+                 {
+                     id: ids[1],
+                     name: "SecurityProjectB",
+                     description: "Security project level A",
+                     status: "Tested",
+                     images: [
+                         {"id":"sdghsertewrg","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
+                         {"id":"asdgfagsfga","name":"rethinkdb","tag":"1","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                         {"id":"sagfegfrefg","name":"java","tag":"7","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
+                     ],
+                     tests: [
+                         {"id":"fsadfsdfer","name":"test1.1","description":"test1_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.1","ILM Data_3.3"]},{"paramName":"Parameter1","paramValue":["ILM Data_1.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"ytueytueuy","name":"test1.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"dfgtrsfgrt","name":"test1.3","description":"test3_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.3"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                     ],
+                     needsBuild: false,
+                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     author: "admin",
+                     updatedBy: "admin"
+                 },
+                 {
+                     id: ids[2],
+                     name: "SecurityProjectC",
+                     description: "Security project level A",
+                     status: "Published",
+                     images: [
+                         {"id":"asdfawfgreg","name":"mongo","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                         {"id":"asdgfag66sfga","name":"verigreen/vg-collector","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                         {"id":"567j67w45yg4w","name":"shipyard/shipyard","tag":"2.0.0","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
+                     ],
+                     tests: [
+                         {"id":"rtsrtsrret","name":"test2.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"ertehgfhsg","name":"test2.2","description":"test2_description","targets":"verigreen","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"hkfgohkfog","name":"test2.3","description":"test3_description","targets":"mongodb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.2"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                     ],
+                     needsBuild: false,
+                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     author: "admin",
+                     updatedBy: "admin"
+                 },
+                 {
+                     id: ids[3],
+                     name: "SecurityProjectA",
+                     description: "Security project level A",
+                     status: "Published",
+                     images: [
+                         {"id":"4y56ujty6h6ew","name":"busybox","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                         {"id":"tyujk67rj7j65","name":"ubuntu","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                         {"id":"8i5tryw456w","name":"mongo","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
+                     ],
+                     tests: [
+                         {"id":"gfhfjgfjyt","name":"test3.1","description":"test1_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name2","test":"test2.2"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.3"]},{"paramName":"Parameter1","paramValue":["ILM Data_2"]},{"paramName":"Parameter2","paramValue":["ILM Data_1"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"yjdhkjpkoh","name":"test3.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_3.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"ytjtjhjghg","name":"test3.3","description":"test3_description","targets":"ubuntu","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter1","paramValue":["ILM Data_1.1"]},{"paramName":"Parameter2","paramValue":["ILM Data_2.1"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                     ],
+                     needsBuild: false,
+                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     author: "admin",
+                     updatedBy: "admin"
+                 },
+                 {
+                     id: ids[4],
+                     name: "SecurityProjectD",
+                     description: "Security project level A",
+                     status: "Published",
+                     images: [
+                         {"id":"4y56ujty6h6ew","name":"soninob/soninob","tag":"latest","description":"...","location":"Shipyard Registry","registry":"local","skipImageBuild":false},
+                         {"id":"tyujk67rj7j65","name":"rethinkdb","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false},
+                         {"id":"8i5tryw456w","name":"busybox","tag":"latest","description":"...","location":"Public Registry","registry":"","skipImageBuild":false}
+                     ],
+                     tests: [
+                         {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"rethinkdb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter4","paramValue":["ILM Data_4.2"]},{"paramName":"","paramValue":[]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"uyiyuyukku","name":"test4.2","description":"test2_description","targets":"","provider":{"type":"Predefined Provider","name":"provider_name1","test":"test1.1"},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter3","paramValue":["ILM Data_3.2"]}],"tagging":{"onSuccess":"","onFailure":""}},
+                         {"id":"tyrtyrthjy","name":"test4.3","description":"test3_description","targets":"soninob/soninob","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"Parameter2","paramValue":["ILM Data_2.1"]}],"tagging":{"onSuccess":"","onFailure":""}}
+                     ],
+                     needsBuild: true,
+                     lastRun: "Wednesday, February 24, 2016 at 00:00:00",
+                     creationTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     updateTime: "Wednesday, February 24, 2016 at 00:00:00",
+                     author: "admin",
+                     updatedBy: "admin"
+                 }
+             ];
 
-        //     var providers = [
-        //         {
-        //             id:"34234234",
-        //             name:"provider_name1",
-        //             availableBuildTypes:"",
-        //             config:"",
-        //             url:"",
-        //             providerJobs: [
-        //                 {id:"6745674565",name:"test1.1"},
-        //                 {id:"67fdgdf456",name:"test1.2"}
-        //             ]
-        //         },
-        //         {
-        //             id:"dfsdfsdf43",
-        //             name:"provider_name2",
-        //             availableBuildTypes:"",
-        //             config:"",
-        //             url:"",
-        //             providerJobs: [
-        //                 {id:"45453fdsdf",name:"test2.1"},
-        //                 {id:"hg7665nb65",name:"test2.2"}
-        //             ]
-        //         }
-        //     ];
+             var shipyard_registry = [
+                 {id:"4y56ujty6h6ew",name:"trapsin",tag:"latest",description:"..."},
+                 {id:"tyujk67rj7j65",name:"hammerdin",tag:"",description:"..."},
+                 {id:"8i5tryw456w",name:"lightsorc",tag:"",description:"..."},
+                 {id:"4y56ujty6h6ew",name:"assasin",tag:"latest",description:"..."},
+                 {id:"tyujk67rj7j65",name:"hammerdin",tag:"",description:"..."},
+                 {id:"8i5tryw456w",name:"paladin",tag:"",description:"..."}
+             ];
+
+             var providers = [
+                 {
+                     id:"34234234",
+                     name:"provider_name1",
+                     availableBuildTypes:"",
+                     config:"",
+                     url:"",
+                     providerJobs: [
+                         {id:"6745674565",name:"test1.1"},
+                         {id:"67fdgdf456",name:"test1.2"}
+                     ]
+                 },
+                 {
+                     id:"dfsdfsdf43",
+                     name:"provider_name2",
+                     availableBuildTypes:"",
+                     config:"",
+                     url:"",
+                     providerJobs: [
+                         {id:"45453fdsdf",name:"test2.1"},
+                         {id:"hg7665nb65",name:"test2.2"}
+                     ]
+                 }
+             ];
 
              var results = {
                  projectId: "",
@@ -216,75 +223,239 @@
                  ]
             };
 
-        //     $httpBackend.whenGET('/api/providers').respond(providers);
+            var build = {
+                id: 'dsvfsdvsd',
+                test: {"id":"jkghuyukuy","name":"test4.1","description":"test1_description","targets":"rethinkdb","provider":{"type":"Clair [Internal]","name":"","test":""},"fromTag":"","blocker":"","parameters":[{"paramName":"","paramValue":[]},{"paramName":"","paramValue":[]}],"tagging":{"onSuccess":"","onFailure":""}},
+                startTime: '08:10:22 2016-02-26 AD',
+                endTime: '08:10:22 2016-02-26 AD',
+                status: 'stopped', //["running", "stopped", "finished_success","finished_failed"]
+                statusLastUpdated: '08:10:22 2016-02-26 AD',
+                results: [
+                    {id: 'sdasdfsdfsd', buildId: 'sawdefrewafer', target: {id: 'sasfsdgfsd', type: 'Image'}, resultEntries: [{},{}], timeStamp: 'sdfagrwegwer'},
+                    {id: 'sdasdfsdfsd', buildId: 'sawdefrewafer', target: {id: 'sasfsdgfsd', type: 'Image'}, resultEntries: [{},{}], timeStamp: 'sdfagrwegwer'}
+                ]
+            };
 
-        //     $httpBackend.whenGET('/api/projects').respond(projects);
+            var parameters = [
+                {"paramName":"Parameter1","paramValue":["ILM Data_1.1","ILM Data_1.2","ILM Data_1.3","ILM Data_1.4"]},
+                {"paramName":"Parameter2","paramValue":["ILM Data_2.1","ILM Data_2.2","ILM Data_2.3","ILM Data_2.4"]},
+                {"paramName":"Parameter3","paramValue":["ILM Data_3.1","ILM Data_3.2","ILM Data_3.3","ILM Data_3.4"]},
+                {"paramName":"Parameter4","paramValue":["ILM Data_4.1","ILM Data_4.2","ILM Data_4.3","ILM Data_4.4"]}
+            ];
+
+            $httpBackend.whenGET('/api/parameters').respond(parameters);
+
+            $httpBackend.whenGET('/api/providers').respond(providers);
+
+            $httpBackend.whenGET('/api/projects').respond(projects);
+
+            $httpBackend.whenRoute('POST', '/api/projects/:id/tests/:testId/builds').respond(function(method, url, data, headers, params) {
+                build.status = "running";
+                build.test.id = params.testId;
+
+                setTimeout(function(){ build.status = "finished_success"; }, 15000);
+
+                return [202, angular.toJson(build), {}];
+            });
+
+            $httpBackend.whenRoute('GET', '/api/projects/:id/tests/:testId/:buildId').respond(function(method, url, data, headers, params) {
+                return [200, angular.toJson(build), {}];
+            });
+
+            $httpBackend.whenRoute('PUT', '/api/projects/:id/tests/:testId').respond(function(method, url, data, headers, params) {
+                var test = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var testIndex = arrayObjectIndexOf(projects[indexToEdit].tests, params.testId, "id");
+
+                if (testIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                projects[indexToEdit].tests[testIndex] = test;
+
+                return [200, angular.toJson(test), {}];
+            });
+
+            $httpBackend.whenRoute('PUT', '/api/projects/:id/images/:imageId').respond(function(method, url, data, headers, params) {
+                var image = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var imageIndex = arrayObjectIndexOf(projects[indexToEdit].images, params.imageId, "id");
+
+                if (imageIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                projects[indexToEdit].images[imageIndex] = image;
+
+                return [200, angular.toJson(image), {}];
+            });
+
+            $httpBackend.whenRoute('DELETE', '/api/projects/:id/images/:imageId').respond(function(method, url, data, headers, params) {
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var imageIndex = arrayObjectIndexOf(projects[indexToEdit].images, params.imageId, "id");
+
+                if (imageIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                // Overwrite old project (this might not be how the api behaves)
+                projects[indexToEdit].images.splice(imageIndex, 1);
+
+                return [200, {}, {}];
+            });
+
+            $httpBackend.whenRoute('DELETE', '/api/projects/:id/tests/:testId').respond(function(method, url, data, headers, params) {
+                var indexToEdit = ids.indexOf(params.id);
+
+                if (indexToEdit === -1) {
+                    return [405, {}, {}];
+                }
+
+                var imageIndex = arrayObjectIndexOf(projects[indexToEdit].tests, params.testId, "id");
+
+                if (imageIndex === -1) {
+                    return [405, {}, {}];
+                }
+
+                // Overwrite old project (this might not be how the api behaves)
+                projects[indexToEdit].tests.splice(imageIndex, 1);
+
+                return [200, {}, {}];
+            });
 
              $httpBackend.whenRoute('GET', '/api/projects/:id/results').respond(function(method, url, data, headers, params) {
                  results.projectId = params.id;
                  return [200, angular.toJson(results), {}];
              });
 
-        //     $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
-        //         console.log(params);
-        //         return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
-        //     });
+             $httpBackend.whenRoute('POST', '/api/projects/:id/tests').respond(function(method, url, data, headers, params) {
+                 var test = angular.fromJson(data);
+                 var indexToEdit = ids.indexOf(params.id);
 
-        //     $httpBackend.whenPOST('/api/projects').respond(function(method, url, data){
-        //         var project = angular.fromJson(data);
+                 if (indexToEdit === -1) {
+                     return [404, {}, {}];
+                 }
 
-        //         // Generate ID
-        //         project.id = makeid();
-        //         // Get last ran
-        //         project.creationTime = "Wednesday, February 24, 2016 at 00:00:00";
+                 test.id = makeid();
 
-        //         ids.push(project.id);
-        //         projects.push(project);
+                 projects[indexToEdit].tests.push(test);
 
-        //         return [200, project, {}];
-        //     });
+                 return [201, angular.toJson(test), {}];
+             });
 
-        //     $httpBackend.whenRoute('PUT', '/api/projects/:id').respond(function(method, url, data, headers, params) {
-        //         var project = angular.fromJson(data);
-        //         var indexToEdit = ids.indexOf(params.id);
+            $httpBackend.whenRoute('GET', '/api/projects/:id/tests').respond(function(method, url, data, headers, params) {
+                var test = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
 
-        //         if (indexToEdit === -1) {
-        //             return [404, {}, {}];
-        //         }
+                if (indexToEdit === -1) {
+                    return [500, {}, {}];
+                }
 
-        //         // Overwrite old project (this might not be how the api behaves)
-        //         //"dddd, mmmm dd, yyyy at hh:MM:ss"
-        //         var d = new Date();
-        //         project.updateTime = d.toUTCString();
-        //         project.updatedBy = "admin";
-        //         projects[indexToEdit] = project;
+                return [200, angular.toJson(projects[indexToEdit].tests), {}];
+            });
 
-        //         return [200, angular.toJson(projects[indexToEdit]), {}];
-        //     });
+             $httpBackend.whenRoute('GET', '/api/projects/:id/images').respond(function(method, url, data, headers, params) {
+                 var test = angular.fromJson(data);
+                 var indexToEdit = ids.indexOf(params.id);
 
-        //     $httpBackend.whenRoute('DELETE', '/api/projects/:id').respond(function(method, url, data, headers, params) {
-        //         var indexToEdit = ids.indexOf(params.id);
+                 if (indexToEdit === -1) {
+                     return [500, {}, {}];
+                 }
 
-        //         if (indexToEdit === -1) {
-        //             return [405, {}, {}];
-        //         }
+                 return [200, angular.toJson(projects[indexToEdit].images), {}];
+             });
 
-        //         // Overwrite old project (this might not be how the api behaves)
-        //         projects.splice(indexToEdit, 1);
+            $httpBackend.whenRoute('POST', '/api/projects/:id/images').respond(function(method, url, data, headers, params) {
+                var image = angular.fromJson(data);
+                var indexToEdit = ids.indexOf(params.id);
 
-        //         return [200, {}, {}];
-        //     });
+                if (indexToEdit === -1) {
+                    return [404, {}, {}];
+                }
 
-        //     $httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
+                image.id = makeid();
+
+                projects[indexToEdit].images.push(image);
+
+                return [201, angular.toJson(image), {}];
+             });
+
+
+             $httpBackend.whenRoute('GET', '/api/projects/:id').respond(function(method, url, data, headers, params) {
+                 console.log(params);
+                 return [200, angular.toJson(projects[ids.indexOf(params.id)]), {}];
+             });
+
+             $httpBackend.whenPOST('/api/projects').respond(function(method, url, data){
+                 var project = angular.fromJson(data);
+
+                 // Generate ID
+                 project.id = makeid();
+                 // Get last ran
+                 project.creationTime = "Wednesday, February 24, 2016 at 00:00:00";
+
+                 ids.push(project.id);
+                 projects.push(project);
+
+                 return [200, project, {}];
+             });
+
+             $httpBackend.whenRoute('PUT', '/api/projects/:id').respond(function(method, url, data, headers, params) {
+                 var project = angular.fromJson(data);
+                 var indexToEdit = ids.indexOf(params.id);
+
+                 if (indexToEdit === -1) {
+                     return [404, {}, {}];
+                 }
+
+                 // Overwrite old project (this might not be how the api behaves)
+                 //"dddd, mmmm dd, yyyy at hh:MM:ss"
+                 var d = new Date();
+                 project.updateTime = d.toUTCString();
+                 project.updatedBy = "admin";
+                 projects[indexToEdit] = project;
+
+                 return [200, angular.toJson(projects[indexToEdit]), {}];
+             });
+
+             $httpBackend.whenRoute('DELETE', '/api/projects/:id').respond(function(method, url, data, headers, params) {
+                 var indexToEdit = ids.indexOf(params.id);
+
+                 if (indexToEdit === -1) {
+                     return [405, {}, {}];
+                 }
+
+                 // Overwrite old project (this might not be how the api behaves)
+                 projects.splice(indexToEdit, 1);
+
+                 return [200, {}, {}];
+             });
+
+             $httpBackend.whenGET('/api/projects/location').respond(shipyard_registry);
 
              //Let all the endpoints that don't have "projects" go through (i.e. make real http request)
-             $httpBackend.whenGET(/.*/).passThrough();
-             $httpBackend.whenPOST(/.*/).passThrough();
-             $httpBackend.whenDELETE(/.*/).passThrough();
-             $httpBackend.whenPUT(/.*/).passThrough();
-             $httpBackend.whenPATCH(/.*/).passThrough();
-             $httpBackend.whenDELETE(/.*/).passThrough();
-             $httpBackend.whenJSONP(/.*/).passThrough();
-             $httpBackend.whenRoute(/.*/).passThrough();
+             $httpBackend.whenGET(/.*!/).passThrough();
+             $httpBackend.whenPOST(/.*!/).passThrough();
+             $httpBackend.whenDELETE(/.*!/).passThrough();
+             $httpBackend.whenPUT(/.*!/).passThrough();
+             $httpBackend.whenPATCH(/.*!/).passThrough();
+             $httpBackend.whenDELETE(/.*!/).passThrough();
+             $httpBackend.whenJSONP(/.*!/).passThrough();
+             $httpBackend.whenRoute(/.*!/).passThrough();*/
         })
 })();
