@@ -40,7 +40,7 @@ services:
         context: .
         dockerfile: Dockerfile.build
       entrypoint: /bin/bash
-      command: -c "make all && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+      command: -c "make all && ./shipyard -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
       volumes:
           - .:/go/src/github.com/shipyard/shipyard
       volumes_from:
