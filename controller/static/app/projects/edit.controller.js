@@ -52,6 +52,7 @@
         vm.buttonStyle = "disabled";
 
         vm.createImageTagSpin = false;
+        vm.editImageTagSpin = false;
 
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
@@ -184,7 +185,7 @@
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
                     vm.editImage.tag = $("#editImageTag").dropdown("get value");
-                    vm.checkImage(vm.editImage);
+                    checkImagePublicRepository(vm.editImage);
                     
                     // Search for the image layer of the chosen tag
                     // TODO: find a way to save the layer when the user clicks on the tag name
@@ -472,6 +473,7 @@
             vm.selectedEditImage = image;
             vm.buttonStyle = "positive";
             vm.randomEditId = vm.editImage.id;
+            vm.editImageTagSpin = true;
             $('#editImageTagDefault').html(image.tag);
             $scope.$apply();
             if(image.location === "Public Registry") {
@@ -491,17 +493,21 @@
                                 vm.editImage.additionalTags.push(vm.publicRegistryTags[index].name);
                             }
                         });
+                        vm.editImageTagSpin = false;
                     }, function(data) {
                         vm.error = data;
                     });
             }
             if(image.location === "Shipyard Registry") {
                 getShipyardImages(image.registry);
+                vm.editImageTagSpin = false;
             }
             $('#edit-project-image-edit-modal-'+vm.randomEditId)
                 .modal({
                     onHidden: function() {
                         // $('#edit-project-image-edit-modal-'+vm.project.id).modal('destroy');
+                        $('.ui.dropdown').dropdown('restore defaults');
+                        vm.publicRegistryTags = [];
                     },
                     onShow: function () {
                         $("#editImageTag").dropdown("refresh");
@@ -621,7 +627,7 @@
         function checkImage(imageData) {
             vm.buttonStyle = "disabled";
             console.log(" check image " + imageData.name + " with tag " + imageData.tag);
-            angular.forEach(vm.images, function (image) {
+            angular.forEach(vm.shipyardImages, function (image) {
                 if(image.name === imageData.name && image.tag === imageData.tag) {
                     vm.buttonStyle = "positive";
                 }

@@ -284,7 +284,8 @@
                                         <label>Tag</label>
                                         <div class="ui selection fluid dropdown edit tag" id="editImageTag">
                                             <input type="hidden" name="tag">
-                                            <i class="dropdown icon"></i>
+                                            <i ng-if="!vm.editImageTagSpin" class="dropdown icon"></i>
+                                            <i ng-if="vm.editImageTagSpin" class="repeat icon spin" aria-hidden="true" style="float: right; position: relative; width: auto; font-size: 0.85714286; margin: 0em 0em 0em 1em;"></i>
                                             <div id="editImageTagDefault" class="default text"></div>
                                             <div class="menu">
                                                 <div ng-repeat="a in vm.publicRegistryTags"
@@ -782,7 +783,7 @@
                                         </div>
                                         <div class="field">
                                             <label>Status</label>
-                                            <select class="ui selection dropdown" default="0" ng-model="vm.project.status">
+                                           <select class="ui selection dropdown" ng-model="vm.project.status">
                                                 <option value="">{{vm.project.status || 'Select status'}}</option>
                                                 <option value="Published">Published</option>
                                                 <option value="Tested">Tested</option>
