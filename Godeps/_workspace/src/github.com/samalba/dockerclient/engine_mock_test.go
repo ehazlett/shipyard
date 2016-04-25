@@ -13,7 +13,6 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 	"github.com/docker/docker/pkg/jsonlog"
 	"github.com/docker/docker/pkg/stdcopy"
-	"github.com/docker/docker/pkg/timeutils"
 	"github.com/gorilla/mux"
 )
 
@@ -28,6 +27,7 @@ func init() {
 	r.HandleFunc(baseURL+"/containers/json", handlerGetContainers).Methods("GET")
 	r.HandleFunc(baseURL+"/containers/{id}/logs", handleContainerLogs).Methods("GET")
 	r.HandleFunc(baseURL+"/containers/{id}/changes", handleContainerChanges).Methods("GET")
+	r.HandleFunc(baseURL+"/containers/{id}/stats", handleContainerStats).Methods("GET")
 	r.HandleFunc(baseURL+"/containers/{id}/kill", handleContainerKill).Methods("POST")
 	r.HandleFunc(baseURL+"/containers/{id}/wait", handleWait).Methods("POST")
 	r.HandleFunc(baseURL+"/images/create", handleImagePull).Methods("POST")
@@ -109,7 +109,7 @@ func handleContainerLogs(w http.ResponseWriter, r *http.Request) {
 		line := fmt.Sprintf("line %d", i)
 		if getBoolValue(r.Form.Get("timestamps")) {
 			l := &jsonlog.JSONLog{Log: line, Created: time.Now().UTC()}
-			line = fmt.Sprintf("%s %s", l.Created.Format(timeutils.RFC3339NanoFixed), line)
+			line = fmt.Sprintf("%s %s", l.Created.Format(jsonlog.RFC3339NanoFixed), line)
 		}
 		if i%2 == 0 && stderr {
 			fmt.Fprintln(errStream, line)
@@ -136,6 +136,15 @@ func handleContainerChanges(w http.ResponseWriter, r *http.Request) {
           }
         ]`
 	w.Write([]byte(body))
+}
+
+func handleContainerStats(w http.ResponseWriter, r *http.Request) {
+	switch mux.Vars(r)["id"] {
+	case "foobar":
+		fmt.Fprintf(w, "%s invalidresp", statsResp)
+	default:
+		fmt.Fprintf(w, "%s %s", statsResp, statsResp)
+	}
 }
 
 func getBoolValue(boolString string) bool {
