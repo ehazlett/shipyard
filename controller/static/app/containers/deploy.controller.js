@@ -273,7 +273,7 @@
                         return;
                     }
                     $http
-                        .post('/containers/'+ data.Id +'/start', vm.request)
+                        .post('/containers/'+ data.Id +'/start')
                         .success(function(data, status, headers, config) {
                             $state.transitionTo('dashboard.containers');
                         })
