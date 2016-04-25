@@ -88,7 +88,7 @@ func CreateTest(authHeader string, url string, name string, description string, 
 
 }
 
-func UpdateTest(authHeader string, url string, name string, description string, targets []*model.TargetArtifact, selectedTestType string, projectId string, testId string, providerType string, providerName string, providerTest string, params []*model.Parameter, successTag string, failTag string, fromTag string) (int, error) {
+func UpdateTest(authHeader string, url string, testId string, name string, description string, targets []*model.TargetArtifact, selectedTestType string, projectId string, providerType string, providerName string, providerTest string, params []*model.Parameter, successTag string, failTag string, fromTag string) (int, error) {
 	var test *model.Test
 	test = test.NewTest(name,
 		description,

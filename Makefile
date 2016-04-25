@@ -12,7 +12,6 @@ clean:
 
 build:
 	@go build -a -tags "netgo static_build" -installsuffix netgo -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit=$(COMMIT)" .
-	@mv shipyard controller/controller
 
 remote-build:
 	@docker build -t shipyard-build -f Dockerfile.build .
