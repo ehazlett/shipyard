@@ -314,3 +314,6 @@ func (m MockManager) VerifyIfImageExistsLocally(name string, tag string) bool {
 func (m MockManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 	return "", nil
 }
+func (m MockManager) UpdateBuildStatus(buildId string, status string) error {
+	return nil
+}

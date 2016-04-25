@@ -40,7 +40,7 @@ services:
         context: .
         dockerfile: Dockerfile.build
       entrypoint: /bin/bash
-      command: -c "make all && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+      command: -c "make all && ./shipyard -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
       volumes:
           - .:/go/src/github.com/shipyard/shipyard
       volumes_from:
@@ -48,6 +48,8 @@ services:
       ports:
           - "8082:8080"
           - "9279"
+      depends_on:
+        - rethinkdb
       networks:
         - sy_network
 
@@ -66,15 +68,17 @@ services:
 
   clair:
     env_file: .env
-    image: quay.io/coreos/clair:v1.0.0
+    image: quay.io/coreos/clair:v1.1.0
     volumes:
       - ./clair_config:/config:ro
-      - /tmp:/tmp
-    command: "--config=/config/config.yaml"
+      - /tmp/clair-data:/tmp
+    entrypoint: /bin/bash
+    command: -c "sleep 30 && clair --config=/config/config.yaml"
     ports:
      - "6060:6060"
      - "6061:6061"
-     - "9279:9279"
+    depends_on:
+      - postgres
     networks:
       - sy_network
 

@@ -1038,6 +1038,7 @@ func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool
 	for _, img := range images {
 		imageRepoTags := img.RepoTags
 		for _, imageRepoTag := range imageRepoTags {
+			log.Printf("Image from daemon: %s", imageRepoTag)
 			if strings.Contains(imageRepoTag, imageToCheck) {
 				fmt.Printf("Image %s exists locally ... Proceeding to check with clair ... \n", imageToCheck)
 				return true
@@ -1406,7 +1407,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		for _, image := range projectImages {
 			for _, artifactId := range targetIds {
 				if image.ID == artifactId {
-					imageNames = append(imageNames, image.Name)
+					imageNames = append(imageNames, image.Name+":"+image.Tag)
 				}
 
 			}

@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -23,10 +22,29 @@ var (
 )
 
 const (
-	postLayerURI        = "/v1/layers"
-	getLayerFeaturesURI = "/v1/layers/%s?vulnerabilities"
-	httpPort            = 9279
+	postLayerURI         = "/v1/layers"
+	getLayerFeaturesURI  = "/v1/layers/%s?vulnerabilities"
+	CLAIR_ENDPOINT       = "http://clair:6060"
+	FILE_SERVER_ENDPOINT = "http://controller:9279"
+	FILE_SERVER_ROOT     = "/tmp/"
 )
+
+func StartImageFileServer(fileServerRoot string) {
+	//Setup a simple HTTP server if Clair is not local.
+	if !server_exists {
+		parts := strings.Split(FILE_SERVER_ENDPOINT, ":")
+		if len(parts) < 3 {
+			fmt.Errorf("Did not pass valid endpoint for File Server = %s", FILE_SERVER_ENDPOINT)
+			return
+		}
+		server_exists = true
+		go listenHTTP(fileServerRoot, parts[2])
+	}
+}
+
+func formatImageLayerTarEndpoint(fileServerEndpoint, fileServerLayerPath, fileServerLayerId string) string {
+	return fileServerEndpoint + "/" + fileServerLayerPath + "/" + fileServerLayerId + "/layer.tar"
+}
 
 func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	// TODO: parse first./ 2 params from config file
@@ -38,18 +56,10 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	//create a new buildResult object
 	buildResult := model.BuildResult{}
 
-	// add stuff to the buildresult
-	//in the end
+	StartImageFileServer(FILE_SERVER_ROOT)
 
-	endpoint_value := "http://clair:6060"
-	//endpoint_value := "http://172.18.0.8:6060"
-	myAddress_value := "controller"
-	//myAddress_value := "127.0.0.1"
-	//myAddress_value, _ := exec.Command("sh", "-c", "cat /etc/hosts |grep `cat /etc/hostname`|awk '{print $1}'").Output()
-	endpoint := &endpoint_value
-	//myAddress_value2 := strings.TrimSpace(fmt.Sprintf("%s", myAddress_value))
-	//myAddress := &myAddress_value
-	myAddress := &myAddress_value
+	endpoint := CLAIR_ENDPOINT
+
 	imageName := name
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)
@@ -66,52 +76,43 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	fmt.Println("Getting image's history")
 	layerIDs, err := historyFromManifest(path)
 	if err != nil {
+		fmt.Printf("Could not get history from manifest\n")
 		layerIDs, err = historyFromCommand(imageName)
 	}
+
+	fmt.Printf("Layer IDs = %v\n", layerIDs)
+
 	if err != nil || len(layerIDs) == 0 {
 		fmt.Printf("- Could not get image's history: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get image's history: %s\n", err)
 		return buildResult, errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
 	}
 
-	//Setup a simple HTTP server if Clair is not local.
-	if !strings.Contains(*endpoint, "127.0.0.1") && !strings.Contains(*endpoint, "localhost") {
-		allowedHost := strings.TrimPrefix(*endpoint, "http://")
-		portIndex := strings.Index(allowedHost, ":")
-		if portIndex >= 0 {
-			allowedHost = allowedHost[:portIndex]
-		}
-		if !server_exists {
-			server_exists = true
-			go listenHTTP(path, allowedHost)
-		}
-
-		path = "http://" + *myAddress + ":" + strconv.Itoa(httpPort)
-		time.Sleep(200 * time.Millisecond)
-	}
-
 	// Analyze layers.
 	fmt.Printf("Analyzing %d layers\n", len(layerIDs))
+	pathWithoutRoot := strings.TrimPrefix(path, FILE_SERVER_ROOT)
 	for i := 0; i < len(layerIDs); i++ {
 		fmt.Printf("- Analyzing %s\n", layerIDs[i])
 
+		remaining := ""
 		var err error
 		if i > 0 {
-			err = analyzeLayer(*endpoint, path+"/"+layerIDs[i]+"/layer.tar", layerIDs[i], layerIDs[i-1])
-		} else {
-			err = analyzeLayer(*endpoint, path+"/"+layerIDs[i]+"/layer.tar", layerIDs[i], "")
+			remaining = layerIDs[i-1]
 		}
+
+		err = analyzeLayer(endpoint, formatImageLayerTarEndpoint(FILE_SERVER_ENDPOINT, pathWithoutRoot, layerIDs[i]), layerIDs[i], remaining)
+
 		if err != nil {
 			fmt.Printf("- Could not analyze layer: %s\n", err)
 			report.Message = fmt.Sprintf("- Could not analyze layer: %s\n", err)
 			return buildResult, errors.New(fmt.Sprintf("- Could not analyze layer: %s\nusing %s %s %s",
-				err, *endpoint, path, layerIDs[i]))
+				err, endpoint, path, layerIDs[i]))
 		}
 	}
 
 	// Get vulnerabilities.
 	fmt.Println("Getting image's vulnerabilities")
-	layer, err := getLayer(*endpoint, layerIDs[len(layerIDs)-1])
+	layer, err := getLayer(endpoint, layerIDs[len(layerIDs)-1])
 	if err != nil {
 		fmt.Printf("- Could not get layer information: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get layer information: %s\n", err)
@@ -185,7 +186,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 }
 
 func save(imageName string) (string, error) {
-	path, err := ioutil.TempDir("", "analyze-local-image-")
+	path, err := ioutil.TempDir(FILE_SERVER_ROOT, "analyze-local-image-")
 	if err != nil {
 		return "", err
 	}
@@ -193,7 +194,7 @@ func save(imageName string) (string, error) {
 	var stderr bytes.Buffer
 	save := exec.Command("docker", "save", imageName)
 	save.Stderr = &stderr
-	extract := exec.Command("tar", "xf", "-", "-C"+path)
+	extract := exec.Command("tar", "xf", "-", "-C", path)
 	extract.Stderr = &stderr
 	pipe, err := extract.StdinPipe()
 	if err != nil {
@@ -276,31 +277,25 @@ func historyFromCommand(imageName string) ([]string, error) {
 	return layers, nil
 }
 
-func listenHTTP(path, allowedHost string) {
-	fmt.Printf("Setting up HTTP server (allowing: %s)\n", allowedHost)
+func listenHTTP(path string, port string) {
+	fmt.Printf("Setting up HTTP server on local root path %s \n", path)
 
-	restrictedFileServer := func(path, allowedHost string) http.Handler {
-		fc := func(w http.ResponseWriter, r *http.Request) {
-			//if r.Host == allowedHost {
-			http.FileServer(http.Dir(path)).ServeHTTP(w, r)
-			return
-			//}
-			//w.WriteHeader(403)
-		}
-		return http.HandlerFunc(fc)
+	if port == "" || path == "" {
+		fmt.Errorf("Empty values passed to listeHTTP(path=%s, port=%s)", path, port)
+		return
 	}
-	err := http.ListenAndServe(":"+strconv.Itoa(httpPort), restrictedFileServer(path, allowedHost))
+	err := http.ListenAndServe(":"+port, http.FileServer(http.Dir(path)))
 	if err != nil {
-		fmt.Printf("- An error occurs with the HTTP server: %s\n", err)
+		fmt.Printf("- An error occured with the HTTP server: %s\n", err)
 		return
 	}
 }
 
-func analyzeLayer(endpoint, path, layerName, parentLayerName string) error {
+func analyzeLayer(clairEndpoint, layerEndpoint, layerName, parentLayerName string) error {
 	payload := v1.LayerEnvelope{
 		Layer: &v1.Layer{
 			Name:       layerName,
-			Path:       path,
+			Path:       layerEndpoint,
 			ParentName: parentLayerName,
 			Format:     "Docker",
 		},
@@ -311,7 +306,10 @@ func analyzeLayer(endpoint, path, layerName, parentLayerName string) error {
 		return err
 	}
 
-	request, err := http.NewRequest("POST", endpoint+postLayerURI, bytes.NewBuffer(jsonPayload))
+	requestEndpoint := clairEndpoint + postLayerURI
+	log.Printf("Sending request to endpoint %s to analyze %v", requestEndpoint, payload)
+
+	request, err := http.NewRequest("POST", requestEndpoint, bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return err
 	}
