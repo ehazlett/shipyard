@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"runtime"
 )
 
 var boolFlagTests = []struct {
@@ -58,8 +59,12 @@ func TestStringFlagWithEnvVarHelpOutput(t *testing.T) {
 		flag := StringFlag{Name: test.name, Value: test.value, EnvVar: "APP_FOO"}
 		output := flag.String()
 
-		if !strings.HasSuffix(output, " [$APP_FOO]") {
-			t.Errorf("%s does not end with [$APP_FOO]", output)
+		expectedSuffix := " [$APP_FOO]"
+		if runtime.GOOS == "windows" {
+			expectedSuffix = " [%APP_FOO%]"
+		}
+		if !strings.HasSuffix(output, expectedSuffix) {
+			t.Errorf("%s does not end with" + expectedSuffix, output)
 		}
 	}
 }
@@ -110,8 +115,12 @@ func TestStringSliceFlagWithEnvVarHelpOutput(t *testing.T) {
 		flag := StringSliceFlag{Name: test.name, Value: test.value, EnvVar: "APP_QWWX"}
 		output := flag.String()
 
-		if !strings.HasSuffix(output, " [$APP_QWWX]") {
-			t.Errorf("%q does not end with [$APP_QWWX]", output)
+		expectedSuffix := " [$APP_QWWX]"
+		if runtime.GOOS == "windows" {
+			expectedSuffix = " [%APP_QWWX%]"
+		}
+		if !strings.HasSuffix(output, expectedSuffix) {
+			t.Errorf("%q does not end with" + expectedSuffix, output)
 		}
 	}
 }
@@ -143,8 +152,12 @@ func TestIntFlagWithEnvVarHelpOutput(t *testing.T) {
 		flag := IntFlag{Name: test.name, EnvVar: "APP_BAR"}
 		output := flag.String()
 
-		if !strings.HasSuffix(output, " [$APP_BAR]") {
-			t.Errorf("%s does not end with [$APP_BAR]", output)
+		expectedSuffix := " [$APP_BAR]"
+		if runtime.GOOS == "windows" {
+			expectedSuffix = " [%APP_BAR%]"
+		}
+		if !strings.HasSuffix(output, expectedSuffix) {
+			t.Errorf("%s does not end with" + expectedSuffix, output)
 		}
 	}
 }
@@ -176,8 +189,12 @@ func TestDurationFlagWithEnvVarHelpOutput(t *testing.T) {
 		flag := DurationFlag{Name: test.name, EnvVar: "APP_BAR"}
 		output := flag.String()
 
-		if !strings.HasSuffix(output, " [$APP_BAR]") {
-			t.Errorf("%s does not end with [$APP_BAR]", output)
+		expectedSuffix := " [$APP_BAR]"
+		if runtime.GOOS == "windows" {
+			expectedSuffix = " [%APP_BAR%]"
+		}
+		if !strings.HasSuffix(output, expectedSuffix) {
+			t.Errorf("%s does not end with" + expectedSuffix, output)
 		}
 	}
 }
@@ -216,8 +233,12 @@ func TestIntSliceFlagWithEnvVarHelpOutput(t *testing.T) {
 		flag := IntSliceFlag{Name: test.name, Value: test.value, EnvVar: "APP_SMURF"}
 		output := flag.String()
 
-		if !strings.HasSuffix(output, " [$APP_SMURF]") {
-			t.Errorf("%q does not end with [$APP_SMURF]", output)
+		expectedSuffix := " [$APP_SMURF]"
+		if runtime.GOOS == "windows" {
+			expectedSuffix = " [%APP_SMURF%]"
+		}
+		if !strings.HasSuffix(output, expectedSuffix) {
+			t.Errorf("%q does not end with" + expectedSuffix, output)
 		}
 	}
 }
@@ -249,8 +270,12 @@ func TestFloat64FlagWithEnvVarHelpOutput(t *testing.T) {
 		flag := Float64Flag{Name: test.name, EnvVar: "APP_BAZ"}
 		output := flag.String()
 
-		if !strings.HasSuffix(output, " [$APP_BAZ]") {
-			t.Errorf("%s does not end with [$APP_BAZ]", output)
+		expectedSuffix := " [$APP_BAZ]"
+		if runtime.GOOS == "windows" {
+			expectedSuffix = " [%APP_BAZ%]"
+		}
+		if !strings.HasSuffix(output, expectedSuffix) {
+			t.Errorf("%s does not end with" + expectedSuffix, output)
 		}
 	}
 }
@@ -283,8 +308,12 @@ func TestGenericFlagWithEnvVarHelpOutput(t *testing.T) {
 		flag := GenericFlag{Name: test.name, EnvVar: "APP_ZAP"}
 		output := flag.String()
 
-		if !strings.HasSuffix(output, " [$APP_ZAP]") {
-			t.Errorf("%s does not end with [$APP_ZAP]", output)
+		expectedSuffix := " [$APP_ZAP]"
+		if runtime.GOOS == "windows" {
+			expectedSuffix = " [%APP_ZAP%]"
+		}
+		if !strings.HasSuffix(output, expectedSuffix) {
+			t.Errorf("%s does not end with" + expectedSuffix, output)
 		}
 	}
 }
@@ -303,6 +332,24 @@ func TestParseMultiString(t *testing.T) {
 			}
 		},
 	}).Run([]string{"run", "-s", "10"})
+}
+
+func TestParseDestinationString(t *testing.T) {
+	var dest string
+	a := App{
+		Flags: []Flag{
+			StringFlag{
+				Name:        "dest",
+				Destination: &dest,
+			},
+		},
+		Action: func(ctx *Context) {
+			if dest != "10" {
+				t.Errorf("expected destination String 10")
+			}
+		},
+	}
+	a.Run([]string{"run", "--dest", "10"})
 }
 
 func TestParseMultiStringFromEnv(t *testing.T) {
@@ -410,6 +457,24 @@ func TestParseMultiInt(t *testing.T) {
 		},
 	}
 	a.Run([]string{"run", "-s", "10"})
+}
+
+func TestParseDestinationInt(t *testing.T) {
+	var dest int
+	a := App{
+		Flags: []Flag{
+			IntFlag{
+				Name:        "dest",
+				Destination: &dest,
+			},
+		},
+		Action: func(ctx *Context) {
+			if dest != 10 {
+				t.Errorf("expected destination Int 10")
+			}
+		},
+	}
+	a.Run([]string{"run", "--dest", "10"})
 }
 
 func TestParseMultiIntFromEnv(t *testing.T) {
@@ -521,6 +586,24 @@ func TestParseMultiFloat64(t *testing.T) {
 	a.Run([]string{"run", "-s", "10.2"})
 }
 
+func TestParseDestinationFloat64(t *testing.T) {
+	var dest float64
+	a := App{
+		Flags: []Flag{
+			Float64Flag{
+				Name:        "dest",
+				Destination: &dest,
+			},
+		},
+		Action: func(ctx *Context) {
+			if dest != 10.2 {
+				t.Errorf("expected destination Float64 10.2")
+			}
+		},
+	}
+	a.Run([]string{"run", "--dest", "10.2"})
+}
+
 func TestParseMultiFloat64FromEnv(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("APP_TIMEOUT_SECONDS", "15.5")
@@ -576,6 +659,24 @@ func TestParseMultiBool(t *testing.T) {
 	a.Run([]string{"run", "--serve"})
 }
 
+func TestParseDestinationBool(t *testing.T) {
+	var dest bool
+	a := App{
+		Flags: []Flag{
+			BoolFlag{
+				Name:        "dest",
+				Destination: &dest,
+			},
+		},
+		Action: func(ctx *Context) {
+			if dest != true {
+				t.Errorf("expected destination Bool true")
+			}
+		},
+	}
+	a.Run([]string{"run", "--dest"})
+}
+
 func TestParseMultiBoolFromEnv(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("APP_DEBUG", "1")
@@ -629,6 +730,24 @@ func TestParseMultiBoolT(t *testing.T) {
 		},
 	}
 	a.Run([]string{"run", "--serve"})
+}
+
+func TestParseDestinationBoolT(t *testing.T) {
+	var dest bool
+	a := App{
+		Flags: []Flag{
+			BoolTFlag{
+				Name:        "dest",
+				Destination: &dest,
+			},
+		},
+		Action: func(ctx *Context) {
+			if dest != true {
+				t.Errorf("expected destination BoolT true")
+			}
+		},
+	}
+	a.Run([]string{"run", "--dest"})
 }
 
 func TestParseMultiBoolTFromEnv(t *testing.T) {

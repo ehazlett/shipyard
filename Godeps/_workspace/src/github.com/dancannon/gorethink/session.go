@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 // A Session represents a connection to a RethinkDB cluster and should be used
@@ -24,13 +24,19 @@ type ConnectOpts struct {
 	Address      string        `gorethink:"address,omitempty"`
 	Addresses    []string      `gorethink:"addresses,omitempty"`
 	Database     string        `gorethink:"database,omitempty"`
-	AuthKey      string        `gorethink:"authkey,omitempty"`
+	Username     string        `gorethink:"username,omitempty"`
+	Password     string        `gorethink:"password,omitempty"`
+	AuthKey      string        `gorethink:"authkey,omitempty"` // Deprecated
 	Timeout      time.Duration `gorethink:"timeout,omitempty"`
 	WriteTimeout time.Duration `gorethink:"write_timeout,omitempty"`
 	ReadTimeout  time.Duration `gorethink:"read_timeout,omitempty"`
-	TLSConfig    *tls.Config   `gorethink:"tlsconfig,omitempty"`
+	// The duration in which a connection should send a keep-alive.
+	KeepAlivePeriod  time.Duration    `gorethink:"keep_alive_timeout,omitempty"`
+	TLSConfig        *tls.Config      `gorethink:"tlsconfig,omitempty"`
+	HandshakeVersion HandshakeVersion `gorethink:"handshake_version,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
+	// By default a maximum of 2 connections are opened per host.
 	MaxOpen int `gorethink:"max_open,omitempty"`
 
 	// Below options are for cluster discovery, please note there is a high
@@ -42,7 +48,17 @@ type ConnectOpts struct {
 	DiscoverHosts bool `gorethink:"discover_hosts,omitempty"`
 	// NodeRefreshInterval is used to determine how often the driver should
 	// refresh the status of a node.
+	//
+	// Deprecated: This function is no longer used due to changes in the
+	// way hosts are selected.
 	NodeRefreshInterval time.Duration `gorethink:"node_refresh_interval,omitempty"`
+	// HostDecayDuration is used by the go-hostpool package to calculate a weighted
+	// score when selecting a host. By default a value of 5 minutes is used.
+	HostDecayDuration time.Duration
+
+	// Indicates whether the cursors running in this session should use json.Number instead of float64 while
+	// unmarshaling documents with interface{}. The default is `false`.
+	UseJSONNumber bool
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {
@@ -107,6 +123,14 @@ type CloseOpts struct {
 
 func (o *CloseOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
+}
+
+// IsConnected returns true if session has a valid connection.
+func (s *Session) IsConnected() bool {
+	if s.cluster == nil || s.closed {
+		return false
+	}
+	return s.cluster.IsConnected()
 }
 
 // Reconnect closes and re-opens a session.
@@ -220,6 +244,11 @@ func (s *Session) Exec(q Query) error {
 	}
 
 	return s.cluster.Exec(q)
+}
+
+// Server returns the server name and server UUID being used by a connection.
+func (s *Session) Server() (ServerResponse, error) {
+	return s.cluster.Server()
 }
 
 // SetHosts resets the hosts used when connecting to the RethinkDB cluster

@@ -2,15 +2,18 @@ package cli
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 )
 
-func ExampleApp() {
+func ExampleApp_Run() {
 	// set args for examples sake
 	os.Args = []string{"greet", "--name", "Jeremy"}
 
@@ -22,6 +25,7 @@ func ExampleApp() {
 	app.Action = func(c *Context) {
 		fmt.Printf("Hello %v\n", c.String("name"))
 	}
+	app.UsageText = "app [first_arg] [second_arg]"
 	app.Author = "Harrison"
 	app.Email = "harrison@lolwut.com"
 	app.Authors = []Author{Author{Name: "Oliver Allen", Email: "oliver@toyshop.com"}}
@@ -30,7 +34,7 @@ func ExampleApp() {
 	// Hello Jeremy
 }
 
-func ExampleAppSubcommand() {
+func ExampleApp_Run_subcommand() {
 	// set args for examples sake
 	os.Args = []string{"say", "hi", "english", "--name", "Jeremy"}
 	app := NewApp()
@@ -67,7 +71,7 @@ func ExampleAppSubcommand() {
 	// Hello, Jeremy
 }
 
-func ExampleAppHelp() {
+func ExampleApp_Run_help() {
 	// set args for examples sake
 	os.Args = []string{"greet", "h", "describeit"}
 
@@ -90,16 +94,16 @@ func ExampleAppHelp() {
 	app.Run(os.Args)
 	// Output:
 	// NAME:
-	//    describeit - use it to see a description
+	//    greet describeit - use it to see a description
 	//
 	// USAGE:
-	//    command describeit [arguments...]
+	//    greet describeit [arguments...]
 	//
 	// DESCRIPTION:
 	//    This is how we describe describeit the function
 }
 
-func ExampleAppBashComplete() {
+func ExampleApp_Run_bashComplete() {
 	// set args for examples sake
 	os.Args = []string{"greet", "--generate-bash-completion"}
 
@@ -246,6 +250,24 @@ func TestApp_CommandWithFlagBeforeTerminator(t *testing.T) {
 	expect(t, args[0], "my-arg")
 	expect(t, args[1], "--")
 	expect(t, args[2], "--notARealFlag")
+}
+
+func TestApp_CommandWithDash(t *testing.T) {
+	var args []string
+
+	app := NewApp()
+	command := Command{
+		Name: "cmd",
+		Action: func(c *Context) {
+			args = c.Args()
+		},
+	}
+	app.Commands = []Command{command}
+
+	app.Run([]string{"", "cmd", "my-arg", "-"})
+
+	expect(t, args[0], "my-arg")
+	expect(t, args[1], "-")
 }
 
 func TestApp_CommandWithNoFlagBeforeTerminator(t *testing.T) {
@@ -556,6 +578,7 @@ func TestAppNoHelpFlag(t *testing.T) {
 	HelpFlag = BoolFlag{}
 
 	app := NewApp()
+	app.Writer = ioutil.Discard
 	err := app.Run([]string{"test", "-h"})
 
 	if err != flag.ErrHelp {
@@ -737,7 +760,7 @@ func TestApp_Run_SubcommandFullPath(t *testing.T) {
 	app := NewApp()
 	buf := new(bytes.Buffer)
 	app.Writer = buf
-
+	app.Name = "command"
 	subCmd := Command{
 		Name:  "bar",
 		Usage: "does bar things",
@@ -755,10 +778,103 @@ func TestApp_Run_SubcommandFullPath(t *testing.T) {
 	}
 
 	output := buf.String()
-	if !strings.Contains(output, "foo bar - does bar things") {
+	if !strings.Contains(output, "command foo bar - does bar things") {
 		t.Errorf("expected full path to subcommand: %s", output)
 	}
 	if !strings.Contains(output, "command foo bar [arguments...]") {
+		t.Errorf("expected full path to subcommand: %s", output)
+	}
+}
+
+func TestApp_Run_SubcommandHelpName(t *testing.T) {
+	app := NewApp()
+	buf := new(bytes.Buffer)
+	app.Writer = buf
+	app.Name = "command"
+	subCmd := Command{
+		Name:     "bar",
+		HelpName: "custom",
+		Usage:    "does bar things",
+	}
+	cmd := Command{
+		Name:        "foo",
+		Description: "foo commands",
+		Subcommands: []Command{subCmd},
+	}
+	app.Commands = []Command{cmd}
+
+	err := app.Run([]string{"command", "foo", "bar", "--help"})
+	if err != nil {
+		t.Error(err)
+	}
+
+	output := buf.String()
+	if !strings.Contains(output, "custom - does bar things") {
+		t.Errorf("expected HelpName for subcommand: %s", output)
+	}
+	if !strings.Contains(output, "custom [arguments...]") {
+		t.Errorf("expected HelpName to subcommand: %s", output)
+	}
+}
+
+func TestApp_Run_CommandHelpName(t *testing.T) {
+	app := NewApp()
+	buf := new(bytes.Buffer)
+	app.Writer = buf
+	app.Name = "command"
+	subCmd := Command{
+		Name:  "bar",
+		Usage: "does bar things",
+	}
+	cmd := Command{
+		Name:        "foo",
+		HelpName:    "custom",
+		Description: "foo commands",
+		Subcommands: []Command{subCmd},
+	}
+	app.Commands = []Command{cmd}
+
+	err := app.Run([]string{"command", "foo", "bar", "--help"})
+	if err != nil {
+		t.Error(err)
+	}
+
+	output := buf.String()
+	if !strings.Contains(output, "command foo bar - does bar things") {
+		t.Errorf("expected full path to subcommand: %s", output)
+	}
+	if !strings.Contains(output, "command foo bar [arguments...]") {
+		t.Errorf("expected full path to subcommand: %s", output)
+	}
+}
+
+func TestApp_Run_CommandSubcommandHelpName(t *testing.T) {
+	app := NewApp()
+	buf := new(bytes.Buffer)
+	app.Writer = buf
+	app.Name = "base"
+	subCmd := Command{
+		Name:     "bar",
+		HelpName: "custom",
+		Usage:    "does bar things",
+	}
+	cmd := Command{
+		Name:        "foo",
+		Description: "foo commands",
+		Subcommands: []Command{subCmd},
+	}
+	app.Commands = []Command{cmd}
+
+	err := app.Run([]string{"command", "foo", "--help"})
+	if err != nil {
+		t.Error(err)
+	}
+
+	output := buf.String()
+	if !strings.Contains(output, "base foo - foo commands") {
+		t.Errorf("expected full path to subcommand: %s", output)
+	}
+	if !strings.Contains(output, "base foo command [command options] [arguments...]") {
 		t.Errorf("expected full path to subcommand: %s", output)
 	}
 }
@@ -824,6 +940,55 @@ func TestApp_Run_Version(t *testing.T) {
 	}
 }
 
+func TestApp_Run_Categories(t *testing.T) {
+	app := NewApp()
+	app.Name = "categories"
+	app.Commands = []Command{
+		Command{
+			Name:     "command1",
+			Category: "1",
+		},
+		Command{
+			Name:     "command2",
+			Category: "1",
+		},
+		Command{
+			Name:     "command3",
+			Category: "2",
+		},
+	}
+	buf := new(bytes.Buffer)
+	app.Writer = buf
+
+	app.Run([]string{"categories"})
+
+	expect := CommandCategories{
+		&CommandCategory{
+			Name: "1",
+			Commands: []Command{
+				app.Commands[0],
+				app.Commands[1],
+			},
+		},
+		&CommandCategory{
+			Name: "2",
+			Commands: []Command{
+				app.Commands[2],
+			},
+		},
+	}
+	if !reflect.DeepEqual(app.Categories(), expect) {
+		t.Fatalf("expected categories %#v, to equal %#v", app.Categories(), expect)
+	}
+
+	output := buf.String()
+	t.Logf("output: %q\n", buf.Bytes())
+
+	if !strings.Contains(output, "1:\n    command1") {
+		t.Errorf("want buffer to include category %q, did not: \n%q", "1:\n    command1", output)
+	}
+}
+
 func TestApp_Run_DoesNotOverwriteErrorFromBefore(t *testing.T) {
 	app := NewApp()
 	app.Action = func(c *Context) {}
@@ -832,7 +997,7 @@ func TestApp_Run_DoesNotOverwriteErrorFromBefore(t *testing.T) {
 
 	err := app.Run([]string{"foo"})
 	if err == nil {
-		t.Fatalf("expected to recieve error from Run, got none")
+		t.Fatalf("expected to receive error from Run, got none")
 	}
 
 	if !strings.Contains(err.Error(), "before error") {
@@ -847,6 +1012,11 @@ func TestApp_Run_SubcommandDoesNotOverwriteErrorFromBefore(t *testing.T) {
 	app := NewApp()
 	app.Commands = []Command{
 		Command{
+			Subcommands: []Command{
+				Command{
+					Name: "sub",
+				},
+			},
 			Name:   "bar",
 			Before: func(c *Context) error { return fmt.Errorf("before error") },
 			After:  func(c *Context) error { return fmt.Errorf("after error") },
@@ -855,7 +1025,7 @@ func TestApp_Run_SubcommandDoesNotOverwriteErrorFromBefore(t *testing.T) {
 
 	err := app.Run([]string{"foo", "bar"})
 	if err == nil {
-		t.Fatalf("expected to recieve error from Run, got none")
+		t.Fatalf("expected to receive error from Run, got none")
 	}
 
 	if !strings.Contains(err.Error(), "before error") {
@@ -863,5 +1033,65 @@ func TestApp_Run_SubcommandDoesNotOverwriteErrorFromBefore(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "after error") {
 		t.Errorf("expected text of error from After method, but got none in \"%v\"", err)
+	}
+}
+
+func TestApp_OnUsageError_WithWrongFlagValue(t *testing.T) {
+	app := NewApp()
+	app.Flags = []Flag{
+		IntFlag{Name: "flag"},
+	}
+	app.OnUsageError = func(c *Context, err error, isSubcommand bool) error {
+		if isSubcommand {
+			t.Errorf("Expect no subcommand")
+		}
+		if !strings.HasPrefix(err.Error(), "invalid value \"wrong\"") {
+			t.Errorf("Expect an invalid value error, but got \"%v\"", err)
+		}
+		return errors.New("intercepted: " + err.Error())
+	}
+	app.Commands = []Command{
+		Command{
+			Name: "bar",
+		},
+	}
+
+	err := app.Run([]string{"foo", "--flag=wrong"})
+	if err == nil {
+		t.Fatalf("expected to receive error from Run, got none")
+	}
+
+	if !strings.HasPrefix(err.Error(), "intercepted: invalid value") {
+		t.Errorf("Expect an intercepted error, but got \"%v\"", err)
+	}
+}
+
+func TestApp_OnUsageError_WithWrongFlagValue_ForSubcommand(t *testing.T) {
+	app := NewApp()
+	app.Flags = []Flag{
+		IntFlag{Name: "flag"},
+	}
+	app.OnUsageError = func(c *Context, err error, isSubcommand bool) error {
+		if isSubcommand {
+			t.Errorf("Expect subcommand")
+		}
+		if !strings.HasPrefix(err.Error(), "invalid value \"wrong\"") {
+			t.Errorf("Expect an invalid value error, but got \"%v\"", err)
+		}
+		return errors.New("intercepted: " + err.Error())
+	}
+	app.Commands = []Command{
+		Command{
+			Name: "bar",
+		},
+	}
+
+	err := app.Run([]string{"foo", "--flag=wrong", "bar"})
+	if err == nil {
+		t.Fatalf("expected to receive error from Run, got none")
+	}
+
+	if !strings.HasPrefix(err.Error(), "intercepted: invalid value") {
+		t.Errorf("Expect an intercepted error, but got \"%v\"", err)
 	}
 }

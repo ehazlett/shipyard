@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"fmt"
 	"time"
 
 	test "gopkg.in/check.v1"
@@ -218,6 +219,13 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	res, err = DB("test").Table("test").Filter(obj).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
+
+	var objP *object
+
+	res, err = DB("test").Table("test").Get("missing value").Run(session)
+	res.Next(&objP)
+	c.Assert(err, test.IsNil)
+	c.Assert(objP, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorAll(c *test.C) {
@@ -338,6 +346,23 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestCursorChangesClose(c *test.C) {
+	// Ensure table + database exist
+	DBCreate("test").Exec(session)
+	DB("test").TableDrop("Table3").Exec(session)
+	DB("test").TableCreate("Table3").Exec(session)
+
+	// Test query
+	// res, err := DB("test").Table("Table3").Changes().Run(session)
+	res, err := DB("test").Table("Table3").Changes().Run(session)
+	c.Assert(err, test.IsNil)
+	c.Assert(res, test.NotNil)
+
+	// Ensure that the cursor can be closed
+	err = res.Close()
+	c.Assert(err, test.IsNil)
+}
+
 func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
 	// Test query
 	query := Expr([]interface{}{
@@ -397,4 +422,109 @@ func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
 		i++
 	}
 	c.Assert(res.Err(), test.IsNil)
+}
+
+func (s *RethinkSuite) TestCursorNextResponse(c *test.C) {
+	res, err := Expr(5).Run(session)
+	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
+
+	b, ok := res.NextResponse()
+	c.Assert(ok, test.Equals, true)
+	c.Assert(b, jsonEquals, []byte(`5`))
+}
+
+func (s *RethinkSuite) TestCursorNextResponse_object(c *test.C) {
+	res, err := Expr(map[string]string{"foo": "bar"}).Run(session)
+	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
+
+	b, ok := res.NextResponse()
+	c.Assert(ok, test.Equals, true)
+	c.Assert(b, jsonEquals, []byte(`{"foo":"bar"}`))
+}
+
+func (s *RethinkSuite) TestCursorPeek_idempotency(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	var result int
+
+	// Test idempotency
+	for i := 0; i < 2; i++ {
+		hasMore, err := res.Peek(&result)
+		c.Assert(err, test.IsNil)
+		c.Assert(result, test.Equals, 1)
+		c.Assert(hasMore, test.Equals, true)
+	}
+
+}
+
+func (s *RethinkSuite) TestCursorPeek_wrong_type(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	// Test that wrongType doesn't break the cursor
+	wrongType := struct {
+		Name string
+		Age  int
+	}{}
+
+	hasMore, err := res.Peek(&wrongType)
+	c.Assert(err, test.NotNil)
+	c.Assert(hasMore, test.Equals, false)
+	c.Assert(res.Err(), test.IsNil)
+}
+
+func (s *RethinkSuite) TestCursorPeek_usage(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	var result int
+
+	// Test that Skip progresses our cursor
+	res.Skip()
+	hasMore, err := res.Peek(&result)
+	c.Assert(err, test.IsNil)
+	c.Assert(result, test.Equals, 2)
+	c.Assert(hasMore, test.Equals, true)
+
+	// Test that we can use Next afterwards and we get the same result
+	hasMore = res.Next(&result)
+	c.Assert(result, test.Equals, 2)
+	c.Assert(hasMore, test.Equals, true)
+}
+
+func (s *RethinkSuite) TestCursorSkip(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	res.Skip()
+
+	var result int
+	hasMore := res.Next(&result)
+	c.Assert(result, test.Equals, 2)
+	c.Assert(hasMore, test.Equals, true)
+}
+
+func ExampleCursor_Peek() {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	var result, altResult int
+	wasRead, err := res.Peek(&result) // Result is now 1
+	if err != nil {
+		fmt.Print(err)
+		return
+	} else if !wasRead {
+		fmt.Print("No data to read!")
+	}
+
+	res.Next(&altResult) // altResult is also 1, peek didn't progress the cursor
+
+	res.Skip()        // progress the cursor, skipping 2
+	res.Peek(&result) // result is now 3
 }

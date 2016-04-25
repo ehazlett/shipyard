@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 // DB references a database.
@@ -61,7 +61,10 @@ func (t Term) Get(args ...interface{}) Term {
 	return constructMethodTerm(t, "Get", p.Term_GET, args, map[string]interface{}{})
 }
 
-// GetAll gets all documents where the given value matches the value of the primary index.
+// GetAll gets all documents where the given value matches the value of the primary
+// index. Multiple values can be passed this function if you want to select multiple
+// documents. If the documents you are fetching have composite keys then each
+// argument should be a slice. For more information see the examples.
 func (t Term) GetAll(keys ...interface{}) Term {
 	return constructMethodTerm(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{})
 }

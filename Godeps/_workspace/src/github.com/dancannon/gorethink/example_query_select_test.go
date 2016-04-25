@@ -22,7 +22,80 @@ func ExampleTerm_Get() {
 	var hero map[string]interface{}
 	err = res.One(&hero)
 	if err != nil {
-		fmt.Print("Error scanning database result: %s", err)
+		fmt.Printf("Error scanning database result: %s", err)
+		return
+	}
+	fmt.Print(hero["name"])
+
+	// Output: Superman
+}
+
+// Find a document by ID.
+func ExampleTerm_GetAll() {
+	// Fetch the row from the database
+	res, err := DB("examples").Table("heroes").GetAll(2).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer res.Close()
+
+	if res.IsNil() {
+		fmt.Print("Row not found")
+		return
+	}
+
+	var hero map[string]interface{}
+	err = res.One(&hero)
+	if err != nil {
+		fmt.Printf("Error scanning database result: %s", err)
+		return
+	}
+	fmt.Print(hero["name"])
+
+	// Output: Superman
+}
+
+// Find a document by ID.
+func ExampleTerm_GetAll_multiple() {
+	// Fetch the row from the database
+	res, err := DB("examples").Table("heroes").GetAll(1, 2).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer res.Close()
+
+	var heroes []map[string]interface{}
+	err = res.All(&heroes)
+	if err != nil {
+		fmt.Printf("Error scanning database result: %s", err)
+		return
+	}
+	fmt.Print(heroes[0]["name"])
+
+	// Output: Superman
+}
+
+// Find all document with an indexed value.
+func ExampleTerm_GetAllByIndex() {
+	// Fetch the row from the database
+	res, err := DB("examples").Table("heroes").GetAllByIndex("code_name", "man_of_steel").Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer res.Close()
+
+	if res.IsNil() {
+		fmt.Print("Row not found")
+		return
+	}
+
+	var hero map[string]interface{}
+	err = res.One(&hero)
+	if err != nil {
+		fmt.Printf("Error scanning database result: %s", err)
 		return
 	}
 	fmt.Print(hero["name"])
@@ -50,7 +123,7 @@ func ExampleTerm_Get_merge() {
 	var hero map[string]interface{}
 	err = res.One(&hero)
 	if err != nil {
-		fmt.Print("Error scanning database result: %s", err)
+		fmt.Printf("Error scanning database result: %s", err)
 		return
 	}
 	fmt.Printf("%s: %v", hero["name"], hero["powers"])
@@ -74,7 +147,7 @@ func ExampleTerm_Filter() {
 	var users []interface{}
 	err = res.All(&users)
 	if err != nil {
-		fmt.Print("Error scanning database result: %s", err)
+		fmt.Printf("Error scanning database result: %s", err)
 		return
 	}
 	fmt.Printf("%d users", len(users))
@@ -96,7 +169,7 @@ func ExampleTerm_Filter_row() {
 	var users []interface{}
 	err = res.All(&users)
 	if err != nil {
-		fmt.Print("Error scanning database result: %s", err)
+		fmt.Printf("Error scanning database result: %s", err)
 		return
 	}
 	fmt.Printf("%d users", len(users))
@@ -120,7 +193,7 @@ func ExampleTerm_Filter_function() {
 	var users []interface{}
 	err = res.All(&users)
 	if err != nil {
-		fmt.Print("Error scanning database result: %s", err)
+		fmt.Printf("Error scanning database result: %s", err)
 		return
 	}
 	fmt.Printf("%d users", len(users))

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 // A Query represents a query ready to be sent to the database, A Query differs
@@ -45,6 +45,7 @@ type termsObj map[string]Term
 // see http://rethinkdb.com/docs/writing-drivers/.
 type Term struct {
 	name     string
+	rawQuery bool
 	rootTerm bool
 	termType p.Term_TermType
 	data     interface{}
@@ -60,6 +61,10 @@ func (t Term) build() (interface{}, error) {
 
 	if t.lastErr != nil {
 		return nil, t.lastErr
+	}
+
+	if t.rawQuery {
+		return t.data, nil
 	}
 
 	switch t.termType {
@@ -83,15 +88,15 @@ func (t Term) build() (interface{}, error) {
 		}
 	}
 
-	args := []interface{}{}
-	optArgs := map[string]interface{}{}
+	args := make([]interface{}, len(t.args))
+	optArgs := make(map[string]interface{}, len(t.optArgs))
 
-	for _, v := range t.args {
+	for i, v := range t.args {
 		arg, err := v.build()
 		if err != nil {
 			return nil, err
 		}
-		args = append(args, arg)
+		args[i] = arg
 	}
 
 	for k, v := range t.optArgs {
@@ -151,6 +156,11 @@ func (t Term) String() string {
 	if t.rootTerm {
 		return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 	}
+
+	if t.args == nil {
+		return "r"
+	}
+
 	return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
 }
 
@@ -196,7 +206,7 @@ type RunOpts struct {
 	DB             interface{} `gorethink:"db,omitempty"`
 	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
 	Profile        interface{} `gorethink:"profile,omitempty"`
-	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
+	Durability     interface{} `gorethink:"durability,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
@@ -232,6 +242,10 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 		opts = optArgs[0].toMap()
 	}
 
+	if s == nil || !s.IsConnected() {
+		return nil, ErrConnectionClosed
+	}
+
 	q, err := s.newQuery(t, opts)
 	if err != nil {
 		return nil, err
@@ -241,7 +255,7 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
-// scans the result into a variable of type WriteResponss. This function should be used
+// scans the result into a variable of type WriteResponse. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...).
 //
 // If an error occurs when running the write query the first error is returned.
@@ -254,20 +268,41 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	if err != nil {
 		return response, err
 	}
+	defer res.Close()
 
 	if err = res.One(&response); err != nil {
 		return response, err
 	}
 
-	if err = res.Close(); err != nil {
-		return response, err
-	}
-
 	if response.Errors > 0 {
-		return response, fmt.Errorf(response.FirstError)
+		return response, fmt.Errorf("%s", response.FirstError)
 	}
 
 	return response, nil
+}
+
+// ReadOne is a shortcut method that runs the query on the given connection
+// and reads one response from the cursor before closing it.
+//
+// It returns any errors encountered from running the query or reading the response
+func (t Term) ReadOne(dest interface{}, s *Session, optArgs ...RunOpts) error {
+	res, err := t.Run(s, optArgs...)
+	if err != nil {
+		return err
+	}
+	return res.One(dest)
+}
+
+// ReadAll is a shortcut method that runs the query on the given connection
+// and reads all of the responses from the cursor before closing it.
+//
+// It returns any errors encountered from running the query or reading the responses
+func (t Term) ReadAll(dest interface{}, s *Session, optArgs ...RunOpts) error {
+	res, err := t.Run(s, optArgs...)
+	if err != nil {
+		return err
+	}
+	return res.All(dest)
 }
 
 // ExecOpts contains the optional arguments for the Exec function and  inherits
@@ -280,7 +315,7 @@ type ExecOpts struct {
 	DB             interface{} `gorethink:"db,omitempty"`
 	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
 	Profile        interface{} `gorethink:"profile,omitempty"`
-	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
+	Durability     interface{} `gorethink:"durability,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`

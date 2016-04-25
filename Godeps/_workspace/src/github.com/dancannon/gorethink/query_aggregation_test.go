@@ -1,8 +1,6 @@
 package gorethink
 
-import (
-	test "gopkg.in/check.v1"
-)
+import test "gopkg.in/check.v1"
 
 func (s *RethinkSuite) TestAggregationReduce(c *test.C) {
 	var response int
@@ -319,4 +317,41 @@ func (s *RethinkSuite) TestAggregationContains(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, true)
+}
+
+func (s *RethinkSuite) TestAggregationFold(c *test.C) {
+	var response int
+	query := Expr(arr).Reduce(func(acc, val Term) Term {
+		return acc.Add(val)
+	})
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 45)
+}
+
+func (s *RethinkSuite) TestAggregationFoldEmit(c *test.C) {
+	var response []interface{}
+	query := Expr(objList).Fold(0, func(acc, row Term) Term {
+		return acc.Add(1)
+	}, FoldOpts{
+		Emit: func(acc, row, cur Term) Term {
+			return Branch(acc.Mod(2).Eq(0), []interface{}{row}, []interface{}{})
+		},
+	})
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, []interface{}{
+		map[string]interface{}{"id": 1, "g1": 1, "g2": 1, "num": 0},
+		map[string]interface{}{"id": 3, "g1": 3, "g2": 2, "num": 10},
+		map[string]interface{}{"id": 5, "g1": 2, "g2": 3, "num": 100},
+		map[string]interface{}{"id": 7, "g1": 1, "g2": 2, "num": 0},
+		map[string]interface{}{"id": 9, "g1": 2, "g2": 3, "num": 25},
+	})
 }

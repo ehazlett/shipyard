@@ -63,7 +63,7 @@ func (s *RethinkSuite) TestClusterRecoverAfterNoNodes(c *test.C) {
 
 func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
 	session, err := Connect(ConnectOpts{
-		Addresses:           []string{url, url2, url3},
+		Addresses:           []string{url1, url2, url3},
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
 		MaxIdle:             50,
@@ -75,7 +75,7 @@ func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
 	failed := 0
 	seconds := 0
 
-	t := time.NewTimer(time.Second * 10)
+	t := time.NewTimer(time.Second * 30)
 	tick := time.NewTicker(time.Second)
 	for {
 		select {

@@ -301,6 +301,19 @@ func (s *RethinkSuite) TestManipulationKeys(c *test.C) {
 	c.Assert(response, jsonEquals, []interface{}{"a", "b", "c"})
 }
 
+func (s *RethinkSuite) TestManipulationValues(c *test.C) {
+	query := Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Values()
+
+	var response []interface{}
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3})
+}
+
 func (s *RethinkSuite) TestManipulationObject(c *test.C) {
 	query := Object("a", 1, "b", 2)
 

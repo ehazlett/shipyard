@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 var (
@@ -71,12 +72,12 @@ var ErrEmptyResult = errors.New("The result does not contain any more rows")
 
 // rqlResponseError is the base type for all errors, it formats both
 // for the response and query if set.
-type rqlResponseError struct {
+type rqlServerError struct {
 	response *Response
 	term     *Term
 }
 
-func (e rqlResponseError) Error() string {
+func (e rqlServerError) Error() string {
 	var err = "An error occurred"
 	if e.response != nil {
 		json.Unmarshal(e.response.Responses[0], &err)
@@ -90,51 +91,92 @@ func (e rqlResponseError) Error() string {
 
 }
 
-func (e rqlResponseError) String() string {
+func (e rqlServerError) String() string {
 	return e.Error()
 }
 
-// RQLCompileError represents an error that occurs when compiling a query on
-// the database server.
-type RQLCompileError struct {
-	rqlResponseError
+type rqlError string
+
+func (e rqlError) Error() string {
+	return fmt.Sprintf("gorethink: %s", string(e))
 }
 
-// RQLRuntimeError represents an error when executing an error on the database
-// server, this is also returned by the database when using the `Error` term.
-type RQLRuntimeError struct {
-	rqlResponseError
+func (e rqlError) String() string {
+	return e.Error()
 }
 
-// RQLClientError represents a client error returned from the database.
-type RQLClientError struct {
-	rqlResponseError
-}
+// Exported Error "Implementations"
+
+type RQLClientError struct{ rqlServerError }
+type RQLCompileError struct{ rqlServerError }
+type RQLDriverCompileError struct{ RQLCompileError }
+type RQLServerCompileError struct{ RQLCompileError }
+type RQLAuthError struct{ RQLDriverError }
+type RQLRuntimeError struct{ rqlServerError }
+
+type RQLQueryLogicError struct{ RQLRuntimeError }
+type RQLNonExistenceError struct{ RQLQueryLogicError }
+type RQLResourceLimitError struct{ RQLRuntimeError }
+type RQLUserError struct{ RQLRuntimeError }
+type RQLInternalError struct{ RQLRuntimeError }
+type RQLTimeoutError struct{ rqlServerError }
+type RQLAvailabilityError struct{ RQLRuntimeError }
+type RQLOpFailedError struct{ RQLAvailabilityError }
+type RQLOpIndeterminateError struct{ RQLAvailabilityError }
 
 // RQLDriverError represents an unexpected error with the driver, if this error
 // persists please create an issue.
 type RQLDriverError struct {
-	message string
-}
-
-func (e RQLDriverError) Error() string {
-	return fmt.Sprintf("gorethink: %s", e.message)
-}
-
-func (e RQLDriverError) String() string {
-	return e.Error()
+	rqlError
 }
 
 // RQLConnectionError represents an error when communicating with the database
 // server.
 type RQLConnectionError struct {
-	message string
+	rqlError
 }
 
-func (e RQLConnectionError) Error() string {
-	return fmt.Sprintf("gorethink: %s", e.message)
+func createRuntimeError(errorType p.Response_ErrorType, response *Response, term *Term) error {
+	serverErr := rqlServerError{response, term}
+
+	switch errorType {
+	case p.Response_QUERY_LOGIC:
+		return RQLQueryLogicError{RQLRuntimeError{serverErr}}
+	case p.Response_NON_EXISTENCE:
+		return RQLNonExistenceError{RQLQueryLogicError{RQLRuntimeError{serverErr}}}
+	case p.Response_RESOURCE_LIMIT:
+		return RQLResourceLimitError{RQLRuntimeError{serverErr}}
+	case p.Response_USER:
+		return RQLUserError{RQLRuntimeError{serverErr}}
+	case p.Response_INTERNAL:
+		return RQLInternalError{RQLRuntimeError{serverErr}}
+	case p.Response_OP_FAILED:
+		return RQLOpFailedError{RQLAvailabilityError{RQLRuntimeError{serverErr}}}
+	case p.Response_OP_INDETERMINATE:
+		return RQLOpIndeterminateError{RQLAvailabilityError{RQLRuntimeError{serverErr}}}
+	default:
+		return RQLRuntimeError{serverErr}
+	}
 }
 
-func (e RQLConnectionError) String() string {
-	return e.Error()
+// Error type helpers
+
+// IsConflictErr returns true if the error is non-nil and the query failed
+// due to a duplicate primary key.
+func IsConflictErr(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	return strings.HasPrefix(err.Error(), "Duplicate primary key")
+}
+
+// IsTypeErr returns true if the error is non-nil and the query failed due
+// to a type error.
+func IsTypeErr(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	return strings.HasPrefix(err.Error(), "Expected type")
 }

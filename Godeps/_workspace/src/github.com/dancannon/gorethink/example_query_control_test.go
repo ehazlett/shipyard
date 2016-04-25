@@ -218,3 +218,23 @@ func ExampleExpr_structTags() {
 	//     "field_b": "b"
 	// }
 }
+
+// Execute a raw JSON query
+func ExampleRawQuery() {
+	cur, err := RawQuery([]byte(`"hello world"`)).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	var res interface{}
+	err = cur.One(&res)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	jsonPrint(res)
+
+	// Output: "hello world"
+}

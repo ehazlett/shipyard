@@ -102,7 +102,9 @@ func (s *RethinkSuite) TestJoinEqJoinZip(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := DB("test").Table("Join1").EqJoin("id", DB("test").Table("Join2")).Zip()
+	query := DB("test").Table("Join1").EqJoin("id", DB("test").Table("Join2"), EqJoinOpts{
+		Ordered: true,
+	}).Zip()
 	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
@@ -133,7 +135,8 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 	// Test query
 	var response []interface{}
 	query := DB("test").Table("Join1").EqJoin("id", DB("test").Table("Join3"), EqJoinOpts{
-		Index: "it",
+		Index:   "it",
+		Ordered: true,
 	}).Zip()
 	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)

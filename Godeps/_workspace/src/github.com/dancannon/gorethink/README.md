@@ -8,20 +8,21 @@
 
 ![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v1.1.1 (RethinkDB v2.1)
+Current version: v2.0.2 (RethinkDB v2.3)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dancannon/gorethink?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+If you need any help you can find me on the [RethinkDB slack](http://slack.rethinkdb.com/) in the #gorethink channel.
 
 ## Installation
 
-```sh
-go get -u github.com/dancannon/gorethink
+```
+go get gopkg.in/dancannon/gorethink.v2
 ```
 
-Or (pinned to the v1.x.x tag)
-```
+(Or v1)
+
+```sh
 go get gopkg.in/dancannon/gorethink.v1
 ```
 
@@ -34,6 +35,7 @@ Setting up a basic connection with RethinkDB is simple:
 ```go
 import (
     r "github.com/dancannon/gorethink"
+    "log"
 )
 
 var session *r.Session
@@ -90,6 +92,35 @@ if err != nil {
 
 When `DiscoverHosts` is true any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by GoRethink. Unfortunately the canonical address of each server in the cluster **MUST** be set as otherwise clients will try to connect to the database nodes locally. For more information about how to set a RethinkDB servers canonical address set this page http://www.rethinkdb.com/docs/config-file/.
 
+## User Authentication
+
+To login with a username and password you should first create a user, this can be done by writing to the `users` system table and then grant that user access to any tables or databases they need access to. This queries can also be executed in the RethinkDB admin console.
+
+```go
+err := r.DB("rethinkdb").Table("users").Insert(map[string]string{
+    "id": "john",
+    "password": "p455w0rd",
+}).Exec(session)
+...
+err = r.DB("blog").Table("posts").Grant("john", map[string]bool{
+    "read": true,
+    "write": true,
+}).Exec(session)
+...
+```
+
+Finally the username and password should be passed to `Connect` when creating your session, for example:
+
+```go
+session, err := r.Connect(r.ConnectOpts{
+    Address: "localhost:28015",
+    Database: "blog",
+    Username: "john",
+    Password: "p455w0rd",
+})
+```
+
+Please note that `DiscoverHosts` will not work with user authentication at this time due to the fact that RethinkDB restricts access to the required system tables.
 
 ## Query Functions
 
@@ -214,6 +245,57 @@ Field int `gorethink:",omitempty"`
 **NOTE:** It is strongly recommended that struct tags are used to explicitly define the mapping between your Go type and how the data is stored by RethinkDB. This is especially important when using an `Id` field as by default RethinkDB will create a field named `id` as the primary key (note that the RethinkDB field is lowercase but the Go version starts with a capital letter).
 
 When encoding maps with non-string keys the key values are automatically converted to strings where possible, however it is recommended that you use strings where possible (for example `map[string]T`).
+
+If you wish to use the `json` tags for GoRethink then you can call `SetTags("gorethink", "json")` when starting your program, this will cause GoRethink to check for `json` tags after checking for `gorethink` tags. By default this feature is disabled. This function will also let you support any other tags, the driver will check for tags in the same order as the parameters.
+
+### References
+
+Sometimes you may want to use a Go struct that references a document in another table, instead of creating a new struct which is just used when writing to RethinkDB you can annotate your struct with the reference tag option. This will tell GoRethink that when encoding your data it should "pluck" the ID field from the nested document and use that instead.
+
+This is all quite complicated so hopefully this example should help. First lets assume you have two types `Author` and `Book` and you want to insert a new book into your database however you dont want to include the entire author struct in the books table. As you can see the `Author` field in the `Book` struct has some extra tags, firstly we have added the `reference` tag option which tells GoRethink to pluck a field from the `Author` struct instead of inserting the whole author document. We also have the `gorethink_ref` tag which tells GoRethink to look for the `id` field in the `Author` document, without this tag GoRethink would instead look for the `author_id` field.
+
+```go
+type Author struct {
+    ID      string  `gorethink:"id,omitempty"`
+    Name    string  `gorethink:"name"`
+}
+
+type Book struct {
+    ID      string  `gorethink:"id,omitempty"`
+    Title   string  `gorethink:"title"`
+    Author  Author `gorethink:"author_id,reference" gorethink_ref:"id"`
+}
+```
+
+The resulting data in RethinkDB should look something like this:
+
+```json
+{
+    "author_id": "c2182a10-6b9d-4ea1-a70c-d6649bb5f8d7",
+    "id":  "eeb006d6-7fec-46c8-9d29-45b83f07ca14",
+    "title":  "The Hobbit"
+}
+```
+
+If you wanted to read back the book with the author included then you could run the following GoRethink query:
+
+```go
+r.Table("books").Get("1").Merge(func(p r.Term) interface{} {
+    return map[string]interface{}{
+        "author_id": r.Table("authors").Get(p.Field("author_id")),
+    }
+}).Run(session)
+```
+
+## Logging
+
+By default the driver logs errors when it fails to connect to the database. If you would like more verbose error logging you can call `r.SetVerbose(true)`.
+
+Alternatively if you wish to modify the logging behaviour you can modify the logger provided by `github.com/Sirupsen/logrus`. For example the following code completely disable the logger:
+
+```go
+r.Log.Out = ioutil.Discard
+```
 
 ## Benchmarks
 

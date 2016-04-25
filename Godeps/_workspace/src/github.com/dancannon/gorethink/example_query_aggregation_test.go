@@ -91,11 +91,11 @@ func ExampleTerm_Ungroup() {
 func ExampleTerm_Reduce() {
 	cur, err := DB("examples").Table("posts").
 		Map(func(doc Term) interface{} {
-		return 1
-	}).
+			return 1
+		}).
 		Reduce(func(left, right Term) interface{} {
-		return left.Add(right)
-	}).
+			return left.Add(right)
+		}).
 		Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -110,4 +110,26 @@ func ExampleTerm_Reduce() {
 	}
 
 	fmt.Print(res)
+}
+
+// Concatenate words from a list.
+func ExampleTerm_Fold() {
+	cur, err := Expr([]string{"a", "b", "c"}).Fold("", func(acc, word Term) Term {
+		return acc.Add(Branch(acc.Eq(""), "", ", ")).Add(word)
+	}).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	var res string
+	err = cur.One(&res)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	fmt.Print(res)
+	// Output:
+	// a, b, c
 }

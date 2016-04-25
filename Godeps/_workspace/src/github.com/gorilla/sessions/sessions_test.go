@@ -112,6 +112,10 @@ func TestFlashes(t *testing.T) {
 		t.Fatal("No cookies. Header:", hdr)
 	}
 
+	if _, err = store.Get(req, "session:key"); err.Error() != "sessions: invalid character in cookie name: session:key" {
+		t.Fatalf("Expected error due to invalid cookie name")
+	}
+
 	// Round 2 ----------------------------------------------------------------
 
 	req, _ = http.NewRequest("GET", "http://localhost:8080/", nil)

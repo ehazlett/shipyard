@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 // Row returns the currently visited document. Note that Row does not work within
@@ -109,6 +109,10 @@ func (t Term) ChangeAt(args ...interface{}) Term {
 // Keys returns an array containing all of the object's keys.
 func (t Term) Keys(args ...interface{}) Term {
 	return constructMethodTerm(t, "Keys", p.Term_KEYS, args, map[string]interface{}{})
+}
+
+func (t Term) Values(args ...interface{}) Term {
+	return constructMethodTerm(t, "Values", p.Term_VALUES, args, map[string]interface{}{})
 }
 
 // Object creates an object from a list of key-value pairs, where the keys must be strings.

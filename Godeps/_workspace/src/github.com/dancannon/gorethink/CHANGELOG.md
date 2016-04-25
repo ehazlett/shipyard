@@ -2,17 +2,154 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## v1.1.2
+## v2.0.2 - 2016-04-18
+
+### Fixed
+ - Fixed issue which prevented anonymous `time.Time` values from being encoded when used in a struct.
+ - Fixed panic when attempting to run a query with a nil session
+
+## v2.0.1 - 2016-04-14
+
+### Added
+ - Added `UnionWithOpts` term which allows `Union` to be called with optional arguments (such as `Interleave`)
+ - Added `IncludeOffsets` and `IncludeTypes` optional arguments to `ChangesOpts`
+ - Added `Conflict` optional argument to `InsertOpts`
+
+### Fixed
+ - Fixed error when connecting to database as non-admin user, please note that `DiscoverHosts` will not work with user authentication at this time due to the fact that RethinkDB restricts access to the required system tables.
+
+## v2.0.0 - 2016-04-13
+
+### Changed
+
+ - GoRethink now uses the v1.0 RethinkDB protocol which supports RethinkDB v2.3 and above. If you are using RethinkDB 2.2 or older please set `HandshakeVersion` when creating a session. For example:
+```go
+r.Connect(
+    ...
+    HandshakeVersion: r.HandshakeV0_4,
+    ...
+)
+```
+
+### Added
+ - Added support for username/password authentication. To login pass your username and password when creating a session using the `Username` and `Password` fields in the `ConnectOpts`.
+ - Added the `Grant` term
+ - Added the `Ordered` optional argument to `EqJoin`
+ - Added the `Fold` term and examples
+ - Added the `ReadOne` and `ReadAll` helper functions for quickly executing a query and scanning the result into a variable. For examples see the godocs.
+ - Added the `Peek` and `Skip` functions to the `Cursor`.
+ - Added support for referential arrays in structs
+ - Added the `Durability` argument to `RunOpts`/`ExecOpts`
+
+### Deprecated
+ - Deprecated the root `Wait` term, `r.Table(...).Wait()` should now be used instead.
+ - Deprecated session authentication using `AuthKey` 
+
+### Fixed
+ - Fixed issue with `ReconfigureOpts` field `PrimaryTag`
+
+## v1.4.1 - 2016-04-02
+
+### Fixed
+
+ - Fixed panic when closing a connection at the same time as using a changefeed.
+ - Update imports to correctly use gopkg.in
+ - Fixed race condition when using anonymous functions
+ - Fixed IsConflictErr and IsTypeErr panicking when passed nil errors
+ - RunWrite no longer misformats errors with formatting directives in them
+
+## v1.4.0 - 2016-03-15
+
+### Added
+- Added the ability to reference subdocuments when inserting new documents, for more information see the documentation in the readme.
+- Added the `SetTags` function which allows GoRethink to override which tags are used when working with structs. For example to support the `json` add the following call `SetTags("gorethink", "json")`.
+- Added helper functions for checking the error type of a write query, this is useful when calling `RunWrite`.
+    + Added `IsConflictErr` which returns true when RethinkDB returns a duplicate key error.
+    + Added `IsTypeErr` which returns true when RethinkDB returns an unexpected type error.
+- Added the `RawQuery` term which can be used to execute a raw JSON query, for more information about this query see the godoc.
+- Added the `NextResponse` function to `Cursor` which will return the next raw JSON response in the result set.
+- Added ability to set the keep alive period by setting the `KeepAlivePeriod` field in `ConnectOpts`.
+
+### Fixed
+- Fixed an issue that could prevent bad connections from being removed from the connection pool.
+- Fixed certain connection errors not being returned as `RqlConnectionError` when calling `Run`, `Exec` or `RunWrite`. 
+- Fixed potential dead lock in connection code caused when building the query.
+
+## v1.3.2 - 2015-02-01
+
+### Fixed
+- Fixed race condition in cursor which caused issues when closing a cursor that is in the process of fetching data.
+
+## v1.3.1 - 2015-01-22
+
+### Added
+ - Added more documentation and examples for `GetAll`.
+
+### Fixed
+- Fixed `RunWrite` not defering its call to `Cursor.Close()`. This could cause issues if an error occurred when decoding the result.
+- Fixed panic when calling `Error()` on a GoRethink `rqlError`.
+
+## v1.3.0 - 2016-01-11
+
+### Added
+ - Added new error types, the following error types can now be returned: `RQLClientError`, `RQLCompileError`, `RQLDriverCompileError`, `RQLServerCompileError`, `RQLAuthError`, `RQLRuntimeError`, `RQLQueryLogicError`, `RQLNonExistenceError`, `RQLResourceLimitError`, `RQLUserError`, `RQLInternalError`, `RQLTimeoutError`, `RQLAvailabilityError`, `RQLOpFailedError`, `RQLOpIndeterminateError`, `RQLDriverError`, `RQLConnectionError`. Please note that some other errors can be returned.
+ - Added `IsConnected` function to `Session`.
+ 
+### Fixed
+ - Fixed panic when scanning through results caused by incorrect queue implementation.
+
+## v1.2.0 - 2015-11-19
+### Added
+ - Added `UUID` term
+ - Added `Values` term
+ - Added `IncludeInitial` and `ChangefeedQueueSize` to `ChangesOpts`
+ - Added `UseJSONNumber` to `ConnectOpts` which changes the way the JSON unmarshal works when deserializing JSON with interface{}, it's preferred to use json.Number instead float64 as it preserves the original precision.
+ - Added `HostDecayDuration` to `ConnectOpts` to configure how hosts are selected. For more information see the godoc.
+
+### Changed
+ - Timezones from `time.Time` are now stored in the database, before all times were stored as UTC. To convert a go `time.Time` back to UTC you can call  `t.In(time.UTC)`.
+ - Improved host selection to use `hailocab/go-hostpool` to select nodes based on recent responses and timings.
+ - Changed connection pool to use `fatih/pool` instead of a custom connection pool, this has caused some internal API changes and the behaviour of `MaxIdle` and `MaxOpen` has slightly changed. This change was made mostly to make driver maintenance easier.
+     + `MaxIdle` now configures the initial size of the pool, the name of this field will likely change in the future.
+     + Not setting `MaxOpen` no longer creates an unbounded connection pool per host but instead creates a pool with a maximum capacity of 2 per host.
+
+### Deprecated
+ - Deprecated the option `NodeRefreshInterval` in `ConnectOpts`
+ - Deprecated `SetMaxIdleConns` and `SetMaxOpenConns`, these options should now only be set when creating the session.
+
+### Fixed
+ - Fixed some type aliases not being correctly encoded when using `Expr`.
+
+## v1.1.4 - 2015-10-02
+### Added
+ - Added root table terms (`r.TableCreate`, `r.TableList` and `r.TableDrop`)
+
+### Removed
+ - Removed `ReadMode` option from `RunOpts` and `ExecOpts` (incorrectly added in v1.1.0)
+
+### Fixed 
+ - Fixed `Decode` no longer setting pointer to nil on document not found
+ - Fixed panic when `fetchMore` returns an error
+ - Fixed deadlock when closing changefeed
+ - Fixed stop query incorrectly waiting for response
+ - Fixed pointers not to be properly decoded
+
+## v1.1.3 - 2015-09-06
+### Fixed
+ - Fixed pointers not to be properly decoded
+ - Fixed queries always timing out when Timeout ConnectOpt is set.
+
+## v1.1.2 - 2015-08-28
 ### Fixed
  - Fixed issue when encoding some maps
 
-## v1.1.1
+## v1.1.1 - 2015-08-21
 ### Fixed
  - Corrected protobuf import
  - Fixed documentation
  - Fixed issues with time pseudotype conversion that caused issues with milliseconds
 
-## v1.1.0
+## v1.1.0 - 2015-08-19
 ### Added
  - Replaced `UseOutdated` with `ReadMode`
  - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`

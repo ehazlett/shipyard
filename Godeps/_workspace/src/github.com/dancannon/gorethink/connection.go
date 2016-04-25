@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 const (
@@ -21,6 +21,7 @@ const (
 type Response struct {
 	Token     int64
 	Type      p.Response_ResponseType   `json:"t"`
+	ErrorType p.Response_ErrorType      `json:"e"`
 	Notes     []p.Response_ResponseNote `json:"n"`
 	Responses []json.RawMessage         `json:"r"`
 	Backtrace []interface{}             `json:"b"`
@@ -30,15 +31,17 @@ type Response struct {
 // Connection is a connection to a rethinkdb database. Connection is not thread
 // safe and should only be accessed be a single goroutine
 type Connection struct {
+	net.Conn
+
 	address string
 	opts    *ConnectOpts
-	conn    net.Conn
 
 	_       [4]byte
 	mu      sync.Mutex
 	token   int64
 	cursors map[int64]*Cursor
 	bad     bool
+	closed  bool
 }
 
 // NewConnection creates a new connection to the database server
@@ -50,33 +53,23 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		cursors: make(map[int64]*Cursor),
 	}
 	// Connect to Server
-	nd := net.Dialer{Timeout: c.opts.Timeout}
+	nd := net.Dialer{Timeout: c.opts.Timeout, KeepAlive: opts.KeepAlivePeriod}
 	if c.opts.TLSConfig == nil {
-		c.conn, err = nd.Dial("tcp", address)
+		c.Conn, err = nd.Dial("tcp", address)
 	} else {
-		c.conn, err = tls.DialWithDialer(&nd, "tcp", address, c.opts.TLSConfig)
+		c.Conn, err = tls.DialWithDialer(&nd, "tcp", address, c.opts.TLSConfig)
 	}
+	if err != nil {
+		return nil, RQLConnectionError{rqlError(err.Error())}
+	}
+
+	// Send handshake
+	handshake, err := c.handshake(opts.HandshakeVersion)
 	if err != nil {
 		return nil, err
 	}
-	// Enable TCP Keepalives on TCP connections
-	if tc, ok := c.conn.(*net.TCPConn); ok {
-		if err := tc.SetKeepAlive(true); err != nil {
-			// Don't send COM_QUIT before handshake.
-			c.conn.Close()
-			c.conn = nil
-			return nil, err
-		}
-	}
-	// Send handshake request
-	if err = c.writeHandshakeReq(); err != nil {
-		c.Close()
-		return nil, err
-	}
-	// Read handshake response
-	err = c.readHandshakeSuccess()
-	if err != nil {
-		c.Close()
+
+	if err = handshake.Send(); err != nil {
 		return nil, err
 	}
 
@@ -88,14 +81,15 @@ func (c *Connection) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.conn != nil {
-		c.conn.Close()
-		c.conn = nil
+	var err error
+
+	if !c.closed {
+		err = c.Conn.Close()
+		c.closed = true
+		c.cursors = make(map[int64]*Cursor)
 	}
 
-	c.cursors = nil
-
-	return nil
+	return err
 }
 
 // Query sends a Query to the database, returning both the raw Response and a
@@ -103,25 +97,27 @@ func (c *Connection) Close() error {
 //
 // This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
-	c.mu.Lock()
 	if c == nil {
-		c.mu.Unlock()
 		return nil, nil, ErrConnectionClosed
 	}
-	if c.conn == nil {
+	c.mu.Lock()
+	if c.Conn == nil {
 		c.bad = true
 		c.mu.Unlock()
 		return nil, nil, ErrConnectionClosed
 	}
 
 	// Add token if query is a START/NOREPLY_WAIT
-	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
+	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT || q.Type == p.Query_SERVER_INFO {
 		q.Token = c.nextToken()
+	}
+	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		if c.opts.Database != "" {
 			var err error
 			q.Opts["db"], err = DB(c.opts.Database).build()
 			if err != nil {
-				return nil, nil, err
+				c.mu.Unlock()
+				return nil, nil, RQLDriverError{rqlError(err.Error())}
 			}
 		}
 	}
@@ -154,25 +150,52 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	}
 }
 
+type ServerResponse struct {
+	ID   string `gorethink:"id"`
+	Name string `gorethink:"name"`
+}
+
+// Server returns the server name and server UUID being used by a connection.
+func (c *Connection) Server() (ServerResponse, error) {
+	var response ServerResponse
+
+	_, cur, err := c.Query(Query{
+		Type: p.Query_SERVER_INFO,
+	})
+	if err != nil {
+		return response, err
+	}
+
+	if err = cur.One(&response); err != nil {
+		return response, err
+	}
+
+	if err = cur.Close(); err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
 // sendQuery marshals the Query and sends the JSON to the server.
 func (c *Connection) sendQuery(q Query) error {
 	// Build query
 	b, err := json.Marshal(q.build())
 	if err != nil {
-		return RQLDriverError{"Error building query"}
+		return RQLDriverError{rqlError("Error building query")}
 	}
 
 	// Set timeout
-	if c.opts.Timeout == 0 {
-		c.conn.SetWriteDeadline(time.Time{})
+	if c.opts.WriteTimeout == 0 {
+		c.Conn.SetWriteDeadline(time.Time{})
 	} else {
-		c.conn.SetWriteDeadline(time.Now().Add(c.opts.WriteTimeout))
+		c.Conn.SetWriteDeadline(time.Now().Add(c.opts.WriteTimeout))
 	}
 
 	// Send the JSON encoding of the query itself.
 	if err = c.writeQuery(q.Token, b); err != nil {
 		c.bad = true
-		return RQLConnectionError{err.Error()}
+		return RQLConnectionError{rqlError(err.Error())}
 	}
 
 	return nil
@@ -189,16 +212,17 @@ func (c *Connection) nextToken() int64 {
 // could be read then an error is returned.
 func (c *Connection) readResponse() (*Response, error) {
 	// Set timeout
-	if c.opts.Timeout == 0 {
-		c.conn.SetReadDeadline(time.Time{})
+	if c.opts.ReadTimeout == 0 {
+		c.Conn.SetReadDeadline(time.Time{})
 	} else {
-		c.conn.SetReadDeadline(time.Now().Add(c.opts.ReadTimeout))
+		c.Conn.SetReadDeadline(time.Now().Add(c.opts.ReadTimeout))
 	}
 
 	// Read response header (token+length)
 	headerBuf := [respHeaderLen]byte{}
 	if _, err := c.read(headerBuf[:], respHeaderLen); err != nil {
-		return nil, err
+		c.bad = true
+		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
 	responseToken := int64(binary.LittleEndian.Uint64(headerBuf[:8]))
@@ -209,14 +233,14 @@ func (c *Connection) readResponse() (*Response, error) {
 
 	if _, err := c.read(b, int(messageLength)); err != nil {
 		c.bad = true
-		return nil, RQLConnectionError{err.Error()}
+		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
 	// Decode the response
 	var response = newCachedResponse()
 	if err := json.Unmarshal(b, response); err != nil {
 		c.bad = true
-		return nil, RQLDriverError{err.Error()}
+		return nil, RQLDriverError{rqlError(err.Error())}
 	}
 	response.Token = responseToken
 
@@ -226,12 +250,12 @@ func (c *Connection) readResponse() (*Response, error) {
 func (c *Connection) processResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
-		return c.processErrorResponse(q, response, RQLClientError{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLClientError{rqlServerError{response, q.Term}})
 	case p.Response_COMPILE_ERROR:
-		return c.processErrorResponse(q, response, RQLCompileError{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLCompileError{rqlServerError{response, q.Term}})
 	case p.Response_RUNTIME_ERROR:
-		return c.processErrorResponse(q, response, RQLRuntimeError{rqlResponseError{response, q.Term}})
-	case p.Response_SUCCESS_ATOM:
+		return c.processErrorResponse(q, response, createRuntimeError(response.ErrorType, response, q.Term))
+	case p.Response_SUCCESS_ATOM, p.Response_SERVER_INFO:
 		return c.processAtomResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
 		return c.processPartialResponse(q, response)
@@ -241,7 +265,7 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 		return c.processWaitResponse(q, response)
 	default:
 		putResponse(response)
-		return nil, nil, RQLDriverError{"Unexpected response type"}
+		return nil, nil, RQLDriverError{rqlError("Unexpected response type")}
 	}
 }
 
@@ -321,6 +345,13 @@ func (c *Connection) processWaitResponse(q Query, response *Response) (*Response
 	c.mu.Unlock()
 
 	return response, nil, nil
+}
+
+func (c *Connection) isBad() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.bad
 }
 
 var responseCache = make(chan *Response, 16)

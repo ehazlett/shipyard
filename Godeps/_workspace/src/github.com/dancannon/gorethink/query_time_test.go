@@ -69,15 +69,13 @@ func (s *RethinkSuite) TestTimeISO8601(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTimeInTimezone(c *test.C) {
-	loc, err := time.LoadLocation("MST")
-	c.Assert(err, test.IsNil)
 	var response []time.Time
-	res, err2 := Expr([]interface{}{Now(), Now().InTimezone("-07:00")}).Run(session)
-	c.Assert(err2, test.IsNil)
+	res, err := Expr([]interface{}{Now(), Now().InTimezone("-07:00")}).Run(session)
+	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response[1].Equal(response[0].In(loc)), test.Equals, true)
+	c.Assert(response[1].Equal(response[0]), test.Equals, true)
 }
 
 func (s *RethinkSuite) TestTimeBetween(c *test.C) {

@@ -105,6 +105,24 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestControlStructTags(c *test.C) {
+	SetTags("gorethink", "json")
+	defer SetTags()
+
+	var response map[string]interface{}
+	query := Expr(TagsTest{"1", "2", "3"})
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, map[string]interface{}{
+		"a": "1", "b": "2", "c1": "3",
+	})
+
+}
+
 func (s *RethinkSuite) TestControlMapTypeAlias(c *test.C) {
 	var response TMap
 	query := Expr(TMap{"A": 1, "B": 2})
@@ -189,7 +207,7 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 	c.Assert(err, test.NotNil)
 
 	c.Assert(err, test.NotNil)
-	c.Assert(err, test.FitsTypeOf, RQLRuntimeError{})
+	c.Assert(err, test.FitsTypeOf, RQLUserError{})
 
 	c.Assert(err.Error(), test.Equals, "gorethink: An error occurred in: \nr.Error(\"An error occurred\")")
 }
@@ -447,8 +465,57 @@ func (s *RethinkSuite) TestControlToJSON(c *test.C) {
 	c.Assert(response, test.Equals, "[4,5]")
 }
 
+func (s *RethinkSuite) TestControlUUID(c *test.C) {
+	var response string
+	query := UUID()
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(len(response) == 36, test.Equals, true)
+}
+
+func (s *RethinkSuite) TestControlUUIDString(c *test.C) {
+	var response string
+	query := UUID("rethinkdb")
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(len(response) == 36, test.Equals, true)
+}
+
 func (s *RethinkSuite) TestControlInvalidType(c *test.C) {
 	query := Expr(map[struct{ string }]string{})
 	_, err := query.Run(session)
 	c.Assert(err, test.NotNil)
+}
+
+func (s *RethinkSuite) TestControlRawQuery(c *test.C) {
+	var response int
+	query := RawQuery([]byte(`1`))
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 1)
+}
+
+func (s *RethinkSuite) TestControlRawQuery_advanced(c *test.C) {
+	var response []int
+	// r.expr([1,2,3]).map(function(v) { return v.add(1)})
+	query := RawQuery([]byte(`[38,[[2,[1,2,3]],[69,[[2,[25]],[24,[[10,[25]],1]]]]]]`))
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, []int{2, 3, 4})
 }

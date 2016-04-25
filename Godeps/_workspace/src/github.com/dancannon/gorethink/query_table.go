@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 // TableCreateOpts contains the optional arguments for the TableCreate term
@@ -21,6 +21,18 @@ func (o *TableCreateOpts) toMap() map[string]interface{} {
 // documents.
 //
 // Note: Only alphanumeric characters and underscores are valid for the table name.
+func TableCreate(name interface{}, optArgs ...TableCreateOpts) Term {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return constructRootTerm("TableCreate", p.Term_TABLE_CREATE, []interface{}{name}, opts)
+}
+
+// TableCreate creates a table. A RethinkDB table is a collection of JSON
+// documents.
+//
+// Note: Only alphanumeric characters and underscores are valid for the table name.
 func (t Term) TableCreate(name interface{}, optArgs ...TableCreateOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
@@ -30,8 +42,18 @@ func (t Term) TableCreate(name interface{}, optArgs ...TableCreateOpts) Term {
 }
 
 // TableDrop deletes a table. The table and all its data will be deleted.
+func TableDrop(args ...interface{}) Term {
+	return constructRootTerm("TableDrop", p.Term_TABLE_DROP, args, map[string]interface{}{})
+}
+
+// TableDrop deletes a table. The table and all its data will be deleted.
 func (t Term) TableDrop(args ...interface{}) Term {
 	return constructMethodTerm(t, "TableDrop", p.Term_TABLE_DROP, args, map[string]interface{}{})
+}
+
+// TableList lists all table names in a database.
+func TableList(args ...interface{}) Term {
+	return constructRootTerm("TableList", p.Term_TABLE_LIST, args, map[string]interface{}{})
 }
 
 // TableList lists all table names in a database.
@@ -56,9 +78,8 @@ func (o *IndexCreateOpts) toMap() map[string]interface{} {
 // IndexCreate supports the creation of the following types of indexes, to create
 // indexes using arbitrary expressions use IndexCreateFunc.
 //   - Simple indexes based on the value of a single field.
-//   - Compound indexes based on multiple fields.
-//   - Multi indexes based on arrays of values, created when the multi optional argument is true.
-//   - Geospatial indexes based on indexes of geometry objects, created when the geo optional argument is true.
+//   - Geospatial indexes based on indexes of geometry objects, created when the
+//     geo optional argument is true.
 func (t Term) IndexCreate(name interface{}, optArgs ...IndexCreateOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
@@ -69,10 +90,15 @@ func (t Term) IndexCreate(name interface{}, optArgs ...IndexCreateOpts) Term {
 
 // IndexCreateFunc creates a new secondary index on a table. Secondary indexes
 // improve the speed of many read queries at the slight cost of increased
-// storage space and decreased write performance.
+// storage space and decreased write performance. The function takes a index
+// name and RQL term as the index value , the term can be an anonymous function
+// or a binary representation obtained from the function field of indexStatus.
 //
-// The indexFunction can be an anonymous function or a binary representation
-// obtained from the function field of indexStatus.
+// It supports the creation of the following types of indexes.
+//   - Simple indexes based on the value of a single field where the index has a
+//     different name to the field.
+//   - Compound indexes based on multiple fields.
+//   - Multi indexes based on arrays of values, created when the multi optional argument is true.
 func (t Term) IndexCreateFunc(name, indexFunction interface{}, optArgs ...IndexCreateOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
@@ -123,8 +149,12 @@ func (t Term) IndexWait(args ...interface{}) Term {
 
 // ChangesOpts contains the optional arguments for the Changes term
 type ChangesOpts struct {
-	Squash        interface{} `gorethink:"squash,omitempty"`
-	IncludeStates interface{} `gorethink:"include_states,omitempty"`
+	Squash              interface{} `gorethink:"squash,omitempty"`
+	IncludeInitial      interface{} `gorethink:"include_initial,omitempty"`
+	IncludeStates       interface{} `gorethink:"include_states,omitempty"`
+	IncludeOffsets      interface{} `gorethink:"include_offsets,omitempty"`
+	IncludeTypes        interface{} `gorethink:"include_types,omitempty"`
+	ChangefeedQueueSize interface{} `gorethink:"changefeed_queue_size,omitempty"`
 }
 
 // ChangesOpts contains the optional arguments for the Changes term
