@@ -18,7 +18,7 @@
         //TODO: Should the default state be on or off (i.e. checked or not checked)?
         vm.skipImages = false;
         vm.skipTests = false;
-
+        vm.projectIsUpdated = false;
         vm.needsBuild = false;
 
         vm.selected = {};
@@ -48,6 +48,14 @@
         vm.providerTests = [];
 
         vm.parameters = [];
+
+        vm.buildMessageConfig = {
+            testId: ''
+        };
+
+        vm.saveProjectMessageConfig = {
+            status: 'hidden' // 'hidden' 'success' 'failure'
+        };
 
         vm.buttonStyle = "disabled";
 
@@ -94,6 +102,7 @@
         vm.messageLoadStatus = messageLoadStatus;
         vm.cancelCreateSaveImage = cancelCreateSaveImage;
         vm.cancelEditSaveImage = cancelEditSaveImage;
+        vm.enableSaveProject = enableSaveProject;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -144,6 +153,11 @@
             });
             return;
         });
+
+        $scope.$watch('b', function() {
+            // do something here
+            $scope.count += 1;
+        }, true);
 
         function list() {
             return Object.keys(vm.project)
@@ -701,11 +715,21 @@
         }
 
         function updateProject(project) {
-            console.log("update project" + project);
+            vm.projectIsUpdated = false;
             ProjectService.update(project.id, project)
                 .then(function(data) {
-                    $state.transitionTo('dashboard.projects');
+                    vm.saveProjectMessageConfig.status = 'success';
+                    setTimeout(function () {
+                        vm.saveProjectMessageConfig.status = 'hidden';
+                        $scope.$apply();
+                    }, 3000);
                 }, function(data) {
+                    vm.projectIsUpdated = true;
+                    vm.saveProjectMessageConfig.status = 'failure';
+                    setTimeout(function () {
+                        vm.saveProjectMessageConfig.status = 'hidden';
+                        $scope.$apply();
+                    }, 3000);
                     vm.error = data;
                 });
         }
@@ -750,10 +774,6 @@
         function safeApply(scope, fn) {
             (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
         }
-
-        vm.buildMessageConfig = {
-            testId: ''
-        };
 
         function startBuild(testId) {
             ProjectService.executeBuild(vm.project.id, testId, {action: 'start'})
@@ -831,6 +851,10 @@
             if (!ProjectService.cancelGetPublicRegistryTags()) {
                 console.log("Could not cancel cancelEditSaveImage");
             }
+        }
+
+        function enableSaveProject() {
+            vm.projectIsUpdated = true;
         }
 
     }
