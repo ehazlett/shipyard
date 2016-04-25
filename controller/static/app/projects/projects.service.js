@@ -7,6 +7,8 @@
 
     ProjectService.$inject = ['$http', '$q'];
     function ProjectService($http, $q) {
+        var cancelerGetPublicRegistryTags = null;
+
         return {
             list: function() {
                 var promise = $http
@@ -66,21 +68,24 @@
                     });
                 return promise;
             },
-            //getImages: function() {
-            //    var promise = $http
-            //        .get('/api/projects/location')
-            //        .then(function(response) {
-            //            return response.data;
-            //        });
-            //    return promise;
-            //},
             getPublicRegistryTags: function(imageName) {
+                cancelerGetPublicRegistryTags = $q.defer();
                 var promise = $http
-                    .get('/api/v1/repositories/tags?r='+imageName)
+                    .get('/api/v1/repositories/tags?r='+imageName, {timeout: cancelerGetPublicRegistryTags.promise})
                     .then(function(response) {
                         return response.data;
                     });
                 return promise;
+            },
+            cancelGetPublicRegistryTags: function() {
+                if (cancelerGetPublicRegistryTags === null) {
+                    console.log("Couldn't cancel getPublicRegistryTags. Canceler not set.");
+                    return false;
+                }
+
+                cancelerGetPublicRegistryTags.resolve();
+                
+                return true;
             },
             getProviders: function() {
                 var promise = $http
