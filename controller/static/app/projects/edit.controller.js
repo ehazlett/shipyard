@@ -166,7 +166,7 @@
         $(".ui.selection.fluid.dropdown.tag.create")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    vm.createImage.tag = $("#createImageTag").dropdown("get value");
+                    vm.createImage.tag = value;
                     checkImagePublicRepository(vm.createImage);
 
                     // Search for the image layer of the chosen tag
@@ -184,7 +184,7 @@
         $(".ui.selection.fluid.dropdown.edit.tag")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    vm.editImage.tag = $("#editImageTag").dropdown("get value");
+                    vm.editImage.tag = value;
                     checkImagePublicRepository(vm.editImage);
                     
                     // Search for the image layer of the chosen tag
@@ -638,7 +638,7 @@
             vm.buttonStyle = "disabled";
             console.log(" check image " + imageData.name + " with tag " + imageData.tag);
             angular.forEach(vm.publicRegistryTags, function (tag) {
-                if(tag.name === imageData.tag) {
+                if(tag.name == imageData.tag) { // Type converting equality since tags may be integers (1) or strings (latest)
                     vm.buttonStyle = "positive";
                 }
             });
