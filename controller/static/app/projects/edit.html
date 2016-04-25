@@ -200,7 +200,7 @@
         </div>
     </div>
     <div class="actions">
-        <div class="ui negative button">
+        <div ng-click="vm.cancelCreateSaveImage()" class="ui negative button">
             Cancel
         </div>
         <div ng-click="vm.createSaveImage(vm.createImage)" class="ui positive right labeled icon button {{vm.buttonStyle}}">
@@ -365,7 +365,7 @@
         </div>
     </div>
     <div class="actions">
-        <div class="ui negative button">
+        <div ng-click="vm.cancelEditSaveImage()" class="ui negative button">
             Cancel
         </div>
         <div  ng-click="vm.editSaveImage()" class="ui positive right labeled icon button {{vm.buttonStyle}}">

@@ -92,6 +92,8 @@
         vm.startBuild = startBuild;
         vm.getParameters = getParameters;
         vm.messageLoadStatus = messageLoadStatus;
+        vm.cancelCreateSaveImage = cancelCreateSaveImage;
+        vm.cancelEditSaveImage = cancelEditSaveImage;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -816,6 +818,18 @@
 
             if (buildResults[testId].status === 'finished_failed') {
                 return 'finished_failed';
+            }
+        }
+
+        function cancelCreateSaveImage() {
+            if (!ProjectService.cancelGetPublicRegistryTags()) {
+                console.log("Could not cancel cancelCreateSaveImage");
+            }
+        }
+
+        function cancelEditSaveImage() {
+            if (!ProjectService.cancelGetPublicRegistryTags()) {
+                console.log("Could not cancel cancelEditSaveImage");
             }
         }
 
