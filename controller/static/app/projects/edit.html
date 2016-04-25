@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<div id="edit-project-image-create-modal" class="ui fullscreen modal transition">
+<div id="edit-project-image-create-modal-{{vm.randomCreateId}}" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         Create Image
@@ -46,6 +46,12 @@
             <div class="row" ng-hide="vm.deploying">
                 <div class="column">
                     <div class="ui form" ng-submit="vm.deploy()">
+                        <div ng-show="vm.createImage.location === 'Public Registry' && (!vm.createImage.name || !vm.createImage.tag)" class="ui info message">
+                            <ul class="list">
+                                <li ng-show="!vm.createImage.name">Choose an Image from the dropdown.</li>
+                                <li ng-show="!vm.createImage.tag">Choose Tag from the dropdown.</li>
+                            </ul>
+                        </div>
                         <h5 style="display: inline">Image Configuration&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
                         <div class="ui toggle checkbox" ng-click="vm.createImage.skipImageBuild=!vm.createImage.skipImageBuild">
                             <input type="checkbox" name="public" ng-model="vm.createImage.skipImageBuild">
@@ -111,10 +117,16 @@
                                     </div>
                                     <div ng-show="vm.createImage.location === 'Public Registry'" class="four wide field">
                                         <label>Tag</label>
-                                        <select name="tag" ng-model="vm.createImage.tag" class="ui search fluid dropdown tag" ng-change="vm.checkImagePublicRepository(vm.createImage)">
-                                            <option value="">Tag</option>
-                                            <option ng-repeat="a in vm.publicRegistryTags" data-value="{{a.name}}">{{a.name}}</option>
-                                        </select>
+                                        <div id="createImageTag" class="ui selection fluid dropdown tag create">
+                                            <input type="hidden" name="tag">
+                                            <i ng-if="!vm.createImageTagSpin" class="dropdown icon"></i>
+                                            <i ng-if="vm.createImageTagSpin" class="repeat icon spin" aria-hidden="true" style="float: right; position: relative; width: auto; font-size: 0.85714286; margin: 0em 0em 0em 1em;"></i>
+                                            <div class="default text">Tag</div>
+                                            <div class="menu">
+                                                <div ng-repeat="a in vm.publicRegistryTags"
+                                                     class="item" data-value="{{a.name}}">{{a.name}}</div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div ng-show="vm.createImage.location === 'File'" class="four wide field">
@@ -198,7 +210,7 @@
     </div>
 </div>
 
-<div id="edit-project-image-edit-modal-{{vm.project.id}}" class="ui fullscreen modal transition">
+<div id="edit-project-image-edit-modal-{{vm.randomEditId}}" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         {{ vm.editImage.name }}
@@ -270,10 +282,16 @@
                                     </div>
                                     <div ng-show="vm.editImage.location === 'Public Registry'" class="four wide field">
                                         <label>Tag</label>
-                                        <select name="tag" ng-model="vm.editImage.tag" id="editImageTag" class="ui search fluid dropdown edit tag editImageTag" ng-change="vm.checkImagePublicRepository(vm.editImage)">
-                                            <option value="">{{vm.editImage.tag}}</option>
-                                            <option ng-repeat="a in vm.publicRegistryTags" data-value="{{a.name}}">{{a.name}}</option>
-                                        </select>
+                                        <div class="ui selection fluid dropdown edit tag" id="editImageTag">
+                                            <input type="hidden" name="tag">
+                                            <i ng-if="!vm.editImageTagSpin" class="dropdown icon"></i>
+                                            <i ng-if="vm.editImageTagSpin" class="repeat icon spin" aria-hidden="true" style="float: right; position: relative; width: auto; font-size: 0.85714286; margin: 0em 0em 0em 1em;"></i>
+                                            <div id="editImageTagDefault" class="default text"></div>
+                                            <div class="menu">
+                                                <div ng-repeat="a in vm.publicRegistryTags"
+                                                     class="item" data-value="{{a.name}}">{{a.name}}</div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div ng-show="vm.editImage.location === 'File'" class="four wide field">
@@ -312,8 +330,8 @@
                                     <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.editImage.name }">
                                         {{a.tag}}
                                     </i>
-                                    <i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.editImage.tagLayer }">
-                                        {{a.name}}
+                                    <i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.editImage.additionalTags">
+                                        {{a}}
                                     </i>
                                 </div>
 
@@ -358,7 +376,7 @@
 </div>
 
 
-<div id="edit-project-test-create-modal" class="ui fullscreen modal transition">
+<div id="edit-project-test-create-modal-{{vm.randomCreateTestId}}" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         Create Test
@@ -409,7 +427,7 @@
 
                                     <div class="eleven wide field" ng-show="vm.createTest.provider.providerType === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
+                                        <selectize config='vm.createTest.selectizeConfig' options='vm.createTest.selectizeItems' ng-model="vm.createTest.selectizeData" ng-change="vm.setTargetsCreateTest(vm.createTest.selectizeData)"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.createTest.provider.providerType === 'Predefined Provider'">
@@ -527,7 +545,7 @@
     </div>
 </div>
 
-<div id="edit-project-test-edit-modal-{{vm.project.id}}" class="ui fullscreen modal transition">
+<div id="edit-project-test-edit-modal-{{vm.randomEditTestId}}" class="ui fullscreen modal transition">
     <i class="close icon"></i>
     <div class="header">
         {{vm.editTest.name}}
@@ -576,7 +594,7 @@
 
                                     <div class="eleven wide field" ng-show="vm.editTest.provider.providerType === 'Clair [Internal]'">
                                         <label>Select Images to Test</label>
-                                        <selectize config='vm.myConfig' options='vm.items' ng-model="vm.test.data" ng-change="vm.setTargets(vm.test.data)"></selectize>
+                                        <selectize config='vm.editTest.selectizeConfig' options='vm.editTest.selectizeItems' ng-model="vm.editTest.selectizeData" ng-change="vm.setTargetsEditTest(vm.editTest.selectizeData)"></selectize>
                                     </div>
 
                                     <div class="one wide field" ng-show="vm.editTest.provider.providerType === 'Predefined Provider'">
@@ -765,7 +783,7 @@
                                         </div>
                                         <div class="field">
                                             <label>Status</label>
-                                            <select class="ui selection dropdown" default="0" ng-model="vm.project.status">
+                                           <select class="ui selection dropdown" ng-model="vm.project.status">
                                                 <option value="">{{vm.project.status || 'Select status'}}</option>
                                                 <option value="Published">Published</option>
                                                 <option value="Tested">Tested</option>
@@ -839,8 +857,8 @@
                                     <tr ng-repeat="image in vm.images" jquery>
                                         <td class="collapsing">
                                             <div class="positive ui fitted checkbox">
-                                                <input type="checkbox" id="{{$index}}-cb" ng-model="vm.selected[image.id].Selected">
-                                                <label for="{{$index}}-cb"></label>
+                                                <input type="checkbox" id="{{$index}}" ng-model="vm.selected[image.id].Selected">
+                                                <label for="{{$index}}"></label>
                                             </div>
                                         </td>
                                         <td>{{image.id}}</td>
