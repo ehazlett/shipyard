@@ -8,7 +8,7 @@ GO15VENDOREXPERIMENT=1
 all: build media
 
 clean:
-	@rm -rf controller/controller
+	@rm -rf shipyard
 
 build:
 	@go build -a -tags "netgo static_build" -installsuffix netgo -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit=$(COMMIT)" .
@@ -33,30 +33,5 @@ test: clean
 #	@go test -v `go list ./... | grep -v /vendor | grep -v /test-assets`
 	@go test -tags "netgo static_build" -installsuffix netgo -v `go list ./... | grep -v /vendor | grep -v /test-assets`
 
-# For dev purposes
-docker-build-controller:
-	@docker build -t shipyard_controller -f Dockerfile.build .
-
-docker-restart-controller:
-	@docker-compose -f docker-compose.yml restart controller
-
-controller-container: docker-build-controller docker-restart-controller
-
-container-logs:
-	@docker-compose logs -f docker-compose.yml
-
-run-dev-containers:
-	@docker-compose -f docker-compose.yml up
-
-run-container-test:
-	@docker-compose -f docker-compose.yml up -d
-	@sleep 30
-	# TODO: be smarter about the container name. This is hardcoded at the moment.
-	@docker exec -it shipyard_controller_1 make test; docker-compose -f docker-compose.yml stop; docker-compose -f docker-compose.yml rm -fv
-
-
-docker-containers-clean:
-	@docker-compose -f docker-compose.yml stop
-	@docker-compose -f docker-compose.yml rm -fv
 
 .PHONY: all build clean media image test release

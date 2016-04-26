@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
 	c "github.com/shipyard/shipyard/checker"
+	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/model/dockerhub"
 	"github.com/shipyard/shipyard/utils/auth"
@@ -114,7 +115,8 @@ type (
 		DeleteProject(project *model.Project) error
 		DeleteAllProjects() error
 
-		VerifyIfImageExistsLocally(name string, tag string) bool
+		VerifyIfImageExistsLocally(imageToCheck string) bool
+		PullImage(imageToCheck string) error
 
 		Images() ([]*model.Image, error)
 		ImagesByProjectId(projectId string) ([]*model.Image, error)
@@ -1026,56 +1028,64 @@ func (m DefaultManager) DeleteAllProjects() error {
 // end methods related to the project structure
 
 // check if an image exists
-func (m DefaultManager) VerifyIfImageExistsLocally(name string, tag string) bool {
-	imageToCheck := name + ":" + tag
-	auth := dockerclient.AuthConfig{"", "", ""}
+func (m DefaultManager) VerifyIfImageExistsLocally(imageToCheck string) bool {
 
-	images, err := m.client.ListImages(true)
+	//images, err := m.client.ListImages(true)
+
+	images, err := apiClient.GetLocalImages(m.DockerClient().URL.String())
 
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
+		return false
 	}
+
 	for _, img := range images {
 		imageRepoTags := img.RepoTags
 		for _, imageRepoTag := range imageRepoTags {
-			log.Printf("Image from daemon: %s", imageRepoTag)
-			if strings.Contains(imageRepoTag, imageToCheck) {
-				fmt.Printf("Image %s exists locally ... Proceeding to check with clair ... \n", imageToCheck)
+			if imageRepoTag == imageToCheck {
+				fmt.Printf("Image %s exists locally as %s \n", imageToCheck, imageRepoTag)
 				return true
 			}
 		}
-
 	}
-	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageToCheck)
+
+	return false
+}
+
+func (m DefaultManager) PullImage(imageNameAndTag string) error {
+	auth := dockerclient.AuthConfig{"", "", ""}
+
+	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageNameAndTag)
 	//get registry
-	match, _ := regexp.MatchString(":[0-9]{4}/", imageToCheck)
+	match, _ := regexp.MatchString(":[0-9]{4}/", imageNameAndTag)
 	if match {
-		parts := strings.Split(imageToCheck, "/")
+		parts := strings.Split(imageNameAndTag, "/")
 		address := "https://" + parts[0]
 
 		registry, err := m.RegistryByAddress(address)
 		auth = dockerclient.AuthConfig{registry.Username, registry.Password, ""}
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err)
+			return err
 		}
 	}
 	ticker := time.NewTicker(time.Second * 15)
 	go func() {
 		for t := range ticker.C {
 			fmt.Print("Time: ", t.UTC())
-			fmt.Printf(" Pulling image: %s. Please be patient while the process finishes ... \n", imageToCheck)
+			fmt.Printf(" Pulling image: %s. Please be patient while the process finishes ... \n", imageNameAndTag)
 		}
 	}()
-	error := m.client.PullImage(imageToCheck, &auth)
+	err2 := m.client.PullImage(imageNameAndTag, &auth)
 
-	if error != nil {
-		fmt.Printf("Could not pull image %s ... \n%s \n", imageToCheck, error)
-		return false
+	if err2 != nil {
+		fmt.Printf("Could not pull image %s ... \n%s \n", imageNameAndTag, err2)
+		return err2
 		ticker.Stop()
-
 	}
 	ticker.Stop()
-	return true
+
+	return nil
 }
 
 //methods related to the Image structure
@@ -1365,24 +1375,23 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 
-	var wg sync.WaitGroup
 	var eventType string
 	eventType = eventType
 	var build *model.Build
-	existingResult, _ := m.GetResults(projectId)
+	//existingResult, _ := m.GetResults(projectId)
 	if buildAction.Action == "start" {
-		var testResult *model.TestResult
+		//var testResult *model.TestResult
 		var build *model.Build
-		testResult = &model.TestResult{}
+		//testResult := &model.TestResult{}
 		build = &model.Build{}
 		build.TestId = testId
 		build.ProjectId = projectId
 		build.StartTime = time.Now()
 		// we get the project
-		project, err := m.Project(projectId)
-		if err != nil && err != ErrProjectDoesNotExist {
-			return "", err
-		}
+		//project, err := m.Project(projectId)
+		//if err != nil && err != ErrProjectDoesNotExist {
+		//	return "", err
+		//}
 		// we get the test and its targetArtifacts
 		test, err := m.GetTest(projectId, testId)
 		if err != nil && err != ErrTestDoesNotExist {
@@ -1430,74 +1439,43 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 			}
 			return ""
 		}()
+
+		// Start a goroutine that will execute the build non-blocking
 		go func() {
-			for _, image := range projectImages {
-				for _, name := range imageNames {
-					if image.Name == name {
-						wg.Add(1)
-						go func() {
-							defer wg.Done()
-							m.VerifyIfImageExistsLocally(image.Name, image.Tag)
-						}()
-						m.UpdateBuildStatus(build.ID, "running")
-						testResult.ImageId = image.ID
-						testResult.DockerImageId = image.ImageId
-
-					}
-				}
-			}
-			wg.Wait()
-			result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
-			result.CreateDate = time.Now()
-
+			var wg sync.WaitGroup
+			log.Printf("Processing %d images\n", len(imageNames))
+			// For each image that we target in the test, try to run a build / verification
 			for _, name := range imageNames {
-				// we instantiate fields for the testResult
-				testResult.ImageName = name
-				testResult.TestName = test.Name
-				testResult.TestId = testId
+				log.Printf("Processing image=%s\n", name)
+				wg.Add(1)
+				// Run the verification concurrently for each image and then block to wait for all to finish.
+				go func(name string) {
+					thisImageName := name
+					// When the goroutine finishes, mark this wait group item as done.
+					defer wg.Done()
 
-				buildResult := model.BuildResult{}
-				// we launch a go routine which checks the image
-				go func() {
-					buildResult, err = c.CheckImage(build.ID, name)
-					// in the end we update the build results
+					// Check to see if the image exists locally, if not, try to pull it.
+					if !m.VerifyIfImageExistsLocally(thisImageName) {
+						log.Printf("Image %s not available locally, will try to pull...", thisImageName)
+						if err := m.PullImage(thisImageName); err != nil {
+							log.Errorf("Error pulling image %s", thisImageName)
+							return
+						}
+					}
 
-				}()
-				if err != nil {
-					m.UpdateBuildStatus(build.ID, "finished_failed")
-					testResult.SimpleResult.Status = "finished_failed"
-					testResult.EndDate = time.Now()
-					testResult.Blocker = false
-					result.TestResults = append(result.TestResults, testResult)
-					result.LastUpdate = time.Now()
-					if existingResult != nil {
-						m.UpdateResult(projectId, result)
-
+					log.Printf("Will attempt to test image %s with Clair...", thisImageName)
+					// Once the image is available, try to test it with Clair
+					_, err = c.CheckImage(build.ID, thisImageName)
+					if err != nil {
+						log.Error(err)
+						log.Errorf("Error checking image %s", thisImageName)
+						return
 					}
-					if existingResult == nil {
-						m.CreateResult(projectId, result)
-					}
-				}
-				// if we don't get an error we mark the test for the image as successful
-				if err == nil {
-					m.UpdateBuildStatus(build.ID, "finished_success")
-					testResult.SimpleResult.Status = "finished_success"
-					testResult.EndDate = time.Now()
-					testResult.Blocker = false
-					result.TestResults = append(result.TestResults, testResult)
-					result.LastUpdate = time.Now()
-					if existingResult != nil {
-						m.UpdateResult(projectId, result)
-					}
-					if existingResult == nil {
-						m.CreateResult(projectId, result)
-					}
-				}
-				m.UpdateBuildResults(build.ID, buildResult)
-				m.UpdateBuildStatus(build.ID, "running")
-				//wg.Wait()
-				// if we get an error we mark the test for the image as failed
+					log.Printf("Finished checking image %s", thisImageName)
+				}(name)
 			}
+			// Block the outer goroutine until ALL the inner goroutines finish
+			wg.Wait()
 		}()
 		m.logEvent(eventType, fmt.Sprintf("id=%s", build.ID), []string{"security"})
 		return build.ID, nil
@@ -1528,15 +1506,6 @@ func (m DefaultManager) UpdateBuild(projectId string, testId string, buildId str
 			// go RestartCurrentBuildFromClair
 
 		}
-
-		/*	updates := map[string]interface{}{
-			"startTime": build.StartTime,
-			"endTime":   build.EndTime,
-			"config":    build.Config,
-			"results":   build.Results,
-			"testId":    build.TestId,
-			"projectId": build.ProjectId,
-		}*/
 
 		if _, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Update(tmpBuild).RunWrite(m.session); err != nil {
 			return err

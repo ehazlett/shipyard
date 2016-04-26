@@ -26,7 +26,7 @@ services:
   swarm:
       env_file: .env
       restart: always
-      image: swarm:1.1.3
+      image: swarm:1.2.0
       command: m --host tcp://0.0.0.0:2375 proxy:2375
       ports:
           - "2375"
