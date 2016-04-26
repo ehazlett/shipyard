@@ -5,9 +5,25 @@ import (
 	"errors"
 	"fmt"
 	"github.com/shipyard/shipyard/model"
+	"github.com/docker/engine-api/client"
+	"github.com/docker/engine-api/types"
+	"golang.org/x/net/context"
 	"io/ioutil"
 	"net/http"
 )
+
+func GetLocalImages(url string) ([]types.Image, error) {
+
+	defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
+	cli, err := client.NewClient(url, "", nil, defaultHeaders)
+	if err != nil {
+		return nil, err
+	}
+
+	images, err := cli.ImageList(context.Background(), types.ImageListOptions{All: true} )
+
+	return images, err
+}
 
 func GetImages(authHeader, url string) ([]model.Image, error) {
 	var images []model.Image

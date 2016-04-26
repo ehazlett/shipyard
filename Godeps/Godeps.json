@@ -25,6 +25,11 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/Microsoft/go-winio",
+			"Comment": "v0.3.3",
+			"Rev": "3b8b3c98b207f95fe0cd6c7c311a9ac497ba7c0f"
+		},
+		{
 			"ImportPath": "github.com/Sirupsen/logrus",
 			"Comment": "v0.8.6-13-g84b968c",
 			"Rev": "84b968cb9f82d727044973f8255489bbe15e9948"
@@ -48,7 +53,12 @@
 			"Rev": "c7477ad8e330bef55bf1ebe300cf8aa67c492d1b"
 		},
 		{
-			"ImportPath": "github.com/coreos/clair/api",
+			"ImportPath": "github.com/coreos/clair/api/context",
+			"Comment": "v1.0.0-20-g8d5a330",
+			"Rev": "8d5a330acf296bb0d784349027508b8cae5a2d92"
+		},
+		{
+			"ImportPath": "github.com/coreos/clair/api/v1",
 			"Comment": "v1.0.0-20-g8d5a330",
 			"Rev": "8d5a330acf296bb0d784349027508b8cae5a2d92"
 		},
@@ -91,9 +101,49 @@
 			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
 		},
 		{
+			"ImportPath": "github.com/docker/distribution/digest",
+			"Comment": "v2.4.0-rc.1-48-g47d1455",
+			"Rev": "47d14555c02463c062e920198f3aeb2fcd6bcdb4"
+		},
+		{
+			"ImportPath": "github.com/docker/distribution/reference",
+			"Comment": "v2.4.0-rc.1-48-g47d1455",
+			"Rev": "47d14555c02463c062e920198f3aeb2fcd6bcdb4"
+		},
+		{
 			"ImportPath": "github.com/docker/docker/pkg/units",
 			"Comment": "v1.4.1-5962-g2434bd8",
 			"Rev": "2434bd8e63daebffa69ca863ab8a322847f459c8"
+		},
+		{
+			"ImportPath": "github.com/docker/engine-api/client",
+			"Comment": "v0.3.1-62-g3d72d39",
+			"Rev": "3d72d392d07bece8d7d7b2a3b6b2e57c2df376a2"
+		},
+		{
+			"ImportPath": "github.com/docker/engine-api/types",
+			"Comment": "v0.3.1-62-g3d72d39",
+			"Rev": "3d72d392d07bece8d7d7b2a3b6b2e57c2df376a2"
+		},
+		{
+			"ImportPath": "github.com/docker/go-connections/nat",
+			"Comment": "v0.2.0-4-g5b7154b",
+			"Rev": "5b7154ba2efe13ff86ae8830a9e7cb120b080d6e"
+		},
+		{
+			"ImportPath": "github.com/docker/go-connections/sockets",
+			"Comment": "v0.2.0-4-g5b7154b",
+			"Rev": "5b7154ba2efe13ff86ae8830a9e7cb120b080d6e"
+		},
+		{
+			"ImportPath": "github.com/docker/go-connections/tlsconfig",
+			"Comment": "v0.2.0-4-g5b7154b",
+			"Rev": "5b7154ba2efe13ff86ae8830a9e7cb120b080d6e"
+		},
+		{
+			"ImportPath": "github.com/docker/go-units",
+			"Comment": "v0.3.0",
+			"Rev": "5d2041e26a699eaca682e2ea41c8f891e1060444"
 		},
 		{
 			"ImportPath": "github.com/fernet/fernet-go",
@@ -150,6 +200,11 @@
 			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 		},
 		{
+			"ImportPath": "github.com/opencontainers/runc/libcontainer/user",
+			"Comment": "v0.1.1-59-ge559f7a",
+			"Rev": "e559f7aebb5ce1731ac3949fafa95d2e466cb331"
+		},
+		{
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",
 			"Rev": "e8554b8641db39598be7f6342874b958f12ae1d4"
 		},
@@ -199,11 +254,6 @@
 			"Rev": "7c2b1e5640dcf2631213ca962d892bffa1e08860"
 		},
 		{
-			"ImportPath": "github.com/tylerb/graceful",
-			"Comment": "v1.2.3",
-			"Rev": "48afeb21e2fcbcff0f30bd5ad6b97747b0fae38e"
-		},
-		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
 			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
 		},
@@ -212,7 +262,11 @@
 			"Rev": "aedad9a179ec1ea11b7064c57cbc6dc30d7724ec"
 		},
 		{
-			"ImportPath": "golang.org/x/net/netutil",
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "1d7a0b2100da090d8b02afcfb42f97e2c77e71a4"
+		},
+		{
+			"ImportPath": "golang.org/x/net/proxy",
 			"Rev": "1d7a0b2100da090d8b02afcfb42f97e2c77e71a4"
 		},
 		{

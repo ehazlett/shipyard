@@ -683,7 +683,7 @@
         }
 
         function editSaveImage() {
-            ProjectService.updateImage(vm.project.id, $.extend(true, {}, vm.selectedEditImage))
+            ProjectService.updateImage(vm.project.id, $.extend(true, {}, vm.editImage))
                 .then(function(data) {
                     vm.getImages(vm.project.id);
                 }, function(data) {

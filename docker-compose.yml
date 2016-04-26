@@ -26,7 +26,7 @@ services:
   swarm:
       env_file: .env
       restart: always
-      image: swarm:1.1.3
+      image: swarm:1.2.0
       command: m --host tcp://0.0.0.0:2375 proxy:2375
       ports:
           - "2375"
@@ -48,6 +48,8 @@ services:
       ports:
           - "8082:8080"
           - "9279"
+      depends_on:
+        - rethinkdb
       networks:
         - sy_network
 
@@ -66,15 +68,17 @@ services:
 
   clair:
     env_file: .env
-    image: quay.io/coreos/clair:v1.0.0
+    image: quay.io/coreos/clair:v1.1.0
     volumes:
       - ./clair_config:/config:ro
-      - /tmp:/tmp
-    command: "--config=/config/config.yaml"
+      - /tmp/clair-data:/tmp
+    entrypoint: /bin/bash
+    command: -c "sleep 30 && clair --config=/config/config.yaml"
     ports:
      - "6060:6060"
      - "6061:6061"
-     - "9279:9279"
+    depends_on:
+      - postgres
     networks:
       - sy_network
 
