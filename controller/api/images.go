@@ -97,12 +97,12 @@ func (a *Api) updateImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := a.manager.UpdateImage(projId, image); err != nil {
-		log.Errorf("error updating result: %s", err)
+		log.Errorf("error updating image: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Debugf("updated test: id=%s", image.ID)
+	log.Debugf("updated image: id=%s", image.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
 

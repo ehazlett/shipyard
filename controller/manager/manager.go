@@ -861,7 +861,7 @@ func (m DefaultManager) SaveProject(project *model.Project) error {
 	//add the project ID to the images and save them in the Images table
 	// TODO: investigate how to do a bulk insert
 	for _, img := range project.Images {
-		img.ProjectID = project.ID
+		img.ProjectId = project.ID
 		response, err = r.Table(tblNameImages).Insert(img).RunWrite(m.session)
 
 		if err != nil {
@@ -924,7 +924,7 @@ func (m DefaultManager) UpdateProject(project *model.Project) error {
 		// Insert all the images that are incoming from the request which should have the new and old ones
 		// TODO: investigate how we can do bulk insert
 		for _, newImage := range project.Images {
-			newImage.ProjectID = proj.ID
+			newImage.ProjectId = proj.ID
 			if _, err := r.Table(tblNameImages).Insert(newImage).RunWrite(m.session); err != nil {
 				return err
 			}
@@ -1101,7 +1101,7 @@ func (m DefaultManager) GetImages(projectId string) ([]*model.Image, error) {
 	return images, nil
 }
 
-func (m DefaultManager) GetImage(projectId, imageId string) (*model.Image, error) {
+func (m DefaultManager) GetImage(projectId string, imageId string) (*model.Image, error) {
 	var image *model.Image
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Run(m.session)
 	if err != nil {
@@ -1119,8 +1119,8 @@ func (m DefaultManager) GetImage(projectId, imageId string) (*model.Image, error
 
 func (m DefaultManager) CreateImage(projectId string, image *model.Image) error {
 	var eventType string
-	image.ProjectID = projectId
-	response, err := r.Table(tblNameTests).Insert(image).RunWrite(m.session)
+	image.ProjectId = projectId
+	response, err := r.Table(tblNameImages).Insert(image).RunWrite(m.session)
 	if err != nil {
 
 		return err
@@ -1139,14 +1139,13 @@ func (m DefaultManager) CreateImage(projectId string, image *model.Image) error 
 
 func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error {
 	var eventType string
-
 	// check if exists; if so, update
-	img, err := m.GetImage(projectId, image.ID)
+	rez, err := m.GetImage(projectId, image.ID)
 	if err != nil && err != ErrImageDoesNotExist {
 		return err
 	}
 	// update
-	if img != nil {
+	if rez != nil {
 		updates := map[string]interface{}{
 			"name":           image.Name,
 			"imageId":        image.ImageId,
@@ -1154,9 +1153,8 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 			"description":    image.Description,
 			"location":       image.Location,
 			"skipImageBuild": image.SkipImageBuild,
-			"projectId":      image.ProjectID,
+			"projectId":      image.ProjectId,
 		}
-
 		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
 			return err
 		}
@@ -1164,8 +1162,7 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 		eventType = "update-image"
 	}
 
-	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
-
+	m.logEvent(eventType, fmt.Sprintf("id=%s", image.ID), []string{"security"})
 	return nil
 }
 
