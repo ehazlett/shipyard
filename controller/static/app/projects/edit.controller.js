@@ -242,7 +242,7 @@
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
                 vm.buttonStyle = "disabled";
-                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                $('.ui.selection.fluid.dropdown.tag.create').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
                         vm.publicRegistryTags = data;
@@ -268,15 +268,17 @@
                 }
             },
             onSelect: function(result,response) {
+                vm.editImageTagSpin = true;
                 vm.editImage.name = result.title;
                 vm.editImage.description = result.description;
                 vm.editImage.tag = "";
                 vm.buttonStyle = "disabled";
                 vm.publicRegistryTags = "";
-                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                $('.ui.selection.fluid.dropdown.edit.tag').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
                         vm.publicRegistryTags = data;
+                        vm.editImageTagSpin = false;
                     }, function(data) {
                         vm.error = data;
                     });
@@ -697,7 +699,7 @@
         }
 
         function editSaveImage() {
-            ProjectService.updateImage(vm.project.id, $.extend(true, {}, vm.selectedEditImage))
+            ProjectService.updateImage(vm.project.id, $.extend(true, {}, vm.editImage))
                 .then(function(data) {
                     vm.getImages(vm.project.id);
                 }, function(data) {
