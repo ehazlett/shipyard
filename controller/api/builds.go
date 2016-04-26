@@ -86,12 +86,13 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	jsonResponse, err := json.Marshal(tempResponse)
 
 	if err != nil {
+		log.Errorf("error marshalling response for create build")
 		http.Error(w, err.Error(), http.StatusNoContent)
 	}
 	jsonResponse = jsonResponse
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	//w.Write(jsonResponse)
+	w.Write(jsonResponse)
 	return
 }
 

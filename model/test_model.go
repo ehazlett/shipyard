@@ -94,7 +94,7 @@ type Test struct {
 	Tagging          Tagging           `json:"tagging" gorethink:"tagging"`
 	FromTag          string            `json:"fromTag" gorethink:"fromTag"`
 	Parameters       []*Parameter      `json:"parameters" gorethink:"parameters"`
-	ProjectId        string            `json:"-" gorethink:"projectId"`
+	ProjectId        string            `json:"projectId" gorethink:"projectId"`
 }
 type TestProvider struct {
 	ProviderType string `json:"providerType" gorethink:"providerType"`

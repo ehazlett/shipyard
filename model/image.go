@@ -8,18 +8,19 @@ type Image struct {
 	Description    string `json:"description" gorethink:"description"`
 	Location       string `json:"location" gorethink:"location"`
 	SkipImageBuild bool   `json:"skipImageBuild" gorethink:"skipImageBuild"`
-	ProjectID      string `json:"projectId" gorethink:"projectId"`
+	ProjectId      string `json:"projectId" gorethink:"projectId"`
 }
 
 func (i *Image) NewImage(name string, imageId string, tag string, description string, location string, skipImageBuild bool, projectId string) *Image {
 
-	return &Image{
-		Name:           name,
-		ImageId:        imageId,
-		Tag:            tag,
-		Description:    description,
-		Location:       location,
-		SkipImageBuild: skipImageBuild,
-		ProjectID:      projectId,
-	}
+	image := new(Image)
+	image.Name = name
+	image.ImageId = imageId
+	image.Tag = tag
+	image.Description = description
+	image.Location = location
+	image.SkipImageBuild = skipImageBuild
+	image.ProjectId = projectId
+
+	return image
 }

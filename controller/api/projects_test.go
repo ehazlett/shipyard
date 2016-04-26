@@ -11,12 +11,11 @@ import (
 	"os"
 	"strings"
 	"testing"
+
 	"time"
 )
 
 const (
-	//SYUSER             = "admin"
-	//SYPASS             = "shipyard"
 	PROJECT1_NAME      = "project 1"
 	PROJECT2_NAME      = "project 2"
 	PROJECT1_DESC      = "the first project"
@@ -43,13 +42,9 @@ const (
 )
 
 var (
-	//SY_AUTHTOKEN              string //the authentication header to use with all requests
 	PROJECT1_SAVED_ID         string
 	PROJECT1_PREV_UPDATE_TIME time.Time
 	PROJECT3_SAVED_ID         string
-	//api                       *Api
-	//globalMux                 *http.ServeMux
-	//ts                        *httptest.Server
 )
 
 func init() {
