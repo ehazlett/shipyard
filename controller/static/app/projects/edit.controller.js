@@ -168,7 +168,7 @@
         $(".ui.selection.fluid.dropdown.tag.create")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    vm.createImage.tag = value;
+                    vm.createImage.tag = value.toString();
                     checkImagePublicRepository(vm.createImage);
 
                     // Search for the image layer of the chosen tag
@@ -186,7 +186,7 @@
         $(".ui.selection.fluid.dropdown.edit.tag")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
-                    vm.editImage.tag = value;
+                    vm.editImage.tag = value.toString();
                     checkImagePublicRepository(vm.editImage);
                     
                     // Search for the image layer of the chosen tag
