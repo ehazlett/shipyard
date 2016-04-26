@@ -15,7 +15,7 @@ import (
 func GetLocalImages(url string) ([]types.Image, error) {
 
 	defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-	cli, err := client.NewClient(url, "v1.23", nil, defaultHeaders)
+	cli, err := client.NewClient(url, "", nil, defaultHeaders)
 	if err != nil {
 		return nil, err
 	}
