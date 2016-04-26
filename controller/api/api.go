@@ -129,16 +129,17 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/projects/{id}", a.deleteProject).Methods("DELETE")
 
 	// Endpoints to handle images related to a given project
-	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.imagesByProjectId).Methods("GET")
-	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.deleteImage).Methods("DELETE")
-	apiRouter.HandleFunc("/api/projects/{project_id}/images/{id}", a.image).Methods("GET")
-	apiRouter.HandleFunc("/api/projects/{project_id}/images", a.addImageToProjectId).Methods("POST", "PUT")
+	apiRouter.HandleFunc("/api/projects/{projectId}/images", a.createImage).Methods("POST")
+	apiRouter.HandleFunc("/api/projects/{projectId}/images", a.getImages).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/images/{imageId}", a.getImage).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/images/{imageId}", a.updateImage).Methods("PUT")
+	apiRouter.HandleFunc("/api/projects/{projectId}/images/{imageId}", a.deleteImage).Methods("DELETE")
 
 	//ILM related routes
-	apiRouter.HandleFunc("/api/ilm_images", a.images).Methods("GET")
-	apiRouter.HandleFunc("/api/ilm_images", a.saveImage).Methods("POST")
+	apiRouter.HandleFunc("/api/ilm_images", a.getImages).Methods("GET")
+	apiRouter.HandleFunc("/api/ilm_images", a.createImage).Methods("POST")
 	apiRouter.HandleFunc("/api/ilm_images/{id}", a.updateImage).Methods("PUT")
-	apiRouter.HandleFunc("/api/ilm_images/{id}", a.image).Methods("GET")
+	apiRouter.HandleFunc("/api/ilm_images/{id}", a.getImage).Methods("GET")
 	apiRouter.HandleFunc("/api/ilm_images/{id}", a.deleteImage).Methods("DELETE")
 
 	//Result Related routes

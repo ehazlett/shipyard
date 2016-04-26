@@ -118,12 +118,11 @@ type (
 		VerifyIfImageExistsLocally(imageToCheck string) bool
 		PullImage(imageToCheck string) error
 
-		Images() ([]*model.Image, error)
-		ImagesByProjectId(projectId string) ([]*model.Image, error)
-		Image(name string) (*model.Image, error)
-		SaveImage(image *model.Image) error
-		UpdateImage(image *model.Image) error
-		DeleteImage(image *model.Image) error
+		GetImages(projectId string) ([]*model.Image, error)
+		GetImage(projectId, imageId string) (*model.Image, error)
+		CreateImage(projectId string, image *model.Image) error
+		UpdateImage(projectId string, image *model.Image) error
+		DeleteImage(projectId string, imageId string) error
 		DeleteAllImages() error
 
 		GetTests(projectId string) ([]*model.Test, error)
@@ -814,7 +813,7 @@ func (m DefaultManager) Project(id string) (*model.Project, error) {
 		return nil, err
 	}
 
-	project.Images, err = m.ImagesByProjectId(project.ID)
+	project.Images, err = m.GetImages(project.ID)
 
 	if err != nil {
 		return nil, ErrProjectImagesProblem
@@ -1089,35 +1088,8 @@ func (m DefaultManager) PullImage(imageNameAndTag string) error {
 }
 
 //methods related to the Image structure
-func (m DefaultManager) Images() ([]*model.Image, error) {
-	// TODO: sort by datetime once it is implemented
-	res, err := r.Table(tblNameImages).OrderBy(r.Asc("name")).Run(m.session)
-	if err != nil {
-		return nil, err
-	}
-	images := []*model.Image{}
-	if err := res.All(&images); err != nil {
-		return nil, err
-	}
-	return images, nil
-}
+func (m DefaultManager) GetImages(projectId string) ([]*model.Image, error) {
 
-func (m DefaultManager) Image(id string) (*model.Image, error) {
-	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": id}).Run(m.session)
-	if err != nil {
-		return nil, err
-	}
-	if res.IsNil() {
-		return nil, ErrImageDoesNotExist
-	}
-	var image *model.Image
-	if err := res.One(&image); err != nil {
-		return nil, err
-	}
-	return image, nil
-}
-
-func (m DefaultManager) ImagesByProjectId(projectId string) ([]*model.Image, error) {
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": projectId}).Run(m.session)
 	if err != nil {
 		return nil, err
@@ -1129,33 +1101,47 @@ func (m DefaultManager) ImagesByProjectId(projectId string) ([]*model.Image, err
 	return images, nil
 }
 
-func (m DefaultManager) SaveImage(image *model.Image) error {
-	var eventType string
+func (m DefaultManager) GetImage(projectId, imageId string) (*model.Image, error) {
+	var image *model.Image
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrImageDoesNotExist
+	}
+	if err := res.One(&image); err != nil {
+		return nil, err
+	}
 
-	img, err := m.Image(image.ID)
-	if err != nil && err != ErrImageDoesNotExist {
+	return image, nil
+}
+
+func (m DefaultManager) CreateImage(projectId string, image *model.Image) error {
+	var eventType string
+	image.ProjectID = projectId
+	response, err := r.Table(tblNameTests).Insert(image).RunWrite(m.session)
+	if err != nil {
+
 		return err
 	}
-	if img != nil {
-		return ErrImageExists
-	}
-	if _, err := r.Table(tblNameImages).Insert(image).RunWrite(m.session); err != nil {
-		return err
-	}
+	image.ID = func() string {
+		if len(response.GeneratedKeys) > 0 {
+			return string(response.GeneratedKeys[0])
+		}
+		return ""
+	}()
 	eventType = "add-image"
 
-	// TODO: consider adding "id" from the rethink GeneratedKeys to the Image object
-
-	m.logEvent(eventType, fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
-
+	m.logEvent(eventType, fmt.Sprintf("id=%s", image.ID), []string{"security"})
 	return nil
 }
 
-func (m DefaultManager) UpdateImage(image *model.Image) error {
+func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error {
 	var eventType string
 
 	// check if exists; if so, update
-	img, err := m.Image(image.ID)
+	img, err := m.GetImage(projectId, image.ID)
 	if err != nil && err != ErrImageDoesNotExist {
 		return err
 	}
@@ -1183,8 +1169,8 @@ func (m DefaultManager) UpdateImage(image *model.Image) error {
 	return nil
 }
 
-func (m DefaultManager) DeleteImage(image *model.Image) error {
-	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Delete().Run(m.session)
+func (m DefaultManager) DeleteImage(projectId string, imageId string) error {
+	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Delete().Run(m.session)
 	if err != nil {
 		return err
 	}
@@ -1193,7 +1179,7 @@ func (m DefaultManager) DeleteImage(image *model.Image) error {
 		return ErrImageDoesNotExist
 	}
 
-	m.logEvent("delete-image", fmt.Sprintf("id=%s, name=%s", image.ID, image.Name), []string{"security"})
+	m.logEvent("delete-image", fmt.Sprintf("id=%s", imageId), []string{"security"})
 
 	return nil
 }
@@ -1407,7 +1393,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 		}
 		// we retrieve the images from the projectId
-		projectImages, err := m.ImagesByProjectId(projectId)
+		projectImages, err := m.GetImages(projectId)
 		if err != nil && err != ErrProjectImagesProblem {
 			return "", err
 		}
