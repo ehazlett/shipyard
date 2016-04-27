@@ -738,8 +738,8 @@
                         class="notched check icon"></i>
                 <div class="content">
                     <div class="header">
-                        <span ng-if="vm.saveProjectMessageConfig.status === 'success'">Project Has Been Saved</span>
-                        <span ng-if="vm.saveProjectMessageConfig.status === 'failure'">Failed To Save Project</span>
+                        <span id="edit-project-save-success" ng-if="vm.saveProjectMessageConfig.status === 'success'">Project Has Been Saved</span>
+                        <span id="edit-project-save-failure" ng-if="vm.saveProjectMessageConfig.status === 'failure'">Failed To Save Project</span>
                     </div>
                     <p ng-if="vm.saveProjectMessageConfig.status === 'success'">Project {{vm.project.id}} was successfully updated.</p>
                     <p ng-if="vm.saveProjectMessageConfig.status === 'failure'">Project {{vm.project.id}} could not be updated.</p>
@@ -755,7 +755,7 @@
                                 </span>
                                 <div class="content">
                                     <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>
-                                    Project {{vm.project.name}}
+                                    <span id="edit-project-header">Project {{vm.project.name}}</span>
                                     <i class="ui edit icon"></i>
                                 </div>
                             </h3>
@@ -814,7 +814,8 @@
                                     <div class="field">
                                         <div class="row">
                                             <div class="column">
-                                                <div ng-click='vm.updateProject(vm.project)'
+                                                <div id="edit-project-save-project"
+                                                     ng-click='vm.updateProject(vm.project)'
                                                      ng-class="{'disabled': vm.projectIsUpdated === false, 'green': vm.projectIsUpdated === true}"
                                                      class="ui small disabled button">
                                                     Save Project
