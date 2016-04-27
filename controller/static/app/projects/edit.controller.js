@@ -37,7 +37,7 @@
 
         vm.createImage.additionalTags = [];
 
-        var buildResults = {};
+        var builds = {};
 
         vm.registries = [];
         vm.images = [];
@@ -781,9 +781,10 @@
             ProjectService.executeBuild(vm.project.id, testId, {action: 'start'})
                 .then(function(data) {
                     console.log("starting build");
-                    buildResults[testId] = data;
+                    builds[testId] = {id: data.id};
+                    builds[testId].status = "running";
                     vm.buildMessageConfig.testId = testId;
-                    pollBuild(vm.project.id, testId, buildResults[testId].id);
+                    pollBuild(vm.project.id, testId, builds[testId].id);
                 }, function(data) {
                     vm.error = data;
                 });
@@ -792,29 +793,20 @@
         function pollBuild(projectId, testId, buildId) {
             ProjectService.pollBuild(projectId, testId, buildId)
                 .then(function(status) {
-                    console.log("polls done");
+                    console.log("polls done" + " .." + status);
                     console.log(status);
-                    buildResults[testId].status = status;
-                }, function(data) {
-                    vm.error = data;
-                });
-        }
-
-        function showBuildResults(testId) {
-            ProjectService.pollBuild(project.id, testId, buildResults[testId])
-                .then(function(data) {
-                    $state.transitionTo('dashboard.projects');
+                    builds[testId].status = status;
                 }, function(data) {
                     vm.error = data;
                 });
         }
 
         function buttonLoadStatus(testId) {
-            if (!buildResults.hasOwnProperty(testId)) {
+            if (!builds.hasOwnProperty(testId)) {
                 return false;
             }
 
-            if (buildResults[testId].status === 'running') {
+            if (builds[testId].status === 'running') {
                 return true;
             }
 
@@ -822,23 +814,23 @@
         }
 
         function messageLoadStatus(testId) {
-            if (!buildResults.hasOwnProperty(testId) || !testId) {
+            if (!builds.hasOwnProperty(testId) || !testId) {
                 return 'none';
             }
 
-            if (buildResults[testId].status === 'running') {
+            if (builds[testId].status === 'running') {
                 return 'running';
             }
 
-            if (buildResults[testId].status === 'stopped') {
+            if (builds[testId].status === 'stopped') {
                 return 'stopped';
             }
 
-            if (buildResults[testId].status === 'finished_success') {
+            if (builds[testId].status === 'finished_success') {
                 return 'finished_success';
             }
 
-            if (buildResults[testId].status === 'finished_failed') {
+            if (builds[testId].status === 'finished_failed') {
                 return 'finished_failed';
             }
         }
