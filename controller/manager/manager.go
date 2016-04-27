@@ -1361,7 +1361,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 	var eventType string
 	eventType = eventType
 	var build *model.Build
-	existingResult, _ := m.GetResults(projectId)
+
 	if buildAction.Action == "start" {
 		var build *model.Build
 
@@ -1433,9 +1433,11 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 				wg.Add(1)
 
 				// Run the verification concurrently for each image and then block to wait for all to finish.
-				result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
-				result.CreateDate = time.Now()
 				go func(name string) {
+
+					result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
+					result.CreateDate = time.Now()
+
 					testResult := model.TestResult{}
 					testResult.TestId = test.ID
 					testResult.TestName = test.Name
@@ -1467,7 +1469,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					log.Printf("Will attempt to test image %s with Clair...", thisImageName)
 
 					m.UpdateBuildStatus(build.ID, "running")
-
+					existingResult, _ := m.GetResults(projectId)
 					// Once the image is available, try to test it with Clair
 					buildResult, err := c.CheckImage(build.ID, thisImageName)
 					if err != nil {
