@@ -36,9 +36,9 @@
     </div>
 </div>
 
-<div id="edit-project-image-create-modal-{{vm.randomCreateId}}" class="ui fullscreen modal transition">
+<div id="edit-project-image-create-modal-{{vm.randomCreateId}}" class="ui fullscreen modal transition create image">
     <i class="close icon"></i>
-    <div class="header">
+    <div class="header" id="create-image-header">
         Create Image
     </div>
     <div class="content">
@@ -200,7 +200,7 @@
         </div>
     </div>
     <div class="actions">
-        <div ng-click="vm.cancelCreateSaveImage()" class="ui negative button">
+        <div ng-click="vm.cancelCreateSaveImage()" class="ui negative button create image">
             Cancel
         </div>
         <div ng-click="vm.createSaveImage(vm.createImage)" class="ui positive right labeled icon button {{vm.buttonStyle}}">
@@ -851,7 +851,7 @@
                                     <div class="item">
                                         <div class="row">
                                             <div class="left column">
-                                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
+                                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button" id="create-new-image-button">
                                                     <i class="plus icon"></i>Add Image
                                                 </div>
                                             </div>

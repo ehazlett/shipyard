@@ -12,7 +12,15 @@ var sy = {
     editProjectDescription: by.model('vm.project.description'),
     saveProjectButton: by.id('edit-project-save-project'),
     editProjectSaveSuccess: by.id('edit-project-save-success'),
-    editProjectSaveFailure: by.id('edit-project-save-failure')
+    editProjectSaveFailure: by.id('edit-project-save-failure'),
+    createNewImageButton: by.id('create-new-image-button')
+};
+
+function selectDropdownByNumber( mySelect, optionNum ) {
+    element.findElements(by.tagName('option'))
+        .then(function(options) {
+            options[index].click();
+        });
 };
 
 // TODO: Look into how protractor *knows* when our app is pending tasks. Can we remove tha `browser.waits`?
@@ -79,6 +87,26 @@ describe('ILM', function() {
         );
     });
 
+    it('open modal window for create image', function() {
+        element(sy.createNewImageButton).click();
+        expect(element(by.className('ui fullscreen modal transition create image')).isDisplayed()).toBe(true);
+        expect(element(by.id('create-image-header')).getText()).toEqual('Create Image');
+    });
+
+    it('add new image from public registry', function() {
+        element(by.model('vm.createImage.location')).$('[value= "Public Registry"]').click();
+        /*var select = by.model('vm.createImage.location');
+
+        selectDropdownByNumber(select,2);*/
+        //expect(element(by.model('vm.createImage.location')).getAttribute('value')).toEqual('Public Registry');
+        element(by.model('vm.createImage.description')).clear();
+        element(by.model('vm.createImage.description')).sendKeys('image description');
+    });
+
+    it('close modal window for create image', function() {
+        element(by.className('ui negative button create image')).click();
+        //expect(element(by.className('ui fullscreen modal transition create image')).isDisplayed()).toBe(false);
+    });
     // it('should be able to create a new image', function() {
     //     expect(
     //         element(sy.editProjectHeader).getText()
@@ -98,6 +126,27 @@ describe('ILM', function() {
     //         'Description1'
     //     );
     // });
+
+    /*describe('Protractor Demo App', function() {
+        it('should have a title', function() {
+            // TODO: this port might change in the future or could be random in CI environment
+            browser.get('http://'+process.env.DOCKER_HOST+':8082');
+
+            expect(browser.getTitle()).toEqual('shipyardd');
+        });
+        it('projects page', function() {
+            browser.get('http://'+process.env.DOCKER_HOST+':8082');
+            var url = browser.driver.getCurrentUrl();
+            element( by.css('.title .item .project')).click();
+            expect(url).toMatch('/projects');
+        });
+        /!*it('sign in', function() {
+         var username = element(by.model('username'));
+         var password = element(by.model('password'));
+         username.sendKeys("admin");
+         expect(username.getText()).toEqual("admin");
+         });*!/
+    });*/
 
 
 });
