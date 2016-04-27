@@ -1078,7 +1078,7 @@ func (m DefaultManager) PullImage(imageNameAndTag string) error {
 	err2 := m.client.PullImage(imageNameAndTag, &auth)
 
 	if err2 != nil {
-		fmt.Printf("Could not pull image %s ... \n%s \n", imageNameAndTag, err2)
+		fmt.Printf("Could not pull image %s ... \n %s \n", imageNameAndTag, err2)
 		return err2
 		ticker.Stop()
 	}
@@ -1361,20 +1361,19 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 	var eventType string
 	eventType = eventType
 	var build *model.Build
-	//existingResult, _ := m.GetResults(projectId)
+
 	if buildAction.Action == "start" {
-		//var testResult *model.TestResult
 		var build *model.Build
-		//testResult := &model.TestResult{}
+
 		build = &model.Build{}
 		build.TestId = testId
 		build.ProjectId = projectId
 		build.StartTime = time.Now()
 		// we get the project
-		//project, err := m.Project(projectId)
-		//if err != nil && err != ErrProjectDoesNotExist {
-		//	return "", err
-		//}
+		project, err := m.Project(projectId)
+		if err != nil && err != ErrProjectDoesNotExist {
+			return "", err
+		}
 		// we get the test and its targetArtifacts
 		test, err := m.GetTest(projectId, testId)
 		if err != nil && err != ErrTestDoesNotExist {
@@ -1425,15 +1424,28 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 		// Start a goroutine that will execute the build non-blocking
 		go func() {
+
 			var wg sync.WaitGroup
-			log.Printf("Processing %d images\n", len(imageNames))
+			log.Printf("Processing %d image(s)", len(imageNames))
 			// For each image that we target in the test, try to run a build / verification
 			for _, name := range imageNames {
-				log.Printf("Processing image=%s\n", name)
+				log.Printf("Processing image=%s", name)
 				wg.Add(1)
+
 				// Run the verification concurrently for each image and then block to wait for all to finish.
 				go func(name string) {
+
+					result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
+					result.CreateDate = time.Now()
+
+					testResult := model.TestResult{}
+					testResult.Date = time.Now()
+					testResult.TestId = test.ID
+					testResult.TestName = test.Name
+					testResult.ImageName = name
+
 					thisImageName := name
+
 					// When the goroutine finishes, mark this wait group item as done.
 					defer wg.Done()
 
@@ -1445,16 +1457,53 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 							return
 						}
 					}
-
-					log.Printf("Will attempt to test image %s with Clair...", thisImageName)
-					// Once the image is available, try to test it with Clair
-					_, err = c.CheckImage(build.ID, thisImageName)
-					if err != nil {
-						log.Error(err)
-						log.Errorf("Error checking image %s", thisImageName)
-						return
+					// get the docker image id and append it to the test results
+					images, err := apiClient.GetLocalImages(m.DockerClient().URL.String())
+					for _, img := range images {
+						imageRepoTags := img.RepoTags
+						for _, imageRepoTag := range imageRepoTags {
+							if imageRepoTag == thisImageName {
+								testResult.DockerImageId = img.ID
+							}
+						}
 					}
-					log.Printf("Finished checking image %s", thisImageName)
+					log.Printf("Will attempt to test image %s with Clair...", thisImageName)
+
+					m.UpdateBuildStatus(build.ID, "running")
+					existingResult, _ := m.GetResults(projectId)
+					// Once the image is available, try to test it with Clair
+					buildResult, err := c.CheckImage(build.ID, thisImageName)
+					if err != nil {
+						m.UpdateBuildStatus(build.ID, "finished_failed")
+						testResult.SimpleResult.Status = "finished_failed"
+						testResult.EndDate = time.Now()
+						testResult.Blocker = false
+						result.TestResults = append(result.TestResults, &testResult)
+						result.LastUpdate = time.Now()
+						if existingResult != nil {
+							m.UpdateResult(projectId, result)
+
+						}
+						if existingResult == nil {
+							m.CreateResult(projectId, result)
+						}
+					}
+					// if we don't get an error we mark the test for the image as successful
+					if err == nil {
+						m.UpdateBuildStatus(build.ID, "finished_success")
+						testResult.SimpleResult.Status = "finished_success"
+						testResult.EndDate = time.Now()
+						testResult.Blocker = false
+						result.TestResults = append(result.TestResults, &testResult)
+						result.LastUpdate = time.Now()
+						if existingResult != nil {
+							m.UpdateResult(projectId, result)
+						}
+						if existingResult == nil {
+							m.CreateResult(projectId, result)
+						}
+					}
+					m.UpdateBuildResults(build.ID, buildResult)
 				}(name)
 			}
 			// Block the outer goroutine until ALL the inner goroutines finish
