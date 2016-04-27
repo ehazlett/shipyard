@@ -305,9 +305,8 @@ func analyzeLayer(clairEndpoint, layerEndpoint, layerName, parentLayerName strin
 	if err != nil {
 		return err
 	}
-
 	requestEndpoint := clairEndpoint + postLayerURI
-	log.Printf("Sending request to endpoint %s to analyze %v", requestEndpoint, payload)
+	log.Printf("Sending request to endpoint %s to analyze %s", requestEndpoint, layerName)
 
 	request, err := http.NewRequest("POST", requestEndpoint, bytes.NewBuffer(jsonPayload))
 	if err != nil {

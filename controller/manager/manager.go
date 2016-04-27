@@ -1426,11 +1426,12 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		go func() {
 
 			var wg sync.WaitGroup
-			log.Printf("Processing %d images\n", len(imageNames))
+			log.Printf("Processing %d image(s)", len(imageNames))
 			// For each image that we target in the test, try to run a build / verification
 			for _, name := range imageNames {
-				log.Printf("Processing image=%s\n", name)
+				log.Printf("Processing image=%s", name)
 				wg.Add(1)
+
 				// Run the verification concurrently for each image and then block to wait for all to finish.
 				result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
 				result.CreateDate = time.Now()
@@ -1453,7 +1454,16 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 							return
 						}
 					}
-
+					// get the docker image id and append it to the test results
+					images, err := apiClient.GetLocalImages(m.DockerClient().URL.String())
+					for _, img := range images {
+						imageRepoTags := img.RepoTags
+						for _, imageRepoTag := range imageRepoTags {
+							if imageRepoTag == thisImageName {
+								testResult.DockerImageId = img.ID
+							}
+						}
+					}
 					log.Printf("Will attempt to test image %s with Clair...", thisImageName)
 
 					m.UpdateBuildStatus(build.ID, "running")
