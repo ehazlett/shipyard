@@ -1439,6 +1439,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					result.CreateDate = time.Now()
 
 					testResult := model.TestResult{}
+					testResult.Date = time.Now()
 					testResult.TestId = test.ID
 					testResult.TestName = test.Name
 					testResult.ImageName = name
