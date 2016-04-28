@@ -125,28 +125,6 @@ describe('ILM', function() {
     //     ).toEqual(
     //         'Description1'
     //     );
-    // });
-
-    /*describe('Protractor Demo App', function() {
-        it('should have a title', function() {
-            // TODO: this port might change in the future or could be random in CI environment
-            browser.get('http://'+process.env.DOCKER_HOST+':8082');
-
-            expect(browser.getTitle()).toEqual('shipyardd');
-        });
-        it('projects page', function() {
-            browser.get('http://'+process.env.DOCKER_HOST+':8082');
-            var url = browser.driver.getCurrentUrl();
-            element( by.css('.title .item .project')).click();
-            expect(url).toMatch('/projects');
-        });
-        /!*it('sign in', function() {
-         var username = element(by.model('username'));
-         var password = element(by.model('password'));
-         username.sendKeys("admin");
-         expect(username.getText()).toEqual("admin");
-         });*!/
-    });*/
-
+    // })
 
 });
