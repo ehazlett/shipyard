@@ -1443,7 +1443,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					testResult.TestId = test.ID
 					testResult.TestName = test.Name
 					testResult.ImageName = name
-
+					testResult.BuildId = build.ID
 					thisImageName := name
 
 					// When the goroutine finishes, mark this wait group item as done.

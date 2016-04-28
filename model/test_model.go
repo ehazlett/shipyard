@@ -142,6 +142,7 @@ type TestResult struct {
 	ID            string `json:"id,omitempty" gorethink:"id,omitempty"`
 	ImageId       string `json:"imageId" gorethink:"imageId"`
 	ImageName     string `json:"imageName" gorethink:"imageName"`
+	BuildId       string `json:"buildId" gorethink:"buildId"`
 	DockerImageId string `json:"dockerImageId" gorethink:"dockerImageId"`
 	TestId        string `json:"testId" gorethink:"testId"`
 	TestName      string `json:"testName" gorethink:"testName"`
@@ -152,6 +153,7 @@ type TestResult struct {
 func (t *TestResult) NewTestResult(
 	imageId string,
 	imageName string,
+	buildId string,
 	dockerImageId string,
 	testId string,
 	testName string,
@@ -165,8 +167,10 @@ func (t *TestResult) NewTestResult(
 	testResult := new(TestResult)
 	testResult.ImageId = imageId
 	testResult.ImageName = imageName
+	testResult.BuildId = buildId
 	testResult.DockerImageId = dockerImageId
 	testResult.TestId = testId
+	testResult.TestName = testName
 	testResult.Blocker = blocker
 	testResult.Status = status
 	testResult.Date = date
