@@ -1,10 +1,9 @@
 package model
 
 type Report struct {
-	ImageName string `json:"imageName"`
-	//ImageID   string    `json:"imageID"`
-	Message  string    `json:"message,omitempty"`
-	Features []Feature `json:"features,omitempty"`
+	ImageName string    `json:"imageName"`
+	Message   string    `json:"message,omitempty"`
+	Features  []Feature `json:"features,omitempty"`
 }
 
 type Feature struct {

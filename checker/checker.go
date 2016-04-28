@@ -67,7 +67,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	path, err := save(imageName)
 	defer os.RemoveAll(path)
 	if err != nil {
-		fmt.Printf("- Could not save image: %s\n", err)
+		log.Debugf("- Could not save image: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not save image: %s\n", err)
 		return buildResult, errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
 	}
@@ -76,20 +76,20 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	fmt.Println("Getting image's history")
 	layerIDs, err := historyFromManifest(path)
 	if err != nil {
-		fmt.Printf("Could not get history from manifest\n")
+		log.Debugf("Could not get history from manifest\n")
 		layerIDs, err = historyFromCommand(imageName)
 	}
 
 	fmt.Printf("Layer IDs = %v\n", layerIDs)
 
 	if err != nil || len(layerIDs) == 0 {
-		fmt.Printf("- Could not get image's history: %s\n", err)
+		log.Debugf("- Could not get image's history: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get image's history: %s\n", err)
 		return buildResult, errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
 	}
 
 	// Analyze layers.
-	fmt.Printf("Analyzing %d layers\n", len(layerIDs))
+	log.Debugf("Analyzing %d layers\n", len(layerIDs))
 	pathWithoutRoot := strings.TrimPrefix(path, FILE_SERVER_ROOT)
 	for i := 0; i < len(layerIDs); i++ {
 		fmt.Printf("- Analyzing %s\n", layerIDs[i])
@@ -103,7 +103,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		err = analyzeLayer(endpoint, formatImageLayerTarEndpoint(FILE_SERVER_ENDPOINT, pathWithoutRoot, layerIDs[i]), layerIDs[i], remaining)
 
 		if err != nil {
-			fmt.Printf("- Could not analyze layer: %s\n", err)
+			log.Debugf("- Could not analyze layer: %s\n", err)
 			report.Message = fmt.Sprintf("- Could not analyze layer: %s\n", err)
 			return buildResult, errors.New(fmt.Sprintf("- Could not analyze layer: %s\nusing %s %s %s",
 				err, endpoint, path, layerIDs[i]))
@@ -111,10 +111,10 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	}
 
 	// Get vulnerabilities.
-	fmt.Println("Getting image's vulnerabilities")
+	log.Debugf("Getting image's vulnerabilities")
 	layer, err := getLayer(endpoint, layerIDs[len(layerIDs)-1])
 	if err != nil {
-		fmt.Printf("- Could not get layer information: %s\n", err)
+		log.Printf("- Could not get layer information: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get layer information: %s\n", err)
 		return buildResult, errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
 	}
@@ -123,8 +123,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	fmt.Printf("\n# Clair report for image %s (%s)\n", imageName, time.Now().UTC())
 
 	if len(layer.Features) == 0 {
-		fmt.Println("No feature has been detected on the image.")
-		fmt.Println("This usually means that the image isn't supported by Clair.")
+		log.Debugf("No feature has been detected on the image.")
+		log.Debugf("This usually means that the image isn't supported by Clair.")
 		report.Message = fmt.Sprintf("No feature has been detected on the image.\nThis usually means that the image isn't supported by Clair.\n")
 		return buildResult, nil
 	}
@@ -134,35 +134,29 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		myFeature = model.Feature{}
 		myFeature.Name = feature.Name
 		myFeature.Version = feature.Version
-		fmt.Printf("## Feature: %s %s\n", feature.Name, feature.Version)
+		log.Debugf("## Feature: %s %s\n", feature.Name, feature.Version)
 
 		if len(feature.Vulnerabilities) > 0 {
 			isSafe = false
-
-			fmt.Printf("   - Added by: %s\n", feature.AddedBy)
 			myFeature.AddedBy = feature.AddedBy
 
 			for _, vulnerability := range feature.Vulnerabilities {
 				myVulnerability = model.Vulnerability{}
-				fmt.Printf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
+				log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
 
 				if vulnerability.Link != "" {
-					fmt.Printf("    - Link:          %s\n", vulnerability.Link)
 					myVulnerability.Link = vulnerability.Link
 				}
 
 				if vulnerability.Description != "" {
-					fmt.Printf("    - Description:   %s\n", vulnerability.Description)
 					myVulnerability.Description = vulnerability.Description
 				}
 
 				if vulnerability.FixedBy != "" {
-					fmt.Printf("    - Fixed version: %s\n", vulnerability.FixedBy)
 					myVulnerability.FixedBy = vulnerability.FixedBy
 				}
 
 				if len(vulnerability.Metadata) > 0 {
-					fmt.Printf("    - Metadata:      %+v\n", vulnerability.Metadata)
 					myVulnerability.Metadata = fmt.Sprintf("%+v\n", vulnerability.Metadata)
 				}
 				//add vulnerability
@@ -173,7 +167,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	}
 
 	if isSafe {
-		fmt.Println("\nBravo, your image looks SAFE !")
+		log.Debugf("Bravo, your image looks SAFE !")
 		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")
 	}
 	// what we know
@@ -306,7 +300,6 @@ func analyzeLayer(clairEndpoint, layerEndpoint, layerName, parentLayerName strin
 		return err
 	}
 	requestEndpoint := clairEndpoint + postLayerURI
-	log.Printf("Sending request to endpoint %s to analyze %s", requestEndpoint, layerName)
 
 	request, err := http.NewRequest("POST", requestEndpoint, bytes.NewBuffer(jsonPayload))
 	if err != nil {
