@@ -143,7 +143,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 			for _, vulnerability := range feature.Vulnerabilities {
 				myVulnerability = model.Vulnerability{}
 				log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
-
+				myVulnerability.Severity = vulnerability.Severity
+				myVulnerability.Name = vulnerability.Name
 				if vulnerability.Link != "" {
 					myVulnerability.Link = vulnerability.Link
 				}
@@ -166,16 +167,15 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		report.Features = append(report.Features, myFeature)
 	}
 
+	buildResult.ResultEntries = map[string]interface{}{
+		string(report.ImageName): report,
+	}
 	if isSafe {
 		log.Debugf("Bravo, your image looks SAFE !")
 		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")
+
 	}
-	// what we know
-	buildResult.BuildId = buildId
-	buildResult.TimeStamp = time.Now()
-	buildResult.ResultEntries = map[string]interface{}{
-		report.ImageName: report,
-	}
+
 	return buildResult, nil
 }
 
