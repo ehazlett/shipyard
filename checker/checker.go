@@ -48,10 +48,10 @@ func formatImageLayerTarEndpoint(fileServerEndpoint, fileServerLayerPath, fileSe
 
 func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	// TODO: parse first./ 2 params from config file
-	var report model.Report
-	var myFeature model.Feature
-	var myVulnerability model.Vulnerability
-
+	report := model.Report{}
+	myFeature := model.Feature{}
+	myVulnerability := model.Vulnerability{}
+	report.ImageName = name
 	log.Debugf("starting checker...")
 	//create a new buildResult object
 	buildResult := model.BuildResult{}
@@ -167,7 +167,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		report.Features = append(report.Features, myFeature)
 	}
 
-	buildResult.ResultEntries[string(report.ImageName)] = report
+	buildResult.ResultEntries[report.ImageName] = json.Marshal(report)
 	if isSafe {
 		log.Debugf("Bravo, your image looks SAFE !")
 		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")

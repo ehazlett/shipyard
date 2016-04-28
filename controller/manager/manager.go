@@ -1419,6 +1419,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		}
 		//we check if the image(s) we want to test exist(s) locally and pull them if not
 		// we change the build's buildStatus to submitted
+		build.Config.Targets = targetArtifacts
 		build.Status = &model.BuildStatus{Status: "new"}
 		// we add the build to the table in rethink db
 
@@ -1448,13 +1449,13 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 				// Run the verification concurrently for each image and then block to wait for all to finish.
 				go func(name string) {
-
 					result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
 					result.CreateDate = time.Now()
 
 					testResult := model.TestResult{}
 					testResult.Date = time.Now()
 					testResult.TestId = test.ID
+					testResult.BuildId = build.ID
 					testResult.TestName = test.Name
 					testResult.ImageName = name
 					testResult.BuildId = build.ID

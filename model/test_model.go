@@ -170,6 +170,7 @@ func (t *TestResult) NewTestResult(
 	testResult.BuildId = buildId
 	testResult.DockerImageId = dockerImageId
 	testResult.TestId = testId
+	testResult.BuildId = buildId
 	testResult.TestName = testName
 	testResult.Blocker = blocker
 	testResult.Status = status
