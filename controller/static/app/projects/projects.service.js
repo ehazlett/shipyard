@@ -36,6 +36,13 @@
                     });
                 return promise;
             },
+            buildResults: function(projectId, testId, buildId) {
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/tests/' + testId + '/builds/' + buildId + '/results')
+                    .then(function(response) {
+                       return response.data;
+                    });
+            },
             update: function(projectId, data) {
                 var promise = $http
                     .put('/api/projects/' + projectId, data)
