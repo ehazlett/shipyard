@@ -143,6 +143,7 @@ type (
 		GetBuild(projectId string, testId string, buildId string) (*model.Build, error)
 		GetBuildById(buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
+		GetBuildResults(projectId string, testId string, buildId string) ([]*model.BuildResult, error)
 
 		CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error)
 		UpdateBuildResults(buildId string, result model.BuildResult) error
@@ -1355,7 +1356,20 @@ func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId 
 	}
 	return build.Status.Status, nil
 }
-
+func (m DefaultManager) GetBuildResults(projectId string, testId string, buildId string) ([]*model.BuildResult, error) {
+	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	if err != nil {
+		return nil, err
+	}
+	if res.IsNil() {
+		return nil, ErrBuildDoesNotExist
+	}
+	var build *model.Build
+	if err := res.One(&build); err != nil {
+		return nil, err
+	}
+	return build.Results, nil
+}
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {
 
 	var eventType string
