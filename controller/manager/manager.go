@@ -1487,6 +1487,11 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					existingResult, _ := m.GetResults(projectId)
 					// Once the image is available, try to test it with Clair
 					buildResult, err := c.CheckImage(build.ID, thisImageName)
+
+					buildResult.BuildId = build.ID
+					buildResult.TimeStamp = time.Now()
+					m.UpdateBuildResults(build.ID, buildResult)
+
 					if err != nil {
 						m.UpdateBuildStatus(build.ID, "finished_failed")
 						testResult.SimpleResult.Status = "finished_failed"
@@ -1517,7 +1522,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 							m.CreateResult(projectId, result)
 						}
 					}
-					m.UpdateBuildResults(build.ID, buildResult)
+
 				}(name)
 			}
 			// Block the outer goroutine until ALL the inner goroutines finish
