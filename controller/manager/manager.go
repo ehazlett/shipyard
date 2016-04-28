@@ -11,13 +11,13 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/shipyard/shipyard/version"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 const (
@@ -115,11 +115,11 @@ type (
 )
 
 func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, authenticator auth.Authenticator) (Manager, error) {
+	log.Debug("setting up rethinkdb session")
 	session, err := r.Connect(r.ConnectOpts{
 		Address:  addr,
 		Database: database,
 		AuthKey:  authKey,
-		MaxIdle:  10,
 	})
 	if err != nil {
 		return nil, err
