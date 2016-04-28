@@ -5,8 +5,8 @@
         .module('shipyard.projects')
         .factory('ProjectService', ProjectService)
 
-    ProjectService.$inject = ['$http', '$q'];
-    function ProjectService($http, $q) {
+    ProjectService.$inject = ['$http', '$q', '$rootScope'];
+    function ProjectService($http, $q, $rootScope) {
         var cancelerGetPublicRegistryTags = null;
 
         return {
@@ -162,25 +162,29 @@
         ///api/projects/:id/tests/:testId/builds
             //BuildAction action: enum: ["start", "restart", "stop"]
             executeBuild: function(projectId, testId, buildAction) {
+                $rootScope.skipSpinnerInterceptor = true;
                 var promise = $http
                     .post('/api/projects/' + projectId + '/tests/' + testId + '/builds', buildAction)
                     .then(function(response) {
+                        $rootScope.skipSpinnerInterceptor = false;
                         return response.data;
                     });
                 return promise;
             },
-        ///api/projects/:id/tests/:testId/:buildId
+        ///api/projects/:id/tests/:testId/builds/:buildId
             pollBuild: function(projectId, testId, buildID) {
+                $rootScope.skipSpinnerInterceptor = true;
                 var deferred = $q.defer();
 
                 (function poll() {
                     $http
-                        .get('/api/projects/' + projectId + '/tests/' + testId + '/' + buildID)
+                        .get('/api/projects/' + projectId + '/tests/' + testId + '/builds/' + buildID)
                         .then(function(response) {
                             console.log("completed poll");
-                            if (response.data.status === 'finished_success'
-                                || response.data.status === 'finished_failed') {
-                                deferred.resolve(response.data.status)
+                            if (response.data.status.status === 'finished_success'
+                                || response.data.status.status === 'finished_failed') {
+                                deferred.resolve(response.data.status.status);
+                                $rootScope.skipSpinnerInterceptor = false;
                             } else {
                                 setTimeout(function(){ poll(); }, 2000);
                             }

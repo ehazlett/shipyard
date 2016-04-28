@@ -18,7 +18,7 @@
         //TODO: Should the default state be on or off (i.e. checked or not checked)?
         vm.skipImages = false;
         vm.skipTests = false;
-
+        vm.projectIsUpdated = false;
         vm.needsBuild = false;
 
         vm.selected = {};
@@ -37,7 +37,7 @@
 
         vm.createImage.additionalTags = [];
 
-        var buildResults = {};
+        var builds = {};
 
         vm.registries = [];
         vm.images = [];
@@ -48,6 +48,14 @@
         vm.providerTests = [];
 
         vm.parameters = [];
+
+        vm.buildMessageConfig = {
+            testId: ''
+        };
+
+        vm.saveProjectMessageConfig = {
+            status: 'hidden' // 'hidden' 'success' 'failure'
+        };
 
         vm.buttonStyle = "disabled";
 
@@ -94,6 +102,7 @@
         vm.messageLoadStatus = messageLoadStatus;
         vm.cancelCreateSaveImage = cancelCreateSaveImage;
         vm.cancelEditSaveImage = cancelEditSaveImage;
+        vm.enableSaveProject = enableSaveProject;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -144,6 +153,11 @@
             });
             return;
         });
+
+        $scope.$watch('b', function() {
+            // do something here
+            $scope.count += 1;
+        }, true);
 
         function list() {
             return Object.keys(vm.project)
@@ -228,7 +242,7 @@
                 vm.createImage.description = result.description;
                 vm.createImage.tag = "";
                 vm.buttonStyle = "disabled";
-                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                $('.ui.selection.fluid.dropdown.tag.create').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
                         vm.publicRegistryTags = data;
@@ -254,15 +268,17 @@
                 }
             },
             onSelect: function(result,response) {
+                vm.editImageTagSpin = true;
                 vm.editImage.name = result.title;
                 vm.editImage.description = result.description;
                 vm.editImage.tag = "";
                 vm.buttonStyle = "disabled";
                 vm.publicRegistryTags = "";
-                $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
+                $('.ui.selection.fluid.dropdown.edit.tag').dropdown('restore defaults');
                 ProjectService.getPublicRegistryTags(result.name)
                     .then(function(data) {
                         vm.publicRegistryTags = data;
+                        vm.editImageTagSpin = false;
                     }, function(data) {
                         vm.error = data;
                     });
@@ -701,11 +717,21 @@
         }
 
         function updateProject(project) {
-            console.log("update project" + project);
+            vm.projectIsUpdated = false;
             ProjectService.update(project.id, project)
                 .then(function(data) {
-                    $state.transitionTo('dashboard.projects');
+                    vm.saveProjectMessageConfig.status = 'success';
+                    setTimeout(function () {
+                        vm.saveProjectMessageConfig.status = 'hidden';
+                        $scope.$apply();
+                    }, 3000);
                 }, function(data) {
+                    vm.projectIsUpdated = true;
+                    vm.saveProjectMessageConfig.status = 'failure';
+                    setTimeout(function () {
+                        vm.saveProjectMessageConfig.status = 'hidden';
+                        $scope.$apply();
+                    }, 3000);
                     vm.error = data;
                 });
         }
@@ -751,17 +777,14 @@
             (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply(fn);
         }
 
-        vm.buildMessageConfig = {
-            testId: ''
-        };
-
         function startBuild(testId) {
             ProjectService.executeBuild(vm.project.id, testId, {action: 'start'})
                 .then(function(data) {
                     console.log("starting build");
-                    buildResults[testId] = data;
+                    builds[testId] = {id: data.id};
+                    builds[testId].status = "running";
                     vm.buildMessageConfig.testId = testId;
-                    pollBuild(vm.project.id, testId, buildResults[testId].id);
+                    pollBuild(vm.project.id, testId, builds[testId].id);
                 }, function(data) {
                     vm.error = data;
                 });
@@ -770,29 +793,20 @@
         function pollBuild(projectId, testId, buildId) {
             ProjectService.pollBuild(projectId, testId, buildId)
                 .then(function(status) {
-                    console.log("polls done");
+                    console.log("polls done" + " .." + status);
                     console.log(status);
-                    buildResults[testId].status = status;
-                }, function(data) {
-                    vm.error = data;
-                });
-        }
-
-        function showBuildResults(testId) {
-            ProjectService.pollBuild(project.id, testId, buildResults[testId])
-                .then(function(data) {
-                    $state.transitionTo('dashboard.projects');
+                    builds[testId].status = status;
                 }, function(data) {
                     vm.error = data;
                 });
         }
 
         function buttonLoadStatus(testId) {
-            if (!buildResults.hasOwnProperty(testId)) {
+            if (!builds.hasOwnProperty(testId)) {
                 return false;
             }
 
-            if (buildResults[testId].status === 'running') {
+            if (builds[testId].status === 'running') {
                 return true;
             }
 
@@ -800,23 +814,23 @@
         }
 
         function messageLoadStatus(testId) {
-            if (!buildResults.hasOwnProperty(testId) || !testId) {
+            if (!builds.hasOwnProperty(testId) || !testId) {
                 return 'none';
             }
 
-            if (buildResults[testId].status === 'running') {
+            if (builds[testId].status === 'running') {
                 return 'running';
             }
 
-            if (buildResults[testId].status === 'stopped') {
+            if (builds[testId].status === 'stopped') {
                 return 'stopped';
             }
 
-            if (buildResults[testId].status === 'finished_success') {
+            if (builds[testId].status === 'finished_success') {
                 return 'finished_success';
             }
 
-            if (buildResults[testId].status === 'finished_failed') {
+            if (builds[testId].status === 'finished_failed') {
                 return 'finished_failed';
             }
         }
@@ -831,6 +845,10 @@
             if (!ProjectService.cancelGetPublicRegistryTags()) {
                 console.log("Could not cancel cancelEditSaveImage");
             }
+        }
+
+        function enableSaveProject() {
+            vm.projectIsUpdated = true;
         }
 
     }

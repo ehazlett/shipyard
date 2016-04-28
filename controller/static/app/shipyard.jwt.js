@@ -7,11 +7,17 @@
             var service = this;
             var nLoadings = 0;
             service.request = function(request) {
+                if ($rootScope.skipSpinnerInterceptor === true) {
+                    return request;
+                }
                 nLoadings += 1;
                 $rootScope.isLoadingView = true;
                 return request;
-            }
+            };
             service.response = function(response) {
+                if ($rootScope.skipSpinnerInterceptor === true) {
+                    return response;
+                }
                 nLoadings -= 1;
                 if (nLoadings === 0) {
                     $rootScope.isLoadingView = false;

@@ -36,9 +36,9 @@
     </div>
 </div>
 
-<div id="edit-project-image-create-modal-{{vm.randomCreateId}}" class="ui fullscreen modal transition">
+<div id="edit-project-image-create-modal-{{vm.randomCreateId}}" class="ui fullscreen modal transition create image">
     <i class="close icon"></i>
-    <div class="header">
+    <div class="header" id="create-image-header">
         Create Image
     </div>
     <div class="content">
@@ -200,7 +200,7 @@
         </div>
     </div>
     <div class="actions">
-        <div ng-click="vm.cancelCreateSaveImage()" class="ui negative button">
+        <div ng-click="vm.cancelCreateSaveImage()" class="ui negative button create image">
             Cancel
         </div>
         <div ng-click="vm.createSaveImage(vm.createImage)" class="ui positive right labeled icon button {{vm.buttonStyle}}">
@@ -731,17 +731,31 @@
                     <p ng-if="vm.messageLoadStatus(vm.buildMessageConfig.testId) === 'running'">We're running {{vm.buildMessageConfig.testId}} for you. We'll notify you when it completes.</p>
                 </div>
             </div>
+            <!--Save project info Bar-->
+            <div ng-class="{'positive': vm.saveProjectMessageConfig.status === 'success', 'negative': vm.saveProjectMessageConfig.status === 'failure', 'hidden': vm.saveProjectMessageConfig.status === 'hidden'}"
+                 class="ui icon message">
+                <i ng-class="{'check': vm.saveProjectMessageConfig.status === 'success', 'remove': vm.saveProjectMessageConfig.status === 'failure'}"
+                        class="notched check icon"></i>
+                <div class="content">
+                    <div class="header">
+                        <span id="edit-project-save-success" ng-if="vm.saveProjectMessageConfig.status === 'success'">Project Has Been Saved</span>
+                        <span id="edit-project-save-failure" ng-if="vm.saveProjectMessageConfig.status === 'failure'">Failed To Save Project</span>
+                    </div>
+                    <p ng-if="vm.saveProjectMessageConfig.status === 'success'">Project {{vm.project.id}} was successfully updated.</p>
+                    <p ng-if="vm.saveProjectMessageConfig.status === 'failure'">Project {{vm.project.id}} could not be updated.</p>
+                </div>
+            </div>
             <div class="ui segment page">
-                <span style="float: right">
-                    <a>Go To Projects <i class="sign out icon"></i></a>
-                </span>
                 <div class="ui grid">
-                    <div class="two column row">
+                    <div class="column row">
                         <div class="column">
                             <h3 class="ui header">
+                                <span style="float: right">
+                                    <a ui-sref="dashboard.projects" style="color: #006D95">Go To Projects <i class="sign out icon"></i></a>
+                                </span>
                                 <div class="content">
                                     <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>
-                                    Project {{vm.project.name}}
+                                    <span id="edit-project-header">Project {{vm.project.name}}</span>
                                     <i class="ui edit icon"></i>
                                 </div>
                             </h3>
@@ -775,15 +789,15 @@
                                     <div class="four fields">
                                         <div class="field">
                                             <label>Project Name</label>
-                                            <input name="command" class="input" type="text" ng-model="vm.project.name" placeholder="Name..."></input>
+                                            <input name="command" class="input" type="text" ng-model="vm.project.name" ng-change="vm.enableSaveProject()" placeholder="Name..."></input>
                                         </div>
                                         <div class="field">
                                             <label>Project Description</label>
-                                            <input name="command" class="input" type="text" ng-model="vm.project.description" placeholder="Description..."></input>
+                                            <input name="command" class="input" type="text" ng-model="vm.project.description" ng-change="vm.enableSaveProject()" placeholder="Description..."></input>
                                         </div>
                                         <div class="field">
                                             <label>Status</label>
-                                           <select class="ui selection dropdown" ng-model="vm.project.status">
+                                           <select class="ui selection dropdown" ng-model="vm.project.status" ng-change="vm.enableSaveProject()">
                                                 <option value="">{{vm.project.status || 'Select status'}}</option>
                                                 <option value="Published">Published</option>
                                                 <option value="Tested">Tested</option>
@@ -792,7 +806,7 @@
                                         <div class="field">
                                             <label>Needs Build</label>
                                             <div class="ui toggle checkbox padded" ng-click="vm.project.needsBuild=!vm.project.needsBuild" style="margin-top: 7px">
-                                                <input type="checkbox" name="public" ng-model="vm.project.needsBuild">
+                                                <input type="checkbox" name="public" ng-model="vm.project.needsBuild" ng-change="vm.enableSaveProject()">
                                                 <label></label>
                                             </div>
                                         </div>
@@ -800,7 +814,10 @@
                                     <div class="field">
                                         <div class="row">
                                             <div class="column">
-                                                <div ng-click='vm.updateProject(vm.project)' class="ui small gray button">
+                                                <div id="edit-project-save-project"
+                                                     ng-click='vm.updateProject(vm.project)'
+                                                     ng-class="{'disabled': vm.projectIsUpdated === false, 'green': vm.projectIsUpdated === true}"
+                                                     class="ui small disabled button">
                                                     Save Project
                                                 </div>
                                             </div>
@@ -834,7 +851,7 @@
                                     <div class="item">
                                         <div class="row">
                                             <div class="left column">
-                                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button">
+                                                <div ng-click="vm.showImageCreateDialog()" class="ui small green labeled icon button" id="create-new-image-button">
                                                     <i class="plus icon"></i>Add Image
                                                 </div>
                                             </div>
