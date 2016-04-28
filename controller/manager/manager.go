@@ -1419,7 +1419,6 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		}
 		//we check if the image(s) we want to test exist(s) locally and pull them if not
 		// we change the build's buildStatus to submitted
-		build.Config.Targets = targetArtifacts
 		build.Status = &model.BuildStatus{Status: "new"}
 		// we add the build to the table in rethink db
 
