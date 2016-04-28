@@ -167,7 +167,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		report.Features = append(report.Features, myFeature)
 	}
 
-	buildResult.ResultEntries[report.ImageName] = json.Marshal(report)
+	buildResult.ResultEntries[report.ImageName] = report
 	if isSafe {
 		log.Debugf("Bravo, your image looks SAFE !")
 		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")
