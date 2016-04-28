@@ -14,11 +14,21 @@ func (a *Api) dockerhubSearch(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("q")
 	fmt.Printf("query:" + query)
 
-	response, _ := http.Get("https://index.docker.io/v1/search?q=" + query)
-	defer response.Body.Close()
-	contents, _ := ioutil.ReadAll(response.Body)
+	response, err := http.Get("https://index.docker.io/v1/search?q=" + query)
+	if err != nil {
+		http.Error(w, err.Error(), response.StatusCode)
+		return
+	}
 
-	fmt.Fprintf(w, string(contents))
+	defer response.Body.Close()
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		http.Error(w, err.Error(), response.StatusCode)
+		return
+	}
+
+	w.Write(contents)
 }
 
 // get the tags of an image from dockerhub
@@ -26,10 +36,21 @@ func (a *Api) dockerhubTags(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
 	repo := r.URL.Query().Get("r")
-	fmt.Printf("repo:" + repo)
 
-	response, _ := http.Get("https://registry.hub.docker.com/v1/repositories/" + repo + "/tags")
+	response, err := http.Get("https://registry.hub.docker.com/v1/repositories/" + repo + "/tags")
+	if err != nil {
+		http.Error(w, err.Error(), response.StatusCode)
+		return
+	}
+
 	defer response.Body.Close()
-	contents, _ := ioutil.ReadAll(response.Body)
-	fmt.Fprintf(w, string(contents))
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		http.Error(w, err.Error(), response.StatusCode)
+		return
+	}
+
+	w.Write(contents)
 }
+
