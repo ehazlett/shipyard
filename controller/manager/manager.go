@@ -1490,6 +1490,12 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 					buildResult.BuildId = build.ID
 					buildResult.TimeStamp = time.Now()
+					for _, image := range projectImages {
+						imageCheck := image.Name + ":" + image.Tag
+						if imageCheck == thisImageName {
+							buildResult.TargetArtifact = &model.TargetArtifact{ID: image.ID, ArtifactType: "image"}
+						}
+					}
 					m.UpdateBuildResults(build.ID, buildResult)
 
 					if err != nil {
