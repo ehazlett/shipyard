@@ -144,6 +144,7 @@ type TestResult struct {
 	ImageName     string `json:"imageName" gorethink:"imageName"`
 	DockerImageId string `json:"dockerImageId" gorethink:"dockerImageId"`
 	TestId        string `json:"testId" gorethink:"testId"`
+	BuildId       string `json:"buildId" gorethink:"buildId"`
 	TestName      string `json:"testName" gorethink:"testName"`
 	Blocker       bool   `json:"blocker" gorethink:"blocker"`
 	SimpleResult
@@ -154,6 +155,7 @@ func (t *TestResult) NewTestResult(
 	imageName string,
 	dockerImageId string,
 	testId string,
+	buildId string,
 	testName string,
 	blocker bool,
 	status string,
@@ -167,6 +169,8 @@ func (t *TestResult) NewTestResult(
 	testResult.ImageName = imageName
 	testResult.DockerImageId = dockerImageId
 	testResult.TestId = testId
+	testResult.BuildId = buildId
+	testResult.TestName = testName
 	testResult.Blocker = blocker
 	testResult.Status = status
 	testResult.Date = date
