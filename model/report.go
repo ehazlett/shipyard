@@ -1,16 +1,16 @@
 package model
 
 type Report struct {
-	ImageName string    `json:"imageName"`
-	Message   string    `json:"message,omitempty"`
-	Features  []Feature `json:"features,omitempty"`
+	ImageName string     `json:"imageName"`
+	Message   string     `json:"message,omitempty"`
+	Features  []*Feature `json:"features,omitempty"`
 }
 
 type Feature struct {
-	Name            string          `json:"name"`
-	AddedBy         string          `json:"addedBy"`
-	Vulnerabilities []Vulnerability `json:"vulnerabilities,omitempty"`
-	Version         string          `json:"version"`
+	Name            string           `json:"name"`
+	AddedBy         string           `json:"addedBy"`
+	Vulnerabilities []*Vulnerability `json:"vulnerabilities,omitempty"`
+	Version         string           `json:"version"`
 }
 
 type Vulnerability struct {

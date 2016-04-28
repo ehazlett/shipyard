@@ -49,8 +49,7 @@ func formatImageLayerTarEndpoint(fileServerEndpoint, fileServerLayerPath, fileSe
 func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	// TODO: parse first./ 2 params from config file
 	report := model.Report{}
-	myFeature := model.Feature{}
-	myVulnerability := model.Vulnerability{}
+	//myVulnerability := &model.Vulnerability{}
 	report.ImageName = name
 	log.Debugf("starting checker...")
 	//create a new buildResult object
@@ -63,7 +62,6 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	imageName := name
 	// Save image.
 	fmt.Printf("Saving %s\n", imageName)
-	report.ImageName = imageName
 	path, err := save(imageName)
 	defer os.RemoveAll(path)
 	if err != nil {
@@ -131,7 +129,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 
 	isSafe := true
 	for _, feature := range layer.Features {
-		myFeature = model.Feature{}
+		myFeature := &model.Feature{}
 		myFeature.Name = feature.Name
 		myFeature.Version = feature.Version
 		log.Debugf("## Feature: %s %s\n", feature.Name, feature.Version)
@@ -141,7 +139,7 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 			myFeature.AddedBy = feature.AddedBy
 
 			for _, vulnerability := range feature.Vulnerabilities {
-				myVulnerability = model.Vulnerability{}
+				myVulnerability := &model.Vulnerability{}
 				log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
 				myVulnerability.Severity = vulnerability.Severity
 				myVulnerability.Name = vulnerability.Name
