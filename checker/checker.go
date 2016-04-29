@@ -144,35 +144,45 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		myFeature.Version = feature.Version
 		myFeature.AddedBy = feature.AddedBy
 		log.Debugf("## Feature: %s ## Version: %s", feature.Name, feature.Version)
-		myVulnerability := &model.Vulnerability{}
+
 		if len(feature.Vulnerabilities) > 0 {
 			isSafe = false
 			myFeature.AddedBy = feature.AddedBy
 
 			for _, vulnerability := range feature.Vulnerabilities {
-
-				myVulnerability.Severity = vulnerability.Severity
-				myVulnerability.Name = vulnerability.Name
-				log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
-				if vulnerability.Link != "" {
-					myVulnerability.Link = vulnerability.Link
+				myVulnerability := &model.Vulnerability{
+					Name:        vulnerability.Name,
+					Severity:    vulnerability.Severity,
+					Link:        vulnerability.Link,
+					Description: vulnerability.Description,
+					FixedBy:     vulnerability.FixedBy,
+					Metadata:    fmt.Sprintf("%+v", vulnerability.Metadata),
 				}
+				//myVulnerability.Severity = vulnerability.Severity
+				//myVulnerability.Name = vulnerability.Name
 
-				if vulnerability.Description != "" {
-					myVulnerability.Description = vulnerability.Description
-				}
+				/*	log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
+					if vulnerability.Link != "" {
+						myVulnerability.Link = vulnerability.Link
+					}
 
-				if vulnerability.FixedBy != "" {
-					myVulnerability.FixedBy = vulnerability.FixedBy
-				}
+					if vulnerability.Description != "" {
+						myVulnerability.Description = vulnerability.Description
+					}
 
-				if len(vulnerability.Metadata) > 0 {
-					myVulnerability.Metadata = fmt.Sprintf("%+v\n", vulnerability.Metadata)
-				}
+					if vulnerability.FixedBy != "" {
+						myVulnerability.FixedBy = vulnerability.FixedBy
+					}
+
+					if len(vulnerability.Metadata) > 0 {
+						myVulnerability.Metadata = fmt.Sprintf("%+v", vulnerability.Metadata)
+					}*/
+
 				//add vulnerability
+				myFeature.Vulnerabilities = append(myFeature.Vulnerabilities, myVulnerability)
 			}
 		}
-		myFeature.Vulnerabilities = append(myFeature.Vulnerabilities, myVulnerability)
+
 		report.Features = append(report.Features, myFeature)
 		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
 		buildResult.ResultEntries = resultEntry
