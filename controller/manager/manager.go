@@ -1407,16 +1407,20 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		if err != nil && err != ErrProjectImagesProblem {
 			return "", err
 		}
+
 		//we add the names of the matching images by comparing the ImageID with the ArtifactId
-		imageNames := []string{}
+		//imageNames := []string{}
+		imagesToBuild := []*model.Image{}
 		for _, image := range projectImages {
 			for _, artifactId := range targetIds {
 				if image.ID == artifactId {
-					imageNames = append(imageNames, image.Name+":"+image.Tag)
+					//imageNames = append(imageNames, image.Name+":"+image.Tag)
+					imagesToBuild = append(imagesToBuild, image)
 				}
 
 			}
 		}
+
 		//we check if the image(s) we want to test exist(s) locally and pull them if not
 		// we change the build's buildStatus to submitted
 		build.Status = &model.BuildStatus{Status: "new"}
@@ -1440,14 +1444,15 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		go func() {
 
 			var wg sync.WaitGroup
-			log.Printf("Processing %d image(s)", len(imageNames))
+			log.Printf("Processing %d image(s)", len(imagesToBuild))
 			// For each image that we target in the test, try to run a build / verification
-			for _, name := range imageNames {
+			for _, image := range imagesToBuild {
+				name := image.Name + ":" + image.Tag
 				log.Printf("Processing image=%s", name)
 				wg.Add(1)
 
 				// Run the verification concurrently for each image and then block to wait for all to finish.
-				go func(name string) {
+				go func(name string, image *model.Image) {
 					result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
 					result.CreateDate = time.Now()
 
@@ -1471,65 +1476,61 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 							return
 						}
 					}
+
+					// Get all local images
+					localImages, err := apiClient.GetLocalImages(m.DockerClient().URL.String())
+
 					// get the docker image id and append it to the test results
-					images, err := apiClient.GetLocalImages(m.DockerClient().URL.String())
-					for _, img := range images {
-						imageRepoTags := img.RepoTags
+					for _, localImage := range localImages {
+						imageRepoTags := localImage.RepoTags
 						for _, imageRepoTag := range imageRepoTags {
 							if imageRepoTag == thisImageName {
-								testResult.DockerImageId = img.ID
+								//image.DockerImageId = localImage.ID
+								testResult.DockerImageId = localImage.ID
+								image.ImageId = localImage.ID
 							}
 						}
 					}
-					log.Printf("Will attempt to test image %s with Clair...", thisImageName)
 
 					m.UpdateBuildStatus(build.ID, "running")
 					existingResult, _ := m.GetResults(projectId)
+
 					// Once the image is available, try to test it with Clair
-					buildResult, err := c.CheckImage(build.ID, thisImageName)
+					log.Printf("Will attempt to test image %s with Clair...", thisImageName)
+					resultsSlice, isSafe, err := c.CheckImage(image)
 
-					buildResult.BuildId = build.ID
-					buildResult.TimeStamp = time.Now()
-					for _, image := range projectImages {
-						imageCheck := image.Name + ":" + image.Tag
-						if imageCheck == thisImageName {
-							buildResult.TargetArtifact = &model.TargetArtifact{ID: image.ID, ArtifactType: "image"}
-						}
-					}
-					m.UpdateBuildResults(build.ID, buildResult)
+					targetArtifact := &model.TargetArtifact{ID: image.ID, ArtifactType: "image"}
+					buildResult := model.NewBuildResult(build.ID, targetArtifact, resultsSlice)
 
-					if err != nil {
-						m.UpdateBuildStatus(build.ID, "finished_failed")
-						testResult.SimpleResult.Status = "finished_failed"
-						testResult.EndDate = time.Now()
-						testResult.Blocker = false
-						result.TestResults = append(result.TestResults, &testResult)
-						result.LastUpdate = time.Now()
-						if existingResult != nil {
-							m.UpdateResult(projectId, result)
+					m.UpdateBuildResults(build.ID, *buildResult)
+					finishLabel := "finished_failed"
 
-						}
-						if existingResult == nil {
-							m.CreateResult(projectId, result)
-						}
-					}
-					// if we don't get an error we mark the test for the image as successful
-					if err == nil {
-						m.UpdateBuildStatus(build.ID, "finished_success")
-						testResult.SimpleResult.Status = "finished_success"
-						testResult.EndDate = time.Now()
-						testResult.Blocker = false
-						result.TestResults = append(result.TestResults, &testResult)
-						result.LastUpdate = time.Now()
-						if existingResult != nil {
-							m.UpdateResult(projectId, result)
-						}
-						if existingResult == nil {
-							m.CreateResult(projectId, result)
-						}
+					if isSafe && err == nil {
+						// if we don't get an error and we get the isSafe flag == true
+						// we mark the test for the image as successful
+						finishLabel = "finished_success"
+						log.Infof("Image %s is safe!", thisImageName)
+					} else {
+						log.Errorf("Image %s is NOT safe :(", thisImageName)
 					}
 
-				}(name)
+					m.UpdateBuildStatus(build.ID, finishLabel)
+
+					testResult.SimpleResult.Status = finishLabel
+					testResult.EndDate = time.Now()
+					testResult.Blocker = false
+					result.TestResults = append(result.TestResults, &testResult)
+					result.LastUpdate = time.Now()
+
+					if existingResult != nil {
+						m.UpdateResult(projectId, result)
+
+					}
+					if existingResult == nil {
+						m.CreateResult(projectId, result)
+					}
+
+				}(name, image)
 			}
 			// Block the outer goroutine until ALL the inner goroutines finish
 			wg.Wait()
