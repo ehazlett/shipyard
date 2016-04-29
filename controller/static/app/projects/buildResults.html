@@ -6,14 +6,45 @@
                     <div class="two column row">
                         <div class="column">
                             <h3 class="ui header">
-                                <span style="float: right">
+                                <!--<span style="float: right">
                                     <a ui-sref="dashboard.inspect" style="color: #006D95">Go To Project Results <i class="sign out icon"></i></a>
-                                </span>
+                                </span>-->
                                 <div class="content">
-                                    <i class="circle icon" ng-class=""></i>
-                                    Test Results
+                                    Clair report for image {{vm.results[0].resultEntries.imageName}}
                                 </div>
                             </h3>
+                        </div>
+                    </div>
+
+
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="column">
+                                <div class="ui dividing header"></div>
+                                <div class="six fields">
+                                    <div class="field">
+                                        <h5>{{vm.results[0].resultEntries.report.message}}</h5>
+                                    </div>
+                                </div>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th>Added by</th>
+                                        <th>Name</th>
+                                        <th>Version</th>
+                                        <th>Vulnerabilities</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="feature in vm.results[0].resultEntries.report.features" jquery>
+                                        <td>{{feature.addedBy | limitTo:12}}</td>
+                                        <td>{{feature.name}}</td>
+                                        <td>{{feature.version}}</td>
+                                        <td>{{}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 

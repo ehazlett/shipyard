@@ -11,6 +11,5 @@
 
         vm.results = buildResults;
 
-
     }
 })();

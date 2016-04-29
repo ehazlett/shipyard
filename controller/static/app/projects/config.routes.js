@@ -52,7 +52,7 @@
                 }
             })
             .state('dashboard.buildResults', {
-                url: '^/{projectId}/tests/{testId}/builds/{buildId}/results',
+                url: '^/projects/{projectId}/tests/{testId}/builds/{buildId}/results',
                 templateUrl: 'app/projects/buildResults.html',
                 controller: 'BuildResultsController',
                 controllerAs: 'vm',
