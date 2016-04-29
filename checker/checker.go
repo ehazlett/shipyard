@@ -67,6 +67,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	if err != nil {
 		log.Debugf("- Could not save image: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not save image: %s\n", err)
+		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+		buildResult.ResultEntries = resultEntry
 		return buildResult, errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
 	}
 
@@ -83,6 +85,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	if err != nil || len(layerIDs) == 0 {
 		log.Debugf("- Could not get image's history: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get image's history: %s\n", err)
+		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+		buildResult.ResultEntries = resultEntry
 		return buildResult, errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
 	}
 
@@ -103,6 +107,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		if err != nil {
 			log.Debugf("- Could not analyze layer: %s\n", err)
 			report.Message = fmt.Sprintf("- Could not analyze layer: %s\n", err)
+			resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+			buildResult.ResultEntries = resultEntry
 			return buildResult, errors.New(fmt.Sprintf("- Could not analyze layer: %s\nusing %s %s %s",
 				err, endpoint, path, layerIDs[i]))
 		}
@@ -114,6 +120,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 	if err != nil {
 		log.Printf("- Could not get layer information: %s\n", err)
 		report.Message = fmt.Sprintf("- Could not get layer information: %s\n", err)
+		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+		buildResult.ResultEntries = resultEntry
 		return buildResult, errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
 	}
 
@@ -124,6 +132,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		log.Debugf("No feature has been detected on the image.")
 		log.Debugf("This usually means that the image isn't supported by Clair.")
 		report.Message = fmt.Sprintf("No feature has been detected on the image.\nThis usually means that the image isn't supported by Clair.\n")
+		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+		buildResult.ResultEntries = resultEntry
 		return buildResult, nil
 	}
 
@@ -132,7 +142,8 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		myFeature := &model.Feature{}
 		myFeature.Name = feature.Name
 		myFeature.Version = feature.Version
-		log.Debugf("## Feature: %s %s\n", feature.Name, feature.Version)
+		myFeature.AddedBy = feature.AddedBy
+		log.Debugf("## Feature: %s ## Version: %s", feature.Name, feature.Version)
 
 		if len(feature.Vulnerabilities) > 0 {
 			isSafe = false
@@ -140,9 +151,9 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 
 			for _, vulnerability := range feature.Vulnerabilities {
 				myVulnerability := &model.Vulnerability{}
-				log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
 				myVulnerability.Severity = vulnerability.Severity
 				myVulnerability.Name = vulnerability.Name
+				log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
 				if vulnerability.Link != "" {
 					myVulnerability.Link = vulnerability.Link
 				}
@@ -163,16 +174,19 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 			}
 		}
 		report.Features = append(report.Features, myFeature)
+		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+		buildResult.ResultEntries = resultEntry
 	}
 
-	buildResult.ResultEntries.ImageName = report.ImageName
-	buildResult.ResultEntries.Report = report
 	if isSafe {
 		log.Debugf("Bravo, your image looks SAFE !")
 		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")
+		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+		buildResult.ResultEntries = resultEntry
 
 	}
-
+	resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
+	buildResult.ResultEntries = resultEntry
 	return buildResult, nil
 }
 
