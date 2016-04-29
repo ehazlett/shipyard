@@ -144,13 +144,13 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 		myFeature.Version = feature.Version
 		myFeature.AddedBy = feature.AddedBy
 		log.Debugf("## Feature: %s ## Version: %s", feature.Name, feature.Version)
-
+		myVulnerability := &model.Vulnerability{}
 		if len(feature.Vulnerabilities) > 0 {
 			isSafe = false
 			myFeature.AddedBy = feature.AddedBy
 
 			for _, vulnerability := range feature.Vulnerabilities {
-				myVulnerability := &model.Vulnerability{}
+
 				myVulnerability.Severity = vulnerability.Severity
 				myVulnerability.Name = vulnerability.Name
 				log.Debugf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
@@ -170,17 +170,17 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 					myVulnerability.Metadata = fmt.Sprintf("%+v\n", vulnerability.Metadata)
 				}
 				//add vulnerability
-				myFeature.Vulnerabilities = append(myFeature.Vulnerabilities, myVulnerability)
 			}
 		}
+		myFeature.Vulnerabilities = append(myFeature.Vulnerabilities, myVulnerability)
 		report.Features = append(report.Features, myFeature)
 		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
 		buildResult.ResultEntries = resultEntry
 	}
 
 	if isSafe {
-		log.Debugf("Bravo, your image looks SAFE !")
-		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")
+		log.Debugf("The image is safe. No vulnerabilities have been detected !")
+		report.Message = fmt.Sprintf("The image is safe. No vulnerabilities have been detected !")
 		resultEntry := &model.ResultEntry{ImageName: report.ImageName, Report: &report}
 		buildResult.ResultEntries = resultEntry
 
