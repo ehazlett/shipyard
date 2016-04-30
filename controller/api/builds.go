@@ -67,11 +67,12 @@ func (a *Api) getBuildResults(w http.ResponseWriter, r *http.Request) {
 
 	buildResults, err := a.manager.GetBuildResults(projectId, testId, buildId)
 	if err != nil {
-		log.Errorf("error retrieving build status: %s", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(buildResults); err != nil {
+	log.Info("Was able to get results in controller, now trying json marshalling")
+	if err := json.NewEncoder(w).Encode(&buildResults); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

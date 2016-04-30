@@ -1314,19 +1314,9 @@ func (m DefaultManager) GetBuilds(projectId string, testId string) ([]*model.Bui
 }
 
 func (m DefaultManager) GetBuild(projectId string, testId string, buildId string) (*model.Build, error) {
-	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
-	if err != nil {
-		return nil, err
-	}
-	if res.IsNil() {
-		return nil, ErrBuildDoesNotExist
-	}
-	var build *model.Build
-	if err := res.One(&build); err != nil {
-		return nil, err
-	}
-	return build, nil
+	return m.GetBuildById(buildId)
 }
+
 func (m DefaultManager) GetBuildById(buildId string) (*model.Build, error) {
 	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"id": buildId}).Run(m.session)
 	if err != nil {
@@ -1343,31 +1333,28 @@ func (m DefaultManager) GetBuildById(buildId string) (*model.Build, error) {
 }
 
 func (m DefaultManager) GetBuildStatus(projectId string, testId string, buildId string) (string, error) {
-	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	build, err := m.GetBuildById(buildId)
+
 	if err != nil {
+		log.Errorf("Could not get build status for build= %s err= %s", buildId, err.Error())
 		return "", err
 	}
-	if res.IsNil() {
-		return "", ErrBuildDoesNotExist
-	}
-	var build *model.Build
-	if err := res.One(&build); err != nil {
-		return "", err
+
+	if build.Status == nil {
+		errMsg := fmt.Sprintf("Could not get build status for build= %s, status is nil", buildId, err.Error())
+		log.Errorf(errMsg)
+		return "", errors.New(errMsg)
 	}
 	return build.Status.Status, nil
 }
 func (m DefaultManager) GetBuildResults(projectId string, testId string, buildId string) ([]*model.BuildResult, error) {
-	res, err := r.Table(tblNameBuilds).Filter(map[string]string{"projectId": projectId, "testId": testId, "id": buildId}).Run(m.session)
+	build, err := m.GetBuildById(buildId)
+
 	if err != nil {
+		log.Errorf("Could not get results for build= %s err= %", buildId, err.Error())
 		return nil, err
 	}
-	if res.IsNil() {
-		return nil, ErrBuildDoesNotExist
-	}
-	var build *model.Build
-	if err := res.One(&build); err != nil {
-		return nil, err
-	}
+
 	return build.Results, nil
 }
 func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction) (string, error) {

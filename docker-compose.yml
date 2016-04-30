@@ -59,8 +59,8 @@ services:
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_PASSWORD=postgres
-#    volumes:
-#     - /tmp/postgres:/var/lib/postgresql/data/pgdata
+    volumes:
+     - /tmp/postgres:/var/lib/postgresql/data/pgdata
     ports:
      - "5432:5432"
     networks:
