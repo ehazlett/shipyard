@@ -4,6 +4,12 @@ import (
 	"time"
 )
 
+const (
+	BuildStartActionLabel = "start"
+
+	BuildStatusNewLabel = "new"
+)
+
 type Build struct {
 	ID        string         `json:"id,omitempty" gorethink:"id,omitempty"`
 	StartTime time.Time      `json:"startTime,omitempty" gorethink:"startTime,omitempty"`
