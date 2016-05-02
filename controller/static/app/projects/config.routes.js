@@ -51,5 +51,19 @@
                     }]
                 }
             })
+            .state('dashboard.buildResults', {
+                url: '^/projects/{projectId}/tests/{testId}/builds/{buildId}/results',
+                templateUrl: 'app/projects/buildResults.html',
+                controller: 'BuildResultsController',
+                controllerAs: 'vm',
+                authenticate: true,
+                resolve: {
+                    buildResults: ['ProjectService', '$state', '$stateParams', function(ProjectService, $state, $stateParams) {
+                        return ProjectService.buildResults($stateParams.projectId, $stateParams.testId, $stateParams.buildId).then(null, function(errorData) {
+                            $state.go('error');
+                        });
+                    }]
+                }
+            })
     }
 })();

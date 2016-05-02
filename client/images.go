@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/shipyard/shipyard/model"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
+	"github.com/shipyard/shipyard/model"
 	"golang.org/x/net/context"
 	"io/ioutil"
 	"net/http"
@@ -20,7 +20,7 @@ func GetLocalImages(url string) ([]types.Image, error) {
 		return nil, err
 	}
 
-	images, err := cli.ImageList(context.Background(), types.ImageListOptions{All: true} )
+	images, err := cli.ImageList(context.Background(), types.ImageListOptions{All: true})
 
 	return images, err
 }

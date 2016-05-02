@@ -60,7 +60,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_PASSWORD=postgres
     volumes:
-     - /DATA/postgres/pgdata:/var/lib/postgresql/data/pgdata
+     - /tmp/postgres:/var/lib/postgresql/data/pgdata
     ports:
      - "5432:5432"
     networks:
@@ -79,6 +79,7 @@ services:
      - "6061:6061"
     depends_on:
       - postgres
+      - controller
     networks:
       - sy_network
 
