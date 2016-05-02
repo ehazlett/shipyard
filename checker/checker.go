@@ -14,8 +14,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 	"sync"
+	"time"
 )
 
 var (
@@ -48,7 +48,7 @@ func formatImageLayerTarEndpoint(fileServerEndpoint, fileServerLayerPath, fileSe
 }
 
 func cleanupStrangeCharacters(s string) string {
-	return strings.Replace(strings.Replace(s,`\"`,"",-1),`"`,"",-1)
+	return strings.Replace(strings.Replace(s, `\"`, "", -1), `"`, "", -1)
 }
 
 func CheckImage(image *model.Image) ([]string, bool, error) {
@@ -164,7 +164,7 @@ func CheckImage(image *model.Image) ([]string, bool, error) {
 		myFeature.Version = cleanupStrangeCharacters(feature.Version)
 		myFeature.AddedBy = cleanupStrangeCharacters(feature.AddedBy)
 
-		featureMsg := fmt.Sprintf("Found feature: %s, version: %s, added by: %s", feature.Name, feature.Version,feature.AddedBy)
+		featureMsg := fmt.Sprintf("Found feature: %s, version: %s, added by: %s", feature.Name, feature.Version, feature.AddedBy)
 		results = append(results, featureMsg)
 		log.Info(featureMsg)
 
@@ -181,7 +181,7 @@ func CheckImage(image *model.Image) ([]string, bool, error) {
 					Metadata:    cleanupStrangeCharacters(fmt.Sprintf("%+v", vulnerability.Metadata)),
 				}
 
-				log.Errorf("Found vulnerability %s",myVulnerability.Name)
+				log.Errorf("Found vulnerability %s", myVulnerability.Name)
 				vuls = append(vuls, myVulnerability)
 
 				//add vulnerability

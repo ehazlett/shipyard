@@ -21,7 +21,7 @@ type Result struct {
 	TestResults    []*TestResult `json:"testResults" gorethink:"testResults"`
 }
 
-func (r *Result) NewResult(
+func NewResult(
 	projectId string,
 	description string,
 	buildId string,
@@ -150,7 +150,7 @@ type TestResult struct {
 	SimpleResult
 }
 
-func (t *TestResult) NewTestResult(
+func NewTestResult(
 	imageId string,
 	imageName string,
 	buildId string,

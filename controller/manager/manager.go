@@ -1440,9 +1440,20 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 
 				// Run the verification concurrently for each image and then block to wait for all to finish.
 				go func(name string, image *model.Image) {
-					result := &model.Result{BuildId: build.ID, Author: "author", ProjectId: projectId, Description: project.Description, Updater: "author"}
-					result.CreateDate = time.Now()
+					// TODO: need to revisit API spec, there are just too many redundant "Result" types stored,
+					// TODO: these should probably just be views of the BuildResults
+					// TODO: need to set the author to the real user
+					// TODO: use model.NewResult() instead
+					result := &model.Result{
+						BuildId:     build.ID,
+						Author:      "author",
+						ProjectId:   projectId,
+						Description: project.Description,
+						Updater:     "author",
+						CreateDate:  time.Now(),
+					}
 
+					// TODO: use model.NewTestResult() instead
 					testResult := model.TestResult{}
 					testResult.Date = time.Now()
 					testResult.TestId = test.ID
@@ -1450,6 +1461,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					testResult.TestName = test.Name
 					testResult.ImageName = name
 					testResult.BuildId = build.ID
+
 					thisImageName := name
 
 					// When the goroutine finishes, mark this wait group item as done.
@@ -1512,8 +1524,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 					if existingResult != nil {
 						m.UpdateResult(projectId, result)
 
-					}
-					if existingResult == nil {
+					} else {
 						m.CreateResult(projectId, result)
 					}
 
