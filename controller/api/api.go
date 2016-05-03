@@ -161,6 +161,7 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds", a.createBuild).Methods("POST")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds", a.getBuilds).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}", a.getBuild).Methods("GET")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}/results", a.getBuildResults).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}", a.getBuildStatus).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}/{action}", a.updateBuild).Methods("PUT")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/builds/{buildId}", a.deleteBuild).Methods("DELETE")

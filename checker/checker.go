@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -46,53 +47,57 @@ func formatImageLayerTarEndpoint(fileServerEndpoint, fileServerLayerPath, fileSe
 	return fileServerEndpoint + "/" + fileServerLayerPath + "/" + fileServerLayerId + "/layer.tar"
 }
 
-func CheckImage(buildId string, name string) (model.BuildResult, error) {
-	// TODO: parse first./ 2 params from config file
-	var report model.Report
-	var myFeature model.Feature
-	var myVulnerability model.Vulnerability
+func cleanupStrangeCharacters(s string) string {
+	return strings.Replace(strings.Replace(s, `\"`, "", -1), `"`, "", -1)
+}
 
+func CheckImage(image *model.Image) ([]string, bool, error) {
 	log.Debugf("starting checker...")
-	//create a new buildResult object
-	buildResult := model.BuildResult{}
-
 	StartImageFileServer(FILE_SERVER_ROOT)
 
+	results := []string{}
 	endpoint := CLAIR_ENDPOINT
+	imageName := image.Name + ":" + image.Tag
+	isSafe := false
 
-	imageName := name
 	// Save image.
-	fmt.Printf("Saving %s\n", imageName)
-	report.ImageName = imageName
+	log.Debugf("Saving %s", imageName)
 	path, err := save(imageName)
 	defer os.RemoveAll(path)
+
+	// Check if image could be saved
 	if err != nil {
-		fmt.Printf("- Could not save image: %s\n", err)
-		report.Message = fmt.Sprintf("- Could not save image: %s\n", err)
-		return buildResult, errors.New(fmt.Sprintf("- Could not save image: %s\n", err))
+		resultEntry := fmt.Sprintf("Could not save image: %s", err)
+
+		log.Error(resultEntry)
+
+		results = append(results, resultEntry)
+		return results, isSafe, errors.New(fmt.Sprintf("Could not save image: %s with error %s", imageName, err.Error()))
 	}
 
 	// Retrieve history.
-	fmt.Println("Getting image's history")
+	log.Debug("Getting image's history")
 	layerIDs, err := historyFromManifest(path)
 	if err != nil {
-		fmt.Printf("Could not get history from manifest\n")
+		log.Debugf("Could not get history from manifest")
 		layerIDs, err = historyFromCommand(imageName)
 	}
 
-	fmt.Printf("Layer IDs = %v\n", layerIDs)
+	log.Debugf("Layer IDs = %v", layerIDs)
 
 	if err != nil || len(layerIDs) == 0 {
-		fmt.Printf("- Could not get image's history: %s\n", err)
-		report.Message = fmt.Sprintf("- Could not get image's history: %s\n", err)
-		return buildResult, errors.New(fmt.Sprintf("- Could not get image's history: %s\n", err))
+		resultEntry := fmt.Sprintf("Could not get history for image %s: %s", imageName, err.Error())
+		log.Debugf(resultEntry)
+		results = append(results, resultEntry)
+		return results, isSafe, errors.New(resultEntry)
 	}
 
-	// Analyze layers.
-	fmt.Printf("Analyzing %d layers\n", len(layerIDs))
+	// Analyze all layers.
+	log.Debugf("Analyzing %d layers", len(layerIDs))
 	pathWithoutRoot := strings.TrimPrefix(path, FILE_SERVER_ROOT)
+	layerAnalysisErrors := []string{}
 	for i := 0; i < len(layerIDs); i++ {
-		fmt.Printf("- Analyzing %s\n", layerIDs[i])
+		log.Debugf("- Analyzing %s", layerIDs[i])
 
 		remaining := ""
 		var err error
@@ -102,87 +107,116 @@ func CheckImage(buildId string, name string) (model.BuildResult, error) {
 
 		err = analyzeLayer(endpoint, formatImageLayerTarEndpoint(FILE_SERVER_ENDPOINT, pathWithoutRoot, layerIDs[i]), layerIDs[i], remaining)
 
+		// If there was an error, track it and continue to the next layer
 		if err != nil {
-			fmt.Printf("- Could not analyze layer: %s\n", err)
-			report.Message = fmt.Sprintf("- Could not analyze layer: %s\n", err)
-			return buildResult, errors.New(fmt.Sprintf("- Could not analyze layer: %s\nusing %s %s %s",
-				err, endpoint, path, layerIDs[i]))
+			resultEntry := fmt.Sprintf("Could not analyze layer: %s using %s %s error: %s", layerIDs[i], endpoint, path, err.Error())
+			log.Debugf(resultEntry)
+			results = append(results, resultEntry)
+			layerAnalysisErrors = append(layerAnalysisErrors, resultEntry)
+			return results, isSafe, err
 		}
+
+		// There was no error in analysis so add result
+		resultEntry := fmt.Sprintf("Successfully analyzed layer: %s using %s %s", layerIDs[i], endpoint, path)
+		results = append(results, resultEntry)
 	}
 
-	// Get vulnerabilities.
-	fmt.Println("Getting image's vulnerabilities")
-	layer, err := getLayer(endpoint, layerIDs[len(layerIDs)-1])
+	// If there was ANY error of analysis we should exit out, \
+	// but at least we will get all the results for all layers of the image
+	if len(layerAnalysisErrors) > 0 {
+		results = append(results, "Found errors in analysis of layers")
+		return results, isSafe, errors.New("Found errors in analysis of layers")
+	}
+
+	// Get features and vulnerabilities.
+	log.Debugf("Getting image %s features and vulnerabilities", imageName)
+	// TODO: why are we sending the id of the last layer only and not all Ids in a loop?
+	layerId := layerIDs[len(layerIDs)-1]
+	layer, err := getLayer(endpoint, layerId)
 	if err != nil {
-		fmt.Printf("- Could not get layer information: %s\n", err)
-		report.Message = fmt.Sprintf("- Could not get layer information: %s\n", err)
-		return buildResult, errors.New(fmt.Sprintf("- Could not get layer information: %s\n", err))
+		resultEntry := fmt.Sprintf("Could not get features and vulnerabilities for layer %s of image %s, error information %s", layer.Name, imageName, err.Error())
+		log.Errorf(resultEntry)
+		results = append(results, resultEntry)
+		return results, isSafe, errors.New(resultEntry)
 	}
 
 	// Print report.
-	fmt.Printf("\n# Clair report for image %s (%s)\n", imageName, time.Now().UTC())
+	results = append(results, fmt.Sprintf("Clair report for image %s at %s", imageName, time.Now().UTC()))
+	log.Debug(results)
 
 	if len(layer.Features) == 0 {
-		fmt.Println("No feature has been detected on the image.")
-		fmt.Println("This usually means that the image isn't supported by Clair.")
-		report.Message = fmt.Sprintf("No feature has been detected on the image.\nThis usually means that the image isn't supported by Clair.\n")
-		return buildResult, nil
+		resultEntry := fmt.Sprintf("No features were found in image %s", imageName)
+		results = append(results, resultEntry)
+		resultEntry = "Which typically means that the image is not supported by Clair."
+		results = append(results, resultEntry)
+		return results, isSafe, errors.New(resultEntry)
 	}
 
-	isSafe := true
+	var once sync.Once
+	doOnce := func() {
+		results = append(results, fmt.Sprintf("featureName,featureVersion,featureAddedBy,vulName,vulSeverity,vulLink,vulDescription,vulFixedBy,vulMetadata"))
+	}
+	vuls := []*model.Vulnerability{}
 	for _, feature := range layer.Features {
-		myFeature = model.Feature{}
-		myFeature.Name = feature.Name
-		myFeature.Version = feature.Version
-		fmt.Printf("## Feature: %s %s\n", feature.Name, feature.Version)
+
+		myFeature := &model.Feature{}
+		myFeature.Name = cleanupStrangeCharacters(feature.Name)
+		myFeature.Version = cleanupStrangeCharacters(feature.Version)
+		myFeature.AddedBy = cleanupStrangeCharacters(feature.AddedBy)
+
+		featureMsg := fmt.Sprintf("Found feature: %s, version: %s, added by: %s", feature.Name, feature.Version, feature.AddedBy)
+		results = append(results, featureMsg)
+		log.Info(featureMsg)
 
 		if len(feature.Vulnerabilities) > 0 {
-			isSafe = false
-
-			fmt.Printf("   - Added by: %s\n", feature.AddedBy)
 			myFeature.AddedBy = feature.AddedBy
-
+			once.Do(doOnce)
 			for _, vulnerability := range feature.Vulnerabilities {
-				myVulnerability = model.Vulnerability{}
-				fmt.Printf("### (%s) %s\n", vulnerability.Severity, vulnerability.Name)
-
-				if vulnerability.Link != "" {
-					fmt.Printf("    - Link:          %s\n", vulnerability.Link)
-					myVulnerability.Link = vulnerability.Link
+				myVulnerability := &model.Vulnerability{
+					Name:        cleanupStrangeCharacters(vulnerability.Name),
+					Severity:    cleanupStrangeCharacters(vulnerability.Severity),
+					Link:        cleanupStrangeCharacters(vulnerability.Link),
+					Description: cleanupStrangeCharacters(vulnerability.Description),
+					FixedBy:     cleanupStrangeCharacters(vulnerability.FixedBy),
+					Metadata:    cleanupStrangeCharacters(fmt.Sprintf("%+v", vulnerability.Metadata)),
 				}
 
-				if vulnerability.Description != "" {
-					fmt.Printf("    - Description:   %s\n", vulnerability.Description)
-					myVulnerability.Description = vulnerability.Description
-				}
+				log.Errorf("Found vulnerability %s", myVulnerability.Name)
+				vuls = append(vuls, myVulnerability)
 
-				if vulnerability.FixedBy != "" {
-					fmt.Printf("    - Fixed version: %s\n", vulnerability.FixedBy)
-					myVulnerability.FixedBy = vulnerability.FixedBy
-				}
-
-				if len(vulnerability.Metadata) > 0 {
-					fmt.Printf("    - Metadata:      %+v\n", vulnerability.Metadata)
-					myVulnerability.Metadata = fmt.Sprintf("%+v\n", vulnerability.Metadata)
-				}
 				//add vulnerability
-				myFeature.Vulnerabilities = append(myFeature.Vulnerabilities, myVulnerability)
+				resultEntry := fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s,%s",
+					cleanupStrangeCharacters(myFeature.Name),
+					cleanupStrangeCharacters(myFeature.Version),
+					cleanupStrangeCharacters(myFeature.AddedBy),
+					myVulnerability.Name,
+					myVulnerability.Severity,
+					myVulnerability.Link,
+					myVulnerability.Description,
+					myVulnerability.FixedBy,
+					//myVulnerability.Metadata,
+				)
+				results = append(results, resultEntry)
 			}
 		}
-		report.Features = append(report.Features, myFeature)
 	}
 
-	if isSafe {
-		fmt.Println("\nBravo, your image looks SAFE !")
-		report.Message = fmt.Sprintf("Bravo, your image looks SAFE !")
+	vulLen := len(vuls)
+	resultEntry := "Clair results summary:"
+	results = append(results, resultEntry)
+
+	// If we found NO vulnerabilties then we mark the image check as SAFE
+	resultLabel := "FAILURE:"
+	if vulLen == 0 {
+		// The only place were the image is marked as Safe
+		isSafe = true
+		resultLabel = "SUCCESS:"
 	}
-	// what we know
-	buildResult.BuildId = buildId
-	buildResult.TimeStamp = time.Now()
-	buildResult.ResultEntries = map[string]interface{}{
-		report.ImageName: report,
-	}
-	return buildResult, nil
+	results = append(results, fmt.Sprintf("%s Clair found %d vulnerabilties in image %s.", resultLabel, vulLen, imageName))
+
+	// We return nil for error since there was no execution error.
+	// This is regardless of finding vulnerabilities or not.
+	return results, isSafe, nil
 }
 
 func save(imageName string) (string, error) {
@@ -286,7 +320,7 @@ func listenHTTP(path string, port string) {
 	}
 	err := http.ListenAndServe(":"+port, http.FileServer(http.Dir(path)))
 	if err != nil {
-		fmt.Printf("- An error occured with the HTTP server: %s\n", err)
+		fmt.Printf("- An error occured with the HTTP server: %s\n", err.Error())
 		return
 	}
 }
@@ -306,7 +340,6 @@ func analyzeLayer(clairEndpoint, layerEndpoint, layerName, parentLayerName strin
 		return err
 	}
 	requestEndpoint := clairEndpoint + postLayerURI
-	log.Printf("Sending request to endpoint %s to analyze %s", requestEndpoint, layerName)
 
 	request, err := http.NewRequest("POST", requestEndpoint, bytes.NewBuffer(jsonPayload))
 	if err != nil {

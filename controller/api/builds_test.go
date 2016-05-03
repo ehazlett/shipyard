@@ -61,9 +61,9 @@ var (
 				ID:           "id",
 				ArtifactType: "image",
 			},
-			ResultEntries: map[string]interface{}{
-				"key1": "val1",
-				"key2": "val2",
+			ResultEntries: []string{
+				"result entry 1",
+				"result entry 2",
 			},
 		},
 	}
@@ -74,9 +74,9 @@ var (
 				ID:           "id2",
 				ArtifactType: "image2",
 			},
-			ResultEntries: map[string]interface{}{
-				"key1": "val1",
-				"key2": "val2",
+			ResultEntries: []string{
+				"result entry 3",
+				"result entry 4",
 			},
 		},
 	}

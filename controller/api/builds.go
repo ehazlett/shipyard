@@ -59,7 +59,24 @@ func (a *Api) getBuildStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+func (a *Api) getBuildResults(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectId := vars["projectId"]
+	testId := vars["testId"]
+	buildId := vars["buildId"]
 
+	buildResults, err := a.manager.GetBuildResults(projectId, testId, buildId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Info("Was able to get results in controller, now trying json marshalling")
+	if err := json.NewEncoder(w).Encode(&buildResults); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
 func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projId := vars["projectId"]

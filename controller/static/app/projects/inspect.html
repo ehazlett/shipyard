@@ -11,8 +11,7 @@
         <div class="active item">
             <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'yellow' : 'red'"></i>{{vm.results.buildId}}
         </div>
-</div>
-
+        </div>
     </div>
 </div>
 <!--Leaving pusher in case we need it-->
@@ -105,6 +104,7 @@
                                     <tr>
                                         <th class="collapsing"><i class="heartbeat icon"></i></th>
                                         <th>Test ID</th>
+                                        <th>Build ID</th>
                                         <th>Blocker</th>
                                         <th>Test Name</th>
                                         <th>Image Name</th>
@@ -121,7 +121,8 @@
                                             <i class="circle icon" ng-class="test.status == 'finished_success' ? 'green' : 'red'"></i>
                                             <span class="hidden">{{test.status}}</span>
                                         </td>
-                                        <td>{{test.testId}}</td>
+                                        <td>{{test.testId | limitTo:12}}</td>
+                                        <td>{{test.buildId | limitTo:12}}</td>
                                         <td>{{test.blocker}}</td>
                                         <td>{{test.testName}}</td>
                                         <td>{{test.imageName}}</td>
@@ -134,6 +135,9 @@
                                             </div>
                                         </span></td>
                                         <td class="collapsing">
+                                            <div ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: test.testId, buildId: test.buildId})" class="basic compact blue ui icon button">
+                                                <i class="search icon"></i>
+                                            </div>
                                             <div class="basic compact blue ui icon button">
                                                 <i class="file text icon"></i>
                                             </div>
