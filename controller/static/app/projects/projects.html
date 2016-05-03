@@ -82,7 +82,8 @@
                     <td>{{a.name}}</td>
                     <td>{{a.lastRun}}</td>
                     <td class="collapsing">
-                        <div ui-sref="dashboard.inspect_project({id: a.id})" class="basic compact blue ui icon button">
+                        <div ui-sref="dashboard.inspect_project({id: a.id, projectName: a.name})" class="basic compact blue ui icon button"
+                             ng-class="{disabled: !a.isBuilt}">
                             <i class="search icon"></i>
                         </div>
                         <div class="ui right pointing dropdown">
