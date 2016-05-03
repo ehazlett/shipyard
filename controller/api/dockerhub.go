@@ -53,4 +53,3 @@ func (a *Api) dockerhubTags(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(contents)
 }
-

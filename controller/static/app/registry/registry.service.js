@@ -24,9 +24,9 @@
                     });
                 return promise;
             },
-            inspectRepository: function(registryName, repositoryName) {
+            inspectRepository: function(registryId, repositoryName, repositoryTag) {
                 var promise = $http
-                    .get('/api/registries/'+registryName +'/repositories/'+repositoryName)
+                    .get('/api/registries/'+registryId +'/repositories/'+repositoryName+':'+repositoryTag)
                     .then(function(response) {
                         return response.data;
                     });
@@ -42,15 +42,16 @@
             },
             removeRegistry: function(registry) {
                 var promise = $http
-                    .delete('/api/registries/'+registry.name)
+                    .delete('/api/registries/'+registry.id)
                     .then(function(response) {
                         return response.data;
                     });
                 return promise;
             },
-            removeRepository: function(name, repo) {
+            removeRepository: function(registryId, repo) {
+                var tag = repo.tag ? ":" + repo.tag : ""
                 var promise = $http
-                    .delete('/api/registries/'+name+'/repositories/'+repo.namespace+'/'+repo.repository)
+                    .delete('/api/registries/'+registryId+'/repositories/'+repo.name+tag)
                     .then(function(response) {
                         return response.data;
                     });

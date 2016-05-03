@@ -125,11 +125,15 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 		return nil, err
 	}
 
+	log.Debugf("Response from /_catalog %s", string(data))
+
 	res := &repo{}
 	if err := json.Unmarshal(data, &res); err != nil {
 		log.Debugf("Error on json.Unmarshal(data, &res)")
 		return nil, err
 	}
+
+	log.Debugf("Repos %v", res)
 
 	repos := []*Repository{}
 
@@ -138,22 +142,29 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 		if strings.Index(k, query) == 0 {
 			tl, err := client.getTags(k)
 			if err != nil {
-				log.Debugf("Error on resp.StatusCode >= 400")
-				return nil, err
+				msg := fmt.Sprintf("Error on getting tags: %s", err.Error())
+				log.Error(msg)
+				repos = append(repos, &Repository{
+					Name:         k,
+					Tag:          "",
+					HasProblems:  true,
+					Architecture: "",
+					RegistryUrl:  client.URL.String(),
+					Message:      msg,
+				})
+				// TODO: it is ok to skip, but we should provide information to client about this.
+				continue
 			}
 
 			for _, t := range tl.Tags {
 				// get the repository and append to the slice
-				r, err := client.Repository(k, t)
+				r, err := client.Repository(client.URL.String(), k, t)
 				if err != nil {
-					// the registry will still list the tag after it has been deleted
-					// so ignore for now
-					if err == ErrNotFound {
-						continue
-					}
-					return nil, err
+					log.Errorf("There was a problem when getting the manifest from %s/%s, error = %s", k, t, err.Error())
 				}
 
+				// Add the repo even if there was an error, so that we know that it exists.
+				// The repo will just have name, tag, and mark some other fields as invalid.
 				repos = append(repos, r)
 			}
 		}
@@ -179,7 +190,7 @@ func (client *RegistryClient) DeleteRepository(repo string) error {
 }
 
 func (client *RegistryClient) DeleteTag(repo string, tag string) error {
-	r, err := client.Repository(repo, tag)
+	r, err := client.Repository(client.URL.String(), repo, tag)
 	if err != nil {
 		return err
 	}
@@ -192,24 +203,39 @@ func (client *RegistryClient) DeleteTag(repo string, tag string) error {
 	return nil
 }
 
-func (client *RegistryClient) Repository(name, tag string) (*Repository, error) {
+func (client *RegistryClient) Repository(registryUrl, name, tag string) (*Repository, error) {
 	if tag == "" {
 		tag = "latest"
 	}
 
+	invalidRepository := &Repository{
+		Name:         name,
+		Tag:          tag,
+		HasProblems:  true,
+		Architecture: "",
+		RegistryUrl:  registryUrl,
+	}
+
 	uri := fmt.Sprintf("/%s/manifests/%s", name, tag)
 
+	log.Infof("requesting manifest for %s", uri)
 	data, hdr, err := client.doRequest("GET", uri, nil, nil)
 	if err != nil {
-		return nil, err
+		invalidRepository.Message = fmt.Sprintf("Error when getting manifest for %s, error = %s", uri, err.Error())
+		log.Error(invalidRepository.Message)
+		return invalidRepository, err
 	}
 
 	repo := &Repository{}
 	if err := json.Unmarshal(data, &repo); err != nil {
-		return nil, err
+		invalidRepository.Message = fmt.Sprintf("Error when binding manifests for %s, error = %s", uri, err.Error())
+		log.Error(invalidRepository.Message)
+		return invalidRepository, err
 	}
 
+	repo.RegistryUrl = registryUrl
 	repo.Digest = hdr.Get("Docker-Content-Digest")
+	log.Infof("Got docker content digest %s", repo.Digest)
 	return repo, nil
 }
 
@@ -217,9 +243,11 @@ func (client *RegistryClient) getTags(repo string) (*TagList, error) {
 	uri := fmt.Sprintf("/%s/tags/list", repo)
 	data, _, err := client.doRequest("GET", uri, nil, nil)
 	if err != nil {
+		log.Errorf("There was an error when requesting tags for %s, error = %s", uri, err.Error())
 		return nil, err
 	}
 
+	log.Debugf("Tags received %s", string(data))
 	tl := &TagList{}
 	if err := json.Unmarshal(data, &tl); err != nil {
 		return nil, err

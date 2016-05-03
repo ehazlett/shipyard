@@ -860,8 +860,8 @@ func (m DefaultManager) Registries() ([]*model.Registry, error) {
 	return registries, nil
 }
 
-func (m DefaultManager) Registry(name string) (*model.Registry, error) {
-	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"name": name}).Run(m.session)
+func (m DefaultManager) Registry(id string) (*model.Registry, error) {
+	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"id": id}).Run(m.session)
 	if err != nil {
 		return nil, err
 

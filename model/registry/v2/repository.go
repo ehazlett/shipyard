@@ -38,5 +38,9 @@ type (
 		Architecture  string      `json:"architecture"`
 		FsLayers      []FsLayer   `json:"fsLayers"`
 		Signatures    []Signature `json:"signatures"`
+		HasProblems   bool        `json:"hasProblems"`
+		Message       string      `json:"message"`
+		RegistryUrl   string      `json:"registryUrl"`
+		RegistryName  string      `json:"registryName"`
 	}
 )

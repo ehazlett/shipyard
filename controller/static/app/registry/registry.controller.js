@@ -8,7 +8,7 @@
 	RegistryController.$inject = ['resolvedRepositories', 'RegistryService', '$state', '$stateParams', '$timeout'];
 	function RegistryController(resolvedRepositories, RegistryService, $state, $stateParams, $timeout) {
             var vm = this;
-            vm.registryName = $stateParams.name;
+            vm.registryId = $stateParams.id;
             vm.repositories = resolvedRepositories;
             vm.refresh = refresh;
             vm.selectedRepository = null;
@@ -16,7 +16,7 @@
             vm.removeRepository = removeRepository;
 
             function refresh() {
-                RegistryService.listRepositories(vm.registryName)
+                RegistryService.listRepositories(vm.registryId)
                     .then(function(data) {
                         vm.repositories = data; 
                     }, function(data) {
@@ -27,11 +27,15 @@
 
             function showRemoveRepositoryDialog(repo) {
                 vm.selectedRepository = repo;
-                $('.ui.small.remove.modal').modal('show');
+                if (vm.selectedRepository === undefined || vm.selectedRepository === null) {
+                    console.error("Could not select repository")
+                } else {
+                    $('.ui.small.remove.modal').modal('show');
+                }
             };
 
             function removeRepository() {
-                RegistryService.removeRepository(vm.registryName, vm.selectedRepository)
+                RegistryService.removeRepository(vm.registryId, vm.selectedRepository)
                     .then(function(data) {
                         vm.refresh();
                     }, function(data) {

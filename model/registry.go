@@ -3,6 +3,7 @@ package model
 import (
 	"crypto/tls"
 	registry "github.com/shipyard/shipyard/model/registry/v2"
+	"strings"
 )
 
 type Registry struct {
@@ -48,7 +49,14 @@ func (r *Registry) Repositories() ([]*registry.Repository, error) {
 }
 
 func (r *Registry) Repository(name string) (*registry.Repository, error) {
-	return r.registryClient.Repository(name, "latest")
+	repoPath := name
+	tag := "latest"
+	parts := strings.Split(name, ":")
+	if len(parts) == 2 {
+		repoPath = parts[0]
+		tag = parts[1]
+	}
+	return r.registryClient.Repository(r.Addr, repoPath, tag)
 }
 
 func (r *Registry) DeleteRepository(name string) error {
