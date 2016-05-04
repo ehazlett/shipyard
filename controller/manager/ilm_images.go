@@ -38,14 +38,15 @@ func (m DefaultManager) VerifyIfImageExistsLocally(imageToCheck string) bool {
 }
 
 func (m DefaultManager) PullImage(imageNameAndTag string) error {
+	address := ""
 	auth := dockerclient.AuthConfig{"", "", ""}
-
 	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageNameAndTag)
 	//get registry
-	match, _ := regexp.MatchString(":[0-9]{4}/", imageNameAndTag)
+	strings.Replace(imageNameAndTag, "https://", "", 1)
+	match, _ := regexp.MatchString("/", imageNameAndTag)
 	if match {
 		parts := strings.Split(imageNameAndTag, "/")
-		address := "https://" + parts[0]
+		address = "https://" + parts[0]
 
 		registry, err := m.RegistryByAddress(address)
 		auth = dockerclient.AuthConfig{registry.Username, registry.Password, ""}
@@ -136,7 +137,9 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 			"name":           image.Name,
 			"imageId":        image.ImageId,
 			"tag":            image.Tag,
+			"ilmTags":        image.IlmTags,
 			"description":    image.Description,
+			"registry":       image.Registry,
 			"location":       image.Location,
 			"skipImageBuild": image.SkipImageBuild,
 			"projectId":      image.ProjectId,
@@ -149,6 +152,26 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 	}
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s", image.ID), []string{"security"})
+	return nil
+}
+func (m DefaultManager) UpdateImageIlmTags(projectId string, imageId string, ilmTag string) error {
+	var eventType string
+	// check if exists; if so, update
+	rez, err := m.GetImage(projectId, imageId)
+	if err != nil && err != ErrImageDoesNotExist {
+		return err
+	}
+	// update
+	if rez != nil {
+		rez.IlmTags = append(rez.IlmTags, ilmTag)
+		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Update(rez).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-image"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", imageId), []string{"security"})
 	return nil
 }
 

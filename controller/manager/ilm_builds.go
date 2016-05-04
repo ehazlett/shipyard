@@ -151,8 +151,15 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		var wg sync.WaitGroup
 		log.Printf("Processing %d image(s)", len(imagesToBuild))
 		// For each image that we target in the test, try to run a build / verification
+		name := ""
 		for _, image := range imagesToBuild {
-			name := image.Name + ":" + image.Tag
+			// If the registry field for an image is a shipyard registry, then the image name will be prefixed by the registry name,
+			// in order for the image to be pulled from the correct location
+			if image.Registry != "" {
+				name = image.Registry + "/" + image.Name + ":" + image.Tag
+			}
+			// if the registry field is empty, we will pull the image from the public registry
+			name = image.Name + ":" + image.Tag
 			log.Printf("Processing image=%s", name)
 			wg.Add(1)
 
@@ -258,8 +265,12 @@ func (m DefaultManager) executeBuildTask(
 		// if we don't get an error and we get the isSafe flag == true
 		// we mark the test for the image as successful
 		finishLabel = "finished_success"
+		// if the test is successful, we update the images' ilm tags with the test tags we defined in the case of a success
+		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnSuccess)
 		log.Infof("Image %s is safe!", thisImageName)
 	} else {
+		// if the test is failed, we update the images' ilm tags with the test tags we defined in the case of a failure
+		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnFailure)
 		log.Errorf("Image %s is NOT safe :(", thisImageName)
 	}
 

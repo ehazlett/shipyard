@@ -119,6 +119,7 @@ type (
 		GetImage(projectId, imageId string) (*model.Image, error)
 		CreateImage(projectId string, image *model.Image) error
 		UpdateImage(projectId string, image *model.Image) error
+		UpdateImageIlmTags(projectId string, imageId string, ilmTag string) error
 		DeleteImage(projectId string, imageId string) error
 		DeleteAllImages() error
 
