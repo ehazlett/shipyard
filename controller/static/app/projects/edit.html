@@ -249,9 +249,9 @@
                                     </div>
 
                                     <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="four wide field">
-                                        <label>Registry {{vm.editImage.registry}}</label>
+                                        <label>Registry</label>
                                         <select name="registry_name" ng-model="vm.editImage.registry" class="ui search fluid dropdown registry">
-                                            <option value="">{{vm.editImage.registry}}</option>
+                                            <option value="">{{(vm.registries | filter:{'id': vm.editImage.registry}:true)[0].name}}</option>
                                             <option ng-repeat="r in vm.registries" value="{{r.id}}">{{r.name}}</option>
                                         </select>
                                     </div>

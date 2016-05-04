@@ -518,7 +518,7 @@
                     });
             }
             if(image.location === "Shipyard Registry") {
-                getShipyardImages(image.id);
+                getShipyardImages(image.registry);
                 vm.editImageTagSpin = false;
             }
             $('#edit-project-image-edit-modal-'+vm.randomEditId)
