@@ -166,6 +166,7 @@
         $(".ui.search.fluid.dropdown.registry")
             .dropdown({
                 onChange: function(value, text, $selectedItem) {
+                    console.log("heres registyr: " + vm.createImage.registry);
                     $('#edit-project-image-create-modal-'+vm.project.id).find("input").val("");
                     $('.ui.search.fluid.dropdown.image').dropdown('restore defaults');
                     $('.ui.search.fluid.dropdown.tag').dropdown('restore defaults');
@@ -176,7 +177,7 @@
                     vm.editImage.name = "";
                     vm.editImage.tag = "";
                     vm.editImage.description = "";
-                    getShipyardImages(text);
+                    getShipyardImages(value);
                 }
             });
         $(".ui.selection.fluid.dropdown.tag.create")
@@ -517,7 +518,7 @@
                     });
             }
             if(image.location === "Shipyard Registry") {
-                getShipyardImages(image.registry);
+                getShipyardImages(image.id);
                 vm.editImageTagSpin = false;
             }
             $('#edit-project-image-edit-modal-'+vm.randomEditId)

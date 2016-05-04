@@ -49,7 +49,7 @@
                 return promise;
             },
             removeRepository: function(registryId, repo) {
-                var tag = repo.tag ? ":" + repo.tag : ""
+                var tag = repo.tag ? ":" + repo.tag : "";
                 var promise = $http
                     .delete('/api/registries/'+registryId+'/repositories/'+repo.name+tag)
                     .then(function(response) {

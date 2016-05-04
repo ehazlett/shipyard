@@ -87,7 +87,7 @@
                                         <label>Registry </label>
                                         <select name="registry_name" ng-model="vm.createImage.registry" class="ui search fluid dropdown registry">
                                             <option value="">Registry Name</option>
-                                            <option ng-repeat="r in vm.registries" value="{{r.name}}">{{r.name}}</option>
+                                            <option ng-repeat="r in vm.registries" value="{{r.id}}">{{r.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.createImage.location === 'Shipyard Registry'" class="four wide field">
@@ -249,10 +249,10 @@
                                     </div>
 
                                     <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="four wide field">
-                                        <label>Registry </label>
+                                        <label>Registry {{vm.editImage.registry}}</label>
                                         <select name="registry_name" ng-model="vm.editImage.registry" class="ui search fluid dropdown registry">
                                             <option value="">{{vm.editImage.registry}}</option>
-                                            <option ng-repeat="r in vm.registries" value="{{r.name}}">{{r.name}}</option>
+                                            <option ng-repeat="r in vm.registries" value="{{r.id}}">{{r.name}}</option>
                                         </select>
                                     </div>
                                     <div ng-show="vm.editImage.location === 'Shipyard Registry'" class="four wide field">
