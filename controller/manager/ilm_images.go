@@ -7,8 +7,6 @@ import (
 	"github.com/samalba/dockerclient"
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
-	"regexp"
-	"strings"
 	"time"
 )
 
@@ -37,36 +35,23 @@ func (m DefaultManager) VerifyIfImageExistsLocally(imageToCheck string) bool {
 	return false
 }
 
-func (m DefaultManager) PullImage(imageNameAndTag string) error {
-	auth := dockerclient.AuthConfig{"", "", ""}
+func (m DefaultManager) PullImage(imageNameTag, address, username, password string) error {
+	auth := dockerclient.AuthConfig{username, password, ""}
 
-	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageNameAndTag)
-	//get registry
-	match, _ := regexp.MatchString(":[0-9]{4}/", imageNameAndTag)
-	if match {
-		parts := strings.Split(imageNameAndTag, "/")
-		address := "https://" + parts[0]
-
-		registry, err := m.RegistryByAddress(address)
-		auth = dockerclient.AuthConfig{registry.Username, registry.Password, ""}
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-	}
+	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageNameTag)
 	ticker := time.NewTicker(time.Second * 15)
 	go func() {
 		for t := range ticker.C {
 			fmt.Print("Time: ", t.UTC())
-			fmt.Printf(" Pulling image: %s. Please be patient while the process finishes ... \n", imageNameAndTag)
+			fmt.Printf(" Pulling image: %s. Please be patient while the process finishes ... \n", imageNameTag)
 		}
 	}()
-	err2 := m.client.PullImage(imageNameAndTag, &auth)
+	err := m.client.PullImage(constructPullableImageName(imageNameTag, address), &auth)
 
-	if err2 != nil {
-		fmt.Printf("Could not pull image %s ... \n %s \n", imageNameAndTag, err2)
-		return err2
+	if err != nil {
+		fmt.Printf("Could not pull image %s ... \n %s \n", imageNameTag, err)
 		ticker.Stop()
+		return err
 	}
 	ticker.Stop()
 
@@ -136,7 +121,9 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 			"name":           image.Name,
 			"imageId":        image.ImageId,
 			"tag":            image.Tag,
+			"ilmTags":        image.IlmTags,
 			"description":    image.Description,
+			"registryId":     image.RegistryId,
 			"location":       image.Location,
 			"skipImageBuild": image.SkipImageBuild,
 			"projectId":      image.ProjectId,
@@ -149,6 +136,26 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 	}
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s", image.ID), []string{"security"})
+	return nil
+}
+func (m DefaultManager) UpdateImageIlmTags(projectId string, imageId string, ilmTag string) error {
+	var eventType string
+	// check if exists; if so, update
+	rez, err := m.GetImage(projectId, imageId)
+	if err != nil && err != ErrImageDoesNotExist {
+		return err
+	}
+	// update
+	if rez != nil {
+		rez.IlmTags = append(rez.IlmTags, ilmTag)
+		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Update(rez).RunWrite(m.session); err != nil {
+			return err
+		}
+
+		eventType = "update-image"
+	}
+
+	m.logEvent(eventType, fmt.Sprintf("id=%s", imageId), []string{"security"})
 	return nil
 }
 
