@@ -7,7 +7,7 @@ type Image struct {
 	Tag            string   `json:"tag" gorethink:"tag"`
 	IlmTags        []string `json:"ilmTags" gorethink:"ilmTags"`
 	Description    string   `json:"description" gorethink:"description"`
-	RegistryId     string   `json:"registry" gorethink:"registry"`
+	RegistryId     string   `json:"registryId" gorethink:"registryId"`
 	Location       string   `json:"location" gorethink:"location"`
 	SkipImageBuild bool     `json:"skipImageBuild" gorethink:"skipImageBuild"`
 	ProjectId      string   `json:"projectId" gorethink:"projectId"`
