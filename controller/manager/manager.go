@@ -821,6 +821,10 @@ func (m DefaultManager) PingRegistry(registry *model.Registry) error {
 
 func (m DefaultManager) AddRegistry(registry *model.Registry) error {
 
+	if err := registry.InitRegistryClient(); err != nil {
+		return err
+	}
+
 	// TODO: consider not doing a test on adding the record, perhaps have a pingRegistry route that does this through API.
 	if err := m.PingRegistry(registry); err != nil {
 		log.Error(err)
@@ -861,6 +865,12 @@ func (m DefaultManager) Registries() ([]*model.Registry, error) {
 		return nil, err
 	}
 
+	for _, registry := range regs {
+		if err := registry.InitRegistryClient(); err != nil {
+			log.Errorf("%s", err.Error())
+		}
+	}
+
 	return regs, nil
 }
 
@@ -876,6 +886,11 @@ func (m DefaultManager) Registry(id string) (*model.Registry, error) {
 	var reg *model.Registry
 	if err := res.One(&reg); err != nil {
 		return nil, err
+	}
+
+	if err := reg.InitRegistryClient(); err != nil {
+		log.Errorf("%s", err.Error())
+		return reg, err
 	}
 
 	return reg, nil
@@ -894,6 +909,11 @@ func (m DefaultManager) RegistryByAddress(addr string) (*model.Registry, error) 
 	if err := res.One(&reg); err != nil {
 		log.Debugf("problem with res.One")
 		return nil, err
+	}
+
+	if err := reg.InitRegistryClient(); err != nil {
+		log.Errorf("%s", err.Error())
+		return reg, err
 	}
 
 	return reg, nil

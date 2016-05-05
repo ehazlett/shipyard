@@ -39,6 +39,23 @@ func NewRegistry(id, name, addr, username, password string, tls_skip_verify bool
 	}, nil
 }
 
+func (r *Registry) InitRegistryClient() error {
+	var tlsConfig *tls.Config
+
+	if r.TlsSkipVerify {
+		tlsConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+
+	rClient, err := registry.NewRegistryClient(r.Addr, tlsConfig, r.Username, r.Password)
+	if err != nil {
+		return err
+	}
+
+	r.registryClient = rClient
+
+	return nil
+}
+
 func (r *Registry) Repositories() ([]*registry.Repository, error) {
 	res, err := r.registryClient.Search("")
 	if err != nil {
