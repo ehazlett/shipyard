@@ -8,12 +8,23 @@ type Image struct {
 	IlmTags        []string `json:"ilmTags" gorethink:"ilmTags"`
 	Description    string   `json:"description" gorethink:"description"`
 	RegistryId     string   `json:"registryId" gorethink:"registryId"`
+	RegistryDomain string   `json:"-" gorethink:"registryDomain"`
 	Location       string   `json:"location" gorethink:"location"`
 	SkipImageBuild bool     `json:"skipImageBuild" gorethink:"skipImageBuild"`
 	ProjectId      string   `json:"projectId" gorethink:"projectId"`
 }
 
-func (i *Image) NewImage(name string, imageId string, tag string, ilmTags []string, description string, registryId string, location string, skipImageBuild bool, projectId string) *Image {
+func NewImage(
+	name string,
+	imageId string,
+	tag string,
+	ilmTags []string,
+	description string,
+	registryId string,
+	location string,
+	skipImageBuild bool,
+	projectId string,
+) *Image {
 
 	image := new(Image)
 	image.Name = name
@@ -27,4 +38,12 @@ func (i *Image) NewImage(name string, imageId string, tag string, ilmTags []stri
 	image.ProjectId = projectId
 
 	return image
+}
+
+func (i *Image) PullableName() string {
+	prefix := ""
+	if i.RegistryDomain != "" {
+		prefix = i.RegistryDomain + "/"
+	}
+	return prefix + i.Name + ":" + i.Tag
 }

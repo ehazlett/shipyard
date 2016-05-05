@@ -44,8 +44,7 @@ func GetImages(authHeader, url string) ([]model.Image, error) {
 
 func CreateImage(authHeader string, url string, name string, imageId string, tag string, ilmtags []string, description string, registryId string, location string, skipImageBuild bool, projectId string) (string, error) {
 
-	var image *model.Image
-	image = image.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
+	image := model.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
 	//make a request to create it
 	data, err := json.Marshal(image)
 	if err != nil {
@@ -70,8 +69,7 @@ func CreateImage(authHeader string, url string, name string, imageId string, tag
 
 func UpdateImage(authHeader string, url string, id string, name string, imageId string, tag string, ilmtags []string, description string, registryId string, location string, skipImageBuild bool, projectId string) error {
 
-	var image *model.Image
-	image = image.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
+	image := model.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
 	image.ID = id
 	data, err := json.Marshal(image)
 	if err != nil {

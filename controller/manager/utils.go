@@ -2,31 +2,12 @@ package manager
 
 import (
 	"crypto/sha256"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/hex"
 	"strings"
 	"time"
 
 	"github.com/shipyard/shipyard/model"
 )
-
-func getTLSConfig(caCert, sslCert, sslKey []byte) (*tls.Config, error) {
-	// TLS config
-	var tlsConfig tls.Config
-	tlsConfig.InsecureSkipVerify = true
-	certPool := x509.NewCertPool()
-
-	certPool.AppendCertsFromPEM(caCert)
-	tlsConfig.RootCAs = certPool
-	cert, err := tls.X509KeyPair(sslCert, sslKey)
-	if err != nil {
-		return &tlsConfig, err
-	}
-	tlsConfig.Certificates = []tls.Certificate{cert}
-
-	return &tlsConfig, nil
-}
 
 func generateId(n int) string {
 	hash := sha256.New()
@@ -102,13 +83,6 @@ func parseClusterNodes(driverStatus [][]string) ([]*model.Node, error) {
 	}
 
 	return nodes, nil
-}
-
-func constructPullableImageName(imageNameTag, registryAddress string) string {
-	if registryAddress == "" {
-		return imageNameTag
-	}
-	return formatRegistryDomain(registryAddress) + "/" + imageNameTag
 }
 
 func formatRegistryDomain(registryAddress string) string {

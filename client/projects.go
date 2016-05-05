@@ -110,10 +110,10 @@ func DeleteProject(authHeader, url, id string) (int, error) {
 	return resp.StatusCode, nil
 }
 
-func AddProjectImage(authHeader, url, projectId string, name string, imageId string, tag string, ilmtags []string, description string, registryId string, location string, skipImageBuild bool) (int, error) {
+func AddProjectImage(authHeader, url, projectId string, name string, imageId string, tag string, ilmtags []string,
+	description string, registryId string, location string, skipImageBuild bool) (int, error) {
 
-	var image *model.Image
-	newImage := image.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
+	newImage := model.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
 
 	data, err := json.Marshal(newImage)
 	if err != nil {
