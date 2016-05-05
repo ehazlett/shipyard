@@ -113,7 +113,7 @@ type (
 		DeleteAllProjects() error
 
 		VerifyIfImageExistsLocally(imageToCheck string) bool
-		PullImage(imageToCheck string) error
+		PullImage(imageNameTag, address, username, password string) error
 
 		GetImages(projectId string) ([]*model.Image, error)
 		GetImage(projectId, imageId string) (*model.Image, error)

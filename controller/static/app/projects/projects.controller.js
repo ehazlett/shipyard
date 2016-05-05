@@ -25,6 +25,7 @@
         vm.refresh = refresh;
         vm.checkAll = checkAll;
         vm.clearAll = clearAll;
+        vm.isProjectBuilt = isProjectBuilt;
 
         vm.showDeleteProjectDialog = showDeleteProjectDialog;
         vm.destroyProject = destroyProject;
@@ -84,8 +85,11 @@
             ProjectService.list()
                 .then(function(data) {
                     vm.projects = data;
-                    angular.forEach(vm.projects, function (project) {
+                    angular.forEach(vm.projects, function (project, key) {
                         vm.selected[project.id] = {Id: project.id, Selected: vm.selectedAll};
+                        isProjectBuilt(project.id).then(function (result) {
+                            vm.projects[key].isBuilt = result;
+                        })
                     });
                 }, function(data) {
                     vm.error = data;
@@ -127,6 +131,15 @@
                     vm.error = data;
                 });
         }
-        
+
+        function isProjectBuilt(id) {
+            return ProjectService.results(id)
+                .then(function(data) {
+                    return true;
+                }, function(data) {
+                    return false;
+                });
+        }
+
     }
 })();

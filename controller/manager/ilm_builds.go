@@ -153,12 +153,6 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		// For each image that we target in the test, try to run a build / verification
 		name := ""
 		for _, image := range imagesToBuild {
-			// If the registry field for an image is a shipyard registry, then the image name will be prefixed by the registry name,
-			// in order for the image to be pulled from the correct location
-			if image.Registry != "" {
-				name = image.Registry + "/" + image.Name + ":" + image.Tag
-			}
-			// if the registry field is empty, we will pull the image from the public registry
 			name = image.Name + ":" + image.Tag
 			log.Printf("Processing image=%s", name)
 			wg.Add(1)
@@ -184,6 +178,7 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 }
 
 // Executes a BuilTask in the background as part of a wait group.
+// TODO: We should probably remove the `name` param as we already have the corresponding image object
 func (m DefaultManager) executeBuildTask(
 	project *model.Project,
 	test *model.Test,
@@ -214,17 +209,43 @@ func (m DefaultManager) executeBuildTask(
 	testResult.ImageName = name
 	testResult.BuildId = build.ID
 
-	thisImageName := name
+	associatedRegistry, err := func(id string) (*model.Registry, error) {
+		if image.RegistryId != "" {
+			registry, err := m.Registry(id)
+			if err != nil {
+				return nil, err
+			}
+			return registry, nil
+		} else {
+			return nil, nil
+		}
+	}(image.RegistryId)
+
+	if err != nil {
+		log.Errorf("Error locating registry with id %s", image.RegistryId)
+		return
+	}
+
+	var imageNameTag string = image.Name + ":" + image.Tag
+	var address string
+	var username string
+	var password string
+
+	if associatedRegistry != nil {
+		address = associatedRegistry.Addr
+		username = associatedRegistry.Username
+		password = associatedRegistry.Password
+	}
 
 	// When the goroutine finishes, mark this wait group item as done.
 	// TODO: perhaps do this only if wg != nil?
 	defer wg.Done()
 
 	// Check to see if the image exists locally, if not, try to pull it.
-	if !m.VerifyIfImageExistsLocally(thisImageName) {
-		log.Printf("Image %s not available locally, will try to pull...", thisImageName)
-		if err := m.PullImage(thisImageName); err != nil {
-			log.Errorf("Error pulling image %s", thisImageName)
+	if !m.VerifyIfImageExistsLocally(imageNameTag) {
+		log.Printf("Image %s not available locally, will try to pull...", imageNameTag)
+		if err := m.PullImage(imageNameTag, address, username, password); err != nil {
+			log.Errorf("Error pulling image %s", imageNameTag)
 			return
 		}
 	}
@@ -236,7 +257,7 @@ func (m DefaultManager) executeBuildTask(
 	for _, localImage := range localImages {
 		imageRepoTags := localImage.RepoTags
 		for _, imageRepoTag := range imageRepoTags {
-			if imageRepoTag == thisImageName {
+			if imageRepoTag == imageNameTag {
 				//image.DockerImageId = localImage.ID
 				testResult.DockerImageId = localImage.ID
 				image.ImageId = localImage.ID
@@ -248,7 +269,7 @@ func (m DefaultManager) executeBuildTask(
 	existingResult, _ := m.GetResults(project.ID)
 
 	// Once the image is available, try to test it with Clair
-	log.Printf("Will attempt to test image %s with Clair...", thisImageName)
+	log.Printf("Will attempt to test image %s with Clair...", imageNameTag)
 	resultsSlice, isSafe, err := c.CheckImage(image)
 
 	targetArtifact := model.NewTargetArtifact(
@@ -267,13 +288,12 @@ func (m DefaultManager) executeBuildTask(
 		finishLabel = "finished_success"
 		// if the test is successful, we update the images' ilm tags with the test tags we defined in the case of a success
 		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnSuccess)
-		log.Infof("Image %s is safe!", thisImageName)
+		log.Infof("Image %s is safe!", imageNameTag)
 	} else {
 		// if the test is failed, we update the images' ilm tags with the test tags we defined in the case of a failure
 		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnFailure)
-		log.Errorf("Image %s is NOT safe :(", thisImageName)
+		log.Errorf("Image %s is NOT safe :(", imageNameTag)
 	}
-
 	m.UpdateBuildStatus(build.ID, finishLabel)
 
 	testResult.SimpleResult.Status = finishLabel
