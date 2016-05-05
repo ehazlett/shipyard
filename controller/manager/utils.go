@@ -108,5 +108,14 @@ func constructPullableImageName(imageNameTag, registryAddress string) string {
 	if registryAddress == "" {
 		return imageNameTag
 	}
-	return registryAddress + "/" + imageNameTag
+	return formatRegistryDomain(registryAddress) + "/" + imageNameTag
+}
+
+func formatRegistryDomain(registryAddress string) string {
+	// TODO: Improve this camel-ostrich with a real regex :)
+	return strings.TrimSuffix(
+		strings.TrimPrefix(
+			strings.TrimPrefix(registryAddress, "https://"),
+			"http://",
+		), "/")
 }
