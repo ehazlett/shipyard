@@ -76,6 +76,7 @@ var (
 	ErrExtensionDoesNotExist      = errors.New("extension does not exist")
 	ErrWebhookKeyDoesNotExist     = errors.New("webhook key does not exist")
 	ErrRegistryDoesNotExist       = errors.New("registry does not exist")
+	ErrCannotPingRegistry         = errors.New("there was a problem connecting to registry")
 	ErrConsoleSessionDoesNotExist = errors.New("console session does not exist")
 	store                         = sessions.NewCookieStore([]byte(storeKey))
 )
@@ -113,7 +114,7 @@ type (
 		DeleteAllProjects() error
 
 		VerifyIfImageExistsLocally(imageToCheck string) bool
-		PullImage(imageNameTag, address, username, password string) error
+		PullImage(pullableImageName, username, password string) error
 
 		GetImages(projectId string) ([]*model.Image, error)
 		GetImage(projectId, imageId string) (*model.Image, error)
@@ -779,10 +780,11 @@ func (m DefaultManager) Node(name string) (*model.Node, error) {
 	return nil, nil
 }
 
-func (m DefaultManager) AddRegistry(registry *model.Registry) error {
+func (m DefaultManager) PingRegistry(registry *model.Registry) error {
 
 	// TODO: Please note the trailing forward slash / which is needed for Artifactory, else you get a 404.
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v2/", registry.Addr), nil)
+
 	if err != nil {
 		return err
 	}
@@ -813,10 +815,20 @@ func (m DefaultManager) AddRegistry(registry *model.Registry) error {
 		return errors.New(resp.Status)
 	}
 
+	return nil
+}
+
+func (m DefaultManager) AddRegistry(registry *model.Registry) error {
+
+	// TODO: consider not doing a test on adding the record, perhaps have a pingRegistry route that does this through API.
+	if err := m.PingRegistry(registry); err != nil {
+		log.Error(err)
+		return ErrCannotPingRegistry
+	}
+
 	if _, err := r.Table(tblNameRegistries).Insert(registry).RunWrite(m.session); err != nil {
 		return err
 	}
-
 	m.logEvent("add-registry", fmt.Sprintf("name=%s endpoint=%s", registry.Name, registry.Addr), []string{"registry"})
 
 	return nil
@@ -848,17 +860,7 @@ func (m DefaultManager) Registries() ([]*model.Registry, error) {
 		return nil, err
 	}
 
-	registries := []*model.Registry{}
-	for _, r := range regs {
-		reg, err := model.NewRegistry(r.ID, r.Name, r.Addr, r.Username, r.Password, r.TlsSkipVerify)
-		if err != nil {
-			return nil, err
-		}
-
-		registries = append(registries, reg)
-	}
-
-	return registries, nil
+	return regs, nil
 }
 
 func (m DefaultManager) Registry(id string) (*model.Registry, error) {
@@ -875,12 +877,7 @@ func (m DefaultManager) Registry(id string) (*model.Registry, error) {
 		return nil, err
 	}
 
-	registry, err := model.NewRegistry(reg.ID, reg.Name, reg.Addr, reg.Username, reg.Password, reg.TlsSkipVerify)
-	if err != nil {
-		return nil, err
-	}
-
-	return registry, nil
+	return reg, nil
 }
 
 func (m DefaultManager) RegistryByAddress(addr string) (*model.Registry, error) {
@@ -898,13 +895,7 @@ func (m DefaultManager) RegistryByAddress(addr string) (*model.Registry, error) 
 		return nil, err
 	}
 
-	registry, err := model.NewRegistry(reg.ID, reg.Name, reg.Addr, reg.Username, reg.Password, reg.TlsSkipVerify)
-	if err != nil {
-		log.Debugf("Problem creating new registry")
-		return nil, err
-	}
-
-	return registry, nil
+	return reg, nil
 }
 
 func (m DefaultManager) CreateConsoleSession(c *model.ConsoleSession) error {

@@ -44,6 +44,7 @@ func authConfigB64(username, password, auth, email string) (string, error) {
 
 // pingRegistry Performs a *ping* to a V2 registry by it's `/v2/` endpoint
 // It returns true if the ping is successful.
+// TODO: there are two pingRegistry() funcs one in API and another one in manager. Should refactor.
 func pingRegistry(registry, username, password string) (bool, error) {
 	registryEndpoint := registry + "/v2/"
 

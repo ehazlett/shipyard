@@ -162,7 +162,6 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 				project,
 				test,
 				build,
-				name,
 				image,
 				&wg,
 			)
@@ -183,7 +182,6 @@ func (m DefaultManager) executeBuildTask(
 	project *model.Project,
 	test *model.Test,
 	build *model.Build,
-	name string,
 	image *model.Image,
 	wg *sync.WaitGroup,
 ) {
@@ -206,35 +204,20 @@ func (m DefaultManager) executeBuildTask(
 	testResult.TestId = test.ID
 	testResult.BuildId = build.ID
 	testResult.TestName = test.Name
-	testResult.ImageName = name
+	testResult.ImageName = image.PullableName()
 	testResult.BuildId = build.ID
 
-	associatedRegistry, err := func(id string) (*model.Registry, error) {
-		if image.RegistryId != "" {
-			registry, err := m.Registry(id)
-			if err != nil {
-				return nil, err
-			}
-			return registry, nil
-		} else {
-			return nil, nil
-		}
-	}(image.RegistryId)
-
-	if err != nil {
-		log.Errorf("Error locating registry with id %s", image.RegistryId)
-		return
-	}
-
-	imageNameTag := image.Name + ":" + image.Tag
-	address := ""
 	username := ""
 	password := ""
 
-	if associatedRegistry != nil {
-		address = associatedRegistry.Addr
-		username = associatedRegistry.Username
-		password = associatedRegistry.Password
+	if image.RegistryId != "" {
+		registry, err := m.Registry(image.RegistryId)
+		if err != nil {
+			log.Warnf("Could not find registry %s for image %s", image.RegistryId, image.ID)
+		} else {
+			username = registry.Username
+			password = registry.Password
+		}
 	}
 
 	// When the goroutine finishes, mark this wait group item as done.
@@ -242,10 +225,10 @@ func (m DefaultManager) executeBuildTask(
 	defer wg.Done()
 
 	// Check to see if the image exists locally, if not, try to pull it.
-	if !m.VerifyIfImageExistsLocally(imageNameTag) {
-		log.Printf("Image %s not available locally, will try to pull...", imageNameTag)
-		if err := m.PullImage(imageNameTag, address, username, password); err != nil {
-			log.Errorf("Error pulling image %s", imageNameTag)
+	if !m.VerifyIfImageExistsLocally(image.PullableName()) {
+		log.Printf("Image %s not available locally, will try to pull...", image.PullableName())
+		if err := m.PullImage(image.PullableName(), username, password); err != nil {
+			log.Errorf("Error pulling image %s", image.PullableName())
 			return
 		}
 	}
@@ -253,11 +236,12 @@ func (m DefaultManager) executeBuildTask(
 	// Get all local images
 	localImages, err := apiClient.GetLocalImages(m.DockerClient().URL.String())
 
+	// TODO: Refactor this into its own func
 	// get the docker image id and append it to the test results
 	for _, localImage := range localImages {
 		imageRepoTags := localImage.RepoTags
 		for _, imageRepoTag := range imageRepoTags {
-			if imageRepoTag == imageNameTag {
+			if imageRepoTag == image.PullableName() {
 				//image.DockerImageId = localImage.ID
 				testResult.DockerImageId = localImage.ID
 				image.ImageId = localImage.ID
@@ -269,7 +253,7 @@ func (m DefaultManager) executeBuildTask(
 	existingResult, _ := m.GetResults(project.ID)
 
 	// Once the image is available, try to test it with Clair
-	log.Printf("Will attempt to test image %s with Clair...", imageNameTag)
+	log.Printf("Will attempt to test image %s with Clair...", image.PullableName())
 	resultsSlice, isSafe, err := c.CheckImage(image)
 
 	targetArtifact := model.NewTargetArtifact(
@@ -288,11 +272,11 @@ func (m DefaultManager) executeBuildTask(
 		finishLabel = "finished_success"
 		// if the test is successful, we update the images' ilm tags with the test tags we defined in the case of a success
 		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnSuccess)
-		log.Infof("Image %s is safe!", imageNameTag)
+		log.Infof("Image %s is safe!", image.PullableName())
 	} else {
 		// if the test is failed, we update the images' ilm tags with the test tags we defined in the case of a failure
 		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnFailure)
-		log.Errorf("Image %s is NOT safe :(", imageNameTag)
+		log.Errorf("Image %s is NOT safe :(", image.PullableName())
 	}
 	m.UpdateBuildStatus(build.ID, finishLabel)
 

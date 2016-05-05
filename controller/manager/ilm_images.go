@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	r "github.com/dancannon/gorethink"
@@ -8,6 +9,11 @@ import (
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
 	"time"
+)
+
+var (
+	ErrImageWasEmpty       = errors.New("image name was empty, please pass a valid object")
+	ErrDomainNoLongerValid = "ErrorDomainNoLongerValid"
 )
 
 // check if an image exists
@@ -35,21 +41,26 @@ func (m DefaultManager) VerifyIfImageExistsLocally(imageToCheck string) bool {
 	return false
 }
 
-func (m DefaultManager) PullImage(imageNameTag, address, username, password string) error {
+func (m DefaultManager) PullImage(pullableImageName string, username, password string) error {
+	if pullableImageName == "" {
+		return ErrImageWasEmpty
+	}
 	auth := dockerclient.AuthConfig{username, password, ""}
 
-	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", imageNameTag)
+	fmt.Printf("Image does not exist locally. Pulling image %s ... \n", pullableImageName)
 	ticker := time.NewTicker(time.Second * 15)
 	go func() {
 		for t := range ticker.C {
 			fmt.Print("Time: ", t.UTC())
-			fmt.Printf(" Pulling image: %s. Please be patient while the process finishes ... \n", imageNameTag)
+			fmt.Printf(" Pulling image: %s. Please be patient while the process finishes ... \n", pullableImageName)
 		}
 	}()
-	err := m.client.PullImage(constructPullableImageName(imageNameTag, address), &auth)
+
+	// TODO: stop using samalba/dockerclient, use Docker, Inc docker engine client library instead
+	err := m.client.PullImage(pullableImageName, &auth)
 
 	if err != nil {
-		fmt.Printf("Could not pull image %s ... \n %s \n", imageNameTag, err)
+		fmt.Printf("Could not pull image %s ... \n %s \n", pullableImageName, err)
 		ticker.Stop()
 		return err
 	}
@@ -69,6 +80,10 @@ func (m DefaultManager) GetImages(projectId string) ([]*model.Image, error) {
 	if err := res.All(&images); err != nil {
 		return nil, err
 	}
+
+	for _, image := range images {
+		m.injectRegistryInfo(image)
+	}
 	return images, nil
 }
 
@@ -85,12 +100,26 @@ func (m DefaultManager) GetImage(projectId string, imageId string) (*model.Image
 		return nil, err
 	}
 
+	m.injectRegistryInfo(image)
 	return image, nil
+}
+
+func (m DefaultManager) injectRegistryInfo(image *model.Image) {
+	if image.RegistryId != "" {
+		registry, err := m.Registry(image.RegistryId)
+		domain := ErrDomainNoLongerValid
+		if err == nil {
+			domain = formatRegistryDomain(registry.Addr)
+		}
+		image.RegistryDomain = domain
+	}
 }
 
 func (m DefaultManager) CreateImage(projectId string, image *model.Image) error {
 	var eventType string
 	image.ProjectId = projectId
+
+	m.injectRegistryInfo(image)
 	response, err := r.Table(tblNameImages).Insert(image).RunWrite(m.session)
 	if err != nil {
 
@@ -116,28 +145,35 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 		return err
 	}
 	// update
-	if rez != nil {
-		updates := map[string]interface{}{
-			"name":           image.Name,
-			"imageId":        image.ImageId,
-			"tag":            image.Tag,
-			"ilmTags":        image.IlmTags,
-			"description":    image.Description,
-			"registryId":     image.RegistryId,
-			"location":       image.Location,
-			"skipImageBuild": image.SkipImageBuild,
-			"projectId":      image.ProjectId,
-		}
-		if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
-			return err
-		}
-
-		eventType = "update-image"
+	if rez == nil {
+		return ErrImageDoesNotExist
 	}
+
+	m.injectRegistryInfo(image)
+
+	// Convert struct to map and refrain from doing this manually
+	updates := map[string]interface{}{
+		"name":           image.Name,
+		"imageId":        image.ImageId,
+		"tag":            image.Tag,
+		"ilmTags":        image.IlmTags,
+		"description":    image.Description,
+		"registryId":     image.RegistryId,
+		"location":       image.Location,
+		"skipImageBuild": image.SkipImageBuild,
+		"projectId":      image.ProjectId,
+		"registryDomain": image.RegistryDomain,
+	}
+	if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
+		return err
+	}
+
+	eventType = "update-image"
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s", image.ID), []string{"security"})
 	return nil
 }
+
 func (m DefaultManager) UpdateImageIlmTags(projectId string, imageId string, ilmTag string) error {
 	var eventType string
 	// check if exists; if so, update
