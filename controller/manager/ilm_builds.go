@@ -226,10 +226,10 @@ func (m DefaultManager) executeBuildTask(
 		return
 	}
 
-	var imageNameTag string = image.Name + ":" + image.Tag
-	var address string
-	var username string
-	var password string
+	imageNameTag := image.Name + ":" + image.Tag
+	address := ""
+	username := ""
+	password := ""
 
 	if associatedRegistry != nil {
 		address = associatedRegistry.Addr

@@ -105,5 +105,8 @@ func parseClusterNodes(driverStatus [][]string) ([]*model.Node, error) {
 }
 
 func constructPullableImageName(imageNameTag, registryAddress string) string {
-	return strings.Split(registryAddress, "//")[1] + "/" + imageNameTag
+	if registryAddress == "" {
+		return imageNameTag
+	}
+	return registryAddress + "/" + imageNameTag
 }
