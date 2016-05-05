@@ -780,6 +780,7 @@ func (m DefaultManager) Node(name string) (*model.Node, error) {
 	return nil, nil
 }
 
+// TODO: this duplicated in the api package. Need to refactor into a util or client library.
 func (m DefaultManager) PingRegistry(registry *model.Registry) error {
 
 	// TODO: Please note the trailing forward slash / which is needed for Artifactory, else you get a 404.
