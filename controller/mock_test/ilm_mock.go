@@ -130,6 +130,9 @@ func (m MockManager) GetImages(projectId string) ([]*model.Image, error) {
 	return nil, nil
 }
 
-func (m MockManager) PullImage(imageNameAndTag string) error {
+func (m MockManager) PullImage(imageNameTag, address, username, password string) error {
+	return nil
+}
+func (m MockManager) UpdateImageIlmTags(projectId string, imageId string, ilmTag string) error {
 	return nil
 }

@@ -13,7 +13,17 @@ type Image struct {
 	ProjectId      string   `json:"projectId" gorethink:"projectId"`
 }
 
-func (i *Image) NewImage(name string, imageId string, tag string, ilmTags []string, description string, registryId string, location string, skipImageBuild bool, projectId string) *Image {
+func NewImage(
+	name string,
+	imageId string,
+	tag string,
+	ilmTags []string,
+	description string,
+	registryId string,
+	location string,
+	skipImageBuild bool,
+	projectId string,
+) *Image {
 
 	image := new(Image)
 	image.Name = name

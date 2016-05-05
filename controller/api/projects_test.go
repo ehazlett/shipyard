@@ -363,7 +363,20 @@ func TestAddProjectImage(t *testing.T) {
 		So(code, ShouldEqual, http.StatusCreated)
 		So(err, ShouldBeNil)
 		Convey("When we add a new image to it", func() {
-			code, err := apiClient.AddProjectImage(SY_AUTHTOKEN, ts.URL, projectId, IMAGE1_NAME, "", IMAGE1_TAG, IMAGE1_DESC, IMAGE1_LOCATION, true)
+			code, err := apiClient.AddProjectImage(
+				SY_AUTHTOKEN,
+				ts.URL,
+				projectId,
+				IMAGE1_NAME,
+				"",
+				IMAGE1_TAG,
+				[]string{"latest", "awesomeTag"},
+				IMAGE1_DESC,
+				// TODO: it would be best to actually create a new registry object first and use that id.
+				"myregistryId123423412342",
+				IMAGE1_LOCATION,
+				true,
+			)
 			Convey("Then we should get a successful response", func() {
 				So(code, ShouldEqual, http.StatusCreated)
 				So(err, ShouldBeNil)
@@ -393,8 +406,17 @@ func TestAddProjectImageViaUpdate(t *testing.T) {
 		So(project, ShouldNotBeNil)
 		So(code, ShouldEqual, http.StatusOK)
 		Convey("When we add a new image in the project structure and request an update", func() {
-			var image *model.Image
-			newImage := image.NewImage(IMAGE2_NAME, "", IMAGE2_TAG, IMAGE2_DESC, IMAGE2_LOCATION, true, "")
+			newImage := model.NewImage(
+				IMAGE2_NAME,
+				"",
+				IMAGE2_TAG,
+				[]string{"latest", "awesomeTag"},
+				IMAGE2_DESC,
+				"myAmazingRegistryId1232323123",
+				IMAGE2_LOCATION,
+				true,
+				"",
+			)
 			project.Images = append(project.Images, newImage)
 			code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, project.Images, nil, true)
 			Convey("Then we should get a successful response", func() {
@@ -438,11 +460,29 @@ func TestAddProjectImageViaUpdate(t *testing.T) {
 
 func TestManagingProjectImagesNesting(t *testing.T) {
 	savedProjectId := ""
-	var busybox *model.Image
-	var alpine *model.Image
 	// TODO: refactor all of these hard-coded values to contants
-	busybox = busybox.NewImage("busybox", "23asdfsadf", "latest", "my busybox", "artifactory registry", true, "blank")
-	alpine = alpine.NewImage("alpine", "2asdfasf23423c", "latest", "my alpine", "DockerHub", true, "blank")
+	busybox := model.NewImage(
+		"busybox",
+		"23asdfsadf",
+		"latest",
+		[]string{"ilmTag1", "ilmTag2"},
+		"my busybox",
+		"myRegistryId424324243",
+		"artifactory registry",
+		true,
+		"blank",
+	)
+	alpine := model.NewImage(
+		"alpine",
+		"2asdfasf23423c",
+		"latest",
+		[]string{"ilmTag3", "ilmTag4"},
+		"my alpine",
+		"",
+		"DockerHub",
+		true,
+		"blank",
+	)
 
 	imageList := []*model.Image{}
 	imageList = append(imageList, busybox)
