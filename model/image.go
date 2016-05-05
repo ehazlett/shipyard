@@ -45,5 +45,5 @@ func (i *Image) PullableName() string {
 	if i.RegistryDomain != "" {
 		prefix = i.RegistryDomain + "/"
 	}
-	return prefix + i.Name + "/" + i.Tag
+	return prefix + i.Name + ":" + i.Tag
 }
