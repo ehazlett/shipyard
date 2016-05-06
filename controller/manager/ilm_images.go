@@ -187,20 +187,20 @@ func (m DefaultManager) UpdateImageIlmTags(projectId string, imageId string, ilm
 		return ErrImageDoesNotExist
 	}
 
-
 	//sort.Sort(rez.IlmTags)
 	sort.Strings(rez.IlmTags)
 	index := sort.SearchStrings(rez.IlmTags,ilmTag)
 	if len(rez.IlmTags) == index {
-		log.Infof("ilm tag %s was already found, skipping")
+		log.Infof("ilm tag %s was NOT found in array %v, appending",ilmTag,rez.IlmTags)
 		rez.IlmTags = append(rez.IlmTags, ilmTag)
 	}
+	
 	if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Update(rez).RunWrite(m.session); err != nil {
 		return err
 	}
 
 	eventType = "update-image"
-	
+
 	m.logEvent(eventType, fmt.Sprintf("id=%s", imageId), []string{"security"})
 	return nil
 }
