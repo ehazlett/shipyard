@@ -265,25 +265,32 @@ func (m DefaultManager) executeBuildTask(
 	m.UpdateBuildResults(build.ID, *buildResult)
 	finishLabel := "finished_failed"
 
+	appliedTag := ""
 	if isSafe && err == nil {
 		// if we don't get an error and we get the isSafe flag == true
 		// we mark the test for the image as successful
 		finishLabel = "finished_success"
 		// if the test is successful, we update the images' ilm tags with the test tags we defined in the case of a success
-		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnSuccess)
+		appliedTag = test.Tagging.OnSuccess
 		log.Infof("Image %s is safe! :)", image.PullableName())
 	} else {
 		// if the test is failed, we update the images' ilm tags with the test tags we defined in the case of a failure
-		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnFailure)
+		appliedTag = test.Tagging.OnFailure
 		log.Errorf("Image %s is NOT safe :(", image.PullableName())
 	}
+	if appliedTag != "" {
+		m.UpdateImageIlmTags(project.ID, image.ID, appliedTag)
+	}
+
 	m.UpdateBuildStatus(build.ID, finishLabel)
 
 	testResult.SimpleResult.Status = finishLabel
 	testResult.EndDate = time.Now()
 	testResult.Blocker = false
+	testResult.AppliedTag = append(testResult.AppliedTag, appliedTag)
 	result.TestResults = append(result.TestResults, &testResult)
 	result.LastUpdate = time.Now()
+	result.LastTagApplied = appliedTag
 
 	if existingResult != nil {
 		m.UpdateResult(project.ID, result)
