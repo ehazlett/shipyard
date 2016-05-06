@@ -151,10 +151,8 @@ func (m DefaultManager) CreateBuild(projectId string, testId string, buildAction
 		var wg sync.WaitGroup
 		log.Printf("Processing %d image(s)", len(imagesToBuild))
 		// For each image that we target in the test, try to run a build / verification
-		name := ""
 		for _, image := range imagesToBuild {
-			name = image.Name + ":" + image.Tag
-			log.Printf("Processing image=%s", name)
+			log.Printf("Processing image=%s", image.PullableName())
 			wg.Add(1)
 
 			// Run the verification concurrently for each image and then block to wait for all to finish.
