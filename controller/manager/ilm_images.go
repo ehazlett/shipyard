@@ -8,8 +8,8 @@ import (
 	"github.com/samalba/dockerclient"
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
-	"time"
 	"sort"
+	"time"
 )
 
 var (
@@ -189,12 +189,12 @@ func (m DefaultManager) UpdateImageIlmTags(projectId string, imageId string, ilm
 
 	//sort.Sort(rez.IlmTags)
 	sort.Strings(rez.IlmTags)
-	index := sort.SearchStrings(rez.IlmTags,ilmTag)
+	index := sort.SearchStrings(rez.IlmTags, ilmTag)
 	if len(rez.IlmTags) == index {
-		log.Infof("ilm tag %s was NOT found in array %v, appending",ilmTag,rez.IlmTags)
+		log.Infof("ilm tag %s was NOT found in array %v, appending", ilmTag, rez.IlmTags)
 		rez.IlmTags = append(rez.IlmTags, ilmTag)
 	}
-	
+
 	if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Update(rez).RunWrite(m.session); err != nil {
 		return err
 	}
