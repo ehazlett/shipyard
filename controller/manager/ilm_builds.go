@@ -260,6 +260,7 @@ func (m DefaultManager) executeBuildTask(
 		image,
 	)
 	buildResult := model.NewBuildResult(build.ID, targetArtifact, resultsSlice)
+	buildResult.TimeStamp = time.Now()
 
 	m.UpdateBuildResults(build.ID, *buildResult)
 	finishLabel := "finished_failed"
@@ -270,7 +271,7 @@ func (m DefaultManager) executeBuildTask(
 		finishLabel = "finished_success"
 		// if the test is successful, we update the images' ilm tags with the test tags we defined in the case of a success
 		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnSuccess)
-		log.Infof("Image %s is safe!", image.PullableName())
+		log.Infof("Image %s is safe! :)", image.PullableName())
 	} else {
 		// if the test is failed, we update the images' ilm tags with the test tags we defined in the case of a failure
 		m.UpdateImageIlmTags(project.ID, image.ID, test.Tagging.OnFailure)

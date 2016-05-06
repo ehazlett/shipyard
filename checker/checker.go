@@ -212,7 +212,9 @@ func CheckImage(image *model.Image) ([]string, bool, error) {
 		isSafe = true
 		resultLabel = "SUCCESS:"
 	}
-	results = append(results, fmt.Sprintf("%s Clair found %d vulnerabilties in image %s.", resultLabel, vulLen, imageName))
+	summaryMessage := fmt.Sprintf("%s Clair found %d vulnerabilties in image %s.", resultLabel, vulLen, imageName)
+	results = append(results, summaryMessage)
+	log.Info(summaryMessage)
 
 	// We return nil for error since there was no execution error.
 	// This is regardless of finding vulnerabilities or not.
