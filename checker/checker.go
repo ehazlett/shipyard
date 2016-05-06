@@ -57,7 +57,7 @@ func CheckImage(image *model.Image) ([]string, bool, error) {
 
 	results := []string{}
 	endpoint := CLAIR_ENDPOINT
-	imageName := image.Name + ":" + image.Tag
+	imageName := image.PullableName()
 	isSafe := false
 
 	// Save image.
