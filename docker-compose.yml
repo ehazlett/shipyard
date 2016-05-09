@@ -2,56 +2,57 @@ version: '2'
 
 services:
   rethinkdb:
-      env_file: .env
-      restart: always
-      image: rethinkdb:2.2
-      ports:
-          - "8083:8080"
-          - "8084:28015"
-          - "8085:29015"
-      networks:
-        - sy_network
+    env_file: .env
+    restart: always
+    image: rethinkdb:2.2
+    ports:
+      - "8083:8080"
+      - "8084:28015"
+      - "8085:29015"
+    networks:
+      - sy_network
 
   proxy:
-      env_file: .env
-      restart: always
-      image: ehazlett/docker-proxy:latest
-      volumes:
-          - "/var/run/docker.sock:/var/run/docker.sock"
-      ports:
-          - "2375"
-      command: -D
-      networks:
-        - sy_network
+    env_file: .env
+    restart: always
+    image: ehazlett/docker-proxy:latest
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - "2375"
+    command: -D
+    networks:
+      - sy_network
+
   swarm:
-      env_file: .env
-      restart: always
-      image: swarm:1.2.0
-      command: m --host tcp://0.0.0.0:2375 proxy:2375
-      ports:
-          - "2375"
-      networks:
-        - sy_network
+    env_file: .env
+    restart: always
+    image: swarm:1.2.0
+    command: m --host tcp://0.0.0.0:2375 proxy:2375
+    ports:
+      - "2375"
+    networks:
+      - sy_network
 
   controller:
-      env_file: .env
-      restart: always
-      build:
-        context: .
-        dockerfile: Dockerfile.build
-      entrypoint: /bin/bash
-      command: -c "make all && ./shipyard -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
-      volumes:
-          - .:/go/src/github.com/shipyard/shipyard
-      volumes_from:
-          - proxy
-      ports:
-          - "8082:8080"
-          - "9279"
-      depends_on:
-        - rethinkdb
-      networks:
-        - sy_network
+    env_file: .env
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+    entrypoint: /bin/bash
+    command: -c "make all && ./shipyard -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+    volumes:
+      - .:/go/src/github.com/shipyard/shipyard
+    volumes_from:
+      - proxy
+    ports:
+      - "8082:8080"
+      - "9279"
+    depends_on:
+      - rethinkdb
+    networks:
+      - sy_network
 
   postgres:
     hostname: postgres
@@ -60,9 +61,9 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_PASSWORD=postgres
     volumes:
-     - /tmp/postgres:/var/lib/postgresql/data/pgdata
+      - /tmp/postgres:/var/lib/postgresql/data/pgdata
     ports:
-     - "5432:5432"
+      - "5432:5432"
     networks:
       - sy_network
 
