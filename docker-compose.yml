@@ -76,8 +76,8 @@ services:
     entrypoint: /bin/bash
     command: -c "sleep 30 && clair --config=/config/config.yaml"
     ports:
-     - "6060:6060"
-     - "6061:6061"
+      - "6060:6060"
+      - "6061:6061"
     depends_on:
       - postgres
       - controller
