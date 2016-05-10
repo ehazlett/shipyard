@@ -489,7 +489,7 @@
         function showImageEditDialog(image) {
             vm.editImage = $.extend(true, {}, image);
             vm.selectedEditImage = image;
-            vm.buttonStyle = "positive";
+            vm.buttonStyle = "disabled";
             vm.randomEditId = vm.editImage.id;
             vm.editImageTagSpin = true;
             $('#editImageTagDefault').html(image.tag);
@@ -512,6 +512,7 @@
                             }
                         });
                         vm.editImageTagSpin = false;
+                        vm.buttonStyle = "positive";
                     }, function(data) {
                         vm.error = data;
                     });
@@ -833,7 +834,7 @@
             if (builds[testId].status === 'finished_failed') {
                 return 'finished_failed';
             }
-        }
+         }
 
         function cancelCreateSaveImage() {
             if (!ProjectService.cancelGetPublicRegistryTags()) {
