@@ -15,7 +15,7 @@
                 <div class="ui feed">
                     <div class="event" ng-repeat="resultEntry in vm.results[0].resultEntries">
                         <div class="content">
-                            <div class="summary">
+                            <div class="summary" ng-style="resultEntry.toString().match('High') || resultEntry.toString().match('FAILURE') ? {'color':'red'} : resultEntry.toString().match('Medium') ? {'color':'orange'} : resultEntry.toString().match('Low') ? {'color':'#FBDB0C'} : resultEntry.toString().match('SUCCESS') ? {'color':'green'}: {'color':'black'}">
                                 {{resultEntry}}
                             </div>
                         </div>
