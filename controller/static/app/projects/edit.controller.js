@@ -505,14 +505,15 @@
                             vm.editImage.tagLayer = tagObject.layer;
                             vm.publicRegistryTags = data;
                         }
+                        checkImagePublicRepository(image);
+                        vm.editImageTagSpin = false;
+                        vm.buttonStyle = "positive";
                         vm.editImage.additionalTags = [];
                         $.each(vm.publicRegistryTags, function(index,item) {
                             if(vm.publicRegistryTags[index].layer === vm.editImage.tagLayer) {
                                 vm.editImage.additionalTags.push(vm.publicRegistryTags[index].name);
                             }
                         });
-                        vm.editImageTagSpin = false;
-                        vm.buttonStyle = "positive";
                     }, function(data) {
                         vm.error = data;
                     });
@@ -520,6 +521,7 @@
             if(image.location === "Shipyard Registry") {
                 getShipyardImages(image.registryId);
                 vm.editImageTagSpin = false;
+                vm.buttonStyle = "positive";
             }
             $('#edit-project-image-edit-modal-'+vm.randomEditId)
                 .modal({
