@@ -767,9 +767,12 @@
                             <div class="ui column grid">
                                 <div class="column">
                                     <h5 class="ui dividing header">Project Configuration</h5>
-                                    <div class="six fields">
+                                    <div class="five fields">
                                         <div class="field">
                                             <label>Project ID <span style="font-weight: normal">{{vm.project.id || '...'}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label># of Tests Running in BG: <span style="font-weight: normal">{{vm.interceptorBuff.length}}</span></label>
                                         </div>
                                     </div>
                                     <div class="five fields">
