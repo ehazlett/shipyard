@@ -123,6 +123,30 @@
             return text;
         }
 
+        $(".ui.fullscreen.modal.transition.create.image").on('keyup',function(evt) {
+            if (evt.keyCode == 27) {
+                $(".ui.fullscreen.modal.transition.create.image").modal('hide');
+            }
+        });
+
+        $(".ui.fullscreen.modal.transition.edit.image").on('keyup',function(evt) {
+            if (evt.keyCode == 27) {
+                $(".ui.fullscreen.modal.transition.edit.image").modal('hide');
+            }
+        });
+
+        $(".ui.fullscreen.modal.transition.create.test").on('keyup',function(evt) {
+            if (evt.keyCode == 27) {
+                $(".ui.fullscreen.modal.transition.create.test").modal('hide');
+            }
+        });
+
+        $(".ui.fullscreen.modal.transition.edit.test").on('keyup',function(evt) {
+            if (evt.keyCode == 27) {
+                $(".ui.fullscreen.modal.transition.edit.test").modal('hide');
+            }
+        });
+
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
         });
