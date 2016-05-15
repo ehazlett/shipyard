@@ -135,7 +135,7 @@
                                             </div>
                                         </span></td>
                                         <td class="collapsing">
-                                            <div ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: test.testId, buildId: test.buildId})" class="basic compact blue ui icon button">
+                                            <div ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: test.testId, buildId: test.buildId})" class="basic compact blue ui icon button"  ng-class="{disabled: test.istestResult}">
                                                 <i class="search icon"></i>
                                             </div>
                                             <div class="basic compact blue ui icon button">
