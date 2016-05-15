@@ -1,0 +1,116 @@
+version: '2'
+# Using the docker0 IP address for swarm containers, consul and registrator, as connection fails when using internal hostnames.
+# use "ip addr docker0" to get the local address and update as needed.
+
+services:
+  postgres:
+    hostname: postgres
+    image: postgres:9.4.5
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+     - /DATA/postgres/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+     - "5432:5432"
+
+  clair:
+    env_file: .env
+    image: quay.io/coreos/clair:v1.1.0
+    volumes:
+      - ./clair_config:/config:ro
+      - /tmp/clair-data:/tmp
+    entrypoint: /bin/bash
+    command: -c "sleep 30 && clair --config=/config/config.yaml"
+    ports:
+     - "6060:6060"
+     - "6061:6061"
+    depends_on:
+      - postgres
+
+  rethinkdb:
+    restart: always
+    image: rethinkdb:2.2
+    ports:
+        - "8080"
+        - "28015"
+        - "29015"
+
+  proxy:
+    restart: always
+    environment:
+        HOSTNAME:
+    image: shipyard/docker-proxy:latest
+    volumes:
+        - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+        - "2375:2375"
+
+  consul:
+    restart: always
+    hostname: consul
+    image: arthurtsang/docker-consul
+    command: agent -config-dir /opt/config -advertise 172.17.0.1 -bootstrap-expect 1
+    environment:
+      - SERVICE_IGNORE=true
+    ports:
+      - "8070:8500"
+      - "53:8600"
+      - "53:8600/udp"
+      - "8300:8300"
+      - "8301:8301"
+      - "8301:8301/udp"
+      - "8302:8302"
+      - "8302:8302/udp"
+      - "8400:8400"
+
+  registrator:
+    image: gliderlabs/registrator
+    hostname: registrator
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+    command: "consul://172.17.0.1:8070"
+    security_opt:
+      - label:type:docker_t
+    depends_on:
+      - consul
+
+# use the swarm:1.1.3 image, if latest is misbehaving
+  swarm:
+    restart: always
+    image: swarm:latest
+    command: manage --host tcp://0.0.0.0:3375 consul://172.17.0.1:8070
+    depends_on:
+        - consul
+    ports:
+        - "3375:3375"
+
+  agent:
+    restart: always
+    image: swarm:latest
+    command: join --addr 172.17.0.1:2375 consul://172.17.0.1:8070
+    depends_on:
+        - proxy
+        - swarm
+        - consul
+    ports:
+        - "2375"
+
+  controller:
+    restart: always
+    build:
+        context: . 
+        dockerfile: Dockerfile.build
+    entrypoint: /bin/bash
+    command: -c "make all && ./shipyard -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:3375"
+    volumes:
+        - .:/go/src/github.com/shipyard/shipyard
+    volumes_from:
+        - proxy
+    ports:
+        - "8082:8080"
+        - "9279"
+    depends_on:
+        - rethinkdb
+
