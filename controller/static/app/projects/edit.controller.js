@@ -5,8 +5,8 @@
         .module('shipyard.projects')
         .controller('EditController', EditController);
 
-    EditController.$inject = ['resolvedProject', '$scope', 'ProjectService', 'RegistryService', '$state'];
-    function EditController(resolvedProject, $scope, ProjectService, RegistryService, $state) {
+    EditController.$inject = ['$rootScope', 'resolvedProject', '$scope', 'ProjectService', 'RegistryService', '$state'];
+    function EditController($rootScope, resolvedProject, $scope, ProjectService, RegistryService, $state) {
         var vm = this;
 
         vm.project = resolvedProject;
@@ -134,6 +134,7 @@
                     count += 1;
                 }
             });
+            vm.interceptorBuff = $rootScope.skipSpinnerInterceptorList;
             vm.selectedItemCount = count;
         });
 

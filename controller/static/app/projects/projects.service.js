@@ -171,18 +171,19 @@
         ///api/projects/:id/tests/:testId/builds
             //BuildAction action: enum: ["start", "restart", "stop"]
             executeBuild: function(projectId, testId, buildAction) {
-                $rootScope.skipSpinnerInterceptor = true;
+                $rootScope.skipSpinnerInterceptorList.push(testId);
                 var promise = $http
                     .post('/api/projects/' + projectId + '/tests/' + testId + '/builds', buildAction)
                     .then(function(response) {
-                        $rootScope.skipSpinnerInterceptor = false;
+                        var interceptorEntry = $rootScope.skipSpinnerInterceptorList.indexOf(testId);
+                        $rootScope.skipSpinnerInterceptorList.splice(interceptorEntry, 1);
                         return response.data;
                     });
                 return promise;
             },
         ///api/projects/:id/tests/:testId/builds/:buildId
             pollBuild: function(projectId, testId, buildID) {
-                $rootScope.skipSpinnerInterceptor = true;
+                $rootScope.skipSpinnerInterceptorList.push(testId);
                 var deferred = $q.defer();
 
                 (function poll() {
@@ -193,7 +194,8 @@
                             if (response.data.status.status === 'finished_success'
                                 || response.data.status.status === 'finished_failed') {
                                 deferred.resolve(response.data.status.status);
-                                $rootScope.skipSpinnerInterceptor = false;
+                                var interceptorEntry = $rootScope.skipSpinnerInterceptorList.indexOf(testId);
+                                $rootScope.skipSpinnerInterceptorList.splice(interceptorEntry, 1);
                             } else {
                                 setTimeout(function(){ poll(); }, 2000);
                             }
