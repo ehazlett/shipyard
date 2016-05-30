@@ -37,6 +37,7 @@ const (
 )
 
 var (
+	ErrLoginFailure               = errors.New("invalid username or password")
 	ErrAccountExists              = errors.New("account already exists")
 	ErrAccountDoesNotExist        = errors.New("account does not exist")
 	ErrRoleDoesNotExist           = errors.New("role does not exist")
@@ -479,13 +480,19 @@ func (m DefaultManager) Authenticate(username, password string) (bool, error) {
 		acct, err := m.Account(username)
 		if err != nil {
 			log.Error(err)
-			return false, err
+			return false, ErrLoginFailure
 		}
 
 		passwordHash = acct.Password
 	}
 
-	return m.authenticator.Authenticate(username, password, passwordHash)
+	a, err := m.authenticator.Authenticate(username, password, passwordHash)
+	if !a || err != nil {
+		log.Error(ErrLoginFailure)
+		return false, ErrLoginFailure
+	}
+
+	return true, nil
 }
 
 func (m DefaultManager) NewAuthToken(username string, userAgent string) (*auth.AuthToken, error) {
