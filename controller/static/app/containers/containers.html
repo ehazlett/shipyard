@@ -147,7 +147,7 @@
         </div>
         <div ng-click="vm.commitContainer()" class="ui positive right labeled icon button">
             Yes
-            <i class="eject icon"></i>
+            <i class="save icon"></i>
         </div>
     </div>
 </div>
@@ -258,7 +258,7 @@
                                     <a ng-click="vm.showDestroyContainerDialog(c)" class="item"><i class="red remove icon"></i> Destroy</a>
                                     <a ng-click="vm.showScaleContainerDialog(c)" class="item"><i class="exchange icon"></i> Scale</a>
                                     <a ng-click="vm.showRenameContainerDialog(c)" class="item"><i class="edit icon"></i> Rename</a>
-                                    <a ng-click="vm.showCommitContainerDialog(c)" class="item"><i class="eject icon"></i> Commit</a> 
+                                    <a ng-click="vm.showCommitContainerDialog(c)" class="item"><i class="save icon"></i> Commit</a> 
                                     <a ui-sref="dashboard.stats({id: c.Id})" class="item"><i class="bar chart icon"></i> Stats</a>
                                     <a ui-sref="dashboard.exec({id: c.Id})" class="item"><i class="terminal outline icon"></i> Console</a>
                                     <a ui-sref="dashboard.logs({id: c.Id})" class="item"><i class="text file outline icon"></i> Logs</a>
