@@ -104,6 +104,20 @@
                     });
                 return promise;
             },
+            commit: function(containerId, repoName) {
+                var tag=""
+                var index=repoName.lastIndexOf(":")
+                if (index>0) {
+                    tag=repoName.substring(index+1,repoName.length)
+                    repoName=repoName.substring(0,index)
+                }                 
+                var promise = $http
+                    .post('/commit?container=' + containerId + '&repo=' + repoName + '&tag=' + tag)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
         } 
     }
 
