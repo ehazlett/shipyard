@@ -15,10 +15,18 @@
             vm.removeImage = removeImage;
             vm.pullImage = pullImage;
             vm.pullImageName = "";
+            vm.tagImage = tagImage;
+            vm.tagImageName = "";
+            vm.showTagImageDialog = showTagImageDialog;
             vm.showRemoveImageDialog = showRemoveImageDialog;
             vm.showPullImageDialog = showPullImageDialog;
             vm.error = "";
 
+            function showTagImageDialog(image) {
+                vm.selectedImage = image;
+                $('#tag-modal').modal('show');
+            }
+            
             function showRemoveImageDialog(image) {
                 vm.selectedImage = image;
                 $('#remove-modal').modal('show');
@@ -45,6 +53,17 @@
                         vm.refresh();
                     }, function(data) {
                         vm.error = data.status + ": " + data.data;
+                    });
+            }
+            
+            function tagImage() {
+                ImagesService.tag(vm.selectedImage, vm.tagImageName)
+                    .then(function(data) {
+                        vm.error = "";
+                        vm.refresh();
+                    }, function(data) {
+                        vm.error = data.status + ": " + data.data;
+                        vm.tagImageName = "";
                     });
             }
 
