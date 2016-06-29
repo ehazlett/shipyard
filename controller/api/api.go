@@ -286,14 +286,31 @@ func (a *Api) Run() error {
 	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAccessRequired.HandlerFuncWithNext))
 	swarmAuthRouter.Use(negroni.HandlerFunc(apiAuditor.HandlerFuncWithNext))
 	swarmAuthRouter.UseHandler(swarmRouter)
+
 	globalMux.Handle("/containers/", swarmAuthRouter)
+	globalMux.Handle("/images/", swarmAuthRouter)
+
+	globalMux.Handle("/services", swarmAuthRouter)
+	globalMux.Handle("/services/", swarmAuthRouter)
+	globalMux.Handle("/tasks", swarmAuthRouter)
+	globalMux.Handle("/tasks/", swarmAuthRouter)
+	globalMux.Handle("/swarm", swarmAuthRouter)
+	globalMux.Handle("/swarm/", swarmAuthRouter)
+	globalMux.Handle("/nodes", swarmAuthRouter)
+	globalMux.Handle("/nodes/", swarmAuthRouter)
+	globalMux.Handle("/networks", swarmAuthRouter)
+	globalMux.Handle("/networks/", swarmAuthRouter)
+	globalMux.Handle("/volumes", swarmAuthRouter)
+	globalMux.Handle("/volumes/", swarmAuthRouter)
+
 	globalMux.Handle("/_ping", swarmAuthRouter)
 	globalMux.Handle("/commit", swarmAuthRouter)
 	globalMux.Handle("/build", swarmAuthRouter)
 	globalMux.Handle("/events", swarmAuthRouter)
+	globalMux.Handle("/info", swarmAuthRouter)
 	globalMux.Handle("/version", swarmAuthRouter)
-	globalMux.Handle("/images/", swarmAuthRouter)
 	globalMux.Handle("/exec/", swarmAuthRouter)
+
 	globalMux.Handle("/v1.14/", swarmAuthRouter)
 	globalMux.Handle("/v1.15/", swarmAuthRouter)
 	globalMux.Handle("/v1.16/", swarmAuthRouter)
@@ -301,6 +318,10 @@ func (a *Api) Run() error {
 	globalMux.Handle("/v1.18/", swarmAuthRouter)
 	globalMux.Handle("/v1.19/", swarmAuthRouter)
 	globalMux.Handle("/v1.20/", swarmAuthRouter)
+	globalMux.Handle("/v1.21/", swarmAuthRouter)
+	globalMux.Handle("/v1.22/", swarmAuthRouter)
+	globalMux.Handle("/v1.23/", swarmAuthRouter)
+	globalMux.Handle("/v1.24/", swarmAuthRouter)
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {

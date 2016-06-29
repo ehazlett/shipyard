@@ -2,18 +2,55 @@ package api
 
 import (
 	"bytes"
+	"io"
+	"net"
 	"net/http"
-	"net/url"
+
+	log "github.com/Sirupsen/logrus"
 )
 
-func (a *Api) swarmRedirect(w http.ResponseWriter, req *http.Request) {
-	var err error
-	req.URL, err = url.ParseRequestURI(a.dUrl)
+const (
+	dockerSocket = "/var/run/docker.sock"
+)
+
+func (a *Api) swarmRedirect(w http.ResponseWriter, r *http.Request) {
+	var c net.Conn
+
+	cl, err := net.Dial("unix", dockerSocket)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// TODO: panic and shut down if unable to connect to backend
+		log.Errorf("error connecting to backend: %s", err)
 		return
 	}
-	a.fwd.ServeHTTP(w, req)
+
+	c = cl
+	hj, ok := w.(http.Hijacker)
+	if !ok {
+		http.Error(w, "hijack error", 500)
+		return
+	}
+	nc, _, err := hj.Hijack()
+	if err != nil {
+		log.Printf("hijack error: %v", err)
+		return
+	}
+	defer nc.Close()
+	defer c.Close()
+
+	err = r.Write(c)
+	if err != nil {
+		log.Printf("error copying request to target: %v", err)
+		return
+	}
+
+	errc := make(chan error, 2)
+	cp := func(dst io.Writer, src io.Reader) {
+		_, err := io.Copy(dst, src)
+		errc <- err
+	}
+	go cp(c, nc)
+	go cp(nc, c)
+	<-errc
 }
 
 type proxyWriter struct {
