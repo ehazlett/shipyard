@@ -18,7 +18,7 @@ remote-build:
 	@cd controller && docker run --rm -w /go/src/github.com/shipyard/shipyard --entrypoint /bin/bash shipyard-build -c "make build 1>&2 && cd controller && tar -czf - controller" | tar zxf -
 
 media:
-	@cd controller/static && bower -s install --allow-root -p | xargs echo > /dev/null
+	@cd controller/static && npm install && npm run build
 
 image: media build
 	@echo Building Shipyard image $(TAG)
