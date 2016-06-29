@@ -24,9 +24,10 @@ controller:
     build: .
     dockerfile: Dockerfile.build
     entrypoint: /bin/bash
-    command: -c "make build media && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+    command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
     volumes:
       - "$PWD:/usr/src/app"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     links:
         - rethinkdb
         - swarm
