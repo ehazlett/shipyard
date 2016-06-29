@@ -17,6 +17,30 @@
     </div>
 </div>
 
+<div id="tag-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        Tag Image
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="field">
+                <label>Name</label>
+                <input type="text" ng-model="vm.tagImageName">
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            No
+        </div>
+        <div ng-click="vm.tagImage()" class="ui positive right labeled icon button">
+            Yes
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
 <div id="pull-modal" class="ui small modal transition">
     <i class="close icon"></i>
     <div class="header">
@@ -117,6 +141,9 @@
                     <td>{{i.Engine.Name}}</td>
                     <td ng-attr-data-sort-value="{{i.VirtualSize}}">{{i.VirtualSize / 1048576 | number:2}} MB</td>
                     <td class="collapsing">
+                        <div ng-click="vm.showTagImageDialog(i)" class="compact ui icon button">
+                            <i class="code icon"></i>
+                        </div>
                         <div ng-click="vm.showRemoveImageDialog(i)" class="compact ui icon button red">
                             <i class="trash icon"></i>
                         </div>

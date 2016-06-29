@@ -23,6 +23,21 @@
                             return response.data;
                         });
                     return promise;
+                },
+                tag: function(image, tagName)  {
+                    var versionTag=""
+                    var colonIndex=tagName.lastIndexOf(":")
+                    var slashIndex=tagName.lastIndexOf("/")
+                    if (colonIndex>0 && colonIndex > slashIndex) {
+                        versionTag=tagName.substring(colonIndex+1,tagName.length)
+                        tagName=tagName.substring(0,colonIndex)
+                    }
+                    var promise = $http
+                        .post('/images/' + image.Id + '/tag?repo=' + tagName + '&tag='+ versionTag )
+                        .then(function(response) {
+                            return response.data;
+                        });
+                    return promise;
                 }
             } 
         } 
