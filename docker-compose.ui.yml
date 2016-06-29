@@ -1,0 +1,10 @@
+webpack:
+    image: "node"
+    command: npm run start
+    working_dir: /usr/src/app
+    volumes:
+      - "$PWD/controller/static:/usr/src/app"
+    ports:
+      - "8080:8080"
+    env_file: .env
+

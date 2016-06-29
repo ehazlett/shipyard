@@ -20,24 +20,15 @@ swarm:
     ports:
         - "2375"
 
-media:
-    build: .
-    entrypoint: /bin/bash
-    dockerfile: Dockerfile.build
-    command: -c "make media && sleep infinity"
-    working_dir: /go/src/github.com/shipyard/shipyard
-    volumes:
-        - "/go/src/github.com/shipyard/shipyard/controller/static"
-
 controller:
     build: .
     dockerfile: Dockerfile.build
     entrypoint: /bin/bash
-    command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+    command: -c "make build media && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+    volumes:
+      - "$PWD:/usr/src/app"
     links:
         - rethinkdb
         - swarm
-    volumes_from:
-        - media
     ports:
         - "8080:8080"
