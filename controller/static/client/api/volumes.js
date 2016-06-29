@@ -1,9 +1,14 @@
 import fetch from 'isomorphic-fetch';
 
 import { statusHandler } from './helpers';
+import { getAuthToken } from '../services/auth';
 
 export function listVolumes() {
-  return fetch('/volumes')
+  return fetch('/volumes', {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
     .then(statusHandler)
     .then(response => response.json());
 }
@@ -14,7 +19,8 @@ export function createVolume(volume) {
         body: JSON.stringify(volume),
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-Access-Token': getAuthToken(),
         }
 			})
     .then(statusHandler)
