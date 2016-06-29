@@ -4,9 +4,7 @@ import Modals from './Modals';
 import SwarmInitView from '../swarm/SwarmInitView';
 import LoginView from '../login/LoginView';
 
-import EventsWebSocket from '../events/EventsWebSocket';
-
-import _ from 'lodash';
+// import EventsWebSocket from '../events/EventsWebSocket';
 
 
 const Main = React.createClass({
@@ -17,13 +15,19 @@ const Main = React.createClass({
   },
 
   renderMainPage() {
+    if (!this.props.swarm.initialized) {
+      return (
+        <SwarmInitView {...this.props} />
+      );
+    }
+
     return (
       <div>
         <TopNav />
         <Modals {...this.props} />
         {React.cloneElement(this.props.children, this.props)}
       </div>
-    )
+    );
   },
 
   render() {
