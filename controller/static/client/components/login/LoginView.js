@@ -8,7 +8,7 @@ const LoginView = React.createClass({
   },
   render() {
     return (
-      <div style={{ margin: '0 auto', marginTop: '5em', width: '400px' }}>
+      <div style={{ margin: '0 auto', paddingTop: '5em', width: '400px' }}>
         <div className="ui middle aligned center aligned grid">
           <div className="column">
             <h2 className="ui blue image header">
