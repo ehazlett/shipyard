@@ -19,7 +19,7 @@ const NodeListView = React.createClass({
         <Td column="" className="collapsing">
           <Icon className={'circle ' + (node.Status.State === 'ready' ? 'green' : 'red')}></Icon>
         </Td>
-        <Td column="ID" className="collapsing"><Link to={"/nodes/"+node.ID}>{node.ID.substring(0,12)}</Link></Td>
+        <Td column="ID" className="collapsing"><Link to={'/nodes/' + node.ID}>{node.ID.substring(0, 12)}</Link></Td>
         <Td column="Hostname">{node.Description.Hostname}</Td>
         <Td column="OS">
           <span>{node.Description.Platform.OS} {node.Description.Platform.Architecture}</span>
@@ -67,10 +67,11 @@ const NodeListView = React.createClass({
               <Table
                 ref="table"
                 className="ui compact celled sortable table"
-                sortable={true}
+                sortable
                 filterable={['Hostname', 'OS', 'Engine', 'Type']}
                 hideFilterInput
-                noDataText="Couldn't find any nodes">
+                noDataText="Couldn't find any nodes"
+              >
                 {this.props.nodes ? this.props.nodes.map(this.renderNode) : []}
               </Table>
             </Column>
@@ -78,7 +79,7 @@ const NodeListView = React.createClass({
         </Grid>
       </Container>
     );
-  }
+  },
 });
 
 export default NodeListView;

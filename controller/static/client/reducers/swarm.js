@@ -1,22 +1,22 @@
-import { push } from 'react-router-redux'
+import { push } from 'react-router-redux';
 import store from '../store';
 
 function swarm(state = [], action) {
-  switch(action.type) {
+  switch (action.type) {
     case 'SWARM_FETCH_SUCCEEDED':
       return {
         info: action.swarm,
-        initialized: true
+        initialized: true,
       };
     case 'SWARM_FETCH_FAILED':
       return {
         info: {},
-        initialized: true
+        initialized: true,
       };
     case 'SWARM_NOT_INITIALIZED':
       return {
         info: {},
-        initialized: false
+        initialized: false,
       };
     default:
       return state;

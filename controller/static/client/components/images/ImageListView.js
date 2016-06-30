@@ -36,12 +36,12 @@ const ImageListView = React.createClass({
     );
   },
 
-	renderImage(image) {
-    const rows = [];
-    for(var i = 0; i < image.RepoTags.length; i++) {
-      rows.push(this.renderRow(image, i));
-    }
-    return rows;
+	                    renderImage(image) {
+  const rows = [];
+  for (var i = 0; i < image.RepoTags.length; i++) {
+    rows.push(this.renderRow(image, i));
+  }
+  return rows;
 	},
 
   render() {
@@ -57,7 +57,7 @@ const ImageListView = React.createClass({
             </Column>
             <Column className="right aligned ten wide">
               <Button className="green" onClick={this.props.showPullImageModal}>
-                <Icon className="add"/>
+                <Icon className="add" />
                 Pull
               </Button>
             </Column>
@@ -67,10 +67,11 @@ const ImageListView = React.createClass({
         <Table
           ref="table"
           className="ui compact celled sortable table"
-          sortable={true}
+          sortable
           filterable={['Repository', 'Tag', 'Image ID', 'Created', 'Size']}
           hideFilterInput
-          noDataText="Couldn't find any images">
+          noDataText="Couldn't find any images"
+        >
 						{this.props.images ? this.props.images.map(this.renderImage) : []}
 				</Table>
             </Column>
@@ -78,7 +79,7 @@ const ImageListView = React.createClass({
         </Grid>
 			</Container>
     );
-  }
+  },
 });
 
 export default ImageListView;

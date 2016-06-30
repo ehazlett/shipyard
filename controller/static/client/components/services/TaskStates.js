@@ -14,7 +14,7 @@ function TaskStates(s) {
     starting: 'orange',
     running: 'green',
     failed: 'red',
-    rejected: 'red'
+    rejected: 'red',
   };
 
   return states[s];

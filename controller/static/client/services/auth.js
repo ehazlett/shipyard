@@ -3,7 +3,7 @@ export function getAuthToken() {
 }
 
 export function setAuthToken(token) {
-  localStorage.setItem('authToken', JSON.stringify(token))
+  localStorage.setItem('authToken', JSON.stringify(token));
 }
 
 export function removeAuthToken() {

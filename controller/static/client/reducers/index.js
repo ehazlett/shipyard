@@ -27,7 +27,7 @@ const rootReducer = combineReducers({
   images,
   networks,
   volumes,
-  routing: routerReducer
+  routing: routerReducer,
 });
 
 export default rootReducer;

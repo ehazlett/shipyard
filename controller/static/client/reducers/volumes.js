@@ -1,5 +1,5 @@
 function volumes(state = [], action) {
-  switch(action.type) {
+  switch (action.type) {
     case 'VOLUMES_FETCH_SUCCEEDED':
       return action.volumes.Volumes;
     default:

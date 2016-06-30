@@ -1,12 +1,12 @@
 import React from 'react';
 
 var CreateVolumeModal = React.createClass({
-  createVolume: function() {
+  createVolume() {
     const driverOpts = {};
 
-    if(this.refs.DriverOpts.value !== '') {
+    if (this.refs.DriverOpts.value !== '') {
       var opts = this.refs.DriverOpts.value.split(' ');
-      _.forEach(opts, function(o) {
+      _.forEach(opts, function (o) {
         var opt = o[i].split('=');
         driverOpts[opt[0]] = opt[1];
       });
@@ -15,10 +15,10 @@ var CreateVolumeModal = React.createClass({
     this.props.createVolume({
       Name: this.refs.Name.value,
       Driver: this.refs.Driver.value,
-      DriverOpts: driverOpts
+      DriverOpts: driverOpts,
     });
   },
-  render: function() {
+  render() {
     return (
       <form className={(this.props.visible) ? 'ui small modal transition visible active form' : 'ui small modal transition hidden'} onSubmit={this.createVolume}>
         <div className="ui header">Create a Volume</div>
@@ -44,7 +44,7 @@ var CreateVolumeModal = React.createClass({
         </div>
       </form>
     );
-  }
+  },
 });
 
 export default CreateVolumeModal;

@@ -15,8 +15,8 @@ const ServiceListView = React.createClass({
     this.refs.table.filterBy(input.target.value);
   },
 
-	renderService(service, summary = {}) {
-		return (
+	                    renderService(service, summary = {}) {
+		                    return (
 			<Tr key={service.ID}>
         <Td column="" className="collapsing">
           <div>
@@ -38,18 +38,17 @@ const ServiceListView = React.createClass({
 	},
 
   render() {
-
     const tasksByService = {};
-    _.forEach(this.props.tasks, function(task) {
-      if(!tasksByService[task.ServiceID]) {
+    _.forEach(this.props.tasks, function (task) {
+      if (!tasksByService[task.ServiceID]) {
         tasksByService[task.ServiceID] = [];
       }
       tasksByService[task.ServiceID].push(task);
     });
 
     const taskSummaryByService = {};
-    _.forEach(tasksByService, function(v, k) {
-      taskSummaryByService[k] = _.countBy(v, function(task) {
+    _.forEach(tasksByService, function (v, k) {
+      taskSummaryByService[k] = _.countBy(v, function (task) {
         return TaskStates(task.Status.State);
       });
     });
@@ -66,7 +65,7 @@ const ServiceListView = React.createClass({
             </Column>
             <Column className="right aligned ten wide">
               <Button className="green" onClick={this.props.showCreateServiceModal}>
-                <Icon className="add"/>
+                <Icon className="add" />
                 Create
               </Button>
             </Column>
@@ -76,10 +75,11 @@ const ServiceListView = React.createClass({
               <Table
                 className="ui compact celled sortable table"
                 ref="table"
-                sortable={true}
+                sortable
                 filterable={['ID', 'Name', 'Image', 'Command']}
                 hideFilterInput
-                noDataText="Couldn't find any services">
+                noDataText="Couldn't find any services"
+              >
                 {this.props.services ? this.props.services.map(s => this.renderService(s, taskSummaryByService[s.ID])) : []}
               </Table>
             </Column>
@@ -87,7 +87,7 @@ const ServiceListView = React.createClass({
         </Grid>
 			</Container>
     );
-  }
+  },
 });
 
 export default ServiceListView;

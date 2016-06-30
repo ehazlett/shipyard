@@ -8,7 +8,7 @@ const SwarmInitView = React.createClass({
       <Container className="center middle aligned">
         <div className="ui centered grid">
           <div className="ui eight wide center aligned column">
-            <h2 className="ui header" style={ {marginTop: '5em', marginBottom: '1.5em'} }>
+            <h2 className="ui header" style={{ marginTop: '5em', marginBottom: '1.5em' }}>
               <div className="content">
                 Get Started
                 <div className="sub header">
@@ -22,7 +22,7 @@ const SwarmInitView = React.createClass({
         </div>
       </Container>
     );
-  }
+  },
 });
 
 export default SwarmInitView;

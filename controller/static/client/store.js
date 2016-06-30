@@ -8,7 +8,7 @@ import { hashHistory } from 'react-router';
 import registerWatchers from './sagas';
 import rootReducer from './reducers';
 
-const sagaMiddleware = createSagaMiddleware()
+const sagaMiddleware = createSagaMiddleware();
 
 const store = createStore(
   rootReducer,
@@ -21,11 +21,11 @@ const store = createStore(
 
 registerWatchers(sagaMiddleware);
 
-if(module.hot) {
+if (module.hot) {
   module.hot.accept('./reducers', () => {
     const nextRootReducer = require('./reducers').default;
     store.replaceReducer(nextRootReducer);
-  })
+  });
 }
 
 export const history = syncHistoryWithStore(hashHistory, store);

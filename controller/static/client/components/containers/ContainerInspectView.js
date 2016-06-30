@@ -12,12 +12,12 @@ const ContainerListView = React.createClass({
   },
 
   render() {
-    const {id} = this.props.params;
-    const container = _.filter(this.props.containers, function(s) {
+    const { id } = this.props.params;
+    const container = _.filter(this.props.containers, function (s) {
       return s.Id === id;
     })[0];
 
-    if(!container) return (<div></div>);
+    if (!container) return (<div></div>);
 
     return (
       <Container>
@@ -27,7 +27,7 @@ const ContainerListView = React.createClass({
               <div className="ui breadcrumb">
                 <Link to="/containers" className="section">Containers</Link>
                 <div className="divider"> / </div>
-                <div className="active section">{ container ? container.Names[0] : '' }</div>
+                <div className="active section">{container ? container.Names[0] : ''}</div>
               </div>
             </Column>
             <Column className="sixteen wide">
@@ -37,7 +37,7 @@ const ContainerListView = React.createClass({
         </Grid>
       </Container>
     );
-  }
+  },
 });
 
 export default ContainerListView;

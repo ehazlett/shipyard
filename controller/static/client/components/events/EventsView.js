@@ -38,10 +38,11 @@ const EventListView = React.createClass({
               <Table
                 ref="table"
                 className="ui compact celled sortable table"
-                sortable={true}
+                sortable
                 filterable={['Time', 'Type', 'Name', 'Action']}
                 hideFilterInput
-                noDataText="Couldn't find any events">
+                noDataText="Couldn't find any events"
+              >
                 {this.props.events.map(this.renderEvent)}
               </Table>
             </Column>
@@ -49,7 +50,7 @@ const EventListView = React.createClass({
         </Grid>
       </Container>
     );
-  }
+  },
 });
 
 export default EventListView;

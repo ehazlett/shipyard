@@ -38,23 +38,23 @@ const NodeListView = React.createClass({
           {new Date(t.Status.Timestamp).toLocaleString()}
         </Td>
         <Td column="Service" className="collapsing">
-          <Link to={"/services/" + t.ServiceID }>{services[t.ServiceID] ? services[t.ServiceID].Spec.Name : ''}</Link>
+          <Link to={'/services/' + t.ServiceID}>{services[t.ServiceID] ? services[t.ServiceID].Spec.Name : ''}</Link>
         </Td>
 			</Tr>
-    )
+    );
   },
 
   render() {
-    const {id} = this.props.params;
-    const node = _.filter(this.props.nodes, function(s) {
+    const { id } = this.props.params;
+    const node = _.filter(this.props.nodes, function (s) {
       return s.ID === id;
     })[0];
-    const tasks = _.filter(this.props.tasks, function(t) {
+    const tasks = _.filter(this.props.tasks, function (t) {
       return t.NodeID === id;
     });
-    const services = _.keyBy(this.props.services, function(n) { return n.ID; });
+    const services = _.keyBy(this.props.services, function (n) { return n.ID; });
 
-    if(!node) {
+    if (!node) {
       return (<div></div>);
     }
 
@@ -66,7 +66,7 @@ const NodeListView = React.createClass({
               <div className="ui breadcrumb">
                 <Link to="/nodes" className="section">Nodes</Link>
                 <div className="divider"> / </div>
-                <div className="active section">{ node.Description.Hostname }</div>
+                <div className="active section">{node.Description.Hostname}</div>
               </div>
             </Column>
             <Column className="sixteen wide">
@@ -74,11 +74,11 @@ const NodeListView = React.createClass({
                 <div className="ui relaxed large horizontal list">
                   <div className="item">
                     <div className="header">ID</div>
-                    { node.ID.substring(0, 12) }
+                    {node.ID.substring(0, 12)}
                   </div>
                   <div className="item">
                     <div className="header">Name</div>
-                    { node.Description.Hostname }
+                    {node.Description.Hostname}
                   </div>
                 </div>
               </div>
@@ -93,10 +93,11 @@ const NodeListView = React.createClass({
                 <Table
                   className="ui compact celled sortable table"
                   ref="table"
-                  sortable={true}
+                  sortable
                   filterable={['ID', 'Name', 'Image', 'Command']}
                   hideFilterInput
-                  noDataText="Couldn't find any nodes">
+                  noDataText="Couldn't find any nodes"
+                >
                   {this.props.tasks ? this.props.tasks.map((t) => this.renderTask(node, t, services)) : []}
                 </Table>
               </div>
@@ -105,7 +106,7 @@ const NodeListView = React.createClass({
         </Grid>
 			</Container>
     );
-  }
+  },
 });
 
 export default NodeListView;

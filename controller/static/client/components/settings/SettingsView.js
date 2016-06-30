@@ -9,7 +9,7 @@ const SettingsView = React.createClass({
         <p>Settings</p>
       </Container>
     );
-  }
-})
+  },
+});
 
 export default SettingsView;

@@ -2,9 +2,9 @@ import React from 'react';
 
 var PullImageModal = React.createClass({
   pullImage() {
-    this.props.pullImage(this.refs.imageName.value)
+    this.props.pullImage(this.refs.imageName.value);
   },
-  render: function() {
+  render() {
     return (
       <form className={(this.props.visible) ? 'ui small modal transition visible active form' : 'ui small modal transition hidden'} onSubmit={this.pullImage}>
         <div className="ui header">Pull a Image</div>
@@ -22,7 +22,7 @@ var PullImageModal = React.createClass({
         </div>
       </form>
     );
-  }
+  },
 });
 
 export default PullImageModal;

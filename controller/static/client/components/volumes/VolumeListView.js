@@ -12,8 +12,8 @@ const VolumeListView = React.createClass({
     this.refs.table.filterBy(input.target.value);
   },
 
-	renderVolume(volume) {
-		return (
+	                    renderVolume(volume) {
+		                    return (
 			<Tr key={volume.Name}>
         <Td column="Driver">{volume.Driver}</Td>
         <Td column="Name">{volume.Name}</Td>
@@ -35,7 +35,7 @@ const VolumeListView = React.createClass({
             </Column>
             <Column className="right aligned ten wide">
               <Button className="green" onClick={this.props.showCreateVolumeModal}>
-                <Icon className="add"/>
+                <Icon className="add" />
                 Create
               </Button>
             </Column>
@@ -45,9 +45,10 @@ const VolumeListView = React.createClass({
               <Table
                 ref="table"
                 className="ui compact celled sortable table"
-                sortable={true}
+                sortable
                 filterable={[]}
-                noDataText="Couldn't find any volumes">
+                noDataText="Couldn't find any volumes"
+              >
                 {this.props.volumes ? this.props.volumes.map(this.renderVolume) : []}
               </Table>
             </Column>
@@ -55,7 +56,7 @@ const VolumeListView = React.createClass({
         </Grid>
       </Container>
     );
-  }
+  },
 });
 
 export default VolumeListView;

@@ -1,5 +1,5 @@
 function images(state = [], action) {
-  switch(action.type) {
+  switch (action.type) {
     case 'IMAGES_FETCH_SUCCEEDED':
       return action.images;
     default:

@@ -19,7 +19,7 @@ const ContainerListView = React.createClass({
         <Td column="" className="collapsing">
           <Icon className={'circle ' + (container.Status.indexOf('Up') === 0 ? 'green' : 'red')}></Icon>
         </Td>
-        <Td column="ID" className="collapsing"><Link to={"/containers/" + container.Id}>{container.Id.substring(0, 12)}</Link></Td>
+        <Td column="ID" className="collapsing"><Link to={'/containers/' + container.Id}>{container.Id.substring(0, 12)}</Link></Td>
         <Td column="Image">{container.Image}</Td>
         <Td column="Command">{container.Command}</Td>
         <Td column="Created" className="collapsing">{new Date(container.Created * 1000).toLocaleString()}</Td>
@@ -48,10 +48,11 @@ const ContainerListView = React.createClass({
               <Table
                 ref="table"
                 className="ui compact celled sortable table"
-                sortable={true}
+                sortable
                 filterable={['ID', 'Image', 'Command', 'Created', 'Status', 'Name']}
                 hideFilterInput
-                noDataText="Couldn't find any containers">
+                noDataText="Couldn't find any containers"
+              >
                 {this.props.containers ? this.props.containers.map(this.renderContainer) : []}
               </Table>
             </Column>
@@ -59,7 +60,7 @@ const ContainerListView = React.createClass({
         </Grid>
       </Container>
     );
-  }
+  },
 });
 
 export default ContainerListView;

@@ -23,7 +23,7 @@ const ServiceListView = React.createClass({
           <i className={'ui circle icon ' + TaskStates(t.Status.State)}></i>
         </Td>
         <Td column="ID" className="collapsing">
-          <Link to={"/services/" + s.ID + "/tasks/" + t.ID}>{t.ID.substring(0, 12)}</Link>
+          <Link to={'/services/' + s.ID + '/tasks/' + t.ID}>{t.ID.substring(0, 12)}</Link>
         </Td>
         <Td column="Container ID" className="collapsing">
           {t.Status.ContainerStatus.ContainerID ? t.Status.ContainerStatus.ContainerID.substring(0, 12) : ''}
@@ -41,20 +41,20 @@ const ServiceListView = React.createClass({
           {nodes[t.NodeID] ? nodes[t.NodeID].Description.Hostname : ''}
         </Td>
 			</Tr>
-    )
+    );
   },
 
   render() {
-    const {id} = this.props.params;
-    const service = _.filter(this.props.services, function(s) {
+    const { id } = this.props.params;
+    const service = _.filter(this.props.services, function (s) {
       return s.ID === id;
     })[0];
-    const tasks = _.filter(this.props.tasks, function(t) {
+    const tasks = _.filter(this.props.tasks, function (t) {
       return t.ServiceID === id;
     });
-    const nodes = _.keyBy(this.props.nodes, function(n) { return n.ID; });
+    const nodes = _.keyBy(this.props.nodes, function (n) { return n.ID; });
 
-    if(!service) {
+    if (!service) {
       return (<div></div>);
     }
 
@@ -66,7 +66,7 @@ const ServiceListView = React.createClass({
               <div className="ui breadcrumb">
                 <Link to="/services" className="section">Services</Link>
                 <div className="divider"> / </div>
-                <div className="active section">{ service ? service.Spec.Name : '' }</div>
+                <div className="active section">{service ? service.Spec.Name : ''}</div>
               </div>
             </Column>
             <Column className="sixteen wide">
@@ -74,16 +74,16 @@ const ServiceListView = React.createClass({
                 <div className="ui relaxed large horizontal list">
                   <div className="item">
                     <div className="header">ID</div>
-                    { service.ID.substring(0, 12) }
+                    {service.ID.substring(0, 12)}
                   </div>
                   <div className="item">
                     <div className="header">Name</div>
-                    { service.Spec.Name }
+                    {service.Spec.Name}
                   </div>
                   <div className="item">
                     <div className="header">Type</div>
-                    { service.Spec.Mode.Replicated ? 'Replicated' : ''}
-                    { service.Spec.Mode.Global ? 'Global' : ''}
+                    {service.Spec.Mode.Replicated ? 'Replicated' : ''}
+                    {service.Spec.Mode.Global ? 'Global' : ''}
                   </div>
                 </div>
               </div>
@@ -98,10 +98,11 @@ const ServiceListView = React.createClass({
                 <Table
                   className="ui compact celled sortable table"
                   ref="table"
-                  sortable={true}
+                  sortable
                   filterable={['ID', 'Name', 'Image', 'Command']}
                   hideFilterInput
-                  noDataText="Couldn't find any tasks">
+                  noDataText="Couldn't find any tasks"
+                >
                   {this.props.tasks ? this.props.tasks.map((t) => this.renderTask(service, t, nodes)) : []}
                 </Table>
               </div>
@@ -110,7 +111,7 @@ const ServiceListView = React.createClass({
         </Grid>
 			</Container>
     );
-  }
+  },
 });
 
 export default ServiceListView;

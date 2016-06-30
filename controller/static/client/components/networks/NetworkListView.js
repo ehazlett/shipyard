@@ -42,10 +42,11 @@ const NetworkListView = React.createClass({
               <Table
                 ref="table"
                 className="ui compact celled sortable table"
-                sortable={true}
+                sortable
                 filterable={['ID', 'Name', 'Driver', 'Scope']}
                 hideFilterInput
-                noDataText="Couldn't find any networks">
+                noDataText="Couldn't find any networks"
+              >
                 {this.props.networks.map(this.renderNetwork)}
               </Table>
             </Column>
@@ -53,7 +54,7 @@ const NetworkListView = React.createClass({
         </Grid>
       </Container>
     );
-  }
+  },
 });
 
 export default NetworkListView;

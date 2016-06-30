@@ -1,5 +1,5 @@
 function nodes(state = [], action) {
-  switch(action.type) {
+  switch (action.type) {
     case 'NODES_FETCH_SUCCEEDED':
       return action.nodes;
     default:

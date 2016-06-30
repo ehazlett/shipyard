@@ -13,12 +13,12 @@ const TaskInspectView = React.createClass({
   },
 
   render() {
-    const {id} = this.props.params;
+    const { id } = this.props.params;
     const task = _.filter(this.props.tasks, (t) => t.ID === id)[0];
-    if(!task) { return (<div></div>) };
+    if (!task) { return (<div></div>); }
 
     const service = _.filter(this.props.services, (s) => s.ID === task.ServiceID)[0];
-    if(!service) { return (<div></div>) };
+    if (!service) { return (<div></div>); }
 
     const container = _.filter(this.props.containers, (c) => c.Id === task.Status.ContainerStatus.ContainerID)[0];
 
@@ -31,7 +31,7 @@ const TaskInspectView = React.createClass({
               <div className="ui breadcrumb">
                 <Link to="/services" className="section">Services</Link>
                 <div className="divider"> / </div>
-                <Link to={"/services/"+service.ID} className="section">{service.Spec.Name}</Link>
+                <Link to={'/services/' + service.ID} className="section">{service.Spec.Name}</Link>
                 <div className="divider"> / </div>
                 <div className="active section">{service.Spec.Name}.{task.Slot}</div>
               </div>
@@ -43,9 +43,8 @@ const TaskInspectView = React.createClass({
         </Grid>
 			</Container>
     );
-  }
+  },
 });
 
 export default TaskInspectView;
-
 

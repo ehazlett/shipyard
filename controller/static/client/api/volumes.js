@@ -15,14 +15,14 @@ export function listVolumes() {
 
 export function createVolume(volume) {
   return fetch('/volumes/create', {
-				method: 'POST',
-        body: JSON.stringify(volume),
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Access-Token': getAuthToken(),
-        }
-			})
+				                                        method: 'POST',
+    body: JSON.stringify(volume),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-Access-Token': getAuthToken(),
+    },
+			                    })
     .then(statusHandler)
     .then(response => response.json());
 }

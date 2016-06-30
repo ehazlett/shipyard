@@ -6,12 +6,12 @@ var CreateServiceModal = React.createClass({
       Name: this.refs.name.value,
       TaskTemplate: {
         ContainerSpec: {
-          Image: this.refs.image.value
-        }
-      }
-    })
+          Image: this.refs.image.value,
+        },
+      },
+    });
   },
-  render: function() {
+  render() {
     return (
       <form className={(this.props.visible) ? 'ui small modal transition visible active form' : 'ui small modal transition hidden'} onSubmit={this.createService}>
         <div className="ui header">Create a Service</div>
@@ -33,7 +33,7 @@ var CreateServiceModal = React.createClass({
         </div>
       </form>
     );
-  }
+  },
 });
 
 export default CreateServiceModal;
