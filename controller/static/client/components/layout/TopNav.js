@@ -6,7 +6,7 @@ import { Menu, Container, Dropdown, Icon } from 'react-semantify';
 const TopNav = React.createClass({
   render() {
     return (
-      <Menu className="inverted borderless big blue">
+      <Menu className="inverted borderless blue">
         <Container>
           <Link to="/services" className="item">
             <Icon className="cubes"></Icon>
