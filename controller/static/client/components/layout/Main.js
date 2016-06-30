@@ -3,6 +3,7 @@ import TopNav from './TopNav';
 import Modals from './Modals';
 import SwarmInitView from '../swarm/SwarmInitView';
 import LoginView from '../login/LoginView';
+import { getAuthToken } from '../../services/auth';
 
 // import EventsWebSocket from '../events/EventsWebSocket';
 
@@ -14,16 +15,22 @@ const Main = React.createClass({
     // const eventsWS = new EventsWebSocket(this.props.newEvent);
   },
 
-  renderMainPage() {
-    if (!this.props.swarm.initialized) {
-      return (
-        <SwarmInitView {...this.props} />
-      );
-    }
+  renderLoginPage() {
+    return (
+      <LoginView {...this.props} />
+    );
+  },
 
+  renderWelcomePage() {
+    return (
+      <SwarmInitView {...this.props} />
+    );
+  },
+
+  renderMainPage() {
     return (
       <div>
-        <TopNav />
+        <TopNav {...this.props} />
         <Modals {...this.props} />
         {React.cloneElement(this.props.children, this.props)}
       </div>
@@ -31,12 +38,18 @@ const Main = React.createClass({
   },
 
   render() {
-    return (
-      <div id="Main">
-        { !this.props.user.auth_token ? <LoginView {...this.props} /> : this.renderMainPage() }
-      </div>
-    )
-  }
+    const token = getAuthToken();
+    if (!token) {
+      return this.renderLoginPage();
+    }
+
+    const { initialized } = this.props.swarm;
+    if (!initialized) {
+      return this.renderWelcomePage();
+    }
+
+    return this.renderMainPage();
+  },
 });
 
 export default Main;

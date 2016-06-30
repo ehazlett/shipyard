@@ -1,14 +1,16 @@
 function user(state = [], action) {
-  switch(action.type) {
-    case 'LOGIN_SUCCEEDED':
+  switch (action.type) {
+    case 'SIGN_IN_SUCCEEDED':
       return {
-        auth_token: action.response.auth_token,
-        user_agent: action.response.user_agent
+        username: action.username,
+        token: action.token,
       };
-    case 'LOGIN_FAILED':
+    case 'SIGN_IN_FAILED':
       return {
-        error: action.message
+        error: action.message,
       };
+    case 'SIGNED_OUT':
+      return {};
     default:
       return state;
   }

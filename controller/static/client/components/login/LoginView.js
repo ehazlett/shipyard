@@ -4,7 +4,10 @@ const LoginView = React.createClass({
   tryLogin() {
     const username = this.refs.username.value;
     const password = this.refs.password.value;
-    this.props.login(username, password);
+    this.props.signIn({
+      username,
+      password,
+    });
   },
   render() {
     return (

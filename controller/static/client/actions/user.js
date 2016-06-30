@@ -1,8 +1,13 @@
 
-export function login(username, password) {
+export function signIn(credentials) {
   return {
-    type: 'LOGIN_REQUESTED',
-    username,
-    password
-  }
+    type: 'SIGN_IN',
+    credentials,
+  };
+}
+
+export function signOut() {
+  return {
+    type: 'SIGN_OUT',
+  };
 }

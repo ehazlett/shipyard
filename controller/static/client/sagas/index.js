@@ -1,16 +1,18 @@
-import { fork } from 'redux-saga/effects';
+import { call, fork } from 'redux-saga/effects';
 
 // Watchers
-import userWatchers from './user.js';
-import infoWatchers from './info.js';
-import servicesWatchers from './services.js';
-import nodesWatchers from './nodes.js';
-import imagesWatchers from './images.js';
-import networksWatchers from './networks.js';
-import volumesWatchers from './volumes.js';
-import containersWatchers from './containers.js';
-import eventsWatchers from './events.js';
-import swarmWatchers from './swarm.js';
+import userWatchers from './user';
+import infoWatchers from './info';
+import servicesWatchers from './services';
+import nodesWatchers from './nodes';
+import imagesWatchers from './images';
+import networksWatchers from './networks';
+import volumesWatchers from './volumes';
+import containersWatchers from './containers';
+import eventsWatchers from './events';
+import swarmWatchers, { swarmFetch } from './swarm';
+
+import { getAuthToken } from '../services/auth';
 
 function* watchers() {
   yield [
@@ -27,6 +29,13 @@ function* watchers() {
   ];
 }
 
+function* init() {
+  if (getAuthToken()) {
+    yield call(swarmFetch);
+  }
+}
+
 export default function registerWatchers(sagaMiddleware) {
   sagaMiddleware.run(watchers);
+  sagaMiddleware.run(init);
 }
