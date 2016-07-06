@@ -219,6 +219,8 @@ func (a *Api) Run() error {
 			"/nodes/{id:.*}":                  swarmRedirect,
 			"/tasks":                          swarmRedirect,
 			"/tasks/{id:.*}":                  swarmRedirect,
+			"/volumes":                  			 swarmRedirect,
+			"/volumes/{id:.*}":         			 swarmRedirect,
 		},
 		"POST": {
 			"/auth":                         swarmRedirect,
@@ -245,6 +247,7 @@ func (a *Api) Run() error {
 			"/exec/{execid:.*}/resize":      swarmRedirect,
 			"/services/create":              swarmRedirect,
 			"/services/{id:.*}/update":      swarmRedirect,
+			"/volumes/create":               swarmRedirect,
 			"/swarm/init":                   swarmRedirect,
 			"/swarm/join":                   swarmRedirect,
 			"/swarm/leave":                  swarmRedirect,
