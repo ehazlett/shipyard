@@ -4,32 +4,16 @@ rethinkdb:
         - "8080"
         - "28015"
         - "29015"
-proxy:
-    image: ehazlett/docker-proxy:latest
-    command: -i
-    volumes:
-        - "/var/run/docker.sock:/var/run/docker.sock"
-    ports:
-        - "2375"
-
-swarm:
-    image: swarm:latest
-    command: m --host tcp://0.0.0.0:2375 proxy:2375
-    links:
-        - "proxy:proxy"
-    ports:
-        - "2375"
 
 controller:
     build: .
     dockerfile: Dockerfile.build
     entrypoint: /bin/bash
-    command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+    command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015"
     volumes:
       - "$PWD:/usr/src/app"
       - "/var/run/docker.sock:/var/run/docker.sock"
     links:
         - rethinkdb
-        - swarm
     ports:
         - "8080:8080"

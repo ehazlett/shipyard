@@ -57,27 +57,6 @@ func main() {
 					Usage: "disable anonymous usage reporting",
 				},
 				cli.StringFlag{
-					Name:   "docker, d",
-					Value:  "tcp://127.0.0.1:2375",
-					Usage:  "docker swarm addr",
-					EnvVar: "DOCKER_HOST",
-				},
-				cli.StringFlag{
-					Name:  "tls-ca-cert",
-					Value: "",
-					Usage: "tls ca certificate",
-				},
-				cli.StringFlag{
-					Name:  "tls-cert",
-					Value: "",
-					Usage: "tls certificate",
-				},
-				cli.StringFlag{
-					Name:  "tls-key",
-					Value: "",
-					Usage: "tls key",
-				},
-				cli.StringFlag{
 					Name:  "shipyard-tls-ca-cert",
 					Usage: "Shipyard TLS CA Cert",
 					Value: "",
