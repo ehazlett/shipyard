@@ -50,7 +50,6 @@
     "react-addons-test-utils": "^15.0.2",
     "redbox-react": "^1.2.3",
     "rimraf": "^2.5.2",
-    "semantic-ui": "^2.1.8",
     "style-loader": "^0.13.1",
     "webpack": "^1.13.0",
     "webpack-dev-middleware": "^1.6.1",
