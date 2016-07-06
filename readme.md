@@ -40,19 +40,31 @@ The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyar
 
 # Contributing
 
-## Controller
-To get a development environment you will need:
+Create a 1.12.0-rc3 VM:
 
-* Go 1.4+
-* Node.js: (npm for bower to build the Angular frontend)
+```shell
+docker-machine create -d virtualbox --virtualbox-boot2docker-url "https://github.com/boot2docker/boot2docker/releases/download/v1.12.0-rc3/boot2docker.iso" shipyard
+```
 
-Run the following:
+Build and deploy shipyard:
 
-* install [Godep](https://github.com/tools/godep): `go get github.com/tools/godep`
-* run `npm install -g bower` to install bower
-* run `make build` to build the binary
-* run `make media` to build the media
-* run `./controller -h` for options
+```shell
+eval $(docker-machine env shipyard)
+docker-compose build
+docker-compose up
+```
+
+Run UI development environment (webpack-dev-middleware):
+
+```shell
+# Ensure that the UI dev environment runs on your host, not a VM
+unset {DOCKER_HOST,DOCKER_TLS_VERIFY,DOCKER_CERT_PATH}
+
+# Set up the CONTROLLER_URL env var to point to the running controller backend
+echo -e "CONTROLLER_URL=http://$(docker-machine ip shipyard):8080/" > .env
+
+docker-compose -f docker-compose.ui.yml up
+```
 
 # License
 Shipyard is licensed under the Apache License, Version 2.0. See LICENSE for full license text.
