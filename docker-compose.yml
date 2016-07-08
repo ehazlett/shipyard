@@ -1,22 +1,32 @@
 version: '2'
-services:
-  rethinkdb:
-      image: rethinkdb
-      ports:
-          - "8080"
-          - "28015"
-          - "29015"
 
-  controller:
-      build:
-        context: .
-        dockerfile: Dockerfile.build
-      entrypoint: /bin/bash
-      command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015"
-      volumes:
-        - "$PWD:/usr/src/app"
-        - "/var/run/docker.sock:/var/run/docker.sock"
-      ports:
-        - "8080:8080"
-      depends_on:
-        - rethinkdb
+services:
+	rethinkdb:
+		image: rethinkdb
+		ports:
+			- "8080"
+			- "28015"
+			- "29015"
+
+	proxy:
+		image: ehazlett/docker-proxy:latest
+		command: -i
+		volumes:
+			- "/var/run/docker.sock:/var/run/docker.sock"
+		ports:
+			- "2375"
+
+	controller:
+		build:
+			context: .
+			dockerfile: Dockerfile.build
+			entrypoint: /bin/bash
+			command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://proxy:2375"
+			volumes:
+				- "$PWD:/usr/src/app"
+				- "/var/run/docker.sock:/var/run/docker.sock"
+			ports:
+				- "8080:8080"
+			depends_on:
+				- proxy
+				- rethinkdb
