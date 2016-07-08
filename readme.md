@@ -39,32 +39,14 @@ Everything in Shipyard is built around the Shipyard API.  It enables actions suc
 The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyard API for all interaction.  It is an AngularJS app that is served via the Controller.
 
 # Contributing
-
-Create a 1.12.0-rc3 VM:
-
-```shell
-docker-machine create -d virtualbox --virtualbox-boot2docker-url "https://github.com/boot2docker/boot2docker/releases/download/v1.12.0-rc3/boot2docker.iso" shipyard
-```
-
-Build and deploy shipyard:
+Ensure that you are using engine 1.12.x
 
 ```shell
-eval $(docker-machine env shipyard)
 docker-compose build
 docker-compose up
 ```
 
-Run UI development environment (webpack-dev-middleware):
-
-```shell
-# Ensure that the UI dev environment runs on your host, not a VM
-unset {DOCKER_HOST,DOCKER_TLS_VERIFY,DOCKER_CERT_PATH}
-
-# Set up the CONTROLLER_URL env var to point to the running controller backend
-echo -e "CONTROLLER_URL=http://$(docker-machine ip shipyard):8080/" > .env
-
-docker-compose -f docker-compose.ui.yml up
-```
+The UI will then be available at: [http://localhost:8080](http://localhost:8080)
 
 # License
 Shipyard is licensed under the Apache License, Version 2.0. See LICENSE for full license text.
