@@ -14,16 +14,12 @@ app.use(require('webpack-dev-middleware')(compiler, {
 
 app.use(require('webpack-hot-middleware')(compiler));
 
-if(!process.env.CONTROLLER_URL) {
-  console.log('Please define CONTROLLER_URL, e.g. http://192.168.99.100:8080');
-  return;
-}
-
-
 // var wsProxy = proxy('ws://' + process.env.CONTROLLER_URL.replace('http://', '') + '/ws/events', {changeOrigin: true, ws: true})
 // app.use(wsProxy);
 
-app.use('*', proxy({target: process.env.CONTROLLER_URL, changeOrigin: true}));
+var controllerUrl = process.env.CONTROLLER_URL || "http://controller:8080";
+
+app.use('*', proxy({target: controllerUrl, changeOrigin: true}));
 app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
