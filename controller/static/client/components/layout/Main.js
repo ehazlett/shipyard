@@ -27,11 +27,18 @@ const Main = React.createClass({
     );
   },
 
+  renderError(error) {
+    return (
+      <div className="ui error message">{error}</div>
+    );
+  },
+
   renderMainPage() {
     return (
       <div>
         <TopNav {...this.props} />
         <Modals {...this.props} />
+        {this.props.error ? this.renderError(this.props.error) : null}
         {React.cloneElement(this.props.children, this.props)}
       </div>
     );

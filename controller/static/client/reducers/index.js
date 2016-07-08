@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 
+import error from './error';
 import user from './user';
 import modals from './modals';
 import info from './info';
@@ -15,6 +16,7 @@ import events from './events';
 import containers from './containers';
 
 const rootReducer = combineReducers({
+  error,
   user,
   containers,
   events,

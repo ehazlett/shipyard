@@ -1,12 +1,7 @@
-import { takeEvery, takeLatest } from 'redux-saga';
+import { takeLatest } from 'redux-saga';
 import { call, put } from 'redux-saga/effects';
-import { push } from 'react-router-redux';
 
 import { listVolumes, createVolume } from '../api/volumes.js';
-
-function* watchCreateVolume() {
-  yield* takeLatest('CREATE_VOLUME_REQUESTED', createVolumeSaga);
-}
 
 function* createVolumeSaga(action) {
   try {
@@ -17,15 +12,15 @@ function* createVolumeSaga(action) {
     yield put({ type: 'VOLUMES_FETCH_REQUESTED' });
     yield put({ type: 'HIDE_MODAL' });
   } catch (e) {
-    yield put({ type: 'CREATE_VOLUME_FAILED', message: e.message });
+    yield put({ type: 'CREATE_VOLUME_FAILED', error: e.message });
   }
 }
 
-function* watchVolumesFetch() {
-  yield* takeLatest('VOLUMES_FETCH_REQUESTED', volumesFetch);
+function* watchCreateVolume() {
+  yield* takeLatest('CREATE_VOLUME_REQUESTED', createVolumeSaga);
 }
 
-export function* volumesFetch(action) {
+export function* volumesFetch() {
   try {
     const volumes = yield call(listVolumes);
     yield put({
@@ -33,8 +28,12 @@ export function* volumesFetch(action) {
       volumes,
     });
   } catch (e) {
-    yield put({ type: 'VOLUMES_FETCH_FAILED', message: e.message });
+    yield put({ type: 'VOLUMES_FETCH_FAILED', error: e.message });
   }
+}
+
+function* watchVolumesFetch() {
+  yield* takeLatest('VOLUMES_FETCH_REQUESTED', volumesFetch);
 }
 
 export default function* watchers() {

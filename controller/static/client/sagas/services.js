@@ -1,13 +1,8 @@
 import { takeLatest } from 'redux-saga';
 import { call, put } from 'redux-saga/effects';
-import { push } from 'react-router-redux';
 
 import { listServices, createService } from '../api/services';
 import { listTasks } from '../api/tasks';
-
-function* watchCreateService() {
-  yield* takeLatest('CREATE_SERVICE_REQUESTED', createServiceSaga);
-}
 
 function* createServiceSaga(action) {
   try {
@@ -18,15 +13,15 @@ function* createServiceSaga(action) {
     yield put({ type: 'SERVICES_FETCH_REQUESTED' });
     yield put({ type: 'HIDE_MODAL' });
   } catch (e) {
-    yield put({ type: 'CREATE_SERVICE_FAILED', message: e.message });
+    yield put({ type: 'CREATE_SERVICE_FAILED', error: e.message });
   }
 }
 
-function* watchServicesFetch() {
-  yield* takeLatest('SERVICES_FETCH_REQUESTED', servicesFetch);
+function* watchCreateService() {
+  yield* takeLatest('CREATE_SERVICE_REQUESTED', createServiceSaga);
 }
 
-export function* servicesFetch(action) {
+export function* servicesFetch() {
   try {
     const services = yield call(listServices);
     const tasks = yield call(listTasks);
@@ -36,8 +31,12 @@ export function* servicesFetch(action) {
       tasks,
     });
   } catch (e) {
-    yield put({ type: 'SERVICES_FETCH_FAILED', message: e.message });
+    yield put({ type: 'SERVICES_FETCH_FAILED', error: e.message });
   }
+}
+
+function* watchServicesFetch() {
+  yield* takeLatest('SERVICES_FETCH_REQUESTED', servicesFetch);
 }
 
 export default function* watchers() {

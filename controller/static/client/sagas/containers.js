@@ -3,11 +3,7 @@ import { call, put } from 'redux-saga/effects';
 
 import { listContainers } from '../api/containers.js';
 
-function* watchContainersFetch() {
-  yield* takeLatest('CONTAINERS_FETCH_REQUESTED', containersFetch);
-}
-
-export function* containersFetch(action) {
+export function* containersFetch() {
   try {
     const containers = yield call(listContainers);
     yield put({
@@ -15,8 +11,13 @@ export function* containersFetch(action) {
       containers,
     });
   } catch (e) {
-    yield put({ type: 'CONTAINERS_FETCH_FAILED', message: e.message });
+    yield put({ type: 'CONTAINERS_FETCH_FAILED', error: e.message });
   }
+}
+
+
+function* watchContainersFetch() {
+  yield* takeLatest('CONTAINERS_FETCH_REQUESTED', containersFetch);
 }
 
 export default function* watchers() {

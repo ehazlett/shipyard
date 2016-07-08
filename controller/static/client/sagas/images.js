@@ -1,26 +1,22 @@
-import { takeLatest } from 'redux-saga';
+import { takeLatest, takeEvery } from 'redux-saga';
 import { call, put } from 'redux-saga/effects';
 
 import { listImages, pullImage } from '../api/images.js';
-
-function* watchImagesPull() {
-  yield* takeEvery('IMAGE_PULL_REQUESTED', imagePull);
-}
 
 function* imagePull(action) {
   try {
     yield call(pullImage, action.imageName);
     yield put({ type: 'IMAGE_PULL_SUCCEEDED' });
   } catch (e) {
-    yield put({ type: 'IMAGE_PULL_FAILED', message: e.message });
+    yield put({ type: 'IMAGE_PULL_FAILED', error: e.message });
   }
 }
 
-function* watchImagesFetch() {
-  yield* takeLatest('IMAGES_FETCH_REQUESTED', imagesFetch);
+function* watchImagesPull() {
+  yield* takeEvery('IMAGE_PULL_REQUESTED', imagePull);
 }
 
-export function* imagesFetch(action) {
+export function* imagesFetch() {
   try {
     const images = yield call(listImages);
     yield put({
@@ -28,12 +24,17 @@ export function* imagesFetch(action) {
       images,
     });
   } catch (e) {
-    yield put({ type: 'IMAGES_FETCH_FAILED', message: e.message });
+    yield put({ type: 'IMAGES_FETCH_FAILED', error: e.message });
   }
+}
+
+function* watchImagesFetch() {
+  yield* takeLatest('IMAGES_FETCH_REQUESTED', imagesFetch);
 }
 
 export default function* watchers() {
   yield [
     watchImagesFetch(),
+    watchImagesPull(),
   ];
 }

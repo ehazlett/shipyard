@@ -3,28 +3,20 @@ import { call, put } from 'redux-saga/effects';
 
 import { getSwarm, initSwarm } from '../api/swarm.js';
 
-function* watchSwarmInit() {
-  yield* takeLatest('SWARM_INIT_REQUESTED', swarmInit);
-}
-
-function* swarmInit(action) {
+function* swarmInit() {
   try {
     yield call(initSwarm);
     yield put({ type: 'SWARM_INIT_SUCCEEDED' });
   } catch (e) {
-		                                        yield put({ type: 'SWARM_INIT_FAILED', message: e.message });
+    yield put({ type: 'SWARM_INIT_FAILED', error: e.message });
   }
 }
 
-function* watchSwarmFetch() {
-  yield* takeLatest('SWARM_FETCH_REQUESTED', swarmFetch);
+function* watchSwarmInit() {
+  yield* takeLatest('SWARM_INIT_REQUESTED', swarmInit);
 }
 
-function* watchSwarmInitSucceeded() {
-  yield* takeLatest('SWARM_INIT_SUCCEEDED', swarmFetch);
-}
-
-export function* swarmFetch(action) {
+export function* swarmFetch() {
   try {
     const swarm = yield call(getSwarm);
     yield put({
@@ -38,11 +30,19 @@ export function* swarmFetch(action) {
 
     // If we receive a 406 when fetching swarm info, this means the cluster is not initialised
     if (e.response.status === 406) {
-      yield put({ type: 'SWARM_NOT_INITIALIZED', message: e.message });
+      yield put({ type: 'SWARM_NOT_INITIALIZED', error: e.message });
     } else {
-      yield put({ type: 'SWARM_FETCH_FAILED', message: e.message });
+      yield put({ type: 'SWARM_FETCH_FAILED', error: e.message });
     }
   }
+}
+
+function* watchSwarmFetch() {
+  yield* takeLatest('SWARM_FETCH_REQUESTED', swarmFetch);
+}
+
+function* watchSwarmInitSucceeded() {
+  yield* takeLatest('SWARM_INIT_SUCCEEDED', swarmFetch);
 }
 
 export default function* watchers() {

@@ -5,6 +5,7 @@ import Main from './layout/Main';
 
 function mapStateToProps(state) {
   return {
+    error: state.error,
     user: state.user,
     modals: state.modals,
     info: state.info,

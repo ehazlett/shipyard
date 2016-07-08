@@ -1,9 +1,5 @@
 import { takeEvery } from 'redux-saga';
-import { put, call } from 'redux-saga/effects';
-
-function* watchNewEvent() {
-  yield* takeEvery('NEW_EVENT', newEvent);
-}
+import { put } from 'redux-saga/effects';
 
 function* newEvent(action) {
   switch (action.event.Type) {
@@ -25,7 +21,13 @@ function* newEvent(action) {
     case 'image':
       yield put({ type: 'IMAGES_FETCH_REQUESTED' });
       return;
+    default:
+      return;
   }
+}
+
+function* watchNewEvent() {
+  yield* takeEvery('NEW_EVENT', newEvent);
 }
 
 export default function* watchers() {
