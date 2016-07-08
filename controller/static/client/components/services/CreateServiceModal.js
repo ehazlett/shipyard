@@ -7,6 +7,12 @@ var CreateServiceModal = React.createClass({
       TaskTemplate: {
         ContainerSpec: {
           Image: this.refs.image.value,
+          Command: this.refs.command.value.split(" "),
+        },
+      },
+      Mode: {
+        Replicated: {
+          Replicas: parseInt(this.refs.replicas.value) || 1,
         },
       },
     });
@@ -23,6 +29,14 @@ var CreateServiceModal = React.createClass({
           <div className="field">
             <label>Image</label>
             <input ref="image" type="text"></input>
+          </div>
+          <div className="field">
+            <label>Command</label>
+            <input ref="command" type="text"></input>
+          </div>
+          <div className="field">
+            <label>Replicas</label>
+            <input ref="replicas" type="number" placeholder="1"></input>
           </div>
         </div>
         <div className="actions">

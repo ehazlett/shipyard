@@ -32,7 +32,7 @@ const ServiceListView = React.createClass({
             {Object.keys(summary).map((k) => (<span className={'ui label ' + k} key={k}>{summary[k]}</span>))}
           </div>
         </Td>
-        <Td column="Command"><pre>{service.Spec.TaskTemplate.ContainerSpec.Args ? service.Spec.TaskTemplate.ContainerSpec.Args.join(' ') : ''}</pre></Td>
+        <Td column="Command"><pre>{service.Spec.TaskTemplate.ContainerSpec.Command ? service.Spec.TaskTemplate.ContainerSpec.Command.join(' ') : ''} {service.Spec.TaskTemplate.ContainerSpec.Args ? service.Spec.TaskTemplate.ContainerSpec.Args.join(' ') : ''}</pre></Td>
 			</Tr>
 		);
 	},
