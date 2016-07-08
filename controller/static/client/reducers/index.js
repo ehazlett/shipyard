@@ -3,7 +3,6 @@ import { routerReducer } from 'react-router-redux';
 
 import error from './error';
 import user from './user';
-import modals from './modals';
 import info from './info';
 import swarm from './swarm';
 import services from './services';
@@ -20,7 +19,6 @@ const rootReducer = combineReducers({
   user,
   containers,
   events,
-  modals,
   info,
   swarm,
   services,

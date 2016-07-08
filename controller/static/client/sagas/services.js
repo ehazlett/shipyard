@@ -1,5 +1,6 @@
 import { takeLatest } from 'redux-saga';
-import { call, put } from 'redux-saga/effects';
+import { take, call, put } from 'redux-saga/effects';
+import { push } from 'react-router-redux';
 
 import { listServices, createService } from '../api/services';
 import { listTasks } from '../api/tasks';
@@ -14,6 +15,13 @@ function* createServiceSaga(action) {
     yield put({ type: 'HIDE_MODAL' });
   } catch (e) {
     yield put({ type: 'CREATE_SERVICE_FAILED', error: e.message });
+  }
+}
+// Upon successfully creating a service, navigate to the services page
+function* watchCreateServiceSucceeded() {
+  while (true) {
+    yield take('CREATE_SERVICE_SUCCEEDED');
+    yield put(push('/services'));
   }
 }
 
@@ -43,5 +51,6 @@ export default function* watchers() {
   yield [
     watchServicesFetch(),
     watchCreateService(),
+    watchCreateServiceSucceeded(),
   ];
 }

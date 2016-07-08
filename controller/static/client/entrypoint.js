@@ -9,6 +9,7 @@ import semanticJs from '../node_modules/semantic-ui-css/semantic.js';
 
 import App from './components/App';
 import ServiceListView from './components/services/ServiceListView';
+import CreateServiceView from './components/services/CreateServiceView';
 import ServiceInspectView from './components/services/ServiceInspectView';
 import TaskInspectView from './components/services/TaskInspectView';
 import ContainerListView from './components/containers/ContainerListView';
@@ -30,6 +31,7 @@ const router = (
       <Route path="/" component={App}>
         <IndexRoute component={ServiceListView} />
         <Route path="/services" component={ServiceListView} />
+        <Route path="/services/create" component={CreateServiceView} />
         <Route path="/services/:id" component={ServiceInspectView} />
         <Route path="/services/:serviceId/tasks/:id" component={TaskInspectView} />
         <Route path="/nodes" component={NodeListView} />

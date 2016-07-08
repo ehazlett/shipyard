@@ -3,7 +3,6 @@ import React from 'react';
 import { Container } from 'react-semantify';
 
 import TopNav from './TopNav';
-import Modals from './Modals';
 import SwarmInitView from '../swarm/SwarmInitView';
 import LoginView from '../login/LoginView';
 import { getAuthToken } from '../../services/auth';
@@ -40,7 +39,6 @@ const Main = React.createClass({
     return (
       <div>
         <TopNav {...this.props} />
-        <Modals {...this.props} />
         <Container>
           {this.props.error ? this.renderError(this.props.error) : null}
           {React.cloneElement(this.props.children, this.props)}

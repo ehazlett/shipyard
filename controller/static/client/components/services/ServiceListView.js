@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Container, Grid, Column, Row, Input, Dropdown, Item, Menu, Button, Icon } from 'react-semantify';
-import { Table, Tbody, Tr, Td, Thead, Th } from 'reactable';
+import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Table, Tr, Td } from 'reactable';
 import TaskStates from './TaskStates';
 import { Link } from 'react-router';
 import _ from 'lodash';
@@ -15,9 +15,9 @@ const ServiceListView = React.createClass({
     this.refs.table.filterBy(input.target.value);
   },
 
-	                    renderService(service, summary = {}) {
-		                    return (
-			<Tr key={service.ID}>
+  renderService(service, summary = {}) {
+    return (
+      <Tr key={service.ID}>
         <Td column="" className="collapsing">
           <div>
             {(summary.green ? summary.green : '0')}
@@ -25,17 +25,17 @@ const ServiceListView = React.createClass({
           </div>
         </Td>
         <Td column="ID" className="collapsing"><Link to={'/services/' + service.ID}>{service.ID.substring(0, 12)}</Link></Td>
-				<Td column="Name">{service.Spec.Name}</Td>
-				<Td column="Image">{service.Spec.TaskTemplate.ContainerSpec.Image}</Td>
+        <Td column="Name">{service.Spec.Name}</Td>
+        <Td column="Image">{service.Spec.TaskTemplate.ContainerSpec.Image}</Td>
         <Td column="Tasks" className="collapsing">
           <div className="ui circular labels">
             {Object.keys(summary).map((k) => (<span className={'ui label ' + k} key={k}>{summary[k]}</span>))}
           </div>
         </Td>
         <Td column="Command"><pre>{service.Spec.TaskTemplate.ContainerSpec.Command ? service.Spec.TaskTemplate.ContainerSpec.Command.join(' ') : ''} {service.Spec.TaskTemplate.ContainerSpec.Args ? service.Spec.TaskTemplate.ContainerSpec.Args.join(' ') : ''}</pre></Td>
-			</Tr>
-		);
-	},
+      </Tr>
+    );
+  },
 
   render() {
     const tasksByService = {};
@@ -54,7 +54,7 @@ const ServiceListView = React.createClass({
     });
 
     return (
-			<Container>
+      <Container>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -64,10 +64,10 @@ const ServiceListView = React.createClass({
               </div>
             </Column>
             <Column className="right aligned ten wide">
-              <Button className="green" onClick={this.props.showCreateServiceModal}>
-                <Icon className="add" />
-                Create
-              </Button>
+            <Link to="/services/create" className="ui green button">
+              <Icon className="add" />
+              Create
+            </Link>
             </Column>
           </Row>
           <Row>
@@ -85,7 +85,7 @@ const ServiceListView = React.createClass({
             </Column>
           </Row>
         </Grid>
-			</Container>
+      </Container>
     );
   },
 });

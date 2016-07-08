@@ -56,10 +56,6 @@ const ImageListView = React.createClass({
               </div>
             </Column>
             <Column className="right aligned ten wide">
-              <Button className="green" onClick={this.props.showPullImageModal}>
-                <Icon className="add" />
-                Pull
-              </Button>
             </Column>
           </Row>
           <Row>

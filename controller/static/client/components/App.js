@@ -7,7 +7,6 @@ function mapStateToProps(state) {
   return {
     error: state.error,
     user: state.user,
-    modals: state.modals,
     info: state.info,
     containers: state.containers,
     events: state.events,
