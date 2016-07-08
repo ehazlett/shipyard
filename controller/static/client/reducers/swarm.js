@@ -1,6 +1,3 @@
-import { push } from 'react-router-redux';
-import store from '../store';
-
 function swarm(state = [], action) {
   switch (action.type) {
     case 'SWARM_FETCH_SUCCEEDED':

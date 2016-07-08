@@ -3,9 +3,9 @@ function tasks(state = [], action) {
     case 'SERVICES_FETCH_SUCCEEDED':
       if (action.tasks) {
         return action.tasks;
-      } else {
-        return [];
       }
+      return [];
+
     default:
       return state;
   }

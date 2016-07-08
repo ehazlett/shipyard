@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 import { Link } from 'react-router';
 import { Grid, Row, Column, Icon } from 'react-semantify';
@@ -6,14 +6,14 @@ import { Table, Tr, Td } from 'reactable';
 
 import CreateVolumeForm from './CreateVolumeForm';
 
-const VolumeListView = React.createClass({
+class VolumeListView extends React.Component {
   componentDidMount() {
     this.props.fetchVolumes();
-  },
+  }
 
   updateFilter(input) {
     this.refs.table.filterBy(input.target.value);
-  },
+  }
 
   renderVolume(volume) {
     return (
@@ -23,7 +23,7 @@ const VolumeListView = React.createClass({
         <Td column="Scope">{volume.Scope}</Td>
       </Tr>
     );
-  },
+  }
 
   render() {
     return (
@@ -60,7 +60,12 @@ const VolumeListView = React.createClass({
         </Row>
       </Grid>
     );
-  },
-});
+  }
+}
+
+VolumeListView.propTypes = {
+  fetchVolumes: PropTypes.func.isRequired,
+  volumes: PropTypes.array.isRequired,
+};
 
 export default VolumeListView;
