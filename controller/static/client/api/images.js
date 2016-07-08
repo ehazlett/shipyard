@@ -14,7 +14,7 @@ export function listImages() {
 }
 
 export function pullImage(imageName) {
-  return fetch('/images/create?fromImage' + imageName, {
+  return fetch(`/images/create?fromImage=${imageName}`, {
     method: 'POST',
   })
   .then(statusHandler)

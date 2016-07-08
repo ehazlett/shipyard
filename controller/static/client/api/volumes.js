@@ -9,20 +9,20 @@ export function listVolumes() {
       'X-Access-Token': getAuthToken(),
     },
   })
-    .then(statusHandler)
-    .then(response => response.json());
+  .then(statusHandler)
+  .then(response => response.json());
 }
 
 export function createVolume(volume) {
   return fetch('/volumes/create', {
-				                                        method: 'POST',
+    method: 'POST',
     body: JSON.stringify(volume),
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json',
       'X-Access-Token': getAuthToken(),
     },
-			                    })
-    .then(statusHandler)
-    .then(response => response.json());
+  })
+  .then(statusHandler)
+  .then(response => response.json());
 }

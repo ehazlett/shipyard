@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Container, Grid, Column, Row, Input, Dropdown, Item, Menu, Button, Icon } from 'react-semantify';
-import { Table, Tbody, Tr, Td, Thead, Th } from 'reactable';
+import { Container, Grid, Column, Row } from 'react-semantify';
 import ContainerInspect from '../containers/ContainerInspect';
 import { Link } from 'react-router';
 import _ from 'lodash';

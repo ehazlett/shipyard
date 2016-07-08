@@ -1,4 +1,4 @@
-export function fetchImages(index) {
+export function fetchImages() {
   return {
     type: 'IMAGES_FETCH_REQUESTED',
   };

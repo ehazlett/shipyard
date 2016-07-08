@@ -1,53 +1,53 @@
 
-export function fetchNodes(index) {
+export function fetchNodes() {
   return {
     type: 'NODES_FETCH_REQUESTED',
   };
 }
 
-export function acceptNode(id) {
+export function acceptNode() {
   return {
     type: 'NODE_ACCEPT_REQUESTED',
   };
 }
 
-export function rejectNode(id) {
+export function rejectNode() {
   return {
     type: 'NODE_REJECT_REQUESTED',
   };
 }
 
-export function activateNode(id) {
+export function activateNode() {
   return {
     type: 'NODE_ACTIVATE_REQUESTED',
   };
 }
 
-export function pauseNode(id) {
+export function pauseNode() {
   return {
     type: 'NODE_PAUSE_REQUESTED',
   };
 }
 
-export function drainNode(id) {
+export function drainNode() {
   return {
     type: 'NODE_DRAIN_REQUESTED',
   };
 }
 
-export function disconnectNode(id) {
+export function disconnectNode() {
   return {
     type: 'NODE_DISCONNECT_REQUESTED',
   };
 }
 
-export function promoteNode(id) {
+export function promoteNode() {
   return {
     type: 'NODE_PROMOTE_REQUESTED',
   };
 }
 
-export function demoteNode(id) {
+export function demoteNode() {
   return {
     type: 'NODE_DEMOTE_REQUESTED',
   };

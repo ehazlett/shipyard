@@ -1,22 +1,29 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Input, Dropdown, Item, Menu, Button, Icon } from 'react-semantify';
-import { Table, Tbody, Tr, Td, Thead, Th } from 'reactable';
+import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Table, Tr, Td } from 'reactable';
 
-import _ from 'lodash';
+class ImageListView extends React.Component {
 
-const ImageListView = React.createClass({
+  constructor(props) {
+    super(props);
+
+    this.updateFilter = this.updateFilter.bind(this);
+    this.renderRow = this.renderRow.bind(this);
+    this.renderImage = this.renderImage.bind(this);
+  }
+
   componentDidMount() {
     this.props.fetchImages();
-  },
+  }
 
   updateFilter(input) {
     this.refs.table.filterBy(input.target.value);
-  },
+  }
 
   renderRow(image, tagIndex) {
     return (
-			<Tr key={image.Id}>
+      <Tr key={image.Id}>
         <Td column="Repository">
           {image.RepoTags[tagIndex].split(':')[0]}
         </Td>
@@ -32,21 +39,21 @@ const ImageListView = React.createClass({
         <Td column="Size">
           {image.Size}
         </Td>
-			</Tr>
+      </Tr>
     );
-  },
-
-	                    renderImage(image) {
-  const rows = [];
-  for (var i = 0; i < image.RepoTags.length; i++) {
-    rows.push(this.renderRow(image, i));
   }
-  return rows;
-	},
+
+  renderImage(image) {
+    const rows = [];
+    for (let i = 0; i < image.RepoTags.length; i++) {
+      rows.push(this.renderRow(image, i));
+    }
+    return rows;
+  }
 
   render() {
     return (
-			<Container>
+      <Container>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -55,27 +62,31 @@ const ImageListView = React.createClass({
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Column>
-            <Column className="right aligned ten wide">
-            </Column>
+            <Column className="right aligned ten wide" />
           </Row>
           <Row>
             <Column className="sixteen wide">
-        <Table
-          ref="table"
-          className="ui compact celled sortable table"
-          sortable
-          filterable={['Repository', 'Tag', 'Image ID', 'Created', 'Size']}
-          hideFilterInput
-          noDataText="Couldn't find any images"
-        >
-						{this.props.images ? this.props.images.map(this.renderImage) : []}
-				</Table>
+              <Table
+                ref="table"
+                className="ui compact celled sortable table"
+                sortable
+                filterable={['Repository', 'Tag', 'Image ID', 'Created', 'Size']}
+                hideFilterInput
+                noDataText="Couldn't find any images"
+              >
+                {this.props.images ? this.props.images.map(this.renderImage) : []}
+              </Table>
             </Column>
           </Row>
         </Grid>
-			</Container>
+      </Container>
     );
-  },
-});
+  }
+}
+
+ImageListView.propTypes = {
+  fetchImages: PropTypes.func.isRequired,
+  images: PropTypes.array.isRequired,
+};
 
 export default ImageListView;

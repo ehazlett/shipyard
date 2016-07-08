@@ -1,4 +1,3 @@
-
 export function showCreateVolumeModal() {
   return {
     type: 'SHOW_CREATE_VOLUME_MODAL',
@@ -12,7 +11,7 @@ export function createVolume(volume) {
   };
 }
 
-export function fetchVolumes(index) {
+export function fetchVolumes() {
   return {
     type: 'VOLUMES_FETCH_REQUESTED',
   };

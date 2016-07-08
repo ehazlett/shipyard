@@ -1,4 +1,4 @@
-export function fetchContainers(index) {
+export function fetchContainers() {
   return {
     type: 'CONTAINERS_FETCH_REQUESTED',
   };

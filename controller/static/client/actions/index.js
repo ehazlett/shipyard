@@ -8,4 +8,3 @@ export * from './volumes.js';
 export * from './events.js';
 export * from './swarm.js';
 export * from './info.js';
-export * from './modals.js';

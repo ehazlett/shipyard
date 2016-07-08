@@ -1,5 +1,4 @@
-
-export function fetchServices(index) {
+export function fetchServices() {
   return {
     type: 'SERVICES_FETCH_REQUESTED',
   };

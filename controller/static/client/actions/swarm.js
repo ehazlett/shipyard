@@ -1,12 +1,10 @@
-
-
-export function fetchSwarm(index) {
+export function fetchSwarm() {
   return {
     type: 'SWARM_FETCH_REQUESTED',
   };
 }
 
-export function swarmInit(index) {
+export function swarmInit() {
   return {
     type: 'SWARM_INIT_REQUESTED',
   };

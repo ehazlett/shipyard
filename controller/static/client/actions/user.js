@@ -1,4 +1,3 @@
-
 export function signIn(credentials) {
   return {
     type: 'SIGN_IN',

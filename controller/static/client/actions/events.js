@@ -1,5 +1,5 @@
 
-export function fetchEvents(index) {
+export function fetchEvents() {
   return {
     type: 'EVENTS_FETCH_REQUESTED',
   };
