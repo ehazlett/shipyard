@@ -1,5 +1,6 @@
 import { takeLatest } from 'redux-saga';
-import { call, put } from 'redux-saga/effects';
+import { take, call, put } from 'redux-saga/effects';
+import { push } from 'react-router-redux';
 
 import { listVolumes, createVolume } from '../api/volumes.js';
 
@@ -18,6 +19,14 @@ function* createVolumeSaga(action) {
 
 function* watchCreateVolume() {
   yield* takeLatest('CREATE_VOLUME_REQUESTED', createVolumeSaga);
+}
+
+// Upon successfully creating a volume, navigate to the volumes page
+function* watchCreateVolumeSucceeded() {
+  while (true) {
+    yield take('CREATE_VOLUME_SUCCEEDED');
+    yield put(push('/volumes'));
+  }
 }
 
 export function* volumesFetch() {
@@ -40,5 +49,6 @@ export default function* watchers() {
   yield [
     watchVolumesFetch(),
     watchCreateVolume(),
+    watchCreateVolumeSucceeded(),
   ];
 }

@@ -1,4 +1,7 @@
 import React from 'react';
+
+import { Container } from 'react-semantify';
+
 import TopNav from './TopNav';
 import Modals from './Modals';
 import SwarmInitView from '../swarm/SwarmInitView';
@@ -38,8 +41,10 @@ const Main = React.createClass({
       <div>
         <TopNav {...this.props} />
         <Modals {...this.props} />
-        {this.props.error ? this.renderError(this.props.error) : null}
-        {React.cloneElement(this.props.children, this.props)}
+        <Container>
+          {this.props.error ? this.renderError(this.props.error) : null}
+          {React.cloneElement(this.props.children, this.props)}
+        </Container>
       </div>
     );
   },
