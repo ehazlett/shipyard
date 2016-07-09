@@ -4,7 +4,7 @@ var webpack = require('webpack');
 module.exports = {
   devtool: 'source-map',
   entry: [
-    './client/entrypoint'
+    './client'
   ],
   output: {
     path: path.join(__dirname, 'dist'),

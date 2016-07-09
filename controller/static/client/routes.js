@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Route, IndexRoute } from 'react-router';
 
-import App from './components/App';
+import App from './containers/App';
 import ServiceListView from './components/services/ServiceListView';
 import CreateServiceView from './components/services/CreateServiceView';
 import ServiceInspectView from './components/services/ServiceInspectView';
