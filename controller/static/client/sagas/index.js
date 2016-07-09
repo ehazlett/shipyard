@@ -10,6 +10,7 @@ import networksWatchers from './networks';
 import volumesWatchers from './volumes';
 import containersWatchers from './containers';
 import eventsWatchers from './events';
+import accountsWatchers from './accounts';
 import swarmWatchers, { swarmFetch } from './swarm';
 
 import { getAuthToken } from '../services/auth';
@@ -26,6 +27,7 @@ function* watchers() {
     fork(volumesWatchers),
     fork(containersWatchers),
     fork(eventsWatchers),
+    fork(accountsWatchers),
   ];
 }
 

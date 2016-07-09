@@ -15,6 +15,7 @@ import ImageListView from './components/images/ImageListView';
 import NetworkListView from './components/networks/NetworkListView';
 import VolumeListView from './components/volumes/VolumeListView';
 import CreateVolumeView from './components/volumes/CreateVolumeView';
+import AccountListView from './components/accounts/AccountListView';
 import SettingsView from './components/settings/SettingsView';
 import EventListView from './components/events/EventListView';
 
@@ -33,6 +34,7 @@ export default (
     <Route path="/settings" component={SettingsView} />
     <Route path="/containers" component={ContainerListView} />
     <Route path="/containers/:id" component={ContainerInspectView} />
+    <Route path="/accounts" component={AccountListView} />
     <Route path="/images" component={ImageListView} />
     <Route path="/events" component={EventListView} />
   </Route>

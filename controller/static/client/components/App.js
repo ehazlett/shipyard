@@ -16,6 +16,7 @@ function mapStateToProps(state) {
     nodes: state.nodes,
     images: state.images,
     networks: state.networks,
+    accounts: state.accounts,
     volumes: state.volumes,
     routing: state.routing,
   };

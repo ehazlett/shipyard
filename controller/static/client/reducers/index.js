@@ -10,6 +10,7 @@ import tasks from './tasks';
 import nodes from './nodes';
 import images from './images';
 import networks from './networks';
+import accounts from './accounts';
 import volumes from './volumes';
 import events from './events';
 import containers from './containers';
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   nodes,
   images,
   networks,
+  accounts,
   volumes,
   routing: routerReducer,
 });

@@ -40,6 +40,12 @@ const TopNav = (props) => (
         <Icon className="browser" />
         Events
       </Link>
+
+      <Link to="/accounts" className="item">
+        <Icon className="users" />
+        Accounts
+      </Link>
+
       <Link to="/settings" className="item">
         <Icon className="setting" />
         Settings
