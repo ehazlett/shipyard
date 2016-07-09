@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
@@ -58,7 +58,7 @@ class NodeListView extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -79,12 +79,12 @@ class NodeListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any nodes"
               >
-                {this.props.nodes ? this.props.nodes.map(this.renderNode) : []}
+                {this.props.nodes.data.map(this.renderNode)}
               </Table>
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

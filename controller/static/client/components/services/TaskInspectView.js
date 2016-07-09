@@ -13,14 +13,14 @@ class TaskInspectView extends React.Component {
 
   render() {
     const { id } = this.props.params;
-    const task = _.filter(this.props.tasks, (t) => t.ID === id)[0];
+    const task = _.filter(this.props.tasks.data, (t) => t.ID === id)[0];
     if (!task) { return (<div></div>); }
 
-    const service = _.filter(this.props.services, (s) => s.ID === task.ServiceID)[0];
+    const service = _.filter(this.props.services.data, (s) => s.ID === task.ServiceID)[0];
     if (!service) { return (<div></div>); }
 
     const container = _.filter(
-      this.props.containers, (c) => c.Id === task.Status.ContainerStatus.ContainerID)[0];
+      this.props.containers.data, (c) => c.Id === task.Status.ContainerStatus.ContainerID)[0];
 
     return (
       <Container>

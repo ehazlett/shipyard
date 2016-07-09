@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 
 class ImageListView extends React.Component {
@@ -53,7 +53,7 @@ class ImageListView extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -74,12 +74,12 @@ class ImageListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any images"
               >
-                {this.props.images ? this.props.images.map(this.renderImage) : []}
+                {this.props.images.data.map(this.renderImage)}
               </Table>
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

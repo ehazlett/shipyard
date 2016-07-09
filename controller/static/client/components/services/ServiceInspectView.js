@@ -49,9 +49,9 @@ class ServiceListView extends React.Component {
 
   render() {
     const { id } = this.props.params;
-    const service = _.filter(this.props.services, (s) => s.ID === id)[0];
-    const tasks = _.filter(this.props.tasks, (t) => t.ServiceID === id);
-    const nodes = _.keyBy(this.props.nodes, (n) => n.ID);
+    const service = _.filter(this.props.services.data, (s) => s.ID === id)[0];
+    const tasks = _.filter(this.props.tasks.data, (t) => t.ServiceID === id);
+    const nodes = _.keyBy(this.props.nodes.data, (n) => n.ID);
 
     if (!service) {
       return (<div></div>);

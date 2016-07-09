@@ -1,4 +1,6 @@
-function events(state = [], action) {
+const initialState = [];
+
+function events(state = initialState, action) {
   switch (action.type) {
     case 'NEW_EVENT':
       return [action.event, ...state];

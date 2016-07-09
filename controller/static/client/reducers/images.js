@@ -1,7 +1,25 @@
-function images(state = [], action) {
+const initialState = {
+  loading: false,
+  data: [],
+};
+
+function images(state = initialState, action) {
   switch (action.type) {
+    case 'IMAGES_FETCH_REQUESTED':
+      return {
+        loading: true,
+        data: state.data,
+      };
     case 'IMAGES_FETCH_SUCCEEDED':
-      return action.images;
+      return {
+        loading: false,
+        data: action.images,
+      };
+    case 'IMAGES_FETCH_FAILED':
+      return {
+        loading: false,
+        data: [],
+      };
     default:
       return state;
   }

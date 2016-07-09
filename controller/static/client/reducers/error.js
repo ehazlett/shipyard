@@ -1,4 +1,6 @@
-function error(state = [], action) {
+const initialState = "";
+
+function error(state = initialState, action) {
   if (action.type === 'RESET_ERROR') {
     return null;
   } else if (action.error) {

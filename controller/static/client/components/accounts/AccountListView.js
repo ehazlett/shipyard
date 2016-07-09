@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 
 class AccountListView extends React.Component {
@@ -31,7 +31,7 @@ class AccountListView extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Segment className={`basic ${this.props.accounts.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -52,12 +52,12 @@ class AccountListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any accounts"
               >
-                {this.props.accounts.map(this.renderAccount)}
+                {this.props.accounts.data.map(this.renderAccount)}
               </Table>
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

@@ -53,17 +53,27 @@ class Main extends React.Component {
   }
 
   render() {
+    // If the user is not logged in, show the login page
     const token = getAuthToken();
     if (!token) {
       return this.renderLoginPage();
     }
 
+    // If swarm isn't initialized, show the swarm init page
     const { initialized } = this.props.swarm;
-    if (!initialized) {
+    if (initialized === false) {
       return this.renderWelcomePage();
     }
 
-    return this.renderMainPage();
+    // Render the view if swarm is initialized and it's not loading
+    if(initialized === true) {
+      return this.renderMainPage();
+    }
+
+    // Show a blank page while waiting to get the swarm details
+    return (
+      <div></div>
+    );
   }
 }
 

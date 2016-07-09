@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 
 class NetworkListView extends React.Component {
@@ -31,7 +31,7 @@ class NetworkListView extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Segment className={`basic ${this.props.networks.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -52,12 +52,12 @@ class NetworkListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any networks"
               >
-                {this.props.networks.map(this.renderNetwork)}
+                {this.props.networks.data.map(this.renderNetwork)}
               </Table>
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

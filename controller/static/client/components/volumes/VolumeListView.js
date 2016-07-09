@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 
 import { Link } from 'react-router';
-import { Grid, Row, Column, Icon } from 'react-semantify';
+import { Segment, Grid, Row, Column, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 
 import CreateVolumeForm from './CreateVolumeForm';
@@ -27,38 +27,40 @@ class VolumeListView extends React.Component {
 
   render() {
     return (
-      <Grid>
-        <Row>
-          <Column className="six wide">
-            <div className="ui fluid icon input">
-              <Icon className="search" />
-              <input placeholder="Search..." onChange={this.updateFilter}></input>
-            </div>
-          </Column>
-          <Column className="right aligned ten wide">
-            <Link to="/volumes/create" className="ui green button">
-              <Icon className="add" />
-              Create
-            </Link>
-          </Column>
-        </Row>
+      <Segment className={`basic ${this.props.volumes.loading ? 'loading' : ''}`}>
+        <Grid>
+          <Row>
+            <Column className="six wide">
+              <div className="ui fluid icon input">
+                <Icon className="search" />
+                <input placeholder="Search..." onChange={this.updateFilter}></input>
+              </div>
+            </Column>
+            <Column className="right aligned ten wide">
+              <Link to="/volumes/create" className="ui green button">
+                <Icon className="add" />
+                Create
+              </Link>
+            </Column>
+          </Row>
 
-        {this.createVolumeFormVisible ? <CreateVolumeForm /> : null}
+          {this.createVolumeFormVisible ? <CreateVolumeForm /> : null}
 
-        <Row>
-          <Column className="sixteen wide">
-            <Table
-              ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
-              filterable={[]}
-              noDataText="Couldn't find any volumes"
-            >
-              {this.props.volumes ? this.props.volumes.map(this.renderVolume) : []}
-            </Table>
-          </Column>
-        </Row>
-      </Grid>
+          <Row>
+            <Column className="sixteen wide">
+              <Table
+                ref="table"
+                className="ui compact celled sortable unstackable table"
+                sortable
+                filterable={[]}
+                noDataText="Couldn't find any volumes"
+              >
+                {this.props.volumes.data.map(this.renderVolume)}
+              </Table>
+            </Column>
+          </Row>
+        </Grid>
+      </Segment>
     );
   }
 }

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 import taskStates from './TaskStates';
 import { Link } from 'react-router';
@@ -48,7 +48,7 @@ class ServiceListView extends React.Component {
 
   render() {
     const tasksByService = {};
-    _.forEach(this.props.tasks, function (task) {
+    _.forEach(this.props.tasks.data, function (task) {
       if (!tasksByService[task.ServiceID]) {
         tasksByService[task.ServiceID] = [];
       }
@@ -63,7 +63,7 @@ class ServiceListView extends React.Component {
     });
 
     return (
-      <Container>
+      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -87,16 +87,13 @@ class ServiceListView extends React.Component {
                 sortable
                 filterable={['ID', 'Name', 'Image', 'Command']}
                 hideFilterInput
-                noDataText="Couldn't find any services"
-              >
-                {this.props.services ?
-                  this.props.services.map(s => this.renderService(s, taskSummaryByService[s.ID]))
-                  : []}
+                noDataText="Couldn't find any services">
+                { this.props.services.data.map(s => this.renderService(s, taskSummaryByService[s.ID])) }
               </Table>
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

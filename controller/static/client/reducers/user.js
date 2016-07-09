@@ -1,4 +1,6 @@
-function user(state = [], action) {
+const initialState = {};
+
+function user(state = initialState, action) {
   switch (action.type) {
     case 'SIGN_IN_SUCCEEDED':
       return {

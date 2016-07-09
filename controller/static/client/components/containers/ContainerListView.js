@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
@@ -41,7 +41,7 @@ class ContainerListView extends React.Component {
 
   render() {
     return (
-      <Container>
+      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="six wide">
@@ -62,12 +62,12 @@ class ContainerListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any containers"
               >
-                {this.props.containers ? this.props.containers.map(this.renderContainer) : []}
+                {this.props.containers.data.map(this.renderContainer)}
               </Table>
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

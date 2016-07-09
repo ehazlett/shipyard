@@ -36,11 +36,6 @@ const TopNav = (props) => (
         Volumes
       </Link>
 
-      <Link to="/events" className="item">
-        <Icon className="browser" />
-        Events
-      </Link>
-
       <Link to="/accounts" className="item">
         <Icon className="users" />
         Accounts
