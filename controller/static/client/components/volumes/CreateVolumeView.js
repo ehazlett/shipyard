@@ -2,8 +2,8 @@ import React from 'react';
 
 import CreateVolumeForm from './CreateVolumeForm';
 
-const CreateVolumeView = () => (
-  <CreateVolumeForm {...this.props} />
+const CreateVolumeView = (props) => (
+  <CreateVolumeForm {...props} />
 );
 
 export default CreateVolumeView;
