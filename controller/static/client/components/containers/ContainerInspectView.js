@@ -1,20 +1,18 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 import { Container, Grid, Column, Row } from 'react-semantify';
 import ContainerInspect from '../containers/ContainerInspect';
 import { Link } from 'react-router';
 import _ from 'lodash';
 
-const ContainerListView = React.createClass({
+class ContainerListView extends React.Component {
   componentDidMount() {
     this.props.fetchContainers();
-  },
+  }
 
   render() {
     const { id } = this.props.params;
-    const container = _.filter(this.props.containers, function (s) {
-      return s.Id === id;
-    })[0];
+    const container = _.filter(this.props.containers, (s) => s.Id === id)[0];
 
     if (!container) return (<div></div>);
 
@@ -36,8 +34,16 @@ const ContainerListView = React.createClass({
         </Grid>
       </Container>
     );
-  },
-});
+  }
+}
+
+// ContainerListView.propTypes = {
+//   fetchContainers: PropTypes.func.isRequired,
+//   containers: PropTypes.array.isRequired,
+//   params: {
+//     id: PropTypes.string.isRequired,
+//   },
+// };
 
 export default ContainerListView;
 

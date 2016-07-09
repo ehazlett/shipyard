@@ -49,7 +49,7 @@ class VolumeListView extends React.Component {
           <Column className="sixteen wide">
             <Table
               ref="table"
-              className="ui compact celled sortable table"
+              className="ui compact celled sortable unstackable table"
               sortable
               filterable={[]}
               noDataText="Couldn't find any volumes"
@@ -63,9 +63,9 @@ class VolumeListView extends React.Component {
   }
 }
 
-VolumeListView.propTypes = {
-  fetchVolumes: PropTypes.func.isRequired,
-  volumes: PropTypes.array.isRequired,
-};
+// VolumeListView.propTypes = {
+//   fetchVolumes: PropTypes.func.isRequired,
+//   volumes: PropTypes.array.isRequired,
+// };
 
 export default VolumeListView;

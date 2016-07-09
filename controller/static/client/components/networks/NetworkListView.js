@@ -1,16 +1,22 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Input, Dropdown, Item, Menu, Button, Icon } from 'react-semantify';
-import { Table, Tbody, Tr, Td, Thead, Th } from 'reactable';
+import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Table, Tr, Td } from 'reactable';
 
-const NetworkListView = React.createClass({
+class NetworkListView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateFilter = this.updateFilter.bind(this);
+    this.renderNetwork = this.renderNetwork.bind(this);
+  }
+
   componentDidMount() {
     this.props.fetchNetworks();
-  },
+  }
 
   updateFilter(input) {
     this.refs.table.filterBy(input.target.value);
-  },
+  }
 
   renderNetwork(network) {
     return (
@@ -21,7 +27,7 @@ const NetworkListView = React.createClass({
         <Td column="Scope">{network.Scope}</Td>
       </Tr>
     );
-  },
+  }
 
   render() {
     return (
@@ -34,14 +40,13 @@ const NetworkListView = React.createClass({
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Column>
-            <Column className="right aligned ten wide">
-            </Column>
+            <Column className="right aligned ten wide" />
           </Row>
           <Row>
             <Column className="sixteen wide">
               <Table
                 ref="table"
-                className="ui compact celled sortable table"
+                className="ui compact celled sortable unstackable table"
                 sortable
                 filterable={['ID', 'Name', 'Driver', 'Scope']}
                 hideFilterInput
@@ -54,7 +59,12 @@ const NetworkListView = React.createClass({
         </Grid>
       </Container>
     );
-  },
-});
+  }
+}
+
+// NetworkListView.propTypes = {
+//   fetchNetworks: PropTypes.func.isRequired,
+//   networks: PropTypes.array.isRequired,
+// };
 
 export default NetworkListView;

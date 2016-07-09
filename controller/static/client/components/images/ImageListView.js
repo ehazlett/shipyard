@@ -68,7 +68,7 @@ class ImageListView extends React.Component {
             <Column className="sixteen wide">
               <Table
                 ref="table"
-                className="ui compact celled sortable table"
+                className="ui compact celled sortable unstackable table"
                 sortable
                 filterable={['Repository', 'Tag', 'Image ID', 'Created', 'Size']}
                 hideFilterInput
@@ -84,9 +84,9 @@ class ImageListView extends React.Component {
   }
 }
 
-ImageListView.propTypes = {
-  fetchImages: PropTypes.func.isRequired,
-  images: PropTypes.array.isRequired,
-};
+// ImageListView.propTypes = {
+//   fetchImages: PropTypes.func.isRequired,
+//   images: PropTypes.array.isRequired,
+// };
 
 export default ImageListView;

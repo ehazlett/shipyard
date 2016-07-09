@@ -1,33 +1,43 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Input, Dropdown, Item, Menu, Button, Icon } from 'react-semantify';
-import { Table, Tbody, Tr, Td, Thead, Th } from 'reactable';
+import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
-const ContainerListView = React.createClass({
+class ContainerListView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateFilter = this.updateFilter.bind(this);
+    this.renderContainer = this.renderContainer.bind(this);
+  }
+
   componentDidMount() {
     this.props.fetchContainers();
-  },
+  }
 
   updateFilter(input) {
     this.refs.table.filterBy(input.target.value);
-  },
+  }
 
   renderContainer(container) {
     return (
       <Tr key={container.Id}>
         <Td column="" className="collapsing">
-          <Icon className={'circle ' + (container.Status.indexOf('Up') === 0 ? 'green' : 'red')}></Icon>
+          <Icon className={`circle ${container.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
         </Td>
-        <Td column="ID" className="collapsing"><Link to={'/containers/' + container.Id}>{container.Id.substring(0, 12)}</Link></Td>
+        <Td column="ID" className="collapsing">
+          <Link to={`/containers/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
+        </Td>
         <Td column="Image">{container.Image}</Td>
         <Td column="Command">{container.Command}</Td>
-        <Td column="Created" className="collapsing">{new Date(container.Created * 1000).toLocaleString()}</Td>
+        <Td column="Created" className="collapsing">
+          {new Date(container.Created * 1000).toLocaleString()}
+        </Td>
         <Td column="Status">{container.Status}</Td>
         <Td column="Name">{container.Names[0]}</Td>
       </Tr>
     );
-  },
+  }
 
   render() {
     return (
@@ -40,14 +50,13 @@ const ContainerListView = React.createClass({
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Column>
-            <Column className="right aligned ten wide">
-            </Column>
+            <Column className="right aligned ten wide" />
           </Row>
           <Row>
             <Column className="sixteen wide">
               <Table
                 ref="table"
-                className="ui compact celled sortable table"
+                className="ui compact celled sortable unstackable table"
                 sortable
                 filterable={['ID', 'Image', 'Command', 'Created', 'Status', 'Name']}
                 hideFilterInput
@@ -60,7 +69,12 @@ const ContainerListView = React.createClass({
         </Grid>
       </Container>
     );
-  },
-});
+  }
+}
+
+// ContainerListView.propTypes = {
+//   fetchContainers: PropTypes.func.isRequired,
+//   containers: PropTypes.array.isRequired,
+// };
 
 export default ContainerListView;

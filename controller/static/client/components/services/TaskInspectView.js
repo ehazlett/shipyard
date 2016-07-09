@@ -6,7 +6,6 @@ import { Link } from 'react-router';
 import _ from 'lodash';
 
 class TaskInspectView extends React.Component {
-
   componentDidMount() {
     this.props.fetchContainers();
     this.props.fetchServices();
@@ -46,16 +45,16 @@ class TaskInspectView extends React.Component {
   }
 }
 
-TaskInspectView.propTypes = {
-  fetchContainers: PropTypes.func.isRequired,
-  fetchServices: PropTypes.func.isRequired,
-  containers: PropTypes.array.isRequired,
-  services: PropTypes.array.isRequired,
-  tasks: PropTypes.array.isRequired,
-  params: {
-    id: PropTypes.string.isRequired,
-  },
-};
+// TaskInspectView.propTypes = {
+//   fetchContainers: PropTypes.func.isRequired,
+//   fetchServices: PropTypes.func.isRequired,
+//   containers: PropTypes.array.isRequired,
+//   services: PropTypes.array.isRequired,
+//   tasks: PropTypes.array.isRequired,
+//   params: {
+//     id: PropTypes.string.isRequired,
+//   },
+// };
 
 export default TaskInspectView;
 

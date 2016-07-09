@@ -1,25 +1,33 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Input, Dropdown, Item, Menu, Button, Icon } from 'react-semantify';
-import { Table, Tbody, Tr, Td, Thead, Th } from 'reactable';
+import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
-const NodeListView = React.createClass({
+class NodeListView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.updateFilter = this.updateFilter.bind(this);
+    this.renderNode = this.renderNode.bind(this);
+  }
+
   componentDidMount() {
     this.props.fetchNodes();
-  },
+  }
 
   updateFilter(input) {
     this.refs.table.filterBy(input.target.value);
-  },
+  }
 
   renderNode(node) {
     return (
       <Tr key={node.Id}>
         <Td column="" className="collapsing">
-          <Icon className={'circle ' + (node.Status.State === 'ready' ? 'green' : 'red')}></Icon>
+          <Icon className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
         </Td>
-        <Td column="ID" className="collapsing"><Link to={'/nodes/' + node.ID}>{node.ID.substring(0, 12)}</Link></Td>
+        <Td column="ID" className="collapsing">
+          <Link to={`/nodes/${node.ID}`}>{node.ID.substring(0, 12)}</Link>
+        </Td>
         <Td column="Hostname">{node.Description.Hostname}</Td>
         <Td column="OS">
           <span>{node.Description.Platform.OS} {node.Description.Platform.Architecture}</span>
@@ -30,23 +38,23 @@ const NodeListView = React.createClass({
           <div className="ui simple dropdown">
             <i className="dropdown icon"></i>
             <div className="menu">
-              <div className="item" onClick={this.props.acceptNode(node.ID)}>Accept</div>
-              <div className="item" onClick={this.props.rejectNode(node.ID)}>Reject</div>
+              <div className="item">Accept</div>
+              <div className="item">Reject</div>
 
-              <div className="item" onClick={this.props.activateNode(node.ID)}>Activate</div>
-              <div className="item" onClick={this.props.pauseNode(node.ID)}>Pause</div>
-              <div className="item" onClick={this.props.drainNode(node.ID)}>Drain</div>
+              <div className="item">Activate</div>
+              <div className="item">Pause</div>
+              <div className="item">Drain</div>
 
-              <div className="item" onClick={this.props.disconnectNode(node.ID)}>Disconnect</div>
+              <div className="item">Disconnect</div>
 
-              <div className="item" onClick={this.props.promoteNode(node.ID)}>Promote</div>
-              <div className="item" onClick={this.props.demoteNode(node.ID)}>Demote</div>
+              <div className="item">Promote</div>
+              <div className="item">Demote</div>
             </div>
           </div>
         </Td>
       </Tr>
     );
-  },
+  }
 
   render() {
     return (
@@ -59,14 +67,13 @@ const NodeListView = React.createClass({
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Column>
-            <Column className="right aligned ten wide">
-            </Column>
+            <Column className="right aligned ten wide" />
           </Row>
           <Row>
             <Column className="sixteen wide">
               <Table
                 ref="table"
-                className="ui compact celled sortable table"
+                className="ui compact celled sortable unstackable table"
                 sortable
                 filterable={['Hostname', 'OS', 'Engine', 'Type']}
                 hideFilterInput
@@ -79,7 +86,20 @@ const NodeListView = React.createClass({
         </Grid>
       </Container>
     );
-  },
-});
+  }
+}
+
+// NodeListView.propTypes = {
+//   fetchNodes: PropTypes.func.isRequired,
+//   acceptNode: PropTypes.func.isRequired,
+//   rejectNode: PropTypes.func.isRequired,
+//   activateNode: PropTypes.func.isRequired,
+//   pauseNode: PropTypes.func.isRequired,
+//   drainNode: PropTypes.func.isRequired,
+//   disconnectNode: PropTypes.func.isRequired,
+//   promoteNode: PropTypes.func.isRequired,
+//   demoteNode: PropTypes.func.isRequired,
+//   nodes: PropTypes.array.isRequired,
+// };
 
 export default NodeListView;

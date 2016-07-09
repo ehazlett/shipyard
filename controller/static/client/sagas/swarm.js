@@ -25,7 +25,8 @@ export function* swarmFetch() {
     });
   } catch (e) {
     if (!e.response) {
-      console.error(e);
+      console.error('Error does not contain a response', e);
+      return;
     }
 
     // If we receive a 406 when fetching swarm info, this means the cluster is not initialised

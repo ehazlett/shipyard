@@ -91,7 +91,7 @@ const NodeListView = React.createClass({
                   <input placeholder="Search..." onChange={this.updateFilter}></input>
                 </div>
                 <Table
-                  className="ui compact celled sortable table"
+                  className="ui compact celled sortable unstackable table"
                   ref="table"
                   sortable
                   filterable={['ID', 'Name', 'Image', 'Command']}

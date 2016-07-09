@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 import _ from 'lodash';
 import { Header, Field } from 'react-semantify';
 
-const CreateVolumeForm = React.createClass({
+class CreateVolumeForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.createVolume = this.createVolume.bind(this);
+  }
+
   createVolume() {
     const driverOpts = {};
 
@@ -20,7 +26,8 @@ const CreateVolumeForm = React.createClass({
       Driver: this.refs.Driver.value,
       DriverOpts: driverOpts,
     });
-  },
+  }
+
   render() {
     return (
       <form className="ui form" onSubmit={this.createVolume}>
@@ -40,7 +47,11 @@ const CreateVolumeForm = React.createClass({
         <input type="submit" className="ui positive button" value="Create Volume"></input>
       </form>
     );
-  },
-});
+  }
+}
+
+CreateVolumeForm.propTypes = {
+  createVolume: PropTypes.func.isRequired,
+};
 
 export default CreateVolumeForm;

@@ -2,12 +2,8 @@ import React from 'react';
 
 import CreateServiceForm from './CreateServiceForm';
 
-const CreateServiceView = React.createClass({
-  render() {
-    return (
-      <CreateServiceForm {...this.props} />
-    );
-  },
-});
+const CreateServiceView = (props) => (
+  <CreateServiceForm {...props} />
+);
 
 export default CreateServiceView;
