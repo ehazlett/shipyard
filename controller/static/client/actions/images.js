@@ -1,6 +1,7 @@
-export function fetchImages() {
+export function fetchImages(all) {
   return {
     type: 'IMAGES_FETCH_REQUESTED',
+    all,
   };
 }
 
@@ -17,3 +18,9 @@ export function pullImage(imageName) {
   };
 }
 
+export function removeImage(id) {
+  return {
+    type: 'IMAGE_REMOVE_REQUESTED',
+    id,
+  };
+}

@@ -39,6 +39,17 @@ class ImageListView extends React.Component {
         <Td column="Size">
           {image.Size}
         </Td>
+        <Td column="&nbsp;" className="collapsing">
+          <div className="ui simple dropdown">
+            <i className="dropdown icon"></i>
+            <div className="menu">
+              <div className="item" onClick={() => this.props.removeImage(image.Id)}>
+                <Icon className="red remove" />
+                Remove
+              </div>
+            </div>
+          </div>
+        </Td>
       </Tr>
     );
   }

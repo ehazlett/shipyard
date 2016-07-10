@@ -13,7 +13,7 @@ function images(state = initialState, action) {
     case 'IMAGES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.images, 'id'),
+        data: _.keyBy(action.images, 'Id'),
       };
     case 'IMAGES_FETCH_FAILED':
       return {
