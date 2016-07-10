@@ -1,9 +1,3 @@
-export function showCreateVolumeModal() {
-  return {
-    type: 'SHOW_CREATE_VOLUME_MODAL',
-  };
-}
-
 export function createVolume(volume) {
   return {
     type: 'CREATE_VOLUME_REQUESTED',

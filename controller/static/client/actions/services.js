@@ -11,9 +11,17 @@ export function createService(spec) {
   };
 }
 
-export function showCreateServiceModal() {
+export function removeService(id) {
   return {
-    type: 'SHOW_CREATE_SERVICE_MODAL',
+    type: 'REMOVE_SERVICE_REQUESTED',
+    id,
   };
 }
 
+export function updateService(id, spec) {
+  return {
+    type: 'UPDATE_SERVICE_REQUESTED',
+    id,
+    spec,
+  };
+}

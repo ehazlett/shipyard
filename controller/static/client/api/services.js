@@ -24,3 +24,26 @@ export function createService(spec) {
   .then(statusHandler)
   .then(response => response.json());
 }
+
+export function updateService(id, spec) {
+  const url = `/services/${id}/update`;
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+    body: JSON.stringify(spec),
+  })
+  .then(statusHandler);
+}
+
+export function removeService(id) {
+  const url = `/services/${id}`;
+  return fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+  .then(statusHandler);
+}

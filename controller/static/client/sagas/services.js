@@ -1,8 +1,13 @@
-import { takeLatest } from 'redux-saga';
+import { takeLatest, takeEvery } from 'redux-saga';
 import { take, call, put } from 'redux-saga/effects';
 import { push } from 'react-router-redux';
 
-import { listServices, createService } from '../api/services';
+import {
+  listServices,
+  createService,
+  updateService,
+  removeService,
+} from '../api/services';
 import { listTasks } from '../api/tasks';
 
 function* createServiceSaga(action) {
@@ -47,10 +52,54 @@ function* watchServicesFetch() {
   yield* takeLatest('SERVICES_FETCH_REQUESTED', servicesFetch);
 }
 
+export function* serviceUpdate(action) {
+  try {
+    yield call(updateService, action.id);
+
+    // Signal that update succeeded
+    yield put({
+      type: 'UPDATE_SERVICE_SUCCEEDED',
+      id: action.id,
+    });
+
+    // Refresh after removing a service
+    yield call(servicesFetch);
+  } catch (e) {
+    yield put({ type: 'UPDATE_SERVICE_FAILED', error: e.message });
+  }
+}
+
+function* watchServiceUpdate() {
+  yield* takeEvery('UPDATE_SERVICE_REQUESTED', serviceUpdate);
+}
+
+export function* serviceRemove(action) {
+  try {
+    yield call(removeService, action.id);
+
+    // Signal that remove succeeded
+    yield put({
+      type: 'REMOVE_SERVICE_SUCCEEDED',
+      id: action.id,
+    });
+
+    // Refresh after removing a service
+    yield call(servicesFetch);
+  } catch (e) {
+    yield put({ type: 'REMOVE_SERVICE_FAILED', error: e.message });
+  }
+}
+
+function* watchServiceRemove() {
+  yield* takeEvery('REMOVE_SERVICE_REQUESTED', serviceRemove);
+}
+
 export default function* watchers() {
   yield [
     watchServicesFetch(),
     watchCreateService(),
     watchCreateServiceSucceeded(),
+    watchServiceRemove(),
+    watchServiceUpdate(),
   ];
 }

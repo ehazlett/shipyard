@@ -42,6 +42,17 @@ class ServiceListView extends React.Component {
           </div>
         </Td>
         <Td column="Command"><pre>{service.Spec.TaskTemplate.ContainerSpec.Command ? service.Spec.TaskTemplate.ContainerSpec.Command.join(' ') : ''} {service.Spec.TaskTemplate.ContainerSpec.Args ? service.Spec.TaskTemplate.ContainerSpec.Args.join(' ') : ''}</pre></Td>
+        <Td column="&nbsp;" className="collapsing">
+          <div className="ui simple dropdown">
+            <i className="dropdown icon"></i>
+            <div className="menu">
+              <div className="item" onClick={() => this.props.removeService(service.ID)}>
+                <Icon className="red remove" />
+                Remove
+              </div>
+            </div>
+          </div>
+        </Td>
       </Tr>
     );
   }
