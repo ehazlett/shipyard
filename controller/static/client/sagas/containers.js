@@ -35,12 +35,15 @@ export function* containerStop(action) {
     yield put({
       type: 'CONTAINER_STOP_SUCCEEDED',
       id: action.id,
+      message: `Successfully stopped container ${action.id}`,
+      level: 'success',
     });
 
     // Refresh after removing a container
     yield call(containersFetch);
   } catch (e) {
-    yield put({ type: 'CONTAINER_STOP_FAILED', 
+		yield put({
+			type: 'CONTAINER_STOP_FAILED',
       message: e.message,
       level: error,
     });
@@ -59,6 +62,8 @@ export function* containerStart(action) {
     yield put({
       type: 'CONTAINER_START_SUCCEEDED',
       id: action.id,
+      message: `Successfully started container ${action.id}`,
+      level: 'success',
     });
 
     // Refresh after removing a container
@@ -80,6 +85,8 @@ export function* containerRemove(action) {
     yield put({
       type: 'CONTAINER_REMOVE_SUCCEEDED',
       id: action.id,
+      message: `Successfully removed container ${action.id}`,
+      level: 'success',
     });
 
     // Refresh after removing a container

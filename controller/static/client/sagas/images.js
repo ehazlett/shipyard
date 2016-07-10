@@ -10,7 +10,11 @@ import {
 function* imagePull(action) {
   try {
     yield call(pullImage, action.imageName);
-    yield put({ type: 'IMAGE_PULL_SUCCEEDED' });
+    yield put({
+      type: 'IMAGE_PULL_SUCCEEDED',
+      message: `Successfully pulled image ${action.id}`,
+      level: 'success',
+    });
   } catch (e) {
     yield put({ type: 'IMAGE_PULL_FAILED', message: e.message, level: 'error' });
   }

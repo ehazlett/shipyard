@@ -15,9 +15,10 @@ function* createServiceSaga(action) {
     yield call(createService, action.spec);
     yield put({
       type: 'CREATE_SERVICE_SUCCEEDED',
+      message: `Successfully created service`,
+      level: 'success',
     });
     yield put({ type: 'SERVICES_FETCH_REQUESTED' });
-    yield put({ type: 'HIDE_MODAL' });
   } catch (e) {
     yield put({ type: 'CREATE_SERVICE_FAILED', message: e.message, level: 'error' });
   }
@@ -81,6 +82,8 @@ export function* serviceRemove(action) {
     yield put({
       type: 'REMOVE_SERVICE_SUCCEEDED',
       id: action.id,
+      message: `Successfully removed service ${action.id}`,
+      level: 'success',
     });
 
     // Refresh after removing a service
