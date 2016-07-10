@@ -36,7 +36,10 @@ class Main extends React.Component {
 
   renderMessage(message) {
     return (
-      <div className={`ui ${message.level} message`}>{message.message}</div>
+			<div className={`ui ${message.level} message`}>
+				<i className="close icon" onClick={this.props.resetMessage}></i>
+				{message.message}
+			</div>
     );
   }
 

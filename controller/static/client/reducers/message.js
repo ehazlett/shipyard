@@ -13,7 +13,7 @@ function message(state = initialState, action) {
     };
   }
 
-  return initialState;
+  return state;
 }
 
 export default message;
