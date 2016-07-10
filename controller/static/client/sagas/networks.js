@@ -11,7 +11,7 @@ export function* networksFetch() {
       networks,
     });
   } catch (e) {
-    yield put({ type: 'NETWORKS_FETCH_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'NETWORKS_FETCH_FAILED', message: e.message, level: 'error' });
   }
 }
 

@@ -8,7 +8,7 @@ function message(state = initialState, action) {
     return initialState;
   } else if (action.message) {
     return {
-      level: action.messageLevel,
+      level: action.level,
       message: action.message,
     };
   }

@@ -18,7 +18,7 @@ export function* containersFetch() {
   } catch (e) {
     yield put({ type: 'CONTAINERS_FETCH_FAILED',
       message: e.message,
-      messageLevel: 'error',
+      level: 'error',
     });
   }
 }
@@ -42,7 +42,7 @@ export function* containerStop(action) {
   } catch (e) {
     yield put({ type: 'CONTAINER_STOP_FAILED', 
       message: e.message,
-      messageLevel: error,
+      level: error,
     });
   }
 }
@@ -64,7 +64,7 @@ export function* containerStart(action) {
     // Refresh after removing a container
     yield call(containersFetch);
   } catch (e) {
-    yield put({ type: 'CONTAINER_START_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'CONTAINER_START_FAILED', message: e.message, level: 'error' });
   }
 }
 
@@ -85,7 +85,7 @@ export function* containerRemove(action) {
     // Refresh after removing a container
     yield call(containersFetch);
   } catch (e) {
-    yield put({ type: 'CONTAINER_REMOVE_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'CONTAINER_REMOVE_FAILED', message: e.message, level: 'error' });
   }
 }
 

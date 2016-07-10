@@ -19,7 +19,7 @@ function* createServiceSaga(action) {
     yield put({ type: 'SERVICES_FETCH_REQUESTED' });
     yield put({ type: 'HIDE_MODAL' });
   } catch (e) {
-    yield put({ type: 'CREATE_SERVICE_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'CREATE_SERVICE_FAILED', message: e.message, level: 'error' });
   }
 }
 // Upon successfully creating a service, navigate to the services page
@@ -44,7 +44,7 @@ export function* servicesFetch() {
       tasks,
     });
   } catch (e) {
-    yield put({ type: 'SERVICES_FETCH_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'SERVICES_FETCH_FAILED', message: e.message, level: 'error' });
   }
 }
 
@@ -65,7 +65,7 @@ export function* serviceUpdate(action) {
     // Refresh after removing a service
     yield call(servicesFetch);
   } catch (e) {
-    yield put({ type: 'UPDATE_SERVICE_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'UPDATE_SERVICE_FAILED', message: e.message, level: 'error' });
   }
 }
 
@@ -86,7 +86,7 @@ export function* serviceRemove(action) {
     // Refresh after removing a service
     yield call(servicesFetch);
   } catch (e) {
-    yield put({ type: 'REMOVE_SERVICE_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'REMOVE_SERVICE_FAILED', message: e.message, level: 'error' });
   }
 }
 

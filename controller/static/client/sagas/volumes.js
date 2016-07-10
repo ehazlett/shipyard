@@ -13,7 +13,7 @@ function* createVolumeSaga(action) {
     yield put({ type: 'VOLUMES_FETCH_REQUESTED' });
     yield put({ type: 'HIDE_MODAL' });
   } catch (e) {
-    yield put({ type: 'CREATE_VOLUME_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'CREATE_VOLUME_FAILED', message: e.message, level: 'error' });
   }
 }
 
@@ -37,7 +37,7 @@ export function* volumesFetch() {
       volumes,
     });
   } catch (e) {
-    yield put({ type: 'VOLUMES_FETCH_FAILED', message: e.message, messageLevel: 'error' });
+    yield put({ type: 'VOLUMES_FETCH_FAILED', message: e.message, level: 'error' });
   }
 }
 

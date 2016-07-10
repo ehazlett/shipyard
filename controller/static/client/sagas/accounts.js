@@ -14,7 +14,7 @@ export function* accountsFetch() {
     yield put({
       type: 'ACCOUNTS_FETCH_FAILED',
       message: e.message,
-      messageLevel: 'error',
+      level: 'error',
     });
   }
 }
