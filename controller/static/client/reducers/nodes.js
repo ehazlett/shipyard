@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function nodes(state = initialState, action) {
@@ -13,12 +13,12 @@ function nodes(state = initialState, action) {
     case 'NODES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.nodes,
+        data: _.keyBy(action.nodes, 'ID'),
       };
     case 'NODES_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       };
     default:
       return state;

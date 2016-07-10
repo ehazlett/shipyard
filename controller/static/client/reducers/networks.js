@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function networks(state = initialState, action) {
@@ -13,12 +13,12 @@ function networks(state = initialState, action) {
     case 'NETWORKS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.networks,
+        data: _.keyBy(action.networks, 'id'),
       };
     case 'NETWORKS_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       };
     default:
       return state;

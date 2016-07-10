@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 import _ from 'lodash';
@@ -17,7 +17,7 @@ class ServiceListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   }
 
-  renderTask(s, t, nodes = {}) {
+  renderTask(s, t) {
     return (
       <Tr key={t.ID}>
         <Td column="" className="collapsing">
@@ -41,7 +41,7 @@ class ServiceListView extends React.Component {
           {new Date(t.Status.Timestamp).toLocaleString()}
         </Td>
         <Td column="Node">
-          {nodes[t.NodeID] ? nodes[t.NodeID].Description.Hostname : ''}
+          {this.props.nodes[t.NodeID] ? this.props.nodes[t.NodeID].Description.Hostname : ''}
         </Td>
       </Tr>
     );
@@ -51,14 +51,13 @@ class ServiceListView extends React.Component {
     const { id } = this.props.params;
     const service = _.filter(this.props.services.data, (s) => s.ID === id)[0];
     const tasks = _.filter(this.props.tasks.data, (t) => t.ServiceID === id);
-    const nodes = _.keyBy(this.props.nodes.data, (n) => n.ID);
 
     if (!service) {
       return (<div></div>);
     }
 
     return (
-      <Container>
+      <Segment className={`basic ${this.props.services.loading || this.props.nodes.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="sixteen wide basic ui segment">
@@ -102,13 +101,13 @@ class ServiceListView extends React.Component {
                   hideFilterInput
                   noDataText="Couldn't find any tasks"
                 >
-                  {tasks ? tasks.map((t) => this.renderTask(service, t, nodes)) : []}
+                  {tasks ? tasks.map((t) => this.renderTask(service, t)) : []}
                 </Table>
               </div>
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

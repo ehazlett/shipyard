@@ -55,7 +55,7 @@ class VolumeListView extends React.Component {
                 filterable={[]}
                 noDataText="Couldn't find any volumes"
               >
-                {this.props.volumes.data.map(this.renderVolume)}
+                {Object.values(this.props.volumes.data).map(this.renderVolume)}
               </Table>
             </Column>
           </Row>

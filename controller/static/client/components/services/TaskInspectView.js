@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Grid, Column, Row } from 'react-semantify';
+import { Segment, Grid, Column, Row } from 'react-semantify';
 import ContainerInspect from '../containers/ContainerInspect';
 import { Link } from 'react-router';
 import _ from 'lodash';
@@ -13,17 +13,21 @@ class TaskInspectView extends React.Component {
 
   render() {
     const { id } = this.props.params;
-    const task = _.filter(this.props.tasks.data, (t) => t.ID === id)[0];
+
+    const task = this.props.tasks.data[id];
+
+    // FIXME: Hack for broken refential integrity
     if (!task) { return (<div></div>); }
 
-    const service = _.filter(this.props.services.data, (s) => s.ID === task.ServiceID)[0];
+    const service = this.props.services.data[task.ServiceID];
+
+    // FIXME: Hack for broken refential integrity
     if (!service) { return (<div></div>); }
 
-    const container = _.filter(
-      this.props.containers.data, (c) => c.Id === task.Status.ContainerStatus.ContainerID)[0];
+    const container = this.props.containers.data[task.Status.ContainerStatus.ContainerID];
 
     return (
-      <Container>
+      <Segment className={`basic ${this.props.containers.loading || this.props.tasks.loading || this.props.services.loading || this.props.nodes.loading ? 'loading' : ''}`}>
         <Grid>
           <Row>
             <Column className="sixteen wide basic ui segment">
@@ -40,7 +44,7 @@ class TaskInspectView extends React.Component {
             </Column>
           </Row>
         </Grid>
-      </Container>
+      </Segment>
     );
   }
 }

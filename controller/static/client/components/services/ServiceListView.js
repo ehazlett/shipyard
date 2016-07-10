@@ -88,7 +88,7 @@ class ServiceListView extends React.Component {
                 filterable={['ID', 'Name', 'Image', 'Command']}
                 hideFilterInput
                 noDataText="Couldn't find any services">
-                { this.props.services.data.map(s => this.renderService(s, taskSummaryByService[s.ID])) }
+                {Object.values(this.props.services.data).map(s => this.renderService(s, taskSummaryByService[s.ID]))}
               </Table>
             </Column>
           </Row>

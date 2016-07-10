@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function volumes(state = initialState, action) {
@@ -13,12 +13,12 @@ function volumes(state = initialState, action) {
     case 'VOLUMES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.volumes.Volumes,
+        data: _.keyBy(action.volumes.Volumes, 'Name'),
       };
     case 'VOLUMES_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       };
     default:
       return state;

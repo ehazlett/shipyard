@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function tasks(state = initialState, action) {
@@ -13,12 +13,12 @@ function tasks(state = initialState, action) {
     case 'SERVICES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.tasks,
+        data: _.keyBy(action.tasks, 'ID'),
       };
     case 'SERVICES_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       };
     default:
       return state;

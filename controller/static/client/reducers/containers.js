@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function containers(state = initialState, action) {
@@ -13,12 +13,12 @@ function containers(state = initialState, action) {
     case 'CONTAINERS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.containers,
+        data: _.keyBy(action.containers, 'Id'),
       }
     case 'CONTAINERS_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       }
     default:
       return state;

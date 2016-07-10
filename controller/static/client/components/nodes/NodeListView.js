@@ -79,7 +79,7 @@ class NodeListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any nodes"
               >
-                {this.props.nodes.data.map(this.renderNode)}
+                {Object.values(this.props.nodes.data).map(this.renderNode)}
               </Table>
             </Column>
           </Row>

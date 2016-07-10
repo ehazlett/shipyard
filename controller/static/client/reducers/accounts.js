@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function accounts(state = initialState, action) {
@@ -13,12 +13,12 @@ function accounts(state = initialState, action) {
     case 'ACCOUNTS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.accounts,
+        data: _.keyBy(action.accounts, 'id'),
       }
     case 'ACCOUNTS_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       }
     default:
       return state;

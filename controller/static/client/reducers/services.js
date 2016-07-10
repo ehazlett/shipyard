@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function services(state = initialState, action) {
@@ -14,12 +14,12 @@ function services(state = initialState, action) {
       return {
         loading: false,
         // FIXME: The upstream Services API returns null when empty
-        data: action.services || [],
+        data: _.keyBy(action.services, 'ID'),
       };
     case 'SERVICES_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       };
     default:
       return state;

@@ -12,8 +12,7 @@ class ContainerListView extends React.Component {
 
   render() {
     const { id } = this.props.params;
-    const container = _.filter(this.props.containers.data, (s) => s.Id === id)[0];
-
+    const container = this.props.containers.data[id];
     if (!container) return (<div></div>);
 
     return (

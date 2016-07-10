@@ -1,6 +1,6 @@
 const initialState = {
   loading: false,
-  data: [],
+  data: {},
 };
 
 function images(state = initialState, action) {
@@ -13,12 +13,12 @@ function images(state = initialState, action) {
     case 'IMAGES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.images,
+        data: _.keyBy(action.images, 'id'),
       };
     case 'IMAGES_FETCH_FAILED':
       return {
         loading: false,
-        data: [],
+        data: {},
       };
     default:
       return state;

@@ -52,7 +52,7 @@ class NetworkListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any networks"
               >
-                {this.props.networks.data.map(this.renderNetwork)}
+                {Object.values(this.props.networks.data).map(this.renderNetwork)}
               </Table>
             </Column>
           </Row>

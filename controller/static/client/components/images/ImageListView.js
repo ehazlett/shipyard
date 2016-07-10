@@ -74,7 +74,7 @@ class ImageListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any images"
               >
-                {this.props.images.data.map(this.renderImage)}
+                {Object.values(this.props.images.data).map(this.renderImage)}
               </Table>
             </Column>
           </Row>

@@ -15,20 +15,20 @@ function swarm(state = initialState, action) {
     case 'SWARM_FETCH_SUCCEEDED':
       return {
         loading: false,
-        info: action.swarm,
         initialized: true,
+        info: action.swarm,
       };
     case 'SWARM_FETCH_FAILED':
       return {
         loading: false,
-        info: action.swarm,
         initialized: 'unknown',
+        info: {},
       };
     case 'SWARM_NOT_INITIALIZED':
       return {
         loading: false,
-        info: {},
         initialized: false,
+        info: {},
       };
     default:
       return state;

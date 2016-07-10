@@ -62,7 +62,7 @@ class ContainerListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any containers"
               >
-                {this.props.containers.data.map(this.renderContainer)}
+                {Object.values(this.props.containers.data).map(this.renderContainer)}
               </Table>
             </Column>
           </Row>

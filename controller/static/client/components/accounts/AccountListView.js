@@ -52,7 +52,7 @@ class AccountListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any accounts"
               >
-                {this.props.accounts.data.map(this.renderAccount)}
+                {Object.values(this.props.accounts.data).map(this.renderAccount)}
               </Table>
             </Column>
           </Row>
