@@ -35,6 +35,25 @@ class ContainerListView extends React.Component {
         </Td>
         <Td column="Status">{container.Status}</Td>
         <Td column="Name">{container.Names[0]}</Td>
+        <Td column="&nbsp;" className="collapsing">
+          <div className="ui simple dropdown">
+            <i className="dropdown icon"></i>
+            <div className="menu">
+              <div className="item" onClick={() => this.props.startContainer(container.Id)}>
+                <Icon className="green play" />
+                Start
+              </div>
+              <div className="item" onClick={() => this.props.stopContainer(container.Id)}>
+                <Icon className="black stop" />
+                Stop
+              </div>
+              <div className="item" onClick={() => this.props.removeContainer(container.Id, true, true)}>
+                <Icon className="red remove" />
+                Remove
+              </div>
+            </div>
+          </div>
+        </Td>
       </Tr>
     );
   }
