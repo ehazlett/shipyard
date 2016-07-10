@@ -8,7 +8,7 @@ function* swarmInit() {
     yield call(initSwarm);
     yield put({ type: 'SWARM_INIT_SUCCEEDED' });
   } catch (e) {
-    yield put({ type: 'SWARM_INIT_FAILED', error: e.message });
+    yield put({ type: 'SWARM_INIT_FAILED', message: e.message, messageLevel: 'error' });
   }
 }
 
@@ -31,9 +31,9 @@ export function* swarmFetch() {
 
     // If we receive a 406 when fetching swarm info, this means the cluster is not initialised
     if (e.response.status === 406) {
-      yield put({ type: 'SWARM_NOT_INITIALIZED', error: e.message });
+      yield put({ type: 'SWARM_NOT_INITIALIZED', message: e.message, messageLevel: 'error' });
     } else {
-      yield put({ type: 'SWARM_FETCH_FAILED', error: e.message });
+      yield put({ type: 'SWARM_FETCH_FAILED', message: e.message, messageLevel: 'error' });
     }
   }
 }

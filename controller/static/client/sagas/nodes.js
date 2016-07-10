@@ -11,7 +11,7 @@ export function* nodesFetch() {
       nodes,
     });
   } catch (e) {
-    yield put({ type: 'NODES_FETCH_FAILED', error: e.message });
+    yield put({ type: 'NODES_FETCH_FAILED', message: e.message, messageLevel: 'error' });
   }
 }
 

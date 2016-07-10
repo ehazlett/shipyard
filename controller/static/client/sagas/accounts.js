@@ -11,7 +11,11 @@ export function* accountsFetch() {
       accounts,
     });
   } catch (e) {
-    yield put({ type: 'ACCOUNTS_FETCH_FAILED', error: e.message });
+    yield put({
+      type: 'ACCOUNTS_FETCH_FAILED',
+      message: e.message,
+      messageLevel: 'error',
+    });
   }
 }
 

@@ -12,7 +12,7 @@ function* imagePull(action) {
     yield call(pullImage, action.imageName);
     yield put({ type: 'IMAGE_PULL_SUCCEEDED' });
   } catch (e) {
-    yield put({ type: 'IMAGE_PULL_FAILED', error: e.message });
+    yield put({ type: 'IMAGE_PULL_FAILED', message: e.message, messageLevel: 'error' });
   }
 }
 
@@ -28,7 +28,7 @@ export function* imagesFetch(action) {
       images,
     });
   } catch (e) {
-    yield put({ type: 'IMAGES_FETCH_FAILED', error: e.message });
+    yield put({ type: 'IMAGES_FETCH_FAILED', message: e.message, messageLevel: 'error' });
   }
 }
 
@@ -44,12 +44,14 @@ export function* imageRemove(action) {
     yield put({
       type: 'IMAGE_REMOVE_SUCCEEDED',
       id: action.id,
+      message: `Successfully removed image ${action.id}`,
+      messageLevel: 'success',
     });
 
     // Refresh after removing a image
     yield call(imagesFetch, { all: false });
   } catch (e) {
-    yield put({ type: 'IMAGE_REMOVE_FAILED', error: e.message });
+    yield put({ type: 'IMAGE_REMOVE_FAILED', message: e.message, messageLevel: 'error' });
   }
 }
 

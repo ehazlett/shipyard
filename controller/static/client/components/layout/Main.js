@@ -34,9 +34,9 @@ class Main extends React.Component {
     );
   }
 
-  renderError(error) {
+  renderMessage(message) {
     return (
-      <div className="ui error message">{error}</div>
+      <div className={`ui ${message.level} message`}>{message.message}</div>
     );
   }
 
@@ -45,7 +45,7 @@ class Main extends React.Component {
       <div>
         <TopNav {...this.props} />
         <Container>
-          {this.props.error ? this.renderError(this.props.error) : null}
+          {this.props.message && this.props.message.message ? this.renderMessage(this.props.message) : null}
 					{React.cloneElement(this.props.children, {...this.props, key: undefined, ref: undefined})}
         </Container>
       </div>

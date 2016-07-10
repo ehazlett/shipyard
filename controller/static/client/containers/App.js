@@ -5,7 +5,7 @@ import Main from '../components/layout/Main';
 
 function mapStateToProps(state) {
   return {
-    error: state.error,
+    message: state.message,
     user: state.user,
     info: state.info,
     containers: state.containers,

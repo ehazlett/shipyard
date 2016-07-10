@@ -11,7 +11,7 @@ export function* infoFetch() {
       info,
     });
   } catch (e) {
-    yield put({ type: 'INFO_FETCH_FAILED', error: e.message });
+    yield put({ type: 'INFO_FETCH_FAILED', message: e.message, messageLevel: 'error' });
   }
 }
 
