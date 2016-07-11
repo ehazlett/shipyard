@@ -10,7 +10,7 @@ class CreateServiceForm extends React.Component {
     this.createService = this.createService.bind(this);
   }
 
-  createService() {
+  createService(e) {
     this.props.createService({
       Name: this.refs.name.value,
       TaskTemplate: {
@@ -25,6 +25,7 @@ class CreateServiceForm extends React.Component {
         },
       },
     });
+    e.preventDefault();
   }
 
   render() {

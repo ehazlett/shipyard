@@ -10,7 +10,7 @@ class CreateVolumeForm extends React.Component {
     this.createVolume = this.createVolume.bind(this);
   }
 
-  createVolume() {
+  createVolume(e) {
     const driverOpts = {};
 
     if (this.refs.DriverOpts.value !== '') {
@@ -26,6 +26,8 @@ class CreateVolumeForm extends React.Component {
       Driver: this.refs.Driver.value,
       DriverOpts: driverOpts,
     });
+
+    e.preventDefault();
   }
 
   render() {
