@@ -56,8 +56,10 @@ class ImageListView extends React.Component {
 
   renderImage(image) {
     const rows = [];
-    for (let i = 0; i < image.RepoTags.length; i++) {
-      rows.push(this.renderRow(image, i));
+    if(image.RepoTags) {
+      for (let i = 0; i < image.RepoTags.length; i++) {
+        rows.push(this.renderRow(image, i));
+      }
     }
     return rows;
   }

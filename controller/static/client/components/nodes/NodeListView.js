@@ -33,7 +33,7 @@ class NodeListView extends React.Component {
           <span>{node.Description.Platform.OS} {node.Description.Platform.Architecture}</span>
         </Td>
         <Td column="Engine">{node.Description.Engine.EngineVersion}</Td>
-        <Td column="Type">{node.ManagerStatus.Leader ? 'Leader' : 'Worker'}</Td>
+        <Td column="Type">{node.ManagerStatus ? 'Manager' : 'Worker'}</Td>
         <Td column="&nbsp;" className="collapsing">
           <div className="ui simple dropdown">
             <i className="dropdown icon"></i>

@@ -45,7 +45,7 @@ export function* containerStop(action) {
 		yield put({
 			type: 'CONTAINER_STOP_FAILED',
       message: e.message,
-      level: error,
+      level: 'error',
     });
   }
 }

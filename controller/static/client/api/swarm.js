@@ -13,6 +13,17 @@ export function getSwarm() {
   .then(response => response.json());
 }
 
+export function updateSwarm(spec, version = 0) {
+  return fetch(`/swarm/update?version=${version}`, {
+    method: 'POST',
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+    body: JSON.stringify(spec),
+  })
+  .then(statusHandler);
+}
+
 export function initSwarm() {
   return fetch('/swarm/init', {
     method: 'POST',

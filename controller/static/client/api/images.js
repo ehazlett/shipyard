@@ -5,7 +5,7 @@ import { statusHandler } from './helpers.js';
 import { getAuthToken } from '../services/auth';
 
 export function listImages(all = false) {
-  return fetch(`/images/json?${all ? 'all=1' : ''}`, {
+  return fetch(`/images/json${all ? '?all=1' : ''}`, {
     headers: {
       'X-Access-Token': getAuthToken(),
     },
