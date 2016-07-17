@@ -1,43 +1,43 @@
-rethinkdb:
+version: '2'
+
+services:
+  rethinkdb:
     image: rethinkdb
     ports:
-        - "8080"
-        - "28015"
-        - "29015"
-proxy:
+      - "8080"
+      - "28015"
+      - "29015"
+
+  proxy:
     image: ehazlett/docker-proxy:latest
     command: -i
     volumes:
-        - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
-        - "2375"
+      - "2375"
 
-swarm:
-    image: swarm:latest
-    command: m --host tcp://0.0.0.0:2375 proxy:2375
-    links:
-        - "proxy:proxy"
-    ports:
-        - "2375"
-
-media:
-    build: .
+  controller:
+    build:
+      context: .
+      dockerfile: Dockerfile.build
     entrypoint: /bin/bash
-    dockerfile: Dockerfile.build
-    command: -c "make media && sleep infinity"
-    working_dir: /go/src/github.com/shipyard/shipyard
+    command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://proxy:2375"
     volumes:
-        - "/go/src/github.com/shipyard/shipyard/controller/static"
-
-controller:
-    build: .
-    dockerfile: Dockerfile.build
-    entrypoint: /bin/bash
-    command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
-    links:
-        - rethinkdb
-        - swarm
-    volumes_from:
-        - media
+      - ".:/usr/src/app"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
-        - "8080:8080"
+      - "8080"
+    depends_on:
+      - proxy
+      - rethinkdb
+
+  webpack:
+    image: "node"
+    command: bash -c "npm install && npm run start"
+    working_dir: /usr/src/app
+    volumes:
+      - "./controller/static:/usr/src/app"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - controller

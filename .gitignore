@@ -1,5 +1,8 @@
 *.sw*
+.env
 *.un*
+node_modules
 cli/cli
 controller/controller
+controller/static/dist
 bower_components
