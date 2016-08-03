@@ -31,28 +31,28 @@
                 authenticate: 'true'
             })
             .state('dashboard.inspectRegistry', {
-                url:'^/registry/{name}',
+                url:'^/registry/{id}',
                 templateUrl: 'app/registry/registry.html',
                 controller: 'RegistryController', 
                 controllerAs: 'vm',
                 authenticate: 'true',
                 resolve: { 
                     resolvedRepositories: ['RegistryService', '$state', '$stateParams', function(RegistryService, $state, $stateParams) {
-                        return RegistryService.listRepositories($stateParams.name).then(null, function(errorData) {
+                        return RegistryService.listRepositories($stateParams.id).then(null, function(errorData) {
                             $state.go('error');
                         });
                     }]
                 }
             })
             .state('dashboard.inspectRepository', {
-                url: '^/registry/{name}/{namespace}/{repository}',
+                url: '^/registry/{registryId}/repository/{repositoryName}:{repositoryTag}',
                 templateUrl: 'app/registry/repository.html',
                 controller: 'RepositoryController',
                 controllerAs: 'vm',
                 authenticate: true,
                 resolve: { 
                     resolvedRepository: ['RegistryService', '$state', '$stateParams', function(RegistryService, $state, $stateParams) {
-                        return RegistryService.inspectRepository($stateParams.name, $stateParams.namespace, $stateParams.repository).then(null, function(errorData) {
+                        return RegistryService.inspectRepository($stateParams.registryId, $stateParams.repositoryName, $stateParams.repositoryTag).then(null, function(errorData) {
                             $state.go('error');
                         });
                     }]

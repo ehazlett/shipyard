@@ -20,6 +20,20 @@
                 <div class="field">
                     <input type="text" name="addr" ng-model="vm.addr" placeholder="Registry Addr (i.e. http://10.1.2.3:5000)">
                 </div>
+                <label>Username</label>
+                <div class="field">
+                    <input type="text" name="username" ng-model="vm.username" placeholder="Username">
+                </div>
+                <label>Password</label>
+                <div class="field">
+                    <input type="password" name="password" ng-model="vm.password" placeholder="Password">
+                </div>
+                <div class="field">
+                    <div class="ui checkbox" ng-click="vm.tls.tlsSkipVerify=!vm.tls.tlsSkipVerify">
+                      <input type="checkbox" ng-model="vm.tls.tlsSkipVerify">
+                      <label>TLS Skip Verify</label>
+                    </div>
+                </div>
                 <div class="ui hidden divider"></div>
                 <div class="ui green submit button">Add Registry</div>
             </div>
