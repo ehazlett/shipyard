@@ -200,15 +200,7 @@ func (m headerMatcher) Match(r *http.Request, match *RouteMatch) bool {
 //               "X-Requested-With", "XMLHttpRequest")
 //
 // The above route will only match if both request header values match.
-// Alternatively, you can provide a regular expression and match the header as follows:
-//
-//     r.Headers("Content-Type", "application/(text|json)",
-//               "X-Requested-With", "XMLHttpRequest")
-//
-// The above route will the same as the previous example, with the addition of matching
-// application/text as well.
-//
-// It the value is an empty string, it will match any value if the key is set.
+// If the value is an empty string, it will match any value if the key is set.
 func (r *Route) Headers(pairs ...string) *Route {
 	if r.err == nil {
 		var headers map[string]string
@@ -225,8 +217,9 @@ func (m headerRegexMatcher) Match(r *http.Request, match *RouteMatch) bool {
 	return matchMapWithRegex(m, r.Header, true)
 }
 
-// Regular expressions can be used with headers as well.
-// It accepts a sequence of key/value pairs, where the value has regex support. For example
+// HeadersRegexp accepts a sequence of key/value pairs, where the value has regex
+// support. For example:
+//
 //     r := mux.NewRouter()
 //     r.HeadersRegexp("Content-Type", "application/(text|json)",
 //               "X-Requested-With", "XMLHttpRequest")
@@ -271,6 +264,7 @@ func (r *Route) Host(tpl string) *Route {
 // MatcherFunc is the function signature used by custom matchers.
 type MatcherFunc func(*http.Request, *RouteMatch) bool
 
+// Match returns the match for a given request.
 func (m MatcherFunc) Match(r *http.Request, match *RouteMatch) bool {
 	return m(r, match)
 }
@@ -538,6 +532,36 @@ func (r *Route) URLPath(pairs ...string) (*url.URL, error) {
 	return &url.URL{
 		Path: path,
 	}, nil
+}
+
+// GetPathTemplate returns the template used to build the
+// route match.
+// This is useful for building simple REST API documentation and for instrumentation
+// against third-party services.
+// An error will be returned if the route does not define a path.
+func (r *Route) GetPathTemplate() (string, error) {
+	if r.err != nil {
+		return "", r.err
+	}
+	if r.regexp == nil || r.regexp.path == nil {
+		return "", errors.New("mux: route doesn't have a path")
+	}
+	return r.regexp.path.template, nil
+}
+
+// GetHostTemplate returns the template used to build the
+// route match.
+// This is useful for building simple REST API documentation and for instrumentation
+// against third-party services.
+// An error will be returned if the route does not define a host.
+func (r *Route) GetHostTemplate() (string, error) {
+	if r.err != nil {
+		return "", r.err
+	}
+	if r.regexp == nil || r.regexp.host == nil {
+		return "", errors.New("mux: route doesn't have a host")
+	}
+	return r.regexp.host.template, nil
 }
 
 // prepareVars converts the route variable pairs into a map. If the route has a

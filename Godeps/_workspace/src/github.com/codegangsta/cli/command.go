@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"io/ioutil"
+	"sort"
 	"strings"
 )
 
@@ -16,20 +17,30 @@ type Command struct {
 	Aliases []string
 	// A short description of the usage of this command
 	Usage string
+	// Custom text to show on USAGE section of help
+	UsageText string
 	// A longer explanation of how the command works
 	Description string
+	// A short description of the arguments of this command
+	ArgsUsage string
+	// The category the command is part of
+	Category string
 	// The function to call when checking for bash command completions
 	BashComplete func(context *Context)
 	// An action to execute before any sub-subcommands are run, but after the context is ready
 	// If a non-nil error is returned, no sub-subcommands are run
 	Before func(context *Context) error
-	// An action to execute after any subcommands are run, but after the subcommand has finished
+	// An action to execute after any subcommands are run, but before the subcommand has finished
 	// It is run even if Action() panics
 	After func(context *Context) error
 	// The function to call when this command is invoked
 	Action func(context *Context)
+	// Execute this function, if an usage error occurs. This is useful for displaying customized usage error messages.
+	// This function is able to replace the original error messages.
+	// If this function is not set, the "Incorrect usage" is displayed and the execution is interrupted.
+	OnUsageError func(context *Context, err error) error
 	// List of child commands
-	Subcommands []Command
+	Subcommands Commands
 	// List of flags to parse
 	Flags []Flag
 	// Treat all flags as normal arguments if true
@@ -37,6 +48,8 @@ type Command struct {
 	// Boolean to hide built-in help command
 	HideHelp bool
 
+	// Full name of command for help, defaults to full command name, including parent commands.
+	HelpName        string
 	commandNamePath []string
 }
 
@@ -49,9 +62,11 @@ func (c Command) FullName() string {
 	return strings.Join(c.commandNamePath, " ")
 }
 
+type Commands []Command
+
 // Invokes the command given the context, parses ctx.Args() to generate command-specific flags
-func (c Command) Run(ctx *Context) error {
-	if len(c.Subcommands) > 0 || c.Before != nil || c.After != nil {
+func (c Command) Run(ctx *Context) (err error) {
+	if len(c.Subcommands) > 0 {
 		return c.startApp(ctx)
 	}
 
@@ -70,41 +85,54 @@ func (c Command) Run(ctx *Context) error {
 	set := flagSet(c.Name, c.Flags)
 	set.SetOutput(ioutil.Discard)
 
-	firstFlagIndex := -1
-	terminatorIndex := -1
-	for index, arg := range ctx.Args() {
-		if arg == "--" {
-			terminatorIndex = index
-			break
-		} else if strings.HasPrefix(arg, "-") && firstFlagIndex == -1 {
-			firstFlagIndex = index
+	if !c.SkipFlagParsing {
+		firstFlagIndex := -1
+		terminatorIndex := -1
+		for index, arg := range ctx.Args() {
+			if arg == "--" {
+				terminatorIndex = index
+				break
+			} else if arg == "-" {
+				// Do nothing. A dash alone is not really a flag.
+				continue
+			} else if strings.HasPrefix(arg, "-") && firstFlagIndex == -1 {
+				firstFlagIndex = index
+			}
 		}
-	}
 
-	var err error
-	if firstFlagIndex > -1 && !c.SkipFlagParsing {
-		args := ctx.Args()
-		regularArgs := make([]string, len(args[1:firstFlagIndex]))
-		copy(regularArgs, args[1:firstFlagIndex])
+		if firstFlagIndex > -1 {
+			args := ctx.Args()
+			regularArgs := make([]string, len(args[1:firstFlagIndex]))
+			copy(regularArgs, args[1:firstFlagIndex])
 
-		var flagArgs []string
-		if terminatorIndex > -1 {
-			flagArgs = args[firstFlagIndex:terminatorIndex]
-			regularArgs = append(regularArgs, args[terminatorIndex:]...)
+			var flagArgs []string
+			if terminatorIndex > -1 {
+				flagArgs = args[firstFlagIndex:terminatorIndex]
+				regularArgs = append(regularArgs, args[terminatorIndex:]...)
+			} else {
+				flagArgs = args[firstFlagIndex:]
+			}
+
+			err = set.Parse(append(flagArgs, regularArgs...))
 		} else {
-			flagArgs = args[firstFlagIndex:]
+			err = set.Parse(ctx.Args().Tail())
 		}
-
-		err = set.Parse(append(flagArgs, regularArgs...))
 	} else {
-		err = set.Parse(ctx.Args().Tail())
+		if c.SkipFlagParsing {
+			err = set.Parse(append([]string{"--"}, ctx.Args().Tail()...))
+		}
 	}
 
 	if err != nil {
-		fmt.Fprintln(ctx.App.Writer, "Incorrect Usage.")
-		fmt.Fprintln(ctx.App.Writer)
-		ShowCommandHelp(ctx, c.Name)
-		return err
+		if c.OnUsageError != nil {
+			err := c.OnUsageError(ctx, err)
+			return err
+		} else {
+			fmt.Fprintln(ctx.App.Writer, "Incorrect Usage.")
+			fmt.Fprintln(ctx.App.Writer)
+			ShowCommandHelp(ctx, c.Name)
+			return err
+		}
 	}
 
 	nerr := normalizeFlags(c.Flags, set)
@@ -123,6 +151,30 @@ func (c Command) Run(ctx *Context) error {
 	if checkCommandHelp(context, c.Name) {
 		return nil
 	}
+
+	if c.After != nil {
+		defer func() {
+			afterErr := c.After(context)
+			if afterErr != nil {
+				if err != nil {
+					err = NewMultiError(err, afterErr)
+				} else {
+					err = afterErr
+				}
+			}
+		}()
+	}
+
+	if c.Before != nil {
+		err := c.Before(context)
+		if err != nil {
+			fmt.Fprintln(ctx.App.Writer, err)
+			fmt.Fprintln(ctx.App.Writer)
+			ShowCommandHelp(ctx, c.Name)
+			return err
+		}
+	}
+
 	context.Command = c
 	c.Action(context)
 	return nil
@@ -153,6 +205,12 @@ func (c Command) startApp(ctx *Context) error {
 
 	// set the name and usage
 	app.Name = fmt.Sprintf("%s %s", ctx.App.Name, c.Name)
+	if c.HelpName == "" {
+		app.HelpName = c.HelpName
+	} else {
+		app.HelpName = app.Name
+	}
+
 	if c.Description != "" {
 		app.Usage = c.Description
 	} else {
@@ -174,6 +232,13 @@ func (c Command) startApp(ctx *Context) error {
 	app.Email = ctx.App.Email
 	app.Writer = ctx.App.Writer
 
+	app.categories = CommandCategories{}
+	for _, command := range c.Subcommands {
+		app.categories = app.categories.AddCommand(command.Category, command)
+	}
+
+	sort.Sort(app.categories)
+
 	// bash completion
 	app.EnableBashCompletion = ctx.App.EnableBashCompletion
 	if c.BashComplete != nil {
@@ -189,12 +254,9 @@ func (c Command) startApp(ctx *Context) error {
 		app.Action = helpSubcommand.Action
 	}
 
-	var newCmds []Command
-	for _, cc := range app.Commands {
-		cc.commandNamePath = []string{c.Name, cc.Name}
-		newCmds = append(newCmds, cc)
+	for index, cc := range app.Commands {
+		app.Commands[index].commandNamePath = []string{c.Name, cc.Name}
 	}
-	app.Commands = newCmds
 
 	return app.RunAsSubcommand(ctx)
 }

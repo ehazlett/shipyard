@@ -11,13 +11,13 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	r "github.com/dancannon/gorethink"
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
 	"github.com/shipyard/shipyard"
 	"github.com/shipyard/shipyard/auth"
 	"github.com/shipyard/shipyard/dockerhub"
 	"github.com/shipyard/shipyard/version"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 const (
@@ -37,6 +37,7 @@ const (
 )
 
 var (
+	ErrLoginFailure               = errors.New("invalid username or password")
 	ErrAccountExists              = errors.New("account already exists")
 	ErrAccountDoesNotExist        = errors.New("account does not exist")
 	ErrRoleDoesNotExist           = errors.New("role does not exist")
@@ -115,11 +116,11 @@ type (
 )
 
 func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, authenticator auth.Authenticator) (Manager, error) {
+	log.Debug("setting up rethinkdb session")
 	session, err := r.Connect(r.ConnectOpts{
 		Address:  addr,
 		Database: database,
 		AuthKey:  authKey,
-		MaxIdle:  10,
 	})
 	if err != nil {
 		return nil, err
@@ -250,7 +251,8 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 			// clear hostname to get a newly generated
 			config.Hostname = ""
 			hostConfig := containerInfo.HostConfig
-			id, err := m.client.CreateContainer(config, "")
+			config.HostConfig = *hostConfig // sending hostconfig via the Start-endpoint is deprecated starting with docker-engine 1.12
+			id, err := m.client.CreateContainer(config, "", nil)
 			if err != nil {
 				errChan <- err
 				return
@@ -478,13 +480,19 @@ func (m DefaultManager) Authenticate(username, password string) (bool, error) {
 		acct, err := m.Account(username)
 		if err != nil {
 			log.Error(err)
-			return false, err
+			return false, ErrLoginFailure
 		}
 
 		passwordHash = acct.Password
 	}
 
-	return m.authenticator.Authenticate(username, password, passwordHash)
+	a, err := m.authenticator.Authenticate(username, password, passwordHash)
+	if !a || err != nil {
+		log.Error(ErrLoginFailure)
+		return false, ErrLoginFailure
+	}
+
+	return true, nil
 }
 
 func (m DefaultManager) NewAuthToken(username string, userAgent string) (*auth.AuthToken, error) {

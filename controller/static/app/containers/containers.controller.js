@@ -19,6 +19,7 @@
         vm.selectedContainer = null;
         vm.selectedContainerId = "";
         vm.newName = "";
+        vm.repoName = "";
 
         vm.showDestroyContainerDialog = showDestroyContainerDialog;
         vm.showRestartContainerDialog = showRestartContainerDialog;
@@ -26,6 +27,7 @@
         vm.showPauseContainerDialog = showPauseContainerDialog;
         vm.showScaleContainerDialog = showScaleContainerDialog;
         vm.showRenameContainerDialog = showRenameContainerDialog;
+        vm.showCommitContainerDialog = showCommitContainerDialog;
         vm.destroyContainer = destroyContainer;
         vm.stopContainer = stopContainer;
         vm.pauseContainer = pauseContainer;
@@ -33,6 +35,7 @@
         vm.restartContainer = restartContainer;
         vm.scaleContainer = scaleContainer;
         vm.renameContainer = renameContainer;
+        vm.commitContainer = commitContainer;
         vm.refresh = refresh;
         vm.containerStatusText = containerStatusText;
 		vm.nodeName = nodeName;
@@ -187,6 +190,11 @@
             $('#rename-modal').modal('show');
         }
 
+        function showCommitContainerDialog(container) {
+            vm.selectedContainer = container;
+            $('#commit-modal').modal('show');
+        }
+
         function destroyContainer() {
             ContainerService.destroy(vm.selectedContainerId)
                 .then(function(data) {
@@ -247,6 +255,15 @@
 
         function renameContainer() {
             ContainerService.rename(vm.selectedContainer.Id, vm.newName)
+                .then(function(data) {
+                    vm.refresh();
+                }, function(data) {
+                    vm.error = data;
+                });
+        }
+
+        function commitContainer() {
+            ContainerService.commit(vm.selectedContainer.Id, vm.repoName)
                 .then(function(data) {
                     vm.refresh();
                 }, function(data) {

@@ -16,13 +16,13 @@ type (
 )
 
 func (h *EventHandler) Handle(e *dockerclient.Event) error {
-	log.Infof("event: date=%d status=%s container=%s", e.Time, e.Status, e.Id[:12])
+	log.Infof("event: date=%d status=%s container=%s", e.Time, e.Status, e.ID[:12])
 	h.logDockerEvent(e)
 	return nil
 }
 
 func (h *EventHandler) logDockerEvent(e *dockerclient.Event) error {
-	info, err := h.Manager.Container(e.Id)
+	info, err := h.Manager.Container(e.ID)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (h *EventHandler) logDockerEvent(e *dockerclient.Event) error {
 	evt := &shipyard.Event{
 		Type: e.Status,
 		Message: fmt.Sprintf("action=%s container=%s",
-			e.Status, e.Id[:12]),
+			e.Status, e.ID[:12]),
 		Time:          *ts,
 		ContainerInfo: info,
 		Tags:          []string{"docker"},
