@@ -10,8 +10,13 @@
         var vm = this;
         vm.request = {};
         vm.addRegistry = addRegistry;
+        vm.tls = {
+            tlsSkipVerify: false
+        };
         vm.name = "";
         vm.addr = "";
+        vm.username = "";
+        vm.password = "";
         vm.request = null;
 
         function isValid() {
@@ -25,7 +30,10 @@
             vm.request = {
                 name: vm.name,
                 addr: vm.addr,
-            }
+                username: vm.username,
+                password: vm.password,
+                tls_skip_verify: vm.tls.tlsSkipVerify
+            };
             $http
                 .post('/api/registries', vm.request)
                 .success(function(data, status, headers, config) {

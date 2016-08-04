@@ -93,3 +93,13 @@ func GetClient(dockerUrl, tlsCaCert, tlsCert, tlsKey string, allowInsecure bool)
 
 	return client, nil
 }
+
+// utility for specifying a timeout channel
+func ChanTimeout(timeoutInSeconds int) <-chan bool {
+	timeout := make(chan bool, 1)
+	go func() {
+		time.Sleep(time.Duration(timeoutInSeconds) * time.Second)
+		timeout <- true
+	}()
+	return timeout
+}
