@@ -70,7 +70,7 @@ func (client *RegistryClient) doRequest(method string, path string, body []byte,
 	req, err := http.NewRequest(method, client.URL.String()+"/v2"+path, b)
 	log.Debugf("Method: %s   URL: %s", method, client.URL.String()+"/v2"+path)
 	if err != nil {
-		log.Debugf("Error on doRequest")
+		log.Error(err)
 		return nil, nil, err
 	}
 
@@ -84,31 +84,9 @@ func (client *RegistryClient) doRequest(method string, path string, body []byte,
 	}
 
 	resp, err := client.httpClient.Do(req)
-	if err != nil {
-		if !strings.Contains(err.Error(), "connection refused") && client.tlsConfig == nil {
-			return nil, nil, fmt.Errorf("%s. Are you trying to connect to a TLS-enabled daemon without TLS?", err)
-		}
-		log.Debugf("Connection refused")
-		return nil, nil, err
-	}
-
 	defer resp.Body.Close()
 
 	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Debugf("Error on ioutil.ReadAll")
-		return nil, nil, err
-	}
-
-	if resp.StatusCode == 404 {
-		log.Debugf("Error on resp.StatusCode == 404")
-		return nil, nil, ErrNotFound
-	}
-
-	if resp.StatusCode >= 400 {
-		log.Debugf("Error on resp.StatusCode >= 400")
-		return nil, nil, Error{StatusCode: resp.StatusCode, Status: resp.Status, msg: string(data)}
-	}
 
 	return data, resp.Header, nil
 }
@@ -121,19 +99,15 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 	uri := fmt.Sprintf("/_catalog")
 	data, _, err := client.doRequest("GET", uri, nil, nil)
 	if err != nil {
-		log.Debugf("Error on client.doRequest(GET, uri, nil, nil)")
+		log.Error(err)
 		return nil, err
 	}
-
-	log.Debugf("Response from /_catalog %s", string(data))
 
 	res := &repo{}
 	if err := json.Unmarshal(data, &res); err != nil {
-		log.Debugf("Error on json.Unmarshal(data, &res)")
+		log.Error(err)
 		return nil, err
 	}
-
-	log.Debugf("Repos %v", res)
 
 	repos := []*Repository{}
 
@@ -142,15 +116,14 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 		if strings.Index(k, query) == 0 {
 			tl, err := client.getTags(k)
 			if err != nil {
-				msg := fmt.Sprintf("Error on getting tags: %s", err.Error())
-				log.Error(msg)
+				log.Errorf("error getting tags: %s", err)
 				repos = append(repos, &Repository{
 					Name:         k,
 					Tag:          "",
 					HasProblems:  true,
 					Architecture: "",
 					RegistryUrl:  client.URL.String(),
-					Message:      msg,
+					Message:      string(err.Error()),
 				})
 				// TODO: it is ok to skip, but we should provide information to client about this.
 				continue
@@ -160,7 +133,7 @@ func (client *RegistryClient) Search(query string) ([]*Repository, error) {
 				// get the repository and append to the slice
 				r, err := client.Repository(client.URL.String(), k, t)
 				if err != nil {
-					log.Errorf("There was a problem when getting the manifest from %s/%s, error = %s", k, t, err.Error())
+					log.Error(err)
 				}
 
 				// Add the repo even if there was an error, so that we know that it exists.

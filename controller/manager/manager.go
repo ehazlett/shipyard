@@ -829,17 +829,16 @@ func (m DefaultManager) RegistryByAddress(addr string) (*shipyard.Registry, erro
 		return nil, err
 	}
 	if res.IsNil() {
-		log.Debugf("its nil!! it found nothing")
+		log.Debugf("Could not find registry with address %s", addr)
 		return nil, ErrRegistryDoesNotExist
 	}
 	var reg *shipyard.Registry
 	if err := res.One(&reg); err != nil {
-		log.Debugf("problem with res.One")
 		return nil, err
 	}
 
 	if err := reg.InitRegistryClient(); err != nil {
-		log.Errorf("%s", err.Error())
+		log.Error(err)
 		return reg, err
 	}
 
