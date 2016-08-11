@@ -254,7 +254,10 @@
                 return;
             }
             vm.deploying = true;
-
+            
+            // Reset Env
+            vm.request.Env = [];
+            
             transformVolumes();
             transformLinks();
             transformEnvVars();
