@@ -69,7 +69,7 @@
                 <td>{{r.tag}}</td>
                 <td>{{r.fsLayers.length}}</td>
 				<td>{{r.architecture}}</td>
-                <td>{{}}</td>
+                <td>{{r.size / 1048576 | number:2}} MB</td>
                 <td><i class="ui warning yellow sign icon" ng-show="r.hasProblems"></i>{{r.message}}</td>
                 <td class="collapsing">
                     <div  ng-show="!r.hasProblems" ui-sref="dashboard.inspectRepository({registryId: vm.registryId, repositoryName: r.name, repositoryTag: r.tag})" class="compact ui icon button">

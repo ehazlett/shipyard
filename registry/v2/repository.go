@@ -30,6 +30,15 @@ type (
 		Protected string `json:"protected"`
 	}
 
+	Layers struct {
+		Size int64 `json:"size"`
+	}
+
+	Manifest struct {
+		SchemaVersion int      `json:"schemaVersion,omitempty"`
+		Layers        []Layers `json:"layers"`
+	}
+
 	Repository struct {
 		SchemaVersion int         `json:"schemaVersion,omitempty"`
 		Digest        string      `json:"digest,omitempty"`
@@ -42,5 +51,6 @@ type (
 		Message       string      `json:"message"`
 		RegistryUrl   string      `json:"registryUrl"`
 		RegistryName  string      `json:"registryName"`
+		Size          int64       `json:"size"`
 	}
 )

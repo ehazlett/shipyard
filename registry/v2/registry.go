@@ -181,6 +181,8 @@ func (client *RegistryClient) Repository(registryUrl, name, tag string) (*Reposi
 		tag = "latest"
 	}
 
+	size := int64(0)
+
 	invalidRepository := &Repository{
 		Name:         name,
 		Tag:          tag,
@@ -191,7 +193,7 @@ func (client *RegistryClient) Repository(registryUrl, name, tag string) (*Reposi
 
 	uri := fmt.Sprintf("/%s/manifests/%s", name, tag)
 
-	log.Infof("requesting manifest for %s", uri)
+	log.Debugf("requesting manifest for %s", uri)
 	data, hdr, err := client.doRequest("GET", uri, nil, nil)
 	if err != nil {
 		invalidRepository.Message = fmt.Sprintf("Error when getting manifest for %s, error = %s", uri, err.Error())
@@ -208,7 +210,23 @@ func (client *RegistryClient) Repository(registryUrl, name, tag string) (*Reposi
 
 	repo.RegistryUrl = registryUrl
 	repo.Digest = hdr.Get("Docker-Content-Digest")
-	log.Infof("Got docker content digest %s", repo.Digest)
+	log.Debugf("Got docker content digest %s", repo.Digest)
+
+	var headers map[string]string
+	headers = make(map[string]string)
+	headers["Accept"]= "application/vnd.docker.distribution.manifest.v2+json"
+	data, hdr, err = client.doRequest("GET", uri, nil, headers)
+	ls := &Manifest{}
+	if err := json.Unmarshal(data, &ls); err != nil {
+		invalidRepository.Message = fmt.Sprintf("Error when binding manifests for %s, error = %s", uri, err.Error())
+		log.Error(invalidRepository.Message)
+		return invalidRepository, err
+	}
+	for _, i := range ls.Layers {
+		size += i.Size
+	}
+	repo.Size = size
+
 	return repo, nil
 }
 
