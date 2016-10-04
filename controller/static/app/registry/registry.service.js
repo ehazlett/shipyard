@@ -24,9 +24,9 @@
                     });
                 return promise;
             },
-            inspectRepository: function(name, namespace, repository) {
+            inspectRepository: function(registryName, repositoryName) {
                 var promise = $http
-                    .get('/api/registries/'+name +'/repositories/'+namespace+'/'+repository)
+                    .get('/api/registries/'+registryName +'/repositories/'+repositoryName)
                     .then(function(response) {
                         return response.data;
                     });

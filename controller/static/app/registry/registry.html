@@ -52,23 +52,23 @@
     <table class="ui sortable celled table">
         <thead ng-hide="">
             <tr>
-                <th>Namespace</th>
-                <th>Repository</th>
+                <th>Repository/Name</th>
                 <th>Tags</th>
                 <th>Layers</th>
+				<th>Architecture</th>
                 <th>Size</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="r in vm.repositories | filter:tableFilter">
-                <td>{{r.namespace}}</td>
-                <td>{{r.repository}}</td>
-                <td>{{r.tags.length}}</td>
-                <td>{{r.layers.length}}</td>
-                <td>{{r.size / 1048576 | number:2}} MB</td>
+                <td>{{r.name}}</td>
+                <td>{{r.tag}}</td>
+                <td>{{r.fsLayers.length}}</td>
+				<td>{{r.architecture}}</td>
+                <td>{{}}</td>
                 <td class="collapsing">
-                    <div ui-sref="dashboard.inspectRepository({name: vm.registryName, namespace: r.namespace, repository: r.repository})" class="compact ui icon button">
+                    <div ui-sref="dashboard.inspectRepository({registryName: vm.registryName, repositoryName: r.name})" class="compact ui icon button">
                         <i class="search icon"></i>
                     </div>
                     <div ng-click="vm.showRemoveRepositoryDialog(r)" class="compact ui icon button red">
