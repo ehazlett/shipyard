@@ -148,6 +148,7 @@ func (a *Api) Run() error {
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
 
 	auditExcludes := []string{
+		"^/networks",
 		"^/containers/json",
 		"^/images/json",
 		"^/api/events",
@@ -202,6 +203,8 @@ func (a *Api) Run() error {
 			"/images/{name:.*}/get":           swarmRedirect,
 			"/images/{name:.*}/history":       swarmRedirect,
 			"/images/{name:.*}/json":          swarmRedirect,
+			"/networks":                       swarmRedirect,
+			"/networks/{name:.*}":             swarmRedirect,
 			"/containers/ps":                  swarmRedirect,
 			"/containers/json":                swarmRedirect,
 			"/containers/{name:.*}/export":    swarmRedirect,
@@ -221,6 +224,9 @@ func (a *Api) Run() error {
 			"/images/load":                  swarmRedirect,
 			"/images/{name:.*}/push":        swarmRedirect,
 			"/images/{name:.*}/tag":         swarmRedirect,
+			"/networks/create":              swarmRedirect,
+			"/networks/{name:.*}/connect":	 swarmRedirect,
+			"/networks/{name:.*}/disconnect": swarmRedirect,
 			"/containers/create":            swarmRedirect,
 			"/containers/{name:.*}/kill":    swarmRedirect,
 			"/containers/{name:.*}/pause":   swarmRedirect,
@@ -238,6 +244,7 @@ func (a *Api) Run() error {
 			"/exec/{execid:.*}/resize":      swarmRedirect,
 		},
 		"DELETE": {
+			"/networks/{name:.*}":	 swarmRedirect,
 			"/containers/{name:.*}": swarmRedirect,
 			"/images/{name:.*}":     swarmRedirect,
 		},
@@ -271,6 +278,8 @@ func (a *Api) Run() error {
 	swarmAuthRouter.Use(negroni.HandlerFunc(swarmAccessRequired.HandlerFuncWithNext))
 	swarmAuthRouter.Use(negroni.HandlerFunc(apiAuditor.HandlerFuncWithNext))
 	swarmAuthRouter.UseHandler(swarmRouter)
+	globalMux.Handle("/networks", swarmAuthRouter)
+	globalMux.Handle("/networks/", swarmAuthRouter)
 	globalMux.Handle("/containers/", swarmAuthRouter)
 	globalMux.Handle("/_ping", swarmAuthRouter)
 	globalMux.Handle("/commit", swarmAuthRouter)
