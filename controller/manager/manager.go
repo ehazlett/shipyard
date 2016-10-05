@@ -256,6 +256,7 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 			config.HostConfig = *hostConfig // sending hostconfig via the Start-endpoint is deprecated starting with docker-engine 1.12
 
 			lock.Lock()
+			defer lock.Unlock()
 			id, err := m.client.CreateContainer(config, "", nil)
 			if err != nil {
 				errChan <- err
@@ -265,7 +266,6 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 				errChan <- err
 				return
 			}
-			lock.Unlock()
 			resChan <- id
 		}(i)
 	}
