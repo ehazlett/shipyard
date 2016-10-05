@@ -1,7 +1,7 @@
 <div class="ui small remove modal transition" style="margin-top: -98px;">
 <i class="close icon"></i>
 <div class="header">
-    Remove Repository: {{ vm.selectedRepository.namespace }}/{{ vm.selectedRepository.repository }}
+    Remove Repository: {{ vm.selectedRepository.name }}<span ng-show="vm.selectedRepository.tag">:{{ vm.selectedRepository.tag }}</span>
 </div>
 <div class="content">
     <p>Are you sure you want to remove this repository?</p>
@@ -52,27 +52,28 @@
     <table class="ui sortable celled table">
         <thead ng-hide="">
             <tr>
-                <th>Namespace</th>
-                <th>Repository</th>
+                <th>Registry URL</th>
+                <th>Repository/Name</th>
                 <th>Tags</th>
                 <th>Layers</th>
+				<th>Architecture</th>
                 <th>Size</th>
-                <th></th>
+                <th>Remarks</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="r in vm.repositories | filter:tableFilter">
-                <td>{{r.namespace}}</td>
-                <td>{{r.repository}}</td>
-                <td>{{r.tags.length}}</td>
-                <td>{{r.layers.length}}</td>
+                <td>{{r.registryUrl}}</td>
+                <td>{{r.name}}</td>
+                <td>{{r.tag}}</td>
+                <td>{{r.fsLayers.length}}</td>
+				<td>{{r.architecture}}</td>
                 <td>{{r.size / 1048576 | number:2}} MB</td>
+                <td><i class="ui warning yellow sign icon" ng-show="r.hasProblems"></i>{{r.message}}</td>
                 <td class="collapsing">
-                    <div ui-sref="dashboard.inspectRepository({name: vm.registryName, namespace: r.namespace, repository: r.repository})" class="compact ui icon button">
+                    <div  ng-show="!r.hasProblems" ui-sref="dashboard.inspectRepository({registryId: vm.registryId, repositoryName: r.name, repositoryTag: r.tag})" class="compact ui icon button">
                         <i class="search icon"></i>
-                    </div>
-                    <div ng-click="vm.showRemoveRepositoryDialog(r)" class="compact ui icon button red">
-                        <i class="trash icon"></i>
                     </div>
                 </td>
             </tr>
