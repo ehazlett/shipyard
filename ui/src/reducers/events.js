@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const initialState = [];
 
 function events(state = initialState, action) {

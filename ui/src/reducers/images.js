@@ -1,28 +1,30 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function containers(state = initialState, action) {
+function images(state = initialState, action) {
   switch (action.type) {
-    case 'CONTAINERS_FETCH_REQUESTED':
+    case 'IMAGES_FETCH_REQUESTED':
       return {
         loading: true,
         data: state.data,
-      }
-    case 'CONTAINERS_FETCH_SUCCEEDED':
+      };
+    case 'IMAGES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.containers, 'Id'),
-      }
-    case 'CONTAINERS_FETCH_FAILED':
+        data: _.keyBy(action.images, 'Id'),
+      };
+    case 'IMAGES_FETCH_FAILED':
       return {
         loading: false,
         data: {},
-      }
+      };
     default:
       return state;
   }
 }
 
-export default containers;
+export default images;

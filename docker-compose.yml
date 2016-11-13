@@ -26,18 +26,18 @@ services:
       - ".:/usr/src/app"
       - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
-      - "8080"
+      - "8080:8080"
     depends_on:
       - proxy
       - rethinkdb
 
   webpack:
-    image: "node"
+    image: "node:7.1"
     command: bash -c "npm install && npm run start"
     working_dir: /usr/src/app
     volumes:
-      - "./controller/static:/usr/src/app"
+      - "./ui:/usr/src/app"
     ports:
-      - "8080:8080"
+      - "3000:3000"
     depends_on:
       - controller

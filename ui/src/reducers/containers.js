@@ -1,28 +1,30 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function networks(state = initialState, action) {
+function containers(state = initialState, action) {
   switch (action.type) {
-    case 'NETWORKS_FETCH_REQUESTED':
+    case 'CONTAINERS_FETCH_REQUESTED':
       return {
         loading: true,
         data: state.data,
       }
-    case 'NETWORKS_FETCH_SUCCEEDED':
+    case 'CONTAINERS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.networks, 'id'),
-      };
-    case 'NETWORKS_FETCH_FAILED':
+        data: _.keyBy(action.containers, 'Id'),
+      }
+    case 'CONTAINERS_FETCH_FAILED':
       return {
         loading: false,
         data: {},
-      };
+      }
     default:
       return state;
   }
 }
 
-export default networks;
+export default containers;

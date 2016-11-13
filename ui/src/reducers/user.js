@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const initialState = {};
 
 function user(state = initialState, action) {

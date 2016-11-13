@@ -1,21 +1,23 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function nodes(state = initialState, action) {
+function tasks(state = initialState, action) {
   switch (action.type) {
-    case 'NODES_FETCH_REQUESTED':
+    case 'SERVICES_FETCH_REQUESTED':
       return {
         loading: true,
         data: state.data,
-      }
-    case 'NODES_FETCH_SUCCEEDED':
+      };
+    case 'SERVICES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.nodes, 'ID'),
+        data: _.keyBy(action.tasks, 'ID'),
       };
-    case 'NODES_FETCH_FAILED':
+    case 'SERVICES_FETCH_FAILED':
       return {
         loading: false,
         data: {},
@@ -25,4 +27,4 @@ function nodes(state = initialState, action) {
   }
 }
 
-export default nodes;
+export default tasks;

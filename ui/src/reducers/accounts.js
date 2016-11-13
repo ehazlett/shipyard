@@ -1,28 +1,30 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function images(state = initialState, action) {
+function accounts(state = initialState, action) {
   switch (action.type) {
-    case 'IMAGES_FETCH_REQUESTED':
+    case 'ACCOUNTS_FETCH_REQUESTED':
       return {
         loading: true,
         data: state.data,
       };
-    case 'IMAGES_FETCH_SUCCEEDED':
+    case 'ACCOUNTS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.images, 'Id'),
-      };
-    case 'IMAGES_FETCH_FAILED':
+        data: _.keyBy(action.accounts, 'id'),
+      }
+    case 'ACCOUNTS_FETCH_FAILED':
       return {
         loading: false,
         data: {},
-      };
+      }
     default:
       return state;
   }
 }
 
-export default images;
+export default accounts;

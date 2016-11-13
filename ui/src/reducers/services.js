@@ -1,9 +1,11 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function tasks(state = initialState, action) {
+function services(state = initialState, action) {
   switch (action.type) {
     case 'SERVICES_FETCH_REQUESTED':
       return {
@@ -13,7 +15,8 @@ function tasks(state = initialState, action) {
     case 'SERVICES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.tasks, 'ID'),
+        // FIXME: The upstream Services API returns null when empty
+        data: _.keyBy(action.services, 'ID'),
       };
     case 'SERVICES_FETCH_FAILED':
       return {
@@ -25,4 +28,4 @@ function tasks(state = initialState, action) {
   }
 }
 
-export default tasks;
+export default services;

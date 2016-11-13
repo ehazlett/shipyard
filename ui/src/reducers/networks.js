@@ -1,21 +1,23 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function info(state = initialState, action) {
+function networks(state = initialState, action) {
   switch (action.type) {
-    case 'INFO_FETCH_REQUESTED':
+    case 'NETWORKS_FETCH_REQUESTED':
       return {
         loading: true,
         data: state.data,
-      };
-    case 'INFO_FETCH_SUCCEEDED':
+      }
+    case 'NETWORKS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.info,
+        data: _.keyBy(action.networks, 'id'),
       };
-    case 'INFO_FETCH_FAILED':
+    case 'NETWORKS_FETCH_FAILED':
       return {
         loading: false,
         data: {},
@@ -25,4 +27,4 @@ function info(state = initialState, action) {
   }
 }
 
-export default info;
+export default networks;

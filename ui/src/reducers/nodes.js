@@ -1,21 +1,23 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function volumes(state = initialState, action) {
+function nodes(state = initialState, action) {
   switch (action.type) {
-    case 'VOLUMES_FETCH_REQUESTED':
+    case 'NODES_FETCH_REQUESTED':
       return {
         loading: true,
         data: state.data,
-      };
-    case 'VOLUMES_FETCH_SUCCEEDED':
+      }
+    case 'NODES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.volumes.Volumes, 'Name'),
+        data: _.keyBy(action.nodes, 'ID'),
       };
-    case 'VOLUMES_FETCH_FAILED':
+    case 'NODES_FETCH_FAILED':
       return {
         loading: false,
         data: {},
@@ -25,4 +27,4 @@ function volumes(state = initialState, action) {
   }
 }
 
-export default volumes;
+export default nodes;

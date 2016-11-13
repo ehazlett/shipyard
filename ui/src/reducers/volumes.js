@@ -1,28 +1,30 @@
+import _ from 'lodash';
+
 const initialState = {
   loading: false,
   data: {},
 };
 
-function accounts(state = initialState, action) {
+function volumes(state = initialState, action) {
   switch (action.type) {
-    case 'ACCOUNTS_FETCH_REQUESTED':
+    case 'VOLUMES_FETCH_REQUESTED':
       return {
         loading: true,
         data: state.data,
       };
-    case 'ACCOUNTS_FETCH_SUCCEEDED':
+    case 'VOLUMES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.accounts, 'id'),
-      }
-    case 'ACCOUNTS_FETCH_FAILED':
+        data: _.keyBy(action.volumes.Volumes, 'Name'),
+      };
+    case 'VOLUMES_FETCH_FAILED':
       return {
         loading: false,
         data: {},
-      }
+      };
     default:
       return state;
   }
 }
 
-export default accounts;
+export default volumes;

@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+BUILD_IMAGE_NAME=shipyard-build
+
+docker build -t ${BUILD_IMAGE_NAME} -f Dockerfile.build .
+
+docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock \
+	${BUILD_IMAGE_NAME} $*

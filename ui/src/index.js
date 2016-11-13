@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { render } from 'react-dom';
 
 import semanticCss from '../node_modules/semantic-ui-css/semantic.css';
