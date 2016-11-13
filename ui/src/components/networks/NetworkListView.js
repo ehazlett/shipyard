@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
@@ -61,10 +61,5 @@ class NetworkListView extends React.Component {
     );
   }
 }
-
-// NetworkListView.propTypes = {
-//   fetchNetworks: PropTypes.func.isRequired,
-//   networks: PropTypes.array.isRequired,
-// };
 
 export default NetworkListView;

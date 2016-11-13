@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
@@ -88,18 +88,5 @@ class NodeListView extends React.Component {
     );
   }
 }
-
-// NodeListView.propTypes = {
-//   fetchNodes: PropTypes.func.isRequired,
-//   acceptNode: PropTypes.func.isRequired,
-//   rejectNode: PropTypes.func.isRequired,
-//   activateNode: PropTypes.func.isRequired,
-//   pauseNode: PropTypes.func.isRequired,
-//   drainNode: PropTypes.func.isRequired,
-//   disconnectNode: PropTypes.func.isRequired,
-//   promoteNode: PropTypes.func.isRequired,
-//   demoteNode: PropTypes.func.isRequired,
-//   nodes: PropTypes.array.isRequired,
-// };
 
 export default NodeListView;

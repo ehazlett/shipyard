@@ -15,7 +15,7 @@ function volumes(state = initialState, action) {
     case 'VOLUMES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.volumes.Volumes, 'Name'),
+        data: _.keyBy(action.volumes.json.Volumes, 'Name'),
       };
     case 'VOLUMES_FETCH_FAILED':
       return {

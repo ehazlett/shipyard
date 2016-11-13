@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import $ from 'jquery';
 
-import { statusHandler } from './helpers.js';
+import { jsonHandler } from './helpers.js';
 import { getAuthToken } from '../services/auth';
 
 export function listContainers(all = false) {
@@ -11,8 +11,7 @@ export function listContainers(all = false) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler)
-  .then(response => response.json());
+  .then(jsonHandler);
 }
 
 export function stopContainer(id, timeout = 0) {
@@ -23,7 +22,7 @@ export function stopContainer(id, timeout = 0) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler);
+  .then(jsonHandler);
 }
 
 export function startContainer(id) {
@@ -34,7 +33,7 @@ export function startContainer(id) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler);
+  .then(jsonHandler);
 }
 
 export function removeContainer(id, volumes = false, force = false) {
@@ -49,5 +48,5 @@ export function removeContainer(id, volumes = false, force = false) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler);
+  .then(jsonHandler);
 }

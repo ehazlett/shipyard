@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { statusHandler } from './helpers.js';
+import { jsonHandler } from './helpers.js';
 
 export function login(username, password) {
   return fetch('/auth/login', {
@@ -10,6 +10,5 @@ export function login(username, password) {
       password,
     }),
   })
-  .then(statusHandler)
-  .then(response => response.json());
+  .then(jsonHandler);
 }

@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { statusHandler } from './helpers';
+import { jsonHandler } from './helpers';
 import { getAuthToken } from '../services/auth';
 
 export function listServices() {
@@ -9,8 +9,7 @@ export function listServices() {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler)
-  .then(response => response.json());
+  .then(jsonHandler);
 }
 
 export function createService(spec) {
@@ -21,8 +20,7 @@ export function createService(spec) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler)
-  .then(response => response.json());
+  .then(jsonHandler);
 }
 
 export function updateService(id, spec) {
@@ -34,7 +32,7 @@ export function updateService(id, spec) {
     },
     body: JSON.stringify(spec),
   })
-  .then(statusHandler);
+  .then(jsonHandler);
 }
 
 export function removeService(id) {
@@ -45,5 +43,5 @@ export function removeService(id) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler);
+  .then(jsonHandler);
 }

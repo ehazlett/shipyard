@@ -15,7 +15,7 @@ function info(state = initialState, action) {
     case 'INFO_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: action.info,
+        data: action.info.json,
       };
     case 'INFO_FETCH_FAILED':
       return {

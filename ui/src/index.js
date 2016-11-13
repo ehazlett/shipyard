@@ -1,7 +1,8 @@
-import { render } from 'react-dom';
+import './vendor.js';
+import '../node_modules/semantic-ui-css/semantic.css';
+import '../node_modules/semantic-ui-css/semantic.js';
 
-import semanticCss from '../node_modules/semantic-ui-css/semantic.css';
-import semanticJs from '../node_modules/semantic-ui-css/semantic.js';
+import { render } from 'react-dom';
 
 import Root from './containers/Root';
 

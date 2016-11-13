@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { statusHandler } from './helpers';
+import { jsonHandler } from './helpers';
 import { getAuthToken } from '../services/auth';
 
 export function listVolumes() {
@@ -9,8 +9,7 @@ export function listVolumes() {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler)
-  .then(response => response.json());
+  .then(jsonHandler);
 }
 
 export function createVolume(volume) {
@@ -23,6 +22,5 @@ export function createVolume(volume) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(statusHandler)
-  .then(response => response.json());
+  .then(jsonHandler);
 }

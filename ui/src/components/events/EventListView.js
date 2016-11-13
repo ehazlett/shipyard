@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Container, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
@@ -57,9 +57,5 @@ class EventListView extends React.Component {
     );
   }
 }
-
-// EventListView.propTypes = {
-//   events: PropTypes.array.isRequired,
-// };
 
 export default EventListView;

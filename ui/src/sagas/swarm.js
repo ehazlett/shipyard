@@ -4,9 +4,9 @@ import { call, put } from 'redux-saga/effects';
 import { removeAuthToken } from '../services/auth';
 import { updateSwarm, getSwarm, initSwarm } from '../api/swarm.js';
 
-function* swarmInit() {
+function* swarmInit(action) {
   try {
-    yield call(initSwarm);
+    yield call(initSwarm, action.spec);
     yield put({
       type: 'SWARM_INIT_SUCCEEDED',
       message: 'Successfully initialized swarm',
@@ -15,7 +15,7 @@ function* swarmInit() {
   } catch (e) {
     yield put({
       type: 'SWARM_INIT_FAILED',
-      message: e.message,
+      message: e.json.message,
       level: 'error',
     });
   }
@@ -33,16 +33,11 @@ export function* swarmFetch() {
       swarm,
     });
   } catch (e) {
-    if (!e.response) {
-      console.error('Error does not contain a response', e);
-      return;
-    }
-
     // If we receive a 406 when fetching swarm info, this means the cluster is not initialised
     if (e.response.status === 406) {
       yield put({
         type: 'SWARM_NOT_INITIALIZED',
-        message: e.message,
+        //message: e.json.message, -- It's not necessary to capture the swarm not initialised message yet
         level: 'error',
       });
     } else if (e.response.status === 401) {
@@ -51,7 +46,7 @@ export function* swarmFetch() {
     } else {
       yield put({
         type: 'SWARM_FETCH_FAILED',
-        message: e.message,
+        message: e.json.message,
         level: 'error',
       });
     }
@@ -68,7 +63,7 @@ function* watchSwarmInitSucceeded() {
 
 export function* updateSwarmSettings(action) {
   try {
-    yield call(updateSwarm, action.spec, action.version);
+    yield call(updateSwarm, action.spec, action.version, action.rotateManagerToken, action.rotateWorkerToken);
 
     // Signal that update succeeded
     yield put({
@@ -77,12 +72,11 @@ export function* updateSwarmSettings(action) {
       level: 'success',
     });
 
-    // Refresh after removing a container
     yield call(swarmFetch);
   } catch (e) {
 		yield put({
 			type: 'SWARM_UPDATE_SETTINGS_FAILED',
-      message: e.message,
+      message: e.json.message,
       level: 'error',
     });
   }

@@ -15,7 +15,7 @@ function tasks(state = initialState, action) {
     case 'SERVICES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.tasks, 'ID'),
+        data: _.keyBy(action.tasks.json, 'ID'),
       };
     case 'SERVICES_FETCH_FAILED':
       return {

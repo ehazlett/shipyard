@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Segment, Grid, Column, Row } from 'react-semantify';
 import ContainerInspect from '../containers/ContainerInspect';
@@ -48,17 +48,6 @@ class TaskInspectView extends React.Component {
     );
   }
 }
-
-// TaskInspectView.propTypes = {
-//   fetchContainers: PropTypes.func.isRequired,
-//   fetchServices: PropTypes.func.isRequired,
-//   containers: PropTypes.array.isRequired,
-//   services: PropTypes.array.isRequired,
-//   tasks: PropTypes.array.isRequired,
-//   params: {
-//     id: PropTypes.string.isRequired,
-//   },
-// };
 
 export default TaskInspectView;
 

@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Container, Grid, Column, Row } from 'react-semantify';
 import ContainerInspect from '../containers/ContainerInspect';
@@ -35,14 +35,6 @@ class ContainerListView extends React.Component {
     );
   }
 }
-
-// ContainerListView.propTypes = {
-//   fetchContainers: PropTypes.func.isRequired,
-//   containers: PropTypes.array.isRequired,
-//   params: {
-//     id: PropTypes.string.isRequired,
-//   },
-// };
 
 export default ContainerListView;
 

@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Link } from 'react-router';
 import { Segment, Grid, Row, Column, Icon } from 'react-semantify';
@@ -64,10 +64,5 @@ class VolumeListView extends React.Component {
     );
   }
 }
-
-// VolumeListView.propTypes = {
-//   fetchVolumes: PropTypes.func.isRequired,
-//   volumes: PropTypes.array.isRequired,
-// };
 
 export default VolumeListView;

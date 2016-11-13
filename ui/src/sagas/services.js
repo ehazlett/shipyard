@@ -63,7 +63,6 @@ export function* serviceUpdate(action) {
       id: action.id,
     });
 
-    // Refresh after removing a service
     yield call(servicesFetch);
   } catch (e) {
     yield put({ type: 'UPDATE_SERVICE_FAILED', message: e.message, level: 'error' });

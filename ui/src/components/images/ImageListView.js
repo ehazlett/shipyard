@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
@@ -96,10 +96,5 @@ class ImageListView extends React.Component {
     );
   }
 }
-
-// ImageListView.propTypes = {
-//   fetchImages: PropTypes.func.isRequired,
-//   images: PropTypes.array.isRequired,
-// };
 
 export default ImageListView;

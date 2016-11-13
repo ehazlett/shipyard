@@ -15,7 +15,7 @@ function nodes(state = initialState, action) {
     case 'NODES_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.nodes, 'ID'),
+        data: _.keyBy(action.nodes.json, 'ID'),
       };
     case 'NODES_FETCH_FAILED':
       return {

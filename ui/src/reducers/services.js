@@ -16,7 +16,7 @@ function services(state = initialState, action) {
       return {
         loading: false,
         // FIXME: The upstream Services API returns null when empty
-        data: _.keyBy(action.services, 'ID'),
+        data: _.keyBy(action.services.json, 'ID'),
       };
     case 'SERVICES_FETCH_FAILED':
       return {

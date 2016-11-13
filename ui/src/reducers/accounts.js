@@ -15,7 +15,7 @@ function accounts(state = initialState, action) {
     case 'ACCOUNTS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.accounts, 'id'),
+        data: _.keyBy(action.accounts.json, 'id'),
       }
     case 'ACCOUNTS_FETCH_FAILED':
       return {

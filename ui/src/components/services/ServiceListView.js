@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
@@ -108,11 +108,5 @@ class ServiceListView extends React.Component {
     );
   }
 }
-
-// ServiceListView.propTypes = {
-//   fetchServices: PropTypes.func.isRequired,
-//   services: PropTypes.array.isRequired,
-//   tasks: PropTypes.array.isRequired,
-// };
 
 export default ServiceListView;

@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Container } from 'react-semantify';
 
@@ -30,7 +30,7 @@ class Main extends React.Component {
 
   renderWelcomePage() {
     return (
-      <SwarmInitView swarmInit={this.props.swarmInit} />
+      <SwarmInitView swarmInit={this.props.swarmInit} message={this.props.message} resetMessage={this.props.resetMessage} />
     );
   }
 
@@ -79,15 +79,5 @@ class Main extends React.Component {
     );
   }
 }
-
-// Main.propTypes = {
-//   swarmInit: PropTypes.func.isRequired,
-//   signOut: PropTypes.func.isRequired,
-//   error: PropTypes.string,
-//   swarm: {
-//     initialized: PropTypes.bool.isRequired,
-//   },
-//   children: PropTypes.object.isRequired,
-// };
 
 export default Main;

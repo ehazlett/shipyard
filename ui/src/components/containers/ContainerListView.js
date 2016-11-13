@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 
 import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
 import { Table, Tr, Td } from 'reactable';
@@ -90,10 +90,5 @@ class ContainerListView extends React.Component {
     );
   }
 }
-
-// ContainerListView.propTypes = {
-//   fetchContainers: PropTypes.func.isRequired,
-//   containers: PropTypes.array.isRequired,
-// };
 
 export default ContainerListView;

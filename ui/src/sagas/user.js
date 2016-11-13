@@ -8,7 +8,7 @@ import { swarmFetch } from './swarm';
 
 export function* authorize(credentials) {
   const response = yield call(login, credentials.username, credentials.password);
-  const token = `${credentials.username}:${response.auth_token}`;
+  const token = `${credentials.username}:${response.json.auth_token}`;
   yield call(setAuthToken, token);
   yield put({
     type: 'SIGN_IN_SUCCEEDED',

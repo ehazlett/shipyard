@@ -11,7 +11,7 @@ function message(state = initialState, action) {
   } else if (action.message) {
     return {
       level: action.level,
-      message: action.message,
+      message: action.message.json || action.message,
     };
   }
 

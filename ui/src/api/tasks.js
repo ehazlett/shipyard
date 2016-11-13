@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { statusHandler } from './helpers';
+import { jsonHandler } from './helpers';
 import { getAuthToken } from '../services/auth';
 
 export function listTasks() {
@@ -9,6 +9,5 @@ export function listTasks() {
       'X-Access-Token': getAuthToken(),
     },
   })
-    .then(statusHandler)
-    .then(response => response.json());
+    .then(jsonHandler);
 }

@@ -1,8 +1,10 @@
-export function updateSwarmSettings(spec, version) {
+export function updateSwarmSettings(spec, version, rotateManagerToken, rotateWorkerToken) {
   return {
     type: 'SWARM_UPDATE_SETTINGS_REQUESTED',
     spec,
     version,
+    rotateManagerToken,
+    rotateWorkerToken
   };
 }
 export function fetchSwarm() {
@@ -11,9 +13,10 @@ export function fetchSwarm() {
   };
 }
 
-export function swarmInit() {
+export function swarmInit(spec) {
   return {
     type: 'SWARM_INIT_REQUESTED',
+    spec
   };
 }
 

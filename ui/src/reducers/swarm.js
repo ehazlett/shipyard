@@ -18,7 +18,7 @@ function swarm(state = initialState, action) {
       return {
         loading: false,
         initialized: true,
-        info: action.swarm,
+        info: action.swarm.json,
       };
     case 'SWARM_FETCH_FAILED':
       return {
@@ -32,6 +32,20 @@ function swarm(state = initialState, action) {
         initialized: false,
         info: {},
       };
+    case 'SWARM_UPDATE_SETTINGS_FAILED':
+      return {
+        loading: false,
+        initialized: state.initialized,
+        info: state.info,
+        error: action.message
+      }
+    case 'SWARM_INIT_FAILED':
+      return {
+        loading: false,
+        initialized: false,
+        info: {},
+        error: action.message
+      }
     default:
       return state;
   }

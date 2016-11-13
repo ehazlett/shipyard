@@ -15,7 +15,7 @@ function containers(state = initialState, action) {
     case 'CONTAINERS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.containers, 'Id'),
+        data: _.keyBy(action.containers.json, 'Id'),
       }
     case 'CONTAINERS_FETCH_FAILED':
       return {
