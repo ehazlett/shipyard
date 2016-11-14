@@ -30,13 +30,13 @@ Full docs are available at http://shipyard-project.com
 There are three components to Shipyard:
 
 ## Controller
-The Shipyard controller talks to a RethinkDB instance for data storage (user accounts, engine addresses, events, etc).  It also serves the API and web interface (see below).  The controller uses Citadel to communicate to each host and handle cluster events.
+The Shipyard controller talks to a RethinkDB instance for data storage (user accounts, engine addresses, events, etc).  It also serves the API and web interface (see below).
 
 ## API
 Everything in Shipyard is built around the Shipyard API.  It enables actions such as starting, stopping and inspecting containers, adding and removing engines and more.  It is a very simple RESTful JSON based API.
 
 ## UI
-The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyard API for all interaction.  It is an AngularJS app that is served via the Controller.
+The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyard API for all interaction.  It is an React app that is served via the Controller.
 
 # Contributing
 Ensure that you are using engine 1.12.x
@@ -46,7 +46,7 @@ docker-compose build
 docker-compose up
 ```
 
-The UI will then be available at: [http://localhost:8080](http://localhost:8080)
+The UI will then be available at: [http://localhost:3000](http://localhost:3000)
 
 # License
 Shipyard is licensed under the Apache License, Version 2.0. See LICENSE for full license text.

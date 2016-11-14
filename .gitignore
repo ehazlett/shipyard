@@ -6,3 +6,4 @@ cli/cli
 controller/controller
 controller/static/dist
 bower_components
+static.tar.gz

@@ -1,0 +1,8 @@
+FROM node:7.1-onbuild
+
+RUN npm run build && \
+	mkdir -p static && \
+	mv build static/dist && \
+	tar -zcvf static.tar.gz static
+
+CMD ["cat", "/usr/src/app/static.tar.gz"]

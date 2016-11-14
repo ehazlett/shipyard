@@ -4,10 +4,14 @@ GOARCH=amd64
 TAG?=latest
 COMMIT=`git rev-parse --short HEAD`
 
+UI_BUILD_IMAGE=shipyard-ui-build
+
 all: build media
 
 clean:
-	@rm -rf controller/controller
+	@rm -rf controller/controller && \
+		rm controller/static.tar.gz && \
+		rm -rf ui/node_modules
 
 build:
 	@cd controller && godep go build -a -tags "netgo static_build" -installsuffix netgo -ldflags "-w -X github.com/shipyard/shipyard/version.GitCommit=$(COMMIT)" .
@@ -18,7 +22,8 @@ remote-build:
 	@cd controller && docker run --rm -w /go/src/github.com/shipyard/shipyard --entrypoint /bin/bash shipyard-build -c "make build 1>&2 && cd controller && tar -czf - controller" | tar zxf -
 
 media:
-	@cd controller/static && npm install && npm run build
+	docker build -t $(UI_BUILD_IMAGE) -f ui/Dockerfile.build ui && \
+		docker run --rm -i $(UI_BUILD_IMAGE) > controller/static.tar.gz
 
 image: media build
 	@echo Building Shipyard image $(TAG)
