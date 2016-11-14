@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"crypto/tls"
@@ -239,6 +240,7 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 		errChan = make(chan (error))
 		resChan = make(chan (string))
 		result  = ScaleResult{Scaled: make([]string, 0), Errors: make([]string, 0)}
+		lock    sync.Mutex // when set container affinities to swarm cluster, must use mutex
 	)
 
 	containerInfo, err := m.Container(id)
@@ -255,6 +257,9 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 			config.Hostname = ""
 			hostConfig := containerInfo.HostConfig
 			config.HostConfig = *hostConfig // sending hostconfig via the Start-endpoint is deprecated starting with docker-engine 1.12
+
+			lock.Lock()
+			defer lock.Unlock()
 			id, err := m.client.CreateContainer(config, "", nil)
 			if err != nil {
 				errChan <- err
