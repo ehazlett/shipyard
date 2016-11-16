@@ -28,25 +28,25 @@ export function* signout(error) {
 
 // https://github.com/yelouafi/redux-saga/issues/14#issuecomment-167038759
 function* authFlowSaga() {
-  console.debug('Looking for existing token');
+  // Attempt to retrieve any existing token
   let token = yield call(getAuthToken);
-  console.debug('Existing token', token);
+
+  // TODO: Validate existing token, if invalid, remove it
 
   while (true) {
-    // If don't have a token, wait for sign in
+    // If the user doesn't have a token, wait for sign in
     if (!token) {
-      console.debug('No existing token found, wait for a SIGN_IN');
       const { credentials } = yield take('SIGN_IN');
       token = yield call(authorize, credentials);
     }
 
     // authorization failed, wait the next sign in
     if (!token) {
-      console.error('Sign in failed');
       continue;
     }
 
-    console.debug('Wait for a sign out');
+    // User has a token, so they're logged in, so only
+    // listen for SIGN_OUT actions
     yield take('SIGN_OUT');
     yield call(signout);
     token = null;

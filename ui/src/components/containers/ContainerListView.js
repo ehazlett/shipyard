@@ -29,7 +29,6 @@ class ContainerListView extends React.Component {
           <Link to={`/containers/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
         </Td>
         <Td column="Image">{container.Image}</Td>
-        <Td column="Command">{container.Command}</Td>
         <Td column="Created" className="collapsing">
           {new Date(container.Created * 1000).toLocaleString()}
         </Td>
@@ -77,7 +76,7 @@ class ContainerListView extends React.Component {
                 ref="table"
                 className="ui compact celled sortable unstackable table"
                 sortable
-                filterable={['ID', 'Image', 'Command', 'Created', 'Status', 'Name']}
+                filterable={['ID', 'Image', 'Created', 'Status', 'Name']}
                 hideFilterInput
                 noDataText="Couldn't find any containers"
               >

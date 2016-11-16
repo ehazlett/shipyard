@@ -23,7 +23,7 @@
     "react-semantify": "^0.5.2",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
-    "reactable": "^0.13.2",
+    "reactable": "^0.14.0",
     "redux": "^3.5.2",
     "redux-saga": "^0.10.5",
     "semantic-ui-css": "^2.2.1"
