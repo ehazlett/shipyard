@@ -86,10 +86,6 @@ class NodeListView extends React.Component {
                     {node.Status.State}
                   </div>
                   <div className="item">
-                    <div className="header">Membership</div>
-                    {node.Spec.Membership}
-                  </div>
-                  <div className="item">
                     <div className="header">Role</div>
                     {node.Spec.Role}
                   </div>

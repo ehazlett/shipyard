@@ -8,6 +8,11 @@ import _ from 'lodash';
 import taskStates from './TaskStates';
 
 class ServiceListView extends React.Component {
+	constructor(props) {
+		super(props);
+		this.updateFilter = this.updateFilter.bind(this);
+	}
+
   componentDidMount() {
     this.props.fetchServices();
     this.props.fetchNodes();
@@ -41,7 +46,7 @@ class ServiceListView extends React.Component {
           {new Date(t.Status.Timestamp).toLocaleString()}
         </Td>
         <Td column="Node">
-          {this.props.nodes[t.NodeID] ? this.props.nodes[t.NodeID].Description.Hostname : ''}
+          {this.props.nodes.data[t.NodeID] ? this.props.nodes.data[t.NodeID].Description.Hostname : ''}
         </Td>
       </Tr>
     );

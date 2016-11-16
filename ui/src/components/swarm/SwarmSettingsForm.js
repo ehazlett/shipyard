@@ -26,11 +26,11 @@ class SettingsView extends React.Component {
           <Header>Join Tokens</Header>
           <Field>
             <label>Worker</label>
-            <input value={this.props.swarm.info.JoinTokens.Worker} />
+            <input value={this.props.swarm.info.JoinTokens.Worker} readOnly />
           </Field>
           <Field>
             <label>Manager</label>
-            <input value={this.props.swarm.info.JoinTokens.Manager} />
+            <input value={this.props.swarm.info.JoinTokens.Manager} readOnly />
           </Field>
           <button className="ui blue button" onClick={this.refreshJoinTokens}>Refresh Join Tokens</button>
         </Segment>
