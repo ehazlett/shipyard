@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Link } from 'react-router';
-import { Menu, Container, Icon } from 'react-semantify';
+import { Menu, Container, Icon } from 'semantic-ui-react';
 
 const TopNav = (props) => (
   <Menu className="inverted borderless blue">

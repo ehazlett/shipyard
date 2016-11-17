@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
@@ -61,17 +61,17 @@ class ContainerListView extends React.Component {
     return (
       <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
         <Grid>
-          <Row>
-            <Column className="six wide">
+          <Grid.Row>
+            <Grid.Column className="six wide">
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
-            </Column>
-            <Column className="right aligned ten wide" />
-          </Row>
-          <Row>
-            <Column className="sixteen wide">
+            </Grid.Column>
+            <Grid.Column className="right aligned ten wide" />
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column className="sixteen wide">
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -82,8 +82,8 @@ class ContainerListView extends React.Component {
               >
                 {Object.values(this.props.containers.data).map(this.renderContainer)}
               </Table>
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Segment>
     );

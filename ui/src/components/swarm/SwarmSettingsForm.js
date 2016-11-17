@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Field, Segment, Header } from 'react-semantify';
+import { Form, Segment, Header } from 'semantic-ui-react';
 
 class SettingsView extends React.Component {
   constructor(props) {
@@ -21,20 +21,20 @@ class SettingsView extends React.Component {
 
   render() {
     return (
-      <form className="ui form">
+      <Form>
         <Segment className="basic">
           <Header>Join Tokens</Header>
-          <Field>
+          <Form.Field>
             <label>Worker</label>
             <input value={this.props.swarm.info.JoinTokens.Worker} readOnly />
-          </Field>
-          <Field>
+          </Form.Field>
+          <Form.Field>
             <label>Manager</label>
             <input value={this.props.swarm.info.JoinTokens.Manager} readOnly />
-          </Field>
+          </Form.Field>
           <button className="ui blue button" onClick={this.refreshJoinTokens}>Refresh Join Tokens</button>
         </Segment>
-      </form>
+      </Form>
     );
   }
 }

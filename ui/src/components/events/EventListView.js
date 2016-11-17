@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Container, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 
 class EventListView extends React.Component {
@@ -29,17 +29,17 @@ class EventListView extends React.Component {
     return (
       <Container>
         <Grid>
-          <Row>
-            <Column className="six wide">
+          <Grid.Row>
+            <Grid.Column className="six wide">
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
-            </Column>
-            <Column className="right aligned ten wide" />
-          </Row>
-          <Row>
-            <Column className="sixteen wide">
+            </Grid.Column>
+            <Grid.Column className="right aligned ten wide" />
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column className="sixteen wide">
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -50,8 +50,8 @@ class EventListView extends React.Component {
               >
                 {this.props.events.map(this.renderEvent)}
               </Table>
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Container>
     );

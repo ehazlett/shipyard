@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Container } from 'react-semantify';
+import { Container } from 'semantic-ui-react';
 
 import TopNav from './TopNav';
 import SwarmInitView from '../swarm/SwarmInitView';
