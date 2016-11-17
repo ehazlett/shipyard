@@ -34,19 +34,20 @@ export function* swarmFetch() {
     });
   } catch (e) {
     // If we receive a 406 when fetching swarm info, this means the cluster is not initialised
-    if (e.response.status === 406) {
+    if (e.response && e.response.status === 406) {
       yield put({
         type: 'SWARM_NOT_INITIALIZED',
         //message: e.json.message, -- It's not necessary to capture the swarm not initialised message yet
         level: 'error',
       });
-    } else if (e.response.status === 401) {
+    } else if (e.response && e.response.status === 401) {
       // FIXME: Temporary hack to handle not being able to detect whether a token is expired/invalid
       removeAuthToken();
     } else {
+      console.log(e);
       yield put({
         type: 'SWARM_FETCH_FAILED',
-        message: e.json.message,
+        // message: e.json.message || e,
         level: 'error',
       });
     }

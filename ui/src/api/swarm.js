@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { jsonHandler, jsonErrorHandler } from './helpers';
+import { jsonHandler, jsonSuccessHandler, jsonErrorHandler } from './helpers';
 import { getAuthToken } from '../services/auth';
 
 export function getSwarm() {
@@ -9,7 +9,7 @@ export function getSwarm() {
       'X-Access-Token': getAuthToken(),
     },
   })
-    .then(jsonHandler);
+    .then(jsonSuccessHandler);
 }
 
 export function updateSwarm(spec, version = 0, rotateManagerToken = false, rotateWorkerToken = false) {
