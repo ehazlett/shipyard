@@ -87,7 +87,7 @@ class NodeListView extends React.Component {
                   <tr><td>Hostname</td><td>{node.Description.Hostname}</td></tr>
                   <tr><td>OS</td><td>{node.Description.Platform.OS}</td></tr>
                   <tr><td>Architecture</td><td>{node.Description.Platform.Architecture}</td></tr>
-                  <tr><td>Engine</td><td>{node.Description.Engine ? `${node.Description.Engine.EngineVersion}` : 'Unknown'}</td></tr>
+                  <tr><td>Engine</td><td>{node.Description.Engine ? node.Description.Engine.EngineVersion : 'Unknown'}</td></tr>
                   <tr><td>Created</td><td>{moment(node.CreatedAt).toString()}</td></tr>
                   <tr><td>Last Updated</td><td>{moment(node.UpdatedAt).toString()}</td></tr>
                 </tbody>

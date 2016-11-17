@@ -15,7 +15,7 @@ function networks(state = initialState, action) {
     case 'NETWORKS_FETCH_SUCCEEDED':
       return {
         loading: false,
-        data: _.keyBy(action.networks.json, 'id'),
+        data: _.keyBy(action.networks.json, 'Id'),
       };
     case 'NETWORKS_FETCH_FAILED':
       return {

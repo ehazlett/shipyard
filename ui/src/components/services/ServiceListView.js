@@ -14,6 +14,7 @@ class ServiceListView extends React.Component {
 
   componentDidMount() {
     this.props.fetchServices();
+    this.props.fetchNetworks();
   }
 
   updateFilter(input) {
@@ -23,7 +24,7 @@ class ServiceListView extends React.Component {
   renderService(service, summary = {}) {
     return (
       <Tr key={service.ID}>
-        <Td column="" className="collapsing">
+        <Td column="Tasks" className="collapsing">
           <div>
             {(summary.green ? summary.green : '0')}
             {(service.Spec.Mode.Replicated ? ` / ${service.Spec.Mode.Replicated.Replicas}` : '')}
@@ -34,14 +35,6 @@ class ServiceListView extends React.Component {
         </Td>
         <Td column="Name">{service.Spec.Name}</Td>
         <Td column="Image">{service.Spec.TaskTemplate.ContainerSpec.Image}</Td>
-        <Td column="Tasks" className="collapsing">
-          <div className="ui circular labels">
-            {Object.keys(summary).map((k) => (
-              <span className={`ui label ${k}`} key={k}>{summary[k]}</span>
-              ))}
-          </div>
-        </Td>
-        <Td column="Command"><pre>{service.Spec.TaskTemplate.ContainerSpec.Command ? service.Spec.TaskTemplate.ContainerSpec.Command.join(' ') : ''} {service.Spec.TaskTemplate.ContainerSpec.Args ? service.Spec.TaskTemplate.ContainerSpec.Args.join(' ') : ''}</pre></Td>
         <Td column="&nbsp;" className="collapsing">
           <div className="ui simple dropdown">
             <i className="dropdown icon"></i>
@@ -96,7 +89,7 @@ class ServiceListView extends React.Component {
                 className="ui compact celled sortable unstackable table"
                 ref="table"
                 sortable
-                filterable={['ID', 'Name', 'Image', 'Command']}
+                filterable={['ID', 'Name', 'Image']}
                 hideFilterInput
                 noDataText="Couldn't find any services">
                 {Object.values(this.props.services.data).map(s => this.renderService(s, taskSummaryByService[s.ID]))}
