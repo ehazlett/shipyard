@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 import _ from 'lodash';
@@ -8,17 +8,81 @@ import moment from 'moment';
 
 import taskStates from './TaskStates';
 
+import { inspectService, listTasksForService, listNodes, listNetworks } from '../../api';
+
 class ServiceListView extends React.Component {
+  state = {
+    service: null,
+    tasks: [],
+    nodes: [],
+    networks: [],
+    loading: true,
+    error: null
+  };
+
   componentDidMount() {
-    this.props.fetchServices();
-    this.props.fetchNodes();
+    const { id } = this.props.params;
+
+    inspectService(id)
+      .then((service) => {
+        this.setState({
+          error: null,
+          service: service.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
+
+    listNetworks()
+      .then((networks) => {
+        this.setState({
+          error: null,
+          networks: _.keyBy(networks.body, 'Id'),
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+        });
+      });
+
+    listTasksForService(id)
+      .then((tasks) => {
+        this.setState({
+          error: null,
+          tasks: tasks.body,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+        });
+      });
+
+    listNodes()
+      .then((nodes) => {
+        this.setState({
+          error: null,
+          nodes: _.keyBy(nodes.body, 'ID'),
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+        });
+      });
   }
 
   updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
   };
 
-  renderTask(s, t) {
+  renderTask = (s, t) => {
     return (
       <Tr key={t.ID}>
         <Td column="" className="collapsing">
@@ -43,34 +107,32 @@ class ServiceListView extends React.Component {
           {new Date(t.Status.Timestamp).toLocaleString()}
         </Td>
         <Td column="Node">
-          {this.props.nodes.data[t.NodeID] ? this.props.nodes.data[t.NodeID].Description.Hostname : null}
+          {this.state.nodes[t.NodeID] ? this.state.nodes[t.NodeID].Description.Hostname : null}
         </Td>
       </Tr>
     );
   }
 
   render() {
-    const { id } = this.props.params;
-    const service = _.filter(this.props.services.data, (s) => s.ID === id)[0];
-    const tasks = _.filter(this.props.tasks.data, (t) => t.ServiceID === id);
-    const networks = this.props.networks.data;
+    const { loading, service, tasks, networks, error } = this.state;
 
-    if (!service || !networks) {
-      return (<div></div>);
+    if(loading) {
+      return <div></div>;
     }
 
     return (
-      <Segment className={`basic ${this.props.services.loading || this.props.nodes.loading ? 'loading' : null}`}>
+      <Segment basic>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="sixteen wide basic ui segment">
+            <Grid.Column width={16}>
               <div className="ui breadcrumb">
                 <Link to="/services" className="section">Services</Link>
                 <div className="divider"> / </div>
-                <div className="active section">{service ? service.Spec.Name : null}</div>
+                <div className="active section">{service.Spec ? service.Spec.Name : null}</div>
               </div>
             </Grid.Column>
             <Grid.Column className="ui sixteen wide basic segment">
+              {error && (<Message error>{error}</Message>)}
               <div className="ui header">Details</div>
               <table className="ui very basic celled table">
                 <tbody>

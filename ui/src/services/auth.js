@@ -2,8 +2,8 @@ export function getAuthToken() {
   return JSON.parse(localStorage.getItem('authToken'));
 }
 
-export function setAuthToken(token) {
-  localStorage.setItem('authToken', JSON.stringify(token));
+export function setAuthToken(username, token) {
+  localStorage.setItem('authToken', JSON.stringify(`${username}:${token}`));
 }
 
 export function removeAuthToken() {

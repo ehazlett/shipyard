@@ -1,15 +1,26 @@
 import fetch from 'isomorphic-fetch';
 
-import { jsonHandler } from './helpers';
+import { errorHandler, jsonHandler } from './helpers.js';
 import { getAuthToken } from '../services/auth';
 
 export function listServices() {
   return fetch('/services', {
-    headers: {
-      'X-Access-Token': getAuthToken(),
-    },
-  })
-  .then(jsonHandler);
+      headers: {
+        'X-Access-Token': getAuthToken(),
+      },
+    })
+      .then(errorHandler)
+      .then(jsonHandler);
+}
+
+export function inspectService(id) {
+  return fetch(`/services/${id}`, {
+      headers: {
+        'X-Access-Token': getAuthToken(),
+      },
+    })
+      .then(errorHandler)
+      .then(jsonHandler);
 }
 
 export function createService(spec) {
@@ -20,7 +31,8 @@ export function createService(spec) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler)
+    .then(jsonHandler);
 }
 
 export function updateService(id, spec) {
@@ -32,7 +44,7 @@ export function updateService(id, spec) {
     },
     body: JSON.stringify(spec),
   })
-  .then(jsonHandler);
+    .then(errorHandler);
 }
 
 export function removeService(id) {
@@ -43,5 +55,5 @@ export function removeService(id) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler);
 }

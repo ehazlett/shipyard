@@ -1,25 +1,40 @@
 import React from 'react';
 
-import { Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
+import { listNodes } from '../../api';
+
 class NodeListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.updateFilter = this.updateFilter.bind(this);
-    this.renderNode = this.renderNode.bind(this);
-  }
+  state = {
+    error: null,
+    nodes: [],
+    loading: true,
+  };
 
   componentDidMount() {
-    this.props.fetchNodes();
+    listNodes()
+      .then((nodes) => {
+        this.setState({
+          error: null,
+          nodes: nodes.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
   }
 
-  updateFilter(input) {
+  updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
   }
 
-  renderNode(node) {
+  renderNode = (node) => {
     return (
       <Tr key={node.ID}>
         <Td column="" className="collapsing">
@@ -34,43 +49,32 @@ class NodeListView extends React.Component {
         </Td>
         <Td column="Engine">{node.Description.Engine.EngineVersion}</Td>
         <Td column="Type">{node.ManagerStatus ? 'Manager' : 'Worker'}</Td>
-        <Td column="&nbsp;" className="collapsing">
-          <div className="ui simple dropdown">
-            <i className="dropdown icon"></i>
-            <div className="menu">
-              <div className="item">Accept</div>
-              <div className="item">Reject</div>
-
-              <div className="item">Activate</div>
-              <div className="item">Pause</div>
-              <div className="item">Drain</div>
-
-              <div className="item">Disconnect</div>
-
-              <div className="item">Promote</div>
-              <div className="item">Demote</div>
-            </div>
-          </div>
-        </Td>
       </Tr>
     );
   }
 
   render() {
+    const { loading, error, nodes } = this.state;
+
+    if(loading) {
+      return <div></div>;
+    }
+
     return (
-      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
+      <Segment basic>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="six wide">
+            <Grid.Column width={6}>
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column className="right aligned ten wide" />
+            <Grid.Column textAlign="right" width={10}/>
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column className="sixteen wide">
+            <Grid.Column width={16}>
+              {error && (<Message error>{error}</Message>)}
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -79,7 +83,7 @@ class NodeListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any nodes"
               >
-                {Object.values(this.props.nodes.data).map(this.renderNode)}
+                {Object.values(nodes).map(this.renderNode)}
               </Table>
             </Grid.Column>
           </Grid.Row>

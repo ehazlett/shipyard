@@ -1,32 +1,57 @@
 import React from 'react';
 
-import { Container, Grid,  } from 'semantic-ui-react';
+import { Container, Grid, Message  } from 'semantic-ui-react';
 import ContainerInspect from '../containers/ContainerInspect';
 import { Link } from 'react-router';
 import _ from 'lodash';
 
+import { inspectContainer } from '../../api';
+
 class ContainerListView extends React.Component {
+  state = {
+    container: null,
+    loading: true,
+    error: null
+  };
+
   componentDidMount() {
-    this.props.fetchContainers();
+    const { id } = this.props.params;
+    inspectContainer(id)
+      .then((container) => {
+        this.setState({
+          error: null,
+          container: container.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
   }
 
   render() {
-    const { id } = this.props.params;
-    const container = this.props.containers.data[id];
-    if (!container) return (<div></div>);
+    const { loading, container, error } = this.state;
+
+    if(loading) {
+      return <div></div>;
+    }
 
     return (
       <Container>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="sixteen wide basic ui segment">
+            <Grid.Column width={16}>
               <div className="ui breadcrumb">
                 <Link to="/containers" className="section">Containers</Link>
                 <div className="divider"> / </div>
-                <div className="active section">{container ? container.Names[0] : ''}</div>
+                <div className="active section">{container.Name.substring(1)}</div>
               </div>
             </Grid.Column>
             <Grid.Column className="sixteen wide">
+              {error && (<Message error>{error}</Message>)}
               <ContainerInspect container={container} />
             </Grid.Column>
           </Grid.Row>

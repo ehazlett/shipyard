@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "npm-check-updates": "^2.8.6",
     "react-scripts": "0.7.0"
   },
   "eslintConfig": {
@@ -10,22 +11,16 @@
   },
   "proxy": "http://controller:8080",
   "dependencies": {
-    "babel-polyfill": "^6.16.0",
     "isomorphic-fetch": "^2.2.1",
     "jquery": "^2.2.3 || ^3.0.0",
     "lodash": "^4.16.6",
     "moment": "^2.16.0",
-    "raven-js": "^2.3.0",
-    "react": "^15.3.2",
-    "react-dom": "^15.3.2",
-    "react-redux": "^4.4.5",
-    "react-router": "^2.4.0",
-    "react-router-redux": "^4.0.4",
+    "react": "^15.4.0",
+    "react-dom": "^15.4.0",
+    "react-router": "^4.0.0-alpha.5",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
     "reactable": "^0.14.0",
-    "redux": "^3.5.2",
-    "redux-saga": "^0.10.5",
     "semantic-ui-css": "^2.2.4",
     "semantic-ui-react": "^0.61.1"
   },
@@ -33,6 +28,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "check-updates": "npm-check-updates"
   }
 }

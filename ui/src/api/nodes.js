@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { jsonHandler } from './helpers.js';
+import { jsonHandler, errorHandler } from './helpers';
 import { getAuthToken } from '../services/auth';
 
 export function listNodes() {
@@ -9,5 +9,16 @@ export function listNodes() {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler)
+    .then(jsonHandler);
+}
+
+export function inspectNode(nodeId) {
+  return fetch(`/nodes/${nodeId}`, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
 }

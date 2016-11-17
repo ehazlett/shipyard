@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { jsonHandler } from './helpers.js';
+import { errorHandler, jsonHandler } from './helpers.js';
 import { getAuthToken } from '../services/auth';
 
 export function getInfo() {
@@ -9,5 +9,6 @@ export function getInfo() {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler)
+    .then(jsonHandler);
 }

@@ -1,36 +1,74 @@
 import React from 'react';
 
-import { Form, Segment, Header } from 'semantic-ui-react';
+import { Message, Form, Segment, Header } from 'semantic-ui-react';
+
+import { getSwarm, updateSwarm } from '../../api';
 
 class SettingsView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.refreshJoinTokens = this.refreshJoinTokens.bind(this);
-  }
+  state = {
+    swarm: null,
+    error: null,
+    loading: true,
+  };
 
   componentDidMount() {
-    this.props.fetchSwarm();
+    this.getSwarmSettings();
   }
 
-  refreshJoinTokens(e) {
+  getSwarmSettings = () => {
+    getSwarm()
+      .then((swarm) => {
+        this.setState({
+          error: null,
+          swarm: swarm.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
+  };
+
+  refreshJoinTokens = (e) => {
     const rotateManagerToken = true;
     const rotateWorkerToken = true;
-    this.props.updateSwarmSettings(this.props.swarm.info.Spec, this.props.swarm.info.Version.Index, rotateManagerToken, rotateWorkerToken);
+    const { swarm } = this.state;
+    updateSwarm(swarm.Spec, swarm.Version.Index, rotateManagerToken, rotateWorkerToken)
+      .then((success) => {
+        this.getSwarmSettings();
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
     e.preventDefault();
-  }
+  };
 
   render() {
+    const { swarm, error, loading } = this.state;
+
+    if(loading) {
+      return <div></div>;
+    }
+
     return (
       <Form>
+        <Message error/>
+        {error && (<Message negative>{error}</Message>)}
         <Segment className="basic">
           <Header>Join Tokens</Header>
           <Form.Field>
             <label>Worker</label>
-            <input value={this.props.swarm.info.JoinTokens.Worker} readOnly />
+            <input value={swarm.JoinTokens.Worker} readOnly />
           </Form.Field>
           <Form.Field>
             <label>Manager</label>
-            <input value={this.props.swarm.info.JoinTokens.Manager} readOnly />
+            <input value={swarm.JoinTokens.Manager} readOnly />
           </Form.Field>
           <button className="ui blue button" onClick={this.refreshJoinTokens}>Refresh Join Tokens</button>
         </Segment>

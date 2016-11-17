@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import $ from 'jquery';
 
-import { jsonHandler } from './helpers.js';
+import { errorHandler, jsonHandler } from './helpers.js';
 import { getAuthToken } from '../services/auth';
 
 export function listImages(all = false) {
@@ -10,14 +10,15 @@ export function listImages(all = false) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler)
+    .then(jsonHandler);
 }
 
 export function pullImage(imageName) {
   return fetch(`/images/create?fromImage=${imageName}`, {
     method: 'POST',
   })
-  .then(jsonHandler);
+    .then(errorHandler);
 }
 
 export function removeImage(id, force = false) {
@@ -31,5 +32,5 @@ export function removeImage(id, force = false) {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler);
 }

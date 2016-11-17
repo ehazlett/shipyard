@@ -1,25 +1,40 @@
 import React from 'react';
 
-import { Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
+import { listContainers } from '../../api';
+
 class ContainerListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.updateFilter = this.updateFilter.bind(this);
-    this.renderContainer = this.renderContainer.bind(this);
-  }
+  state = {
+    error: null,
+    containers: [],
+    loading: true,
+  };
 
   componentDidMount() {
-    this.props.fetchContainers();
+    listContainers()
+      .then((containers) => {
+        this.setState({
+          error: null,
+          containers: containers.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
   }
 
-  updateFilter(input) {
+  updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
-  }
+  };
 
-  renderContainer(container) {
+  renderContainer = (container) => {
     return (
       <Tr key={container.Id}>
         <Td column="" className="collapsing">
@@ -34,44 +49,32 @@ class ContainerListView extends React.Component {
         </Td>
         <Td column="Status">{container.Status}</Td>
         <Td column="Name">{container.Names[0]}</Td>
-        <Td column="&nbsp;" className="collapsing">
-          <div className="ui simple dropdown">
-            <i className="dropdown icon"></i>
-            <div className="menu">
-              <div className="item" onClick={() => this.props.startContainer(container.Id)}>
-                <Icon className="green play" />
-                Start
-              </div>
-              <div className="item" onClick={() => this.props.stopContainer(container.Id)}>
-                <Icon className="black stop" />
-                Stop
-              </div>
-              <div className="item" onClick={() => this.props.removeContainer(container.Id, true, true)}>
-                <Icon className="red remove" />
-                Remove
-              </div>
-            </div>
-          </div>
-        </Td>
       </Tr>
     );
   }
 
   render() {
+    const { loading, error, containers } = this.state;
+
+    if(loading) {
+      return <div></div>;
+    }
+
     return (
-      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
+      <Segment basic>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="six wide">
+            <Grid.Column width={6}>
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column className="right aligned ten wide" />
+            <Grid.Column width={10} textAlign="right" />
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column className="sixteen wide">
+            <Grid.Column width={16}>
+              {error && (<Message error>{error}</Message>)}
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -80,7 +83,7 @@ class ContainerListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any containers"
               >
-                {Object.values(this.props.containers.data).map(this.renderContainer)}
+                {Object.values(containers).map(this.renderContainer)}
               </Table>
             </Grid.Column>
           </Grid.Row>

@@ -1,37 +1,27 @@
-export function jsonHandler(response) {
-  return response.json().then((json) => {
-    if (response.status >= 200 && response.status < 300) {
-      return { json, response };
-    } else {
-      return Promise.reject({ json, response });
-    }
+export const errorHandler = (response) => {
+  if (!response.ok) {
+    const error = new Error(response.statusText);
+    error.response = response;
+    throw error;
+  }
+
+  return response;
+}
+
+export const jsonHandler = (response) => {
+  return response.json().then((body) => {
+    return { body, response };
   });
 }
 
-// Handles JSON error messages only, in the case wher error
-// messages are supplied in JSON format, but errors are JSON
-export function jsonErrorHandler(response) {
-  if (!response.ok) {
-    return response.json().then((json) => {
-      return Promise.reject({ json, response });
-    });
-  } else {
-    return { response };
-  }
-}
-
-// Handles JSON success messages only, in the case where success
-// messages are supplied in JSON format, but errors are text
-export function jsonSuccessHandler(response) {
-  if (response.ok) {
-    return response.json().then((json) => {
-      if (response.status >= 200 && response.status < 300) {
-        return { json, response };
-      } else {
-        return Promise.reject({ json, response });
-      }
-    });
-  } else {
-    return Promise.reject({ response });
-  }
+export const dockerErrorHandler = (response) => {
+  return response.json().then((body) => {
+		const matchedGroups = /code = (.+?) desc = (.+?)$/.exec(body.message);
+    return {
+			message: matchedGroups[0],
+			code: matchedGroups[1],
+			desc: matchedGroups[2],
+			response,
+		};
+  });
 }

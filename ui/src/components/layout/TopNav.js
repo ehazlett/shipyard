@@ -1,59 +1,36 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 import { Link } from 'react-router';
-import { Menu, Container, Icon } from 'semantic-ui-react';
+import { Dropdown, Menu, Container } from 'semantic-ui-react';
 
-const TopNav = (props) => (
-  <Menu className="inverted borderless blue">
-    <Container>
-      <Link to="/services" className="item">
-        <Icon className="cubes" />
-        Services
-      </Link>
+export default class TopNav extends React.Component {
+  static propTypes = {
+    signOut: PropTypes.func.isRequired
+  };
 
-      <Link to="/containers" className="item">
-        <Icon className="cube" />
-        Containers
-      </Link>
+  render() {
+    const { signOut, username, location } = this.props;
+    return (
+      <Menu inverted borderless color="blue">
+        <Container>
+          <Menu.Item name="services" icon="cubes" to="/services" as={Link} active={location.pathname === "/services" || location.pathname === "/"} />
+          <Menu.Item name="containers" icon="cube" to="/containers" as={Link} active={location.pathname === "/containers"} />
+          <Menu.Item name="images" icon="file" to="/images" as={Link} active={location.pathname === "/images"} />
+          <Menu.Item name="nodes" icon="server" to="/nodes" as={Link} active={location.pathname === "/nodes"} />
+          <Menu.Item name="networks" icon="sitemap" to="/networks" as={Link} active={location.pathname === "/networks"} />
+          <Menu.Item name="volumes" icon="database" to="/volumes" as={Link} active={location.pathname === "/volumes"} />
+          <Menu.Item name="accounts" icon="users" to="/accounts" as={Link} active={location.pathname === "/accounts"} />
+          <Menu.Item name="settings" icon="settings" to="/settings" as={Link} active={location.pathname === "/settings"} />
 
-      <Link to="/images" className="item">
-        <Icon className="file" />
-        Images
-      </Link>
-
-      <Link to="/nodes" className="item">
-        <Icon className="server" />
-        Nodes
-      </Link>
-
-      <Link to="/networks" className="item">
-        <Icon className="sitemap" />
-        Networks
-      </Link>
-
-      <Link to="/volumes" className="item">
-        <Icon className="database" />
-        Volumes
-      </Link>
-
-      <Link to="/accounts" className="item">
-        <Icon className="users" />
-        Accounts
-      </Link>
-
-      <Link to="/settings" className="item">
-        <Icon className="setting" />
-        Settings
-      </Link>
-
-      <div className="ui right floated simple dropdown item">
-        <Icon className="user" />
-        <div className="menu">
-          <a className="item" onClick={props.signOut}>Sign Out</a>
-        </div>
-      </div>
-    </Container>
-  </Menu>
-);
-
-export default TopNav;
+          <Menu.Menu position='right'>
+            <Dropdown simple as={Menu.Item} text={username}>
+              <Dropdown.Menu>
+                <Dropdown.Item icon="sign out" text="Sign Out" onClick={signOut}></Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Menu.Menu>
+        </Container>
+      </Menu>
+    )
+  }
+}

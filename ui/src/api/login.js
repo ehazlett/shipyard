@@ -1,6 +1,12 @@
 import fetch from 'isomorphic-fetch';
 
-import { jsonHandler } from './helpers.js';
+import { errorHandler, jsonHandler } from './helpers.js';
+import { setAuthToken } from '../services/auth';
+
+const saveTokenHandler = (response, username) => {
+  setAuthToken(username, response.body.auth_token);
+  return response;
+};
 
 export function login(username, password) {
   return fetch('/auth/login', {
@@ -10,5 +16,9 @@ export function login(username, password) {
       password,
     }),
   })
-  .then(jsonHandler);
+    .then(errorHandler)
+    .then(jsonHandler)
+    .then((r) => {
+      return saveTokenHandler(r, username);
+    });
 }
