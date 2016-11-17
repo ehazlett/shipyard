@@ -5,6 +5,7 @@ import { Table, Tr, Td } from 'reactable';
 import TaskStates from '../services/TaskStates';
 import { Link } from 'react-router';
 import _ from 'lodash';
+import moment from 'moment';
 
 class NodeListView extends React.Component {
   constructor(props) {
@@ -77,118 +78,78 @@ class NodeListView extends React.Component {
                 <div className="active section">{node.Description.Hostname}</div>
               </div>
             </Column>
-            <Column className="eight wide">
-              <div className="ui basic segment">
-                <div className="ui header">Details</div>
-                <div className="ui large horizontal list">
-                  <div className="item">
-                    <div className="header">State</div>
-                    {node.Status.State}
-                  </div>
-                  <div className="item">
-                    <div className="header">Role</div>
-                    {node.Spec.Role}
-                  </div>
-                  <div className="item">
-                    <div className="header">Availability</div>
-                    {node.Spec.Availability}
-                  </div>
-                  <div className="item">
-                    <div className="header">ID</div>
-                    {node.ID.substring(0, 12)}
-                  </div>
-                  <div className="item">
-                    <div className="header">Hostname</div>
-                    {node.Description.Hostname || 'Unknown'}
-                  </div>
-                  <div className="item">
-                    <div className="header">Platform</div>
-                    {node.Description.Platform ? `${node.Description.Platform.OS} ${node.Description.Platform.Architecture}` : 'Unknown'}
-                  </div>
-                </div>
-              </div>
-              {
-                node.Status.Message ?
-                  <div className="ui basic segment">
-                    <div className="ui header">Message</div>
-                    <pre>{node.Status.Message}</pre>
-                  </div>
-                  :
-                    ''
-              }
-              {
-                node.ManagerStatus ?
-                  <div className="ui basic segment">
-                    <div className="ui header">Manager Status</div>
-                    <div className="ui large horizontal list">
-                      <div className="item">
-                        <div className="header">Address</div>
-                        {node.ManagerStatus.Addr}
-                      </div>
-                      <div className="item">
-                        <div className="header">Reachability</div>
-                        {node.ManagerStatus.Reachability}
-                      </div>
-                      <div className="item">
-                        <div className="header">Leader</div>
-                        {node.ManagerStatus.Leader ? 'Yes' : 'No'}
-                      </div>
-                    </div>
-                  </div>
-                  :
-                    ''
-              }
-              <div className="ui basic segment">
-                <div className="ui header">Resources</div>
-                <div className="ui large horizontal list">
-                  <div className="item">
-                    <div className="header">CPU (Nanos)</div>
-                    {node.Description.Resources ? `${node.Description.Resources.NanoCPUs}` : 'Unknown'}
-                  </div>
-                  <div className="item">
-                    <div className="header">Memory (Bytes)</div>
-                    {node.Description.Resources ? `${node.Description.Resources.MemoryBytes}` : 'Unknown'}
-                  </div>
-                </div>
-              </div>
-            </Column>
-            <Column className="eight wide">
-              <div className="ui basic segment">
-                <div className="ui header">Engine</div>
-                <div className="ui large horizontal list">
-                  <div className="item">
-                    <div className="header">Version</div>
-                    {node.Description.Engine ? `${node.Description.Engine.EngineVersion}` : 'Unknown'}
-                  </div>
-                </div>
-                <div className="ui header">Plugins</div>
-                <div className="ui horizontal large list">
-                  {
-                    node.Description.Engine && node.Description.Engine.Plugins ?
-                      node.Description.Engine.Plugins.map((p) => (
-                      <div className="ui item">
-                        <div className="header">{p.Name}</div>
-                        {p.Type}
-                      </div>
-                      )) :
-                    'No labels found'
-
-                  }
-                </div>
-                <div className="ui header">Node Labels</div>
-                <div className="ui large list">
-                  {
-                    node.Description.Engine && node.Description.Engine.Labels ?
-                      _.keys(node.Description.Engine.Labels).map((l) => (
-                      <div className="ui item">
-                        <div className="header">{l}</div>
-                        {node.Description.Engine.Labels[l]}
-                      </div>
-                      )) :
-                    'No labels found'
-                  }
-                </div>
-              </div>
+            <Column className="sixteen wide basic ui segment">
+              <div className="ui header">Details</div>
+              <table className="ui very basic celled table">
+                <tbody>
+                  <tr><td className="four wide column">ID</td><td>{node.ID.substring(0, 12)}</td></tr>
+                  <tr><td>Role</td><td>{node.Spec.Role}</td></tr>
+                  <tr><td>Hostname</td><td>{node.Description.Hostname}</td></tr>
+                  <tr><td>OS</td><td>{node.Description.Platform.OS}</td></tr>
+                  <tr><td>Architecture</td><td>{node.Description.Platform.Architecture}</td></tr>
+                  <tr><td>Engine</td><td>{node.Description.Engine ? `${node.Description.Engine.EngineVersion}` : 'Unknown'}</td></tr>
+                  <tr><td>Created</td><td>{moment(node.CreatedAt).toString()}</td></tr>
+                  <tr><td>Last Updated</td><td>{moment(node.UpdatedAt).toString()}</td></tr>
+                </tbody>
+              </table>
+              <div className="ui header">Status</div>
+              <table className="ui very basic celled table">
+                {
+                  node.ManagerStatus ?
+                    <tbody>
+                      <tr><td className="four wide column">State</td><td>{node.Status.State}</td></tr>
+                      <tr><td>Availability</td><td>{node.Spec.Availability}</td></tr>
+                      <tr><td>Message</td><td>{node.Status.Message}</td></tr>
+                      <tr><td>Address</td><td>{node.ManagerStatus.Addr}</td></tr>
+                      <tr><td>Reachability</td><td>{node.ManagerStatus.Reachability}</td></tr>
+                      <tr><td>Leader</td><td>{node.ManagerStatus.Leader ? 'Yes' : 'No'}</td></tr>
+                    </tbody>
+                    :
+                    <tbody>
+                      <tr><td className="four wide column">State</td><td>{node.Status.State}</td></tr>
+                      <tr><td>Availability</td><td>{node.Spec.Availability}</td></tr>
+                      <tr><td>Message</td><td>{node.Status.Message}</td></tr>
+                    </tbody>
+                }
+              </table>
+              <div className="ui header">Resources</div>
+              <table className="ui very basic celled table">
+                <tbody>
+                  <tr><td className="four wide column">CPU (Nanos)</td><td>{node.Description.Resources ? `${node.Description.Resources.NanoCPUs}` : 'Unknown'}</td></tr>
+                  <tr><td>Memory (Bytes)</td><td>{node.Description.Resources ? `${node.Description.Resources.MemoryBytes}` : 'Unknown'}</td></tr>
+                </tbody>
+              </table>
+              <div className="ui header">Plugins</div>
+              <table className="ui very basic celled table">
+                <tbody>
+                {
+                  node.Description.Engine && node.Description.Engine.Plugins ?
+                    node.Description.Engine.Plugins.map((p) => (
+                    <tr key={p.Name}>
+                      <td className="four wide column">{p.Name}</td>
+                      <td>{p.Type}</td>
+                    </tr>
+                    )) : (
+                      <tr><td>No plugins found</td></tr>
+                    )
+                }
+                </tbody>
+              </table>
+              <div className="ui header">Node Labels</div>
+              <table className="ui very basic celled table">
+                <tbody>
+                {
+                  node.Description.Engine && node.Description.Engine.Labels ?
+                    _.keys(node.Description.Engine.Labels).map((l) => (
+                      <tr key={l}>
+                        <td>{l}</td><td>{node.Description.Engine.Labels[l]}</td>
+                      </tr>
+                    )) : (
+                      <tr><td>No labels found</td></tr>
+                    )
+                }
+                </tbody>
+              </table>
             </Column>
             <Column className="sixteen wide">
               <div className="ui segment">
