@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Container, Button } from 'react-semantify';
+import { Container, Button } from 'semantic-ui-react';
 
 class SwarmInitView extends React.Component {
 

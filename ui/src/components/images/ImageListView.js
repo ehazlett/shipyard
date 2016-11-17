@@ -1,27 +1,19 @@
 import React from 'react';
 
-import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 
 class ImageListView extends React.Component {
-
-  constructor(props) {
-    super(props);
-
-    this.updateFilter = this.updateFilter.bind(this);
-    this.renderRow = this.renderRow.bind(this);
-    this.renderImage = this.renderImage.bind(this);
-  }
 
   componentDidMount() {
     this.props.fetchImages();
   }
 
-  updateFilter(input) {
+  updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
   }
 
-  renderRow(image, tagIndex) {
+  renderRow = (image, tagIndex) => {
     return (
       <Tr key={image.Id}>
         <Td column="Repository">
@@ -54,7 +46,7 @@ class ImageListView extends React.Component {
     );
   }
 
-  renderImage(image) {
+  renderImage = (image) => {
     const rows = [];
     if(image.RepoTags) {
       for (let i = 0; i < image.RepoTags.length; i++) {
@@ -68,17 +60,17 @@ class ImageListView extends React.Component {
     return (
       <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
         <Grid>
-          <Row>
-            <Column className="six wide">
+          <Grid.Row>
+            <Grid.Column className="six wide">
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
-            </Column>
-            <Column className="right aligned ten wide" />
-          </Row>
-          <Row>
-            <Column className="sixteen wide">
+            </Grid.Column>
+            <Grid.Column className="right aligned ten wide" />
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column className="sixteen wide">
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -89,8 +81,8 @@ class ImageListView extends React.Component {
               >
                 {Object.values(this.props.images.data).map(this.renderImage)}
               </Table>
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Segment>
     );

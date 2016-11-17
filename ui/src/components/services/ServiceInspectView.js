@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Segment, Grid, Column, Row, Icon } from 'react-semantify';
+import { Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 import _ from 'lodash';
@@ -62,15 +62,15 @@ class ServiceListView extends React.Component {
     return (
       <Segment className={`basic ${this.props.services.loading || this.props.nodes.loading ? 'loading' : null}`}>
         <Grid>
-          <Row>
-            <Column className="sixteen wide basic ui segment">
+          <Grid.Row>
+            <Grid.Column className="sixteen wide basic ui segment">
               <div className="ui breadcrumb">
                 <Link to="/services" className="section">Services</Link>
                 <div className="divider"> / </div>
                 <div className="active section">{service ? service.Spec.Name : null}</div>
               </div>
-            </Column>
-            <Column className="ui sixteen wide basic segment">
+            </Grid.Column>
+            <Grid.Column className="ui sixteen wide basic segment">
               <div className="ui header">Details</div>
               <table className="ui very basic celled table">
                 <tbody>
@@ -111,8 +111,8 @@ class ServiceListView extends React.Component {
                   </tr>
                 </tbody>
               </table>
-            </Column>
-            <Column className="ui sixteen wide basic segment">
+            </Grid.Column>
+            <Grid.Column className="ui sixteen wide basic segment">
               <div className="ui header">Ports</div>
               <table className="ui very basic celled table">
                 {
@@ -342,8 +342,8 @@ class ServiceListView extends React.Component {
                   </tr>
                 </tbody>
               </table>
-            </Column>
-            <Column className="ui sixteen wide basic segment">
+            </Grid.Column>
+            <Grid.Column className="ui sixteen wide basic segment">
               <h3 className="ui header">Tasks</h3>
               <div className="ui fluid icon input">
                 <Icon className="search" />
@@ -359,8 +359,8 @@ class ServiceListView extends React.Component {
               >
                 {tasks ? tasks.map((t) => this.renderTask(service, t)) : []}
               </Table>
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Segment>
     );

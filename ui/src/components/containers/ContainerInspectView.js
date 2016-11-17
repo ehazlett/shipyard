@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Container, Grid, Column, Row } from 'react-semantify';
+import { Container, Grid,  } from 'semantic-ui-react';
 import ContainerInspect from '../containers/ContainerInspect';
 import { Link } from 'react-router';
 import _ from 'lodash';
@@ -18,18 +18,18 @@ class ContainerListView extends React.Component {
     return (
       <Container>
         <Grid>
-          <Row>
-            <Column className="sixteen wide basic ui segment">
+          <Grid.Row>
+            <Grid.Column className="sixteen wide basic ui segment">
               <div className="ui breadcrumb">
                 <Link to="/containers" className="section">Containers</Link>
                 <div className="divider"> / </div>
                 <div className="active section">{container ? container.Names[0] : ''}</div>
               </div>
-            </Column>
-            <Column className="sixteen wide">
+            </Grid.Column>
+            <Grid.Column className="sixteen wide">
               <ContainerInspect container={container} />
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Container>
     );

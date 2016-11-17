@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Container, Grid, Column, Row, Icon } from 'react-semantify';
+import { Container, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import TaskStates from '../services/TaskStates';
 import { Link } from 'react-router';
@@ -70,15 +70,15 @@ class NodeListView extends React.Component {
     return (
       <Container>
         <Grid>
-          <Row>
-            <Column className="sixteen wide basic ui segment">
+          <Grid.Row>
+            <Grid.Column className="sixteen wide basic ui segment">
               <div className="ui breadcrumb">
                 <Link to="/nodes" className="section">Nodes</Link>
                 <div className="divider"> / </div>
                 <div className="active section">{node.Description.Hostname}</div>
               </div>
-            </Column>
-            <Column className="sixteen wide basic ui segment">
+            </Grid.Column>
+            <Grid.Column className="sixteen wide basic ui segment">
               <div className="ui header">Details</div>
               <table className="ui very basic celled table">
                 <tbody>
@@ -150,8 +150,8 @@ class NodeListView extends React.Component {
                 }
                 </tbody>
               </table>
-            </Column>
-            <Column className="sixteen wide">
+            </Grid.Column>
+            <Grid.Column className="sixteen wide">
               <div className="ui segment">
                 <h3 className="ui header">Tasks</h3>
                 <div className="ui fluid icon input">
@@ -169,8 +169,8 @@ class NodeListView extends React.Component {
                   {tasks.map((t) => this.renderTask(node, t, this.props.services.data))}
                 </Table>
               </div>
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Container>
     );

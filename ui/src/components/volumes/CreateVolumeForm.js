@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 
 import _ from 'lodash';
-import { Header, Field } from 'react-semantify';
+import { Header, Field } from 'semantic-ui-react';
 
 class CreateVolumeForm extends React.Component {
   constructor(props) {

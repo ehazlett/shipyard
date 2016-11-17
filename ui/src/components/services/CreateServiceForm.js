@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { Header, Field } from 'react-semantify';
+import { Header, Field } from 'semantic-ui-react';
 
 class CreateServiceForm extends React.Component {
 

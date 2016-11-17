@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Link } from 'react-router';
-import { Segment, Grid, Row, Column, Icon } from 'react-semantify';
+import { Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 
 import CreateVolumeForm from './CreateVolumeForm';
@@ -29,25 +29,25 @@ class VolumeListView extends React.Component {
     return (
       <Segment className={`basic ${this.props.volumes.loading ? 'loading' : ''}`}>
         <Grid>
-          <Row>
-            <Column className="six wide">
+          <Grid.Row>
+            <Grid.Column className="six wide">
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
-            </Column>
-            <Column className="right aligned ten wide">
+            </Grid.Column>
+            <Grid.Column className="right aligned ten wide">
               <Link to="/volumes/create" className="ui green button">
                 <Icon className="add" />
                 Create
               </Link>
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
 
           {this.createVolumeFormVisible ? <CreateVolumeForm /> : null}
 
-          <Row>
-            <Column className="sixteen wide">
+          <Grid.Row>
+            <Grid.Column className="sixteen wide">
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -57,8 +57,8 @@ class VolumeListView extends React.Component {
               >
                 {Object.values(this.props.volumes.data).map(this.renderVolume)}
               </Table>
-            </Column>
-          </Row>
+            </Grid.Column>
+          </Grid.Row>
         </Grid>
       </Segment>
     );
