@@ -31,7 +31,7 @@ services:
       - proxy
       - rethinkdb
 
-  webpack:
+  ui:
     image: "node:7.1"
     command: bash -c "npm install && npm run start"
     working_dir: /usr/src/app
