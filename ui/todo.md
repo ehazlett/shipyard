@@ -6,6 +6,12 @@
 	e.g.
 		actions/containers.js -> redux/containers.actions.js
 
+* Sort direction icon isn't showing on tables
+
+* Is there a better table component we can use than Reactable now?
+
+* Table pagination
+
 * Separate out "top level" view components into a `views/` directory
 
 * Update to latest react-router and use new routes format
@@ -20,8 +26,6 @@
 
 * Update to latest redux
 
-* Table pagination
-
 * On page load, check if user is logged in by requesting their account
 	details, if not, remove login token and redirect to `/login`. This is
 	probably a change that needs to happen in `sagas/user.js`, `authFlowSaga`
@@ -32,5 +36,3 @@
 * Internationalization: https://github.com/yahoo/react-intl
 
 * Forms: http://redux-form.com/6.2.0/
-
-* Maybe use http://www.material-ui.com/ ?
