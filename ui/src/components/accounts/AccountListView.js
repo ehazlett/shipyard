@@ -1,24 +1,39 @@
 import React from 'react';
 
-import { Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 
+import { listAccounts } from '../../api';
+
 class AccountListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.updateFilter = this.updateFilter.bind(this);
-    this.renderAccount = this.renderAccount.bind(this);
-  }
+  state = {
+    error: null,
+    accounts: [],
+    loading: true,
+  };
 
   componentDidMount() {
-    this.props.fetchAccounts();
+    listAccounts()
+      .then((accounts) => {
+        this.setState({
+          error: null,
+          accounts: accounts.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
   }
 
-  updateFilter(input) {
+  updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
-  }
+  };
 
-  renderAccount(account) {
+  renderAccount = (account) => {
     return (
       <Tr key={account.id}>
         <Td column="Username">{account.username}</Td>
@@ -27,23 +42,30 @@ class AccountListView extends React.Component {
         <Td column="Roles">{account.roles.join(', ')}</Td>
       </Tr>
     );
-  }
+  };
 
   render() {
+    const { loading, error, accounts } = this.state;
+
+    if(loading) {
+      return <div></div>;
+    }
+
     return (
-      <Segment className={`basic ${this.props.accounts.loading ? 'loading' : ''}`}>
+      <Segment basic>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="six wide">
+            <Grid.Column width={6}>
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column className="right aligned ten wide" />
+            <Grid.Column width={10} textAlign="right" />
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column className="sixteen wide">
+            <Grid.Column width={16}>
+              {error && (<Message error>{error}</Message>)}
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -52,7 +74,7 @@ class AccountListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any accounts"
               >
-                {Object.values(this.props.accounts.data).map(this.renderAccount)}
+                {Object.values(accounts).map(this.renderAccount)}
               </Table>
             </Grid.Column>
           </Grid.Row>

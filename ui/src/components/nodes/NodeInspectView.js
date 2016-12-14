@@ -1,24 +1,70 @@
 import React from 'react';
 
-import { Container, Grid, Icon } from 'semantic-ui-react';
+import { Message, Container, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import TaskStates from '../services/TaskStates';
 import { Link } from 'react-router';
 import _ from 'lodash';
 import moment from 'moment';
 
+import { inspectNode, listTasksForNode, listServices } from '../../api';
+
 class NodeListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.updateFilter = this.updateFilter.bind(this);
-  }
+  state = {
+    services: {},
+    tasks: [],
+    node: [],
+    loading: true,
+    error: null
+  };
 
   componentDidMount() {
-    this.props.fetchServices();
-    this.props.fetchNodes();
+    const { id } = this.props.params;
+
+    inspectNode(id)
+      .then((node) => {
+        this.setState({
+          error: null,
+          node: node.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
+
+    listTasksForNode(id)
+      .then((tasks) => {
+        this.setState({
+          error: null,
+          tasks: tasks.body,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+        });
+      });
+
+    listServices()
+      .then((services) => {
+        this.setState({
+          error: null,
+          services: _.keyBy(services.body, 'ID'),
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+        });
+      });
   }
 
-  updateFilter(input) {
+
+  updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
   }
 
@@ -57,21 +103,17 @@ class NodeListView extends React.Component {
   }
 
   render() {
-    const { id } = this.props.params;
-    const node = this.props.nodes.data[id];
-    const tasks = _.filter(Object.values(this.props.tasks.data), function (t) {
-      return t.NodeID === id;
-    });
+    const { node, services, tasks, error, loading } = this.state;
 
-    if (!node) {
-      return (<div></div>);
+    if (loading) {
+      return <div></div>;
     }
 
     return (
       <Container>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="sixteen wide basic ui segment">
+            <Grid.Column width={16}>
               <div className="ui breadcrumb">
                 <Link to="/nodes" className="section">Nodes</Link>
                 <div className="divider"> / </div>
@@ -79,6 +121,7 @@ class NodeListView extends React.Component {
               </div>
             </Grid.Column>
             <Grid.Column className="sixteen wide basic ui segment">
+              {error && (<Message error>{error}</Message>)}
               <div className="ui header">Details</div>
               <table className="ui very basic celled table">
                 <tbody>
@@ -166,7 +209,7 @@ class NodeListView extends React.Component {
                   hideFilterInput
                   noDataText="Couldn't find any tasks"
                 >
-                  {tasks.map((t) => this.renderTask(node, t, this.props.services.data))}
+                  {tasks.map((t) => this.renderTask(node, t, services))}
                 </Table>
               </div>
             </Grid.Column>

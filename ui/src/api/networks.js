@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { jsonHandler } from './helpers.js';
+import { jsonHandler, errorHandler } from './helpers';
 import { getAuthToken } from '../services/auth';
 
 export function listNetworks() {
@@ -9,5 +9,6 @@ export function listNetworks() {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler)
+    .then(jsonHandler);
 }

@@ -1,12 +1,32 @@
 import React from 'react';
 
-import { Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 
+import { listImages } from '../../api';
+
 class ImageListView extends React.Component {
+  state = {
+    error: null,
+    images: [],
+    loading: true,
+  };
 
   componentDidMount() {
-    this.props.fetchImages();
+    listImages()
+      .then((images) => {
+        this.setState({
+          error: null,
+          images: images.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
   }
 
   updateFilter = (input) => {
@@ -31,17 +51,6 @@ class ImageListView extends React.Component {
         <Td column="Size">
           {image.Size}
         </Td>
-        <Td column="&nbsp;" className="collapsing">
-          <div className="ui simple dropdown">
-            <i className="dropdown icon"></i>
-            <div className="menu">
-              <div className="item" onClick={() => this.props.removeImage(image.Id)}>
-                <Icon className="red remove" />
-                Remove
-              </div>
-            </div>
-          </div>
-        </Td>
       </Tr>
     );
   }
@@ -57,20 +66,27 @@ class ImageListView extends React.Component {
   }
 
   render() {
+    const { loading, error, images } = this.state;
+
+    if(loading) {
+      return <div></div>;
+    }
+
     return (
-      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
+      <Segment basic>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="six wide">
+            <Grid.Column width={6}>
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column className="right aligned ten wide" />
+            <Grid.Column width={10} />
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column className="sixteen wide">
+            <Grid.Column width={16}>
+              {error && (<Message error>{error}</Message>)}
               <Table
                 ref="table"
                 className="ui compact celled sortable unstackable table"
@@ -79,7 +95,7 @@ class ImageListView extends React.Component {
                 hideFilterInput
                 noDataText="Couldn't find any images"
               >
-                {Object.values(this.props.images.data).map(this.renderImage)}
+                {Object.values(images).map(this.renderImage)}
               </Table>
             </Grid.Column>
           </Grid.Row>

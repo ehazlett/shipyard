@@ -1,23 +1,52 @@
 import React from 'react';
 
-import { Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import taskStates from './TaskStates';
 import { Link } from 'react-router';
 import _ from 'lodash';
 
+import { listServices, listTasks } from '../../api';
+
 class ServiceListView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.updateFilter = this.updateFilter.bind(this);
-  }
+  state = {
+    services: [],
+    tasks: [],
+    loading: true,
+    error: null
+  };
 
   componentDidMount() {
-    this.props.fetchServices();
-    this.props.fetchNetworks();
+    listServices()
+      .then((services) => {
+        this.setState({
+          error: null,
+          services: services.body,
+          loading: false,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+          loading: false,
+        });
+      });
+
+    listTasks()
+      .then((tasks) => {
+        this.setState({
+          error: null,
+          tasks: tasks.body,
+        });
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+        });
+      });
   }
 
-  updateFilter(input) {
+  updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
   }
 
@@ -31,28 +60,19 @@ class ServiceListView extends React.Component {
           </div>
         </Td>
         <Td column="ID" className="collapsing">
-          <Link to={`/services/${service.ID}`}>{service.ID.substring(0, 12)}</Link>
+					<Link to={`/services/inspect/${service.ID}`}>{service.ID.substring(0, 12)}</Link>
         </Td>
         <Td column="Name">{service.Spec.Name}</Td>
         <Td column="Image">{service.Spec.TaskTemplate.ContainerSpec.Image}</Td>
-        <Td column="&nbsp;" className="collapsing">
-          <div className="ui simple dropdown">
-            <i className="dropdown icon"></i>
-            <div className="menu">
-              <div className="item" onClick={() => this.props.removeService(service.ID)}>
-                <Icon className="red remove" />
-                Remove
-              </div>
-            </div>
-          </div>
-        </Td>
       </Tr>
     );
   }
 
   render() {
+    const { loading, error, services, tasks } = this.state;
+
     const tasksByService = {};
-    _.forEach(this.props.tasks.data, function (task) {
+    _.forEach(tasks, function (task) {
       if (!tasksByService[task.ServiceID]) {
         tasksByService[task.ServiceID] = [];
       }
@@ -66,17 +86,21 @@ class ServiceListView extends React.Component {
       });
     });
 
+    if(loading) {
+      return <div></div>;
+    }
+
     return (
-      <Segment className={`basic ${this.props.services.loading ? 'loading' : ''}`}>
+      <Segment basic>
         <Grid>
           <Grid.Row>
-            <Grid.Column className="six wide">
+            <Grid.Column width={6}>
               <div className="ui fluid icon input">
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column className="right aligned ten wide">
+            <Grid.Column width={10} textAlign="right">
               <Link to="/services/create" className="ui green button">
                 <Icon className="add" />
                 Create
@@ -85,6 +109,7 @@ class ServiceListView extends React.Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column className="sixteen wide">
+              {error && (<Message error>{error}</Message>)}
               <Table
                 className="ui compact celled sortable unstackable table"
                 ref="table"
@@ -92,7 +117,7 @@ class ServiceListView extends React.Component {
                 filterable={['ID', 'Name', 'Image']}
                 hideFilterInput
                 noDataText="Couldn't find any services">
-                {Object.values(this.props.services.data).map(s => this.renderService(s, taskSummaryByService[s.ID]))}
+                {Object.values(services).map(s => this.renderService(s, taskSummaryByService[s.ID]))}
               </Table>
             </Grid.Column>
           </Grid.Row>
