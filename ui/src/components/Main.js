@@ -83,7 +83,7 @@ class Main extends React.Component {
           <Match exactly pattern="/" render={() => <Redirect to="/services" />} />
           <Match exactly pattern="/services" component={ServiceListView} />
           <Match exactly pattern="/services/create" component={CreateServiceView} />
-					<Match exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
+          <Match exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
           <Match exactly pattern="/nodes" component={NodeListView} />
           <Match exactly pattern="/nodes/:id" component={NodeInspectView} />
           <Match exactly pattern="/networks" component={NetworkListView} />

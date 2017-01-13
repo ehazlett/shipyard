@@ -60,7 +60,7 @@ class ServiceListView extends React.Component {
           </div>
         </Td>
         <Td column="ID" className="collapsing">
-					<Link to={`/services/inspect/${service.ID}`}>{service.ID.substring(0, 12)}</Link>
+          <Link to={`/services/inspect/${service.ID}`}>{service.ID.substring(0, 12)}</Link>
         </Td>
         <Td column="Name">{service.Spec.Name}</Td>
         <Td column="Image">{service.Spec.TaskTemplate.ContainerSpec.Image}</Td>
@@ -117,7 +117,7 @@ class ServiceListView extends React.Component {
                 filterable={['ID', 'Name', 'Image']}
                 hideFilterInput
                 noDataText="Couldn't find any services">
-                {Object.values(services).map(s => this.renderService(s, taskSummaryByService[s.ID]))}
+                {Object.keys(services).map(key => this.renderService(services[key], taskSummaryByService[services[key].ID]))}
               </Table>
             </Grid.Column>
           </Grid.Row>
