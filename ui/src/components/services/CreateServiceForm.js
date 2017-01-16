@@ -280,9 +280,8 @@ export default class CreateServiceForm extends React.Component {
           <Form.Input name="Groups" label="Groups" placeholder="group1 group2" />
         </Form.Group>
 
-        <Divider hidden/>
+        <Divider />
 
-        <Header as="h4">Mounts</Header>
         <List>
           {this.state.mountInputKeys.map((key, i) => {
             return (
@@ -299,11 +298,10 @@ export default class CreateServiceForm extends React.Component {
             );
           })}
         </List>
-        <Button type="button" icon="plus" basic onClick={this.addMount}/>
+        <Button content="Mount" type="button" icon="plus" basic onClick={this.addMount}/>
 
         <Divider />
 
-        <Header as="h4">Constraints</Header>
         <List>
           {this.state.constraintKeys.map((key, i) => {
             return (
@@ -316,7 +314,7 @@ export default class CreateServiceForm extends React.Component {
             );
           })}
         </List>
-        <Button type="button" icon="plus" basic onClick={this.addConstraint}/>
+        <Button content="Constraint" type="button" icon="plus" basic onClick={this.addConstraint}/>
 
         <Divider />
 
