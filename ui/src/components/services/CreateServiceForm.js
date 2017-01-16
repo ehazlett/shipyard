@@ -153,30 +153,32 @@ export default class CreateServiceForm extends React.Component {
     });
   };
 
-  handleChange = (key, e) => {
-    this.updateValidationConfig(key, e.target.value);
+  handleChange = (key, value) => {
+    this.updateValidationConfig(key, value);
     this.setState({
-      [key]: e.target.value,
+      [key]: value,
     });
   }
 
   addMount = () => {
     const key = this.state.mountsAdded;
     const newConfig = {...this.state.validationConfig};
-    newConfig["Mounts.MountType-" + key] = {
-      identifier: "Mounts.MountType-" + key,
-      rules: [{
-        type: "empty",
-        prompt: "Please select a mount type",
-      }],
+    const emptyValidationMessages = {
+      "Mounts.MountType-": "Please select a mount type",
+      "Mounts.Source-": "Source is a required field",
+      "Mounts.Target-": "Target is a required field",
+      "Mounts.VolumeDriver-": "Volume driver is a required field",
+      "Mounts.ReadOnly-": "Please indicate whether the mount should be read only",
     };
-    newConfig["Mounts.ReadOnly-" + key] = {
-      identifier: "Mounts.ReadOnly-" + key,
-      rules: [{
-        type: "empty",
-        prompt: "Please indicate whether the mount should be read only",
-      }],
-    };
+    Object.keys(emptyValidationMessages).forEach(k => {
+      newConfig[k + key] = {
+        identifier: k + key,
+        rules: [{
+          type: "empty",
+          prompt: emptyValidationMessages[k],
+        }],
+      }
+    });
     this.setState({
       ...this.state,
       validationConfig: newConfig,
@@ -189,6 +191,9 @@ export default class CreateServiceForm extends React.Component {
     const key = button.tabIndex;
     const newConfig = {...this.state.validationConfig};
     delete newConfig["Mounts.MountType-" + key];
+    delete newConfig["Mounts.Source-" + key];
+    delete newConfig["Mounts.Target-" + key];
+    delete newConfig["Mounts.VolumeDriver-" + key];
     delete newConfig["Mounts.ReadOnly-" + key];
     this.setState({
       validationConfig: newConfig,
@@ -197,16 +202,35 @@ export default class CreateServiceForm extends React.Component {
   }
 
   addConstraint = () => {
+    const key = this.state.constraintsAdded;
+    const newConfig = {...this.state.validationConfig};
+    const emptyValidationMessages = {
+      "Constraints.PlacementConstraint-": "Placement constraint is a required field",
+    };
+    Object.keys(emptyValidationMessages).forEach(k => {
+      newConfig[k + key] = {
+        identifier: k + key,
+        rules: [{
+          type: "empty",
+          prompt: emptyValidationMessages[k],
+        }],
+      }
+    });
     this.setState({
       ...this.state,
-      constraintsAdded: this.state.constraintsAdded + 1,
-      constraintKeys: [...this.state.constraintKeys, this.state.constraintsAdded]
+      validationConfig: newConfig,
+      constraintsAdded: key + 1,
+      constraintKeys: [...this.state.constraintKeys, key]
     })
   }
 
   removeConstraint = (e, button) => {
+    const key = button.tabIndex;
+    const newConfig = {...this.state.validationConfig};
+    delete newConfig["Constraints.PlacementConstraint-" + key];
     this.setState({
-      constraintKeys: this.state.constraintKeys.filter((_, i) => i !== button.tabIndex )
+      validationConfig: newConfig,
+      constraintKeys: this.state.constraintKeys.filter((_, i) => i !== key )
     });
   }
 
@@ -244,7 +268,7 @@ export default class CreateServiceForm extends React.Component {
         <Divider hidden />
 
         <Form.Group widths="equal">
-          <Form.Select name="Mode" label="Mode" onChange={(e) => this.handleChange("Mode", e)} options={modes} required />
+          <Form.Select name="Mode" label="Mode" onChange={(e, data) => this.handleChange(data.name, data.value)} options={modes} placeholder="Mode" required />
           <Form.Input name="Replicas" label="Replicas" type="number" disabled={Mode !== "Replicated"} required={Mode === "Replicated"} placeholder={1} />
         </Form.Group>
 
@@ -285,7 +309,7 @@ export default class CreateServiceForm extends React.Component {
             return (
               <List.Item key={key}>
                 <Form.Group widths="equal">
-                  <Form.Input name={"Constraints.PlacementConstraint-" + i} label={i === 0 && "Placement Constraint"} placeholder="node.labels.type == queue" />
+                  <Form.Input name={"Constraints.PlacementConstraint-" + i} label={i === 0 && "Placement Constraint"} placeholder="node.labels.type == queue" required />
                   <Form.Button type="button" tabIndex={i} icon="minus" label={i === 0 && "Remove"} basic onClick={this.removeConstraint}/>
                 </Form.Group>
               </List.Item>
