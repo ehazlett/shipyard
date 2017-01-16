@@ -161,16 +161,38 @@ export default class CreateServiceForm extends React.Component {
   }
 
   addMount = () => {
+    const key = this.state.mountsAdded;
+    const newConfig = {...this.state.validationConfig};
+    newConfig["Mounts.MountType-" + key] = {
+      identifier: "Mounts.MountType-" + key,
+      rules: [{
+        type: "empty",
+        prompt: "Please select a mount type",
+      }],
+    };
+    newConfig["Mounts.ReadOnly-" + key] = {
+      identifier: "Mounts.ReadOnly-" + key,
+      rules: [{
+        type: "empty",
+        prompt: "Please indicate whether the mount should be read only",
+      }],
+    };
     this.setState({
       ...this.state,
-      mountsAdded: this.state.mountsAdded + 1,
-      mountInputKeys: [...this.state.mountInputKeys, this.state.mountsAdded]
+      validationConfig: newConfig,
+      mountsAdded: key + 1,
+      mountInputKeys: [...this.state.mountInputKeys, key]
     })
   }
 
   removeMount = (e, button) => {
+    const key = button.tabIndex;
+    const newConfig = {...this.state.validationConfig};
+    delete newConfig["Mounts.MountType-" + key];
+    delete newConfig["Mounts.ReadOnly-" + key];
     this.setState({
-      mountInputKeys: this.state.mountInputKeys.filter((_, i) => i !== button.tabIndex )
+      validationConfig: newConfig,
+      mountInputKeys: this.state.mountInputKeys.filter((_, i) => i !== key )
     });
   }
 
@@ -198,6 +220,10 @@ export default class CreateServiceForm extends React.Component {
       { text: "Read Only", value: "true" },
       { text: "Read/Write", value: "false" },
     ];
+    const modes = [
+      {text:"Replicated", value:"Replicated"},
+      {text:"Global", value:"Global"},
+    ];
     return (
       <Form inline fields={this.state.validationConfig} onSubmit={this.createService}>
         {redirect && <Redirect to={redirectTo}/>}
@@ -218,11 +244,7 @@ export default class CreateServiceForm extends React.Component {
         <Divider hidden />
 
         <Form.Group widths="equal">
-          <Form.Field name="Mode" label="Mode" onChange={(e) => this.handleChange("Mode", e)} control="select" required>
-            <option value=""></option>
-            <option value="Replicated">Replicated</option>
-            <option value="Global">Global</option>
-          </Form.Field>
+          <Form.Select name="Mode" label="Mode" onChange={(e) => this.handleChange("Mode", e)} options={modes} required />
           <Form.Input name="Replicas" label="Replicas" type="number" disabled={Mode !== "Replicated"} required={Mode === "Replicated"} placeholder={1} />
         </Form.Group>
 
@@ -242,11 +264,11 @@ export default class CreateServiceForm extends React.Component {
             return (
               <List.Item key={key}>
                 <Form.Group widths="equal">
-                  <Form.Select name={"Mounts.MountType-" + i} label={i === 0 && "Type"} options={mountTypes} placeholder="Type" />
-                  <Form.Input name={"Mounts.Source-" + i} label={i === 0 && "Source"} placeholder="volumename or /host/path" />
-                  <Form.Input name={"Mounts.Target-" + i} label={i === 0 && "Target"} placeholder="/container/path" />
-                  <Form.Input name={"Mounts.VolumeDriver-" + i} label={i === 0 && "Volume Driver"} placeholder="local" />
-                  <Form.Select name={"Mounts.ReadOnly-" + i} label={i === 0 && "Read Only"} options={readOnlyOptions} placeholder="Read Only" />
+                  <Form.Select name={"Mounts.MountType-" + i} label={i === 0 && "Type"} options={mountTypes} placeholder="Type" required />
+                  <Form.Input name={"Mounts.Source-" + i} label={i === 0 && "Source"} placeholder="volumename or /host/path" required />
+                  <Form.Input name={"Mounts.Target-" + i} label={i === 0 && "Target"} placeholder="/container/path" required />
+                  <Form.Input name={"Mounts.VolumeDriver-" + i} label={i === 0 && "Volume Driver"} placeholder="local" required />
+                  <Form.Select name={"Mounts.ReadOnly-" + i} label={i === 0 && "Read Only"} options={readOnlyOptions} placeholder="Read Only" required />
                   <Form.Button type="button" tabIndex={i} width={4} icon="minus" label={i === 0 && "Remove"} basic onClick={this.removeMount}/>
                 </Form.Group>
               </List.Item>
