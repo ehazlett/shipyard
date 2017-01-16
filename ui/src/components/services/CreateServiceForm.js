@@ -30,24 +30,27 @@ export default class CreateServiceForm extends React.Component {
     redirectTo: "",
     validationConfig: VALIDATION_CONFIG,
     mountInputKeys: [],
-    mountsAdded: 0
+    mountsAdded: 0,
+    constraintKeys: [],
+    constraintsAdded: 0,
   };
 
-  getMountsFromFormValues = (values) => {
+  getMultipleInputFormValues = (namespace, values) => {
     const filterKeys = (obj, predicate) => {
       return Object.keys(obj)
             .filter( key => predicate(key) )
             .reduce( (res, key) => {res[key] = obj[key]; return res}, {});
     };
-    const dynamicFormElements = filterKeys(values, key => key.includes("-"));
+    const dynamicFormElements = filterKeys(values, key => key.startsWith(namespace + "."));
     const splitDynamicFormElements = Object.keys(dynamicFormElements).map(key => {
-      const split = key.split("-");
+      const strippedKey = key.replace(new RegExp("^" + namespace + "\\."), ""); 
+      const split = strippedKey.split("-");
       return [...split, dynamicFormElements[key]];
     });
 
-    // Groups mount fields by the row that they are in, and creates an object
+    // Groups namespaced fields by the row that they are in, and creates an object
     // out of each field.
-    const mountsObject = splitDynamicFormElements.reduce((acc, tuple) => {
+    const obj = splitDynamicFormElements.reduce((acc, tuple) => {
       const rowTag = tuple[1];
       const key = tuple[0];
       const value = tuple[2];
@@ -59,7 +62,12 @@ export default class CreateServiceForm extends React.Component {
       return output;
     }, {});
 
-    const mounts = Object.keys(mountsObject).map(key => mountsObject[key]);
+    const rows = Object.keys(obj).map(key => obj[key]);
+    return rows;
+  }
+
+  getMountsFromFormValues = (values) => {
+    const mounts = this.getMultipleInputFormValues("Mounts", values);
     return mounts.map(mount => {
       return {
         "Target": mount["Target"],
@@ -75,10 +83,16 @@ export default class CreateServiceForm extends React.Component {
     });
   }
 
+  getConstraintsFromFormValues = (values) => {
+    const constraints = this.getMultipleInputFormValues("Constraints", values);
+    return constraints.map(constraint => constraint["PlacementConstraint"]);
+  }
+
   createService = (e, values) => {
     e.preventDefault();
     const mounts = this.getMountsFromFormValues(values);
-    console.log(mounts);
+    const constraints = this.getConstraintsFromFormValues(values);
+
     createService({
       Name: values.Name,
       TaskTemplate: {
@@ -92,6 +106,7 @@ export default class CreateServiceForm extends React.Component {
           TTY: values.TTY,
           OpenStdin: values.OpenStdin,
           Mounts: mounts,
+          Placements: constraints,
         },
       },
       Mode: {
@@ -154,9 +169,22 @@ export default class CreateServiceForm extends React.Component {
   }
 
   removeMount = (e, button) => {
-    console.log(e, button)
     this.setState({
       mountInputKeys: this.state.mountInputKeys.filter((_, i) => i !== button.tabIndex )
+    });
+  }
+
+  addConstraint = () => {
+    this.setState({
+      ...this.state,
+      constraintsAdded: this.state.constraintsAdded + 1,
+      constraintKeys: [...this.state.constraintKeys, this.state.constraintsAdded]
+    })
+  }
+
+  removeConstraint = (e, button) => {
+    this.setState({
+      constraintKeys: this.state.constraintKeys.filter((_, i) => i !== button.tabIndex )
     });
   }
 
@@ -206,7 +234,7 @@ export default class CreateServiceForm extends React.Component {
           <Form.Input name="Groups" label="Groups" placeholder="group1 group2" />
         </Form.Group>
 
-        <Divider hidden />
+        <Divider hidden/>
 
         <Header as="h4">Mounts</Header>
         <List>
@@ -214,11 +242,11 @@ export default class CreateServiceForm extends React.Component {
             return (
               <List.Item key={key}>
                 <Form.Group widths="equal">
-                  <Form.Select name={"MountType-" + i} label={i === 0 && "Type"} options={mountTypes} placeholder="Type" />
-                  <Form.Input name={"Source-" + i} label={i === 0 && "Source"} placeholder="volumename or /host/path" />
-                  <Form.Input name={"Target-" + i} label={i === 0 && "Target"} placeholder="/container/path" />
-                  <Form.Input name={"VolumeDriver-" + i} label={i === 0 && "Volume Driver"} placeholder="local" />
-                  <Form.Select name={"ReadOnly-" + i} label={i === 0 && "Read Only"} options={readOnlyOptions} placeholder="Read Only" />
+                  <Form.Select name={"Mounts.MountType-" + i} label={i === 0 && "Type"} options={mountTypes} placeholder="Type" />
+                  <Form.Input name={"Mounts.Source-" + i} label={i === 0 && "Source"} placeholder="volumename or /host/path" />
+                  <Form.Input name={"Mounts.Target-" + i} label={i === 0 && "Target"} placeholder="/container/path" />
+                  <Form.Input name={"Mounts.VolumeDriver-" + i} label={i === 0 && "Volume Driver"} placeholder="local" />
+                  <Form.Select name={"Mounts.ReadOnly-" + i} label={i === 0 && "Read Only"} options={readOnlyOptions} placeholder="Read Only" />
                   <Form.Button type="button" tabIndex={i} width={4} icon="minus" label={i === 0 && "Remove"} basic onClick={this.removeMount}/>
                 </Form.Group>
               </List.Item>
@@ -226,6 +254,25 @@ export default class CreateServiceForm extends React.Component {
           })}
         </List>
         <Button type="button" icon="plus" basic onClick={this.addMount}/>
+
+        <Divider />
+
+        <Header as="h4">Constraints</Header>
+        <List>
+          {this.state.constraintKeys.map((key, i) => {
+            return (
+              <List.Item key={key}>
+                <Form.Group widths="equal">
+                  <Form.Input name={"Constraints.PlacementConstraint-" + i} label={i === 0 && "Placement Constraint"} placeholder="node.labels.type == queue" />
+                  <Form.Button type="button" tabIndex={i} icon="minus" label={i === 0 && "Remove"} basic onClick={this.removeConstraint}/>
+                </Form.Group>
+              </List.Item>
+            );
+          })}
+        </List>
+        <Button type="button" icon="plus" basic onClick={this.addConstraint}/>
+
+        <Divider />
 
         {/* These don"t seem to do anything at the moment
         <Form.Field>
