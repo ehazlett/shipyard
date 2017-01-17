@@ -23,8 +23,8 @@ export default class Form extends React.Component {
   onSubmitValidator = (e, values) => {
     const form = $(this.form._form);
 
-		form.form(this.state.formConfig)
-			.form('validate form');
+    form.form(this.state.formConfig)
+      .form('validate form');
 
     if(form.form('is valid')) {
       this.props.onSubmit(e, values);
@@ -33,7 +33,7 @@ export default class Form extends React.Component {
     }
   };
 
-	updateFormConfig = (props) => {
+  updateFormConfig = (props) => {
     const { inline, validateOn, fields } = props;
     this.setState({
       formConfig: {
@@ -42,14 +42,14 @@ export default class Form extends React.Component {
         fields,
       },
     });
-	};
+  };
 
-	componentWillReceiveProps(nextProps) {
-		this.updateFormConfig(nextProps);
-	}
+  componentWillReceiveProps(nextProps) {
+    this.updateFormConfig(nextProps);
+  }
 
   componentDidMount() {
-		this.updateFormConfig(this.props);
+    this.updateFormConfig(this.props);
   }
 
   render() {

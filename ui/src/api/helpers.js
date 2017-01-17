@@ -16,12 +16,12 @@ export const jsonHandler = (response) => {
 
 export const dockerErrorHandler = (response) => {
   return response.json().then((body) => {
-		const matchedGroups = /code = (.+?) desc = (.+?)$/.exec(body.message);
+    const matchedGroups = /code = (.+?) desc = (.+?)$/.exec(body.message);
     return {
-			message: matchedGroups[0],
-			code: matchedGroups[1],
-			desc: matchedGroups[2],
-			response,
-		};
+      message: matchedGroups[0],
+      code: matchedGroups[1],
+      desc: matchedGroups[2],
+      response,
+    };
   });
 }
