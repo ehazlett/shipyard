@@ -4,7 +4,7 @@
   "private": true,
   "devDependencies": {
     "npm-check-updates": "^2.8.6",
-    "react-scripts": "0.7.0"
+    "react-scripts": "0.8.5"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -22,13 +22,13 @@
     "react-transform-hmr": "^1.0.4",
     "reactable": "^0.14.0",
     "semantic-ui-css": "^2.2.4",
-    "semantic-ui-react": "^0.61.1"
+    "semantic-ui-react": "^0.64.3"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "check-updates": "npm-check-updates"
+    "update-deps": "npm-check-updates -u"
   }
 }

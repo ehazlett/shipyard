@@ -1,4 +1,4 @@
-FROM node:7.1-onbuild
+FROM node:7.4-onbuild
 
 RUN npm run build && \
 	mkdir -p static && \

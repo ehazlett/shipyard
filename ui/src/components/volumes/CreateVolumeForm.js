@@ -18,8 +18,8 @@ export default class CreateVolumeForm extends React.Component {
   createVolume = (e, values) => {
     const driverOpts = {};
 
-    if (values.DriverOpts !== '') {
-      const opts = values.DriverOpts.split(' ');
+    if (values.formData.DriverOpts !== '') {
+      const opts = values.formData.DriverOpts.split(' ');
       _.forEach(opts, (o) => {
         const opt = o.split('=');
         driverOpts[opt[0]] = opt[1];
@@ -27,8 +27,8 @@ export default class CreateVolumeForm extends React.Component {
     }
 
     createVolume({
-      Name: values.Name,
-      Driver: values.Driver,
+      Name: values.formData.Name,
+      Driver: values.formData.Driver,
       DriverOpts: driverOpts,
     }).then((success) => {
         this.setState({

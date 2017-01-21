@@ -44,7 +44,7 @@ class Main extends React.Component {
           this.signOut();
         }
         // If we get a 406, a cluster isn't initialized
-        else if(error.response.status === 406) {
+        else if(error.response.status === 503) {
           this.welcome();
         }
       });

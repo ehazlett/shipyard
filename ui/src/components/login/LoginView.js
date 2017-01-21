@@ -37,7 +37,7 @@ export default class LoginView extends React.Component {
       loading: true,
     });
 
-    login(values.username, values.password)
+    login(values.formData.username, values.formData.password)
       .then(this.handleLoginSuccess)
       .catch(this.handleLoginError);
 
