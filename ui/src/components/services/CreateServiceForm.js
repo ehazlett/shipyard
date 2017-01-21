@@ -43,7 +43,7 @@ export default class CreateServiceForm extends React.Component {
     };
     const dynamicFormElements = filterKeys(values, key => key.startsWith(namespace + "."));
     const splitDynamicFormElements = Object.keys(dynamicFormElements).map(key => {
-      const strippedKey = key.replace(new RegExp("^" + namespace + "\\."), ""); 
+      const strippedKey = key.replace(new RegExp("^" + namespace + "\\."), "");
       const split = strippedKey.split("-");
       return [...split, dynamicFormElements[key]];
     });
@@ -94,24 +94,24 @@ export default class CreateServiceForm extends React.Component {
     const constraints = this.getConstraintsFromFormValues(values);
 
     createService({
-      Name: values.Name,
+      Name: values.formData.Name,
       TaskTemplate: {
         ContainerSpec: {
-          Image: values.Image,
-          Args: values.Args ? values.Args.split(" ") : null,
-          Command: values.Command ? values.Command.split(" ") : null,
-          User: values.User ? values.User : null,
-          Dir: values.Dir ? values.Dir : null,
-          Groups: values.Command ? values.Command.split(" ") : null,
-          TTY: values.TTY,
-          OpenStdin: values.OpenStdin,
+          Image: values.formData.Image,
+          Args: values.formData.Args ? values.formData.Args.split(" ") : null,
+          Command: values.formData.Command ? values.formData.Command.split(" ") : null,
+          User: values.formData.User ? values.formData.User : null,
+          Dir: values.formData.Dir ? values.formData.Dir : null,
+          Groups: values.formData.Command ? values.formData.Command.split(" ") : null,
+          TTY: values.formData.TTY,
+          OpenStdin: values.formData.OpenStdin,
           Mounts: mounts,
           Placements: constraints,
         },
       },
       Mode: {
         Replicated: {
-          Replicas: parseInt(values.Replicas, 10) || 1,
+          Replicas: parseInt(values.formData.Replicas, 10) || 1,
         },
       },
     })
