@@ -38,7 +38,7 @@ class NodeListView extends React.Component {
     return (
       <Tr key={node.ID}>
         <Td column="" className="collapsing">
-          <Icon className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
+          <Icon fitted className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
         </Td>
         <Td column="ID" className="collapsing">
           <Link to={`/nodes/${node.ID}`}>{node.ID.substring(0, 12)}</Link>

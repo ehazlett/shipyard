@@ -39,7 +39,7 @@ class ContainerListView extends React.Component {
     return (
       <Tr key={container.Id}>
         <Td column="" className="collapsing">
-          <Icon className={`circle ${container.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
+          <Icon fitted className={`circle ${container.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
         </Td>
         <Td column="ID" className="collapsing">
           <Link to={`/containers/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
