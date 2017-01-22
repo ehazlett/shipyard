@@ -14,3 +14,6 @@
 * Internationalization: https://github.com/yahoo/react-intl
 
 * Explore: https://github.com/zabute/formsy-semantic-ui-react
+
+* Improve loading pages for transitions between pages that depend on API
+	responses

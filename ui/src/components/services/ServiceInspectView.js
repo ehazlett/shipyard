@@ -292,7 +292,7 @@ class ServiceListView extends React.Component {
                         <td>{m.ReadOnly ? 'Read-Only' : 'Read/Write'}</td>
                       </tr>
                     )) :
-                    <tr><td>No container labels</td></tr>
+                    <tr><td>No mounts configured</td></tr>
                 }
                 </tbody>
               </table>
