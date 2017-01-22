@@ -7,7 +7,7 @@ import Form from "../common/Form";
 import { createService, dockerErrorHandler } from "../../api";
 
 const VALIDATION_CONFIG = {
-  Image:{
+  Image: {
     identifier: "Image",
     rules: [{
       type: "empty",

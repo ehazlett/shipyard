@@ -5,6 +5,7 @@ import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
 import { listContainers } from '../../api';
+import { shortenImageName } from '../../lib';
 
 class ContainerListView extends React.Component {
   state = {
@@ -43,7 +44,7 @@ class ContainerListView extends React.Component {
         <Td column="ID" className="collapsing">
           <Link to={`/containers/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
         </Td>
-        <Td column="Image">{container.Image}</Td>
+        <Td column="Image">{shortenImageName(container.Image)}</Td>
         <Td column="Created" className="collapsing">
           {new Date(container.Created * 1000).toLocaleString()}
         </Td>

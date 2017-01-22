@@ -62,4 +62,3 @@ class ContainerListView extends React.Component {
 }
 
 export default ContainerListView;
-
