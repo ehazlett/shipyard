@@ -17,3 +17,5 @@
 
 * Improve loading pages for transitions between pages that depend on API
 	responses
+
+* Automated UI tests
