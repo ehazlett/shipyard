@@ -30,7 +30,7 @@ export default class WelcomeView extends React.Component {
   swarmInit = (e, values) => {
     initSwarm({
       ListenAddr: '0.0.0.0:2377',
-      AdvertiseAddr: values.advertiseAddr || null,
+      AdvertiseAddr: values.formData.advertiseAddr || null,
       ForceNewCluster: false,
       Spec: {
         Orchestration: {},
