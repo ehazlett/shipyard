@@ -52,6 +52,16 @@ func main() {
 					Usage: "RethinkDB database name",
 					Value: "shipyard",
 				},
+				cli.StringFlag{
+					Name:  "rethinkdb-user",
+					Usage: "RethinkDB database username",
+					Value: "",
+				},
+				cli.StringFlag{
+					Name:  "rethinkdb-password",
+					Usage: "RethinkDB database password",
+					Value: "",
+				},
 				cli.BoolFlag{
 					Name:  "disable-usage-info",
 					Usage: "disable anonymous usage reporting",

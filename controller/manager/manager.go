@@ -59,6 +59,8 @@ type (
 		storeKey         string
 		database         string
 		authKey          string
+		userName         string
+		userPassword     string
 		session          *r.Session
 		authenticator    auth.Authenticator
 		store            *sessions.CookieStore
@@ -119,12 +121,14 @@ type (
 	}
 )
 
-func NewManager(addr string, database string, authKey string, client *dockerclient.DockerClient, disableUsageInfo bool, authenticator auth.Authenticator) (Manager, error) {
+func NewManager(addr string, database string, authKey string, userName string, userPassword string, client *dockerclient.DockerClient, disableUsageInfo bool, authenticator auth.Authenticator) (Manager, error) {
 	log.Debug("setting up rethinkdb session")
 	session, err := r.Connect(r.ConnectOpts{
 		Address:  addr,
 		Database: database,
 		AuthKey:  authKey,
+		Username: userName,
+		Password: userPassword,
 	})
 	if err != nil {
 		return nil, err
@@ -135,6 +139,8 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 	m := &DefaultManager{
 		database:         database,
 		authKey:          authKey,
+		userName:         userName,
+		userPassword:     userPassword,
 		session:          session,
 		authenticator:    authenticator,
 		store:            store,

@@ -19,6 +19,8 @@ func CmdServer(c *cli.Context) {
 	rethinkdbAddr := c.String("rethinkdb-addr")
 	rethinkdbDatabase := c.String("rethinkdb-database")
 	rethinkdbAuthKey := c.String("rethinkdb-auth-key")
+	rethinkdbUser := c.String("rethinkdb-user")
+	rethinkdbPassword := c.String("rethinkdb-password")
 	disableUsageInfo := c.Bool("disable-usage-info")
 	listenAddr := c.String("listen")
 	authWhitelist := c.StringSlice("auth-whitelist-cidr")
@@ -54,7 +56,7 @@ func CmdServer(c *cli.Context) {
 		authenticator = ldap.NewAuthenticator(ldapServer, ldapPort, ldapBaseDn, ldapAutocreateUsers, ldapDefaultAccessLevel)
 	}
 
-	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, client, disableUsageInfo, authenticator)
+	controllerManager, err := manager.NewManager(rethinkdbAddr, rethinkdbDatabase, rethinkdbAuthKey, rethinkdbUser, rethinkdbPassword, client, disableUsageInfo, authenticator)
 	if err != nil {
 		log.Fatal(err)
 	}
