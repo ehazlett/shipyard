@@ -8,6 +8,7 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import { inspectNode, listTasksForNode, listServices } from '../../api';
+import { shortenImageName } from '../../lib';
 
 class NodeListView extends React.Component {
   state = {
@@ -93,7 +94,7 @@ class NodeListView extends React.Component {
               {services[t.ServiceID] ? `${services[t.ServiceID].Spec.Name}.${t.Slot}` : ''}
             </Td>
             <Td column="Image">
-              {t.Spec.ContainerSpec.Image}
+              {shortenImageName(t.Spec.ContainerSpec.Image)}
             </Td>
             <Td column="Last Status Update" className="collapsing">
               {new Date(t.Status.Timestamp).toLocaleString()}

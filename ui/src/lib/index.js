@@ -21,3 +21,14 @@ export const getUnhandledProps = (Component, props) => {
     return acc
   }, {})
 }
+
+// FIXME: This is pretty hacky
+export const shortenImageName = (image) => {
+  var splitImage = image.split('@');
+  if(splitImage.length > 1) {
+  	var splitSha = splitImage[1].split(':');
+    return `${splitImage[0]}@${splitSha[0]}:${splitSha[1].substring(0, 12)}`;
+  } else {
+  	return image;
+  }
+}

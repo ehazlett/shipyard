@@ -9,6 +9,7 @@ import moment from 'moment';
 import taskStates from './TaskStates';
 
 import { inspectService, listTasksForService, listNodes, listNetworks } from '../../api';
+import { shortenImageName } from '../../lib';
 
 class ServiceListView extends React.Component {
   state = {
@@ -101,7 +102,7 @@ class ServiceListView extends React.Component {
           {`${s.Spec.Name}.${t.Slot}`}
         </Td>
         <Td column="Image">
-          {t.Spec.ContainerSpec.Image}
+          {shortenImageName(t.Spec.ContainerSpec.Image)}
         </Td>
         <Td column="Last Status Update" className="collapsing">
           {new Date(t.Status.Timestamp).toLocaleString()}
@@ -202,7 +203,7 @@ class ServiceListView extends React.Component {
               <div className="ui header">Task Template</div>
               <table className="ui very basic celled table">
                 <tbody>
-                  <tr><td className="four wide column">Image</td><td>{service.Spec.TaskTemplate.ContainerSpec.Image}</td></tr>
+                  <tr><td className="four wide column">Image</td><td>{shortenImageName(service.Spec.TaskTemplate.ContainerSpec.Image)}</td></tr>
                   <tr><td>Command</td><td>{service.Spec.TaskTemplate.ContainerSpec.Command}</td></tr>
                   <tr><td>Args</td><td>{service.Spec.TaskTemplate.ContainerSpec.Args ? service.Spec.TaskTemplate.ContainerSpec.Args.join(' ') : null}</td></tr>
                   <tr><td>Working Directory</td><td>{service.Spec.TaskTemplate.ContainerSpec.Dir}</td></tr>
@@ -291,7 +292,7 @@ class ServiceListView extends React.Component {
                         <td>{m.ReadOnly ? 'Read-Only' : 'Read/Write'}</td>
                       </tr>
                     )) :
-                    <tr><td>No container labels</td></tr>
+                    <tr><td>No mounts configured</td></tr>
                 }
                 </tbody>
               </table>
