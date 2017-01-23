@@ -16,6 +16,7 @@ import NodeInspectView from './nodes/NodeInspectView';
 import ImageListView from './images/ImageListView';
 import NetworkListView from './networks/NetworkListView';
 import VolumeListView from './volumes/VolumeListView';
+import VolumeInspectView from './volumes/VolumeInspectView';
 import CreateVolumeView from './volumes/CreateVolumeView';
 import AccountListView from './accounts/AccountListView';
 import SettingsView from './settings/SettingsView';
@@ -88,6 +89,7 @@ class Main extends React.Component {
           <Match exactly pattern="/nodes/:id" component={NodeInspectView} />
           <Match exactly pattern="/networks" component={NetworkListView} />
           <Match exactly pattern="/volumes" component={VolumeListView} />
+          <Match exactly pattern="/volumes/:name" component={VolumeInspectView} />
           <Match exactly pattern="/volumes/create" component={CreateVolumeView} />
           <Match exactly pattern="/settings" component={SettingsView} />
           <Match exactly pattern="/containers" component={ContainerListView} />

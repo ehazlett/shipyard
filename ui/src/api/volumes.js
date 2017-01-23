@@ -25,3 +25,14 @@ export function createVolume(volume) {
   })
     .then(errorHandler)
 }
+
+export function inspectVolume(name) {
+  const url = `/volumes/${name}`;
+  return fetch(url, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}

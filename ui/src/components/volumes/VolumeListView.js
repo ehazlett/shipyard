@@ -38,7 +38,7 @@ class VolumeListView extends React.Component {
     return (
       <Tr key={volume.Name}>
         <Td column="Driver">{volume.Driver}</Td>
-        <Td column="Name">{volume.Name}</Td>
+        <Td column="Name"><Link to={`/volumes/${volume.Name}`}>{volume.Name}</Link></Td>
         <Td column="Scope">{volume.Scope}</Td>
       </Tr>
     );
