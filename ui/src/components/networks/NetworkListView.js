@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
+import { Link } from 'react-router';
 
 import { listNetworks } from '../../api';
 
@@ -36,7 +37,9 @@ class NetworkListView extends React.Component {
   renderNetwork = (network) => {
     return (
       <Tr key={network.Id}>
-        <Td column="ID" className="collapsing">{network.Id.substring(0, 12)}</Td>
+        <Td column="Id" className="collapsing">
+          <Link to={`/networks/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
+        </Td>
         <Td column="Name">{network.Name}</Td>
         <Td column="Driver">{network.Driver}</Td>
         <Td column="Scope">{network.Scope}</Td>

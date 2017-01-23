@@ -45,7 +45,7 @@ class VolumeInspectView extends React.Component {
           <Grid.Row>
             <Grid.Column width={16}>
               <div className="ui breadcrumb">
-                <Link to="/volumes" className="section">volumes</Link>
+                <Link to="/volumes" className="section">Volumes</Link>
                 <div className="divider"> / </div>
                 <div className="active section">{volume.Name}</div>
               </div>

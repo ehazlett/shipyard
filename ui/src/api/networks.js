@@ -12,3 +12,14 @@ export function listNetworks() {
     .then(errorHandler)
     .then(jsonHandler);
 }
+
+export function inspectNetwork(id) {
+  const url = `/networks/${id}`;
+  return fetch(url, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}
