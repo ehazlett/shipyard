@@ -34,3 +34,25 @@ export function removeImage(id, force = false) {
   })
     .then(errorHandler);
 }
+
+export function inspectImage(id) {
+  const url = `/images/${id}/json`;
+  return fetch(url, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}
+
+export function historyImage(id) {
+  const url = `/images/${id}/history`;
+  return fetch(url, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}

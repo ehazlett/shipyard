@@ -14,12 +14,14 @@ import ContainerInspectView from './containers/ContainerInspectView';
 import NodeListView from './nodes/NodeListView';
 import NodeInspectView from './nodes/NodeInspectView';
 import ImageListView from './images/ImageListView';
+import ImageInspectView from './images/ImageInspectView';
 import NetworkInspectView from './networks/NetworkInspectView';
 import NetworkListView from './networks/NetworkListView';
 import VolumeListView from './volumes/VolumeListView';
 import VolumeInspectView from './volumes/VolumeInspectView';
 import CreateVolumeView from './volumes/CreateVolumeView';
 import AccountListView from './accounts/AccountListView';
+import AccountInspectView from './accounts/AccountInspectView';
 import SettingsView from './settings/SettingsView';
 
 import { getSwarm } from '../api';
@@ -97,7 +99,9 @@ class Main extends React.Component {
           <Match exactly pattern="/containers" component={ContainerListView} />
           <Match exactly pattern="/containers/:id" component={ContainerInspectView} />
           <Match exactly pattern="/accounts" component={AccountListView} />
+          <Match exactly pattern="/accounts/:id" component={AccountInspectView} />
           <Match exactly pattern="/images" component={ImageListView} />
+          <Match exactly pattern="/images/:id" component={ImageInspectView} />
         </Container>
         {redirect && <Redirect to={redirectTo}/>}
       </div>

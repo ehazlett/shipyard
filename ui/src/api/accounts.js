@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 
-import { jsonHandler } from './helpers.js';
+import { jsonHandler, errorHandler } from './helpers';
 import { getAuthToken } from '../services/auth';
 
 export function listAccounts() {
@@ -9,5 +9,17 @@ export function listAccounts() {
       'X-Access-Token': getAuthToken(),
     },
   })
-  .then(jsonHandler);
+    .then(errorHandler)
+    .then(jsonHandler);
+}
+
+export function inspectAccount(id) {
+  const url = `/api/accounts/${id}`;
+  return fetch(url, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
 }

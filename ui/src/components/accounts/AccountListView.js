@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
+import { Link } from 'react-router';
 
 import { listAccounts } from '../../api';
 
@@ -36,7 +37,9 @@ class AccountListView extends React.Component {
   renderAccount = (account) => {
     return (
       <Tr key={account.id}>
-        <Td column="Username">{account.username}</Td>
+        <Td column="Username">
+          <Link to={`/accounts/${account.username}`}>{account.username}</Link>
+        </Td>
         <Td column="First Name">{account.first_name}</Td>
         <Td column="Last Name">{account.last_name}</Td>
         <Td column="Roles">{account.roles.join(', ')}</Td>
