@@ -3,7 +3,7 @@ import React from 'react';
 import { Redirect, Match } from 'react-router';
 import { Container } from 'semantic-ui-react';
 
-import TopNav from './layout/TopNav';
+import Navigation from './layout/Navigation';
 
 import WelcomeView from './WelcomeView';
 import ServiceListView from './services/ServiceListView';
@@ -82,27 +82,29 @@ class Main extends React.Component {
     return (
       <div>
         <Match pattern="/welcome" component={WelcomeView} />
-        {location.pathname !== '/welcome' && (<TopNav signOut={this.signOut} username={'admin'} location={location} />)}
-        <Container>
-          <Match exactly pattern="/" render={() => <Redirect to="/services" />} />
-          <Match exactly pattern="/services" component={ServiceListView} />
-          <Match exactly pattern="/services/create" component={CreateServiceView} />
-          <Match exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
-          <Match exactly pattern="/nodes" component={NodeListView} />
-          <Match exactly pattern="/nodes/:id" component={NodeInspectView} />
-          <Match exactly pattern="/networks" component={NetworkListView} />
-          <Match exactly pattern="/networks/:id" component={NetworkInspectView} />
-          <Match exactly pattern="/volumes" component={VolumeListView} />
-          <Match exactly pattern="/volumes/:name" component={VolumeInspectView} />
-          <Match exactly pattern="/volumes/create" component={CreateVolumeView} />
-          <Match exactly pattern="/settings" component={SettingsView} />
-          <Match exactly pattern="/containers" component={ContainerListView} />
-          <Match exactly pattern="/containers/:id" component={ContainerInspectView} />
-          <Match exactly pattern="/accounts" component={AccountListView} />
-          <Match exactly pattern="/accounts/:id" component={AccountInspectView} />
-          <Match exactly pattern="/images" component={ImageListView} />
-          <Match exactly pattern="/images/:id" component={ImageInspectView} />
-        </Container>
+        {location.pathname !== '/welcome' && (<Navigation signOut={this.signOut} username={'admin'} location={location} />)}
+        <div style={{marginLeft: "230px", minWidth: "570px", maxWidth: "1150px",}}>
+          <Container>
+            <Match exactly pattern="/" render={() => <Redirect to="/services" />} />
+            <Match exactly pattern="/services" component={ServiceListView} />
+            <Match exactly pattern="/services/create" component={CreateServiceView} />
+            <Match exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
+            <Match exactly pattern="/nodes" component={NodeListView} />
+            <Match exactly pattern="/nodes/:id" component={NodeInspectView} />
+            <Match exactly pattern="/networks" component={NetworkListView} />
+            <Match exactly pattern="/networks/:id" component={NetworkInspectView} />
+            <Match exactly pattern="/volumes" component={VolumeListView} />
+            <Match exactly pattern="/volumes/:name" component={VolumeInspectView} />
+            <Match exactly pattern="/volumes/create" component={CreateVolumeView} />
+            <Match exactly pattern="/settings" component={SettingsView} />
+            <Match exactly pattern="/containers" component={ContainerListView} />
+            <Match exactly pattern="/containers/:id" component={ContainerInspectView} />
+            <Match exactly pattern="/accounts" component={AccountListView} />
+            <Match exactly pattern="/accounts/:id" component={AccountInspectView} />
+            <Match exactly pattern="/images" component={ImageListView} />
+            <Match exactly pattern="/images/:id" component={ImageInspectView} />
+          </Container>
+        </div>
         {redirect && <Redirect to={redirectTo}/>}
       </div>
     );
