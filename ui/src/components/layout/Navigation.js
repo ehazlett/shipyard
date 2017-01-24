@@ -20,14 +20,14 @@ export default class TopNav extends React.Component {
           <Menu.Item>
             <div className="header">Swarm</div>
             <Menu.Menu>
-              <Menu.Item name="services" icon="cubes" to="/services" as={Link} active={location.pathname === "/services" || location.pathname === "/"} />
-              <Menu.Item name="containers" icon="cube" to="/containers" as={Link} active={location.pathname === "/containers"} />
-              <Menu.Item name="images" icon="file" to="/images" as={Link} active={location.pathname === "/images"} />
-              <Menu.Item name="nodes" icon="server" to="/nodes" as={Link} active={location.pathname === "/nodes"} />
-              <Menu.Item name="networks" icon="sitemap" to="/networks" as={Link} active={location.pathname === "/networks"} />
-              <Menu.Item name="volumes" icon="database" to="/volumes" as={Link} active={location.pathname === "/volumes"} />
-              <Menu.Item name="accounts" icon="users" to="/accounts" as={Link} active={location.pathname === "/accounts"} />
-              <Menu.Item name="settings" icon="settings" to="/settings" as={Link} active={location.pathname === "/settings"} />
+              <Menu.Item name="services" icon="cubes" to="/services" as={Link} active={location.pathname.indexOf("/services") === 0 || location.pathname === "/"} />
+              <Menu.Item name="containers" icon="cube" to="/containers" as={Link} active={location.pathname.indexOf("/containers") === 0} />
+              <Menu.Item name="images" icon="file" to="/images" as={Link} active={location.pathname.indexOf("/images") === 0} />
+              <Menu.Item name="nodes" icon="server" to="/nodes" as={Link} active={location.pathname.indexOf("/nodes") === 0} />
+              <Menu.Item name="networks" icon="sitemap" to="/networks" as={Link} active={location.pathname.indexOf("/networks") === 0} />
+              <Menu.Item name="volumes" icon="database" to="/volumes" as={Link} active={location.pathname.indexOf("/volumes") === 0} />
+              <Menu.Item name="accounts" icon="users" to="/accounts" as={Link} active={location.pathname.indexOf("/accounts") === 0} />
+              <Menu.Item name="settings" icon="settings" to="/settings" as={Link} active={location.pathname.indexOf("/settings") === 0} />
             </Menu.Menu>
           </Menu.Item>
 
