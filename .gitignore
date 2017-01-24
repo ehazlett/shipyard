@@ -4,6 +4,6 @@
 node_modules
 cli/cli
 controller/controller
-controller/static/dist
+controller/static
 bower_components
 static.tar.gz

@@ -22,8 +22,9 @@ remote-build:
 	@cd controller && docker run --rm -w /go/src/github.com/shipyard/shipyard --entrypoint /bin/bash shipyard-build -c "make build 1>&2 && cd controller && tar -czf - controller" | tar zxf -
 
 media:
-	docker build -t $(UI_BUILD_IMAGE) -f ui/Dockerfile.build ui && \
-		docker run --rm -i $(UI_BUILD_IMAGE) > controller/static.tar.gz
+	@docker build -t $(UI_BUILD_IMAGE) -f ui/Dockerfile.build ui && \
+		mkdir -p controller/static/ && \
+		docker run --rm -i $(UI_BUILD_IMAGE) | tar xvzf - -C controller/static/
 
 image: media build
 	@echo Building Shipyard image $(TAG)
@@ -32,7 +33,7 @@ image: media build
 release: build image
 	@docker push shipyard/shipyard:$(TAG)
 
-test: clean 
+test: clean
 	@godep go test -v ./...
 
 .PHONY: all build clean media image test release
