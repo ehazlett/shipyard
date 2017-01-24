@@ -1,8 +1,6 @@
 FROM node:7.4-onbuild
 
 RUN npm run build && \
-	mkdir -p static && \
-	mv build static/dist && \
-	tar -zcvf static.tar.gz static
+	tar -C build/ -zcvf build.tar.gz .
 
-CMD ["cat", "/usr/src/app/static.tar.gz"]
+CMD ["cat", "/usr/src/app/build.tar.gz"]

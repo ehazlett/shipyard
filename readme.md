@@ -39,11 +39,11 @@ Everything in Shipyard is built around the Shipyard API.  It enables actions suc
 The Shipyard UI is a web interface to the Shipyard cluster.  It uses the Shipyard API for all interaction.  It is an React app that is served via the Controller.
 
 # Contributing
-Ensure that you are using engine 1.12.x
+Ensure that you are using engine 1.13.x
 
 ```shell
-docker-compose build
-docker-compose up
+docker-compose -f docker-compose.dev.yml build
+docker-compose -f docker-compose.dev.yml up
 ```
 
 The UI will then be available at: [http://localhost:3000](http://localhost:3000)
