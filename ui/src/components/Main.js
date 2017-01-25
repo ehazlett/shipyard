@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Redirect, Match } from 'react-router';
-import { Container } from 'semantic-ui-react';
+import { Container, Loader, Dimmer } from 'semantic-ui-react';
 
 import Navigation from './layout/Navigation';
 
@@ -23,10 +23,14 @@ import CreateVolumeView from './volumes/CreateVolumeView';
 import AccountListView from './accounts/AccountListView';
 import AccountInspectView from './accounts/AccountInspectView';
 import SettingsView from './settings/SettingsView';
+import RegistryListView from './registries/RegistryListView';
+import RegistryInspectView from './registries/RegistryInspectView';
+import SecretListView from './secrets/SecretListView';
+import SecretInspectView from './secrets/SecretInspectView';
 
 import { getSwarm } from '../api';
-
 import { removeAuthToken } from '../services/auth';
+import { MatchWhenAuthorized } from './RouteMatchers';
 
 class Main extends React.Component {
   state = {
@@ -44,13 +48,17 @@ class Main extends React.Component {
       })
       .catch((error) => {
         // Check if our token is valid
-        if(error.response.status === 401) {
+        if(error.response && error.response.status === 401) {
           this.signOut();
         }
         // If we get a 406, a cluster isn't initialized
-        else if(error.response.status === 503) {
+        else if(error.response && error.response.status === 503) {
           this.welcome();
         }
+
+        this.setState({
+          loading: false,
+        });
       });
   }
 
@@ -76,33 +84,53 @@ class Main extends React.Component {
     });
   };
 
+  renderLoader = () => {
+    return (
+      <Dimmer inverted active>
+        <Loader />
+      </Dimmer>
+    );
+  };
+
   render() {
-    const { redirect, redirectTo } = this.state;
+    const { redirect, redirectTo, loading } = this.state;
     const { location } = this.props;
+
+    // Until we have a response from swarm, show a loading screen
+    if(loading) {
+      return this.renderLoader();
+    }
+
     return (
       <div>
-        <Match pattern="/welcome" component={WelcomeView} />
+        <MatchWhenAuthorized pattern="/welcome" component={WelcomeView} />
         {location.pathname !== '/welcome' && (<Navigation signOut={this.signOut} username={'admin'} location={location} />)}
         <div style={{marginLeft: "230px", minWidth: "570px", maxWidth: "1150px",}}>
           <Container>
+            {/* Default route for authorized user is the service list view */}
             <Match exactly pattern="/" render={() => <Redirect to="/services" />} />
-            <Match exactly pattern="/services" component={ServiceListView} />
-            <Match exactly pattern="/services/create" component={CreateServiceView} />
-            <Match exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
-            <Match exactly pattern="/nodes" component={NodeListView} />
-            <Match exactly pattern="/nodes/:id" component={NodeInspectView} />
-            <Match exactly pattern="/networks" component={NetworkListView} />
-            <Match exactly pattern="/networks/:id" component={NetworkInspectView} />
-            <Match exactly pattern="/volumes" component={VolumeListView} />
-            <Match exactly pattern="/volumes/:name" component={VolumeInspectView} />
-            <Match exactly pattern="/volumes/create" component={CreateVolumeView} />
-            <Match exactly pattern="/settings" component={SettingsView} />
-            <Match exactly pattern="/containers" component={ContainerListView} />
-            <Match exactly pattern="/containers/:id" component={ContainerInspectView} />
-            <Match exactly pattern="/accounts" component={AccountListView} />
-            <Match exactly pattern="/accounts/:id" component={AccountInspectView} />
-            <Match exactly pattern="/images" component={ImageListView} />
-            <Match exactly pattern="/images/:id" component={ImageInspectView} />
+
+            <MatchWhenAuthorized exactly pattern="/accounts" component={AccountListView} />
+            <MatchWhenAuthorized exactly pattern="/accounts/:id" component={AccountInspectView} />
+            <MatchWhenAuthorized exactly pattern="/containers" component={ContainerListView} />
+            <MatchWhenAuthorized exactly pattern="/containers/:id" component={ContainerInspectView} />
+            <MatchWhenAuthorized exactly pattern="/images" component={ImageListView} />
+            <MatchWhenAuthorized exactly pattern="/images/:id" component={ImageInspectView} />
+            <MatchWhenAuthorized exactly pattern="/networks" component={NetworkListView} />
+            <MatchWhenAuthorized exactly pattern="/networks/:id" component={NetworkInspectView} />
+            <MatchWhenAuthorized exactly pattern="/nodes" component={NodeListView} />
+            <MatchWhenAuthorized exactly pattern="/nodes/:id" component={NodeInspectView} />
+            <MatchWhenAuthorized exactly pattern="/registries" component={RegistryListView} />
+            <MatchWhenAuthorized exactly pattern="/registries/:id" component={RegistryInspectView} />
+            <MatchWhenAuthorized exactly pattern="/secrets" component={SecretListView} />
+            <MatchWhenAuthorized exactly pattern="/secrets/:id" component={SecretInspectView} />
+            <MatchWhenAuthorized exactly pattern="/services" component={ServiceListView} />
+            <MatchWhenAuthorized exactly pattern="/services/create" component={CreateServiceView} />
+            <MatchWhenAuthorized exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
+            <MatchWhenAuthorized exactly pattern="/settings" component={SettingsView} />
+            <MatchWhenAuthorized exactly pattern="/volumes" component={VolumeListView} />
+            <MatchWhenAuthorized exactly pattern="/volumes/:name" component={VolumeInspectView} />
+            <MatchWhenAuthorized exactly pattern="/volumes/create" component={CreateVolumeView} />
           </Container>
         </div>
         {redirect && <Redirect to={redirectTo}/>}

@@ -219,6 +219,8 @@ func (a *Api) Run() error {
 			"/nodes/{id:.*}":                  swarmRedirect,
 			"/tasks":                          swarmRedirect,
 			"/tasks/{id:.*}":                  swarmRedirect,
+			"/secrets":                        swarmRedirect,
+			"/secrets/{id:.*}":                swarmRedirect,
 			"/volumes":                        swarmRedirect,
 			"/volumes/{id:.*}":                swarmRedirect,
 			"/networks":                       swarmRedirect,
@@ -249,6 +251,7 @@ func (a *Api) Run() error {
 			"/exec/{execid:.*}/resize":      swarmRedirect,
 			"/services/create":              swarmRedirect,
 			"/services/{id:.*}/update":      swarmRedirect,
+			"/secrets/{id:.*}":              swarmRedirect,
 			"/volumes/create":               swarmRedirect,
 			"/networks/create":              swarmRedirect,
 			"/swarm/init":                   swarmRedirect,
@@ -261,6 +264,7 @@ func (a *Api) Run() error {
 			"/images/{name:.*}":     swarmRedirect,
 			"/services/{id:.*}":     swarmRedirect,
 			"/nodes/{id:.*}":        swarmRedirect,
+			"/secrets/{id:.*}":      swarmRedirect,
 		},
 		"OPTIONS": {
 			"": swarmRedirect,
@@ -300,6 +304,8 @@ func (a *Api) Run() error {
 	globalMux.Handle("/services/", swarmAuthRouter)
 	globalMux.Handle("/tasks", swarmAuthRouter)
 	globalMux.Handle("/tasks/", swarmAuthRouter)
+	globalMux.Handle("/secrets", swarmAuthRouter)
+	globalMux.Handle("/secrets/", swarmAuthRouter)
 	globalMux.Handle("/swarm", swarmAuthRouter)
 	globalMux.Handle("/swarm/", swarmAuthRouter)
 	globalMux.Handle("/nodes", swarmAuthRouter)
@@ -328,6 +334,7 @@ func (a *Api) Run() error {
 	globalMux.Handle("/v1.22/", swarmAuthRouter)
 	globalMux.Handle("/v1.23/", swarmAuthRouter)
 	globalMux.Handle("/v1.24/", swarmAuthRouter)
+	globalMux.Handle("/v1.25/", swarmAuthRouter)
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {

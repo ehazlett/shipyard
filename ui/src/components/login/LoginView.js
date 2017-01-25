@@ -6,6 +6,9 @@ import { Divider, Grid, Header } from 'semantic-ui-react';
 import LoginForm from "./LoginForm";
 import { getAuthToken } from '../../services/auth';
 
+import "./LoginView.css";
+import logo from "../../img/logo.png";
+
 export default class LoginView extends React.Component {
   state = {
     error: null,
@@ -30,12 +33,13 @@ export default class LoginView extends React.Component {
   render() {
     const { redirect } = this.state;
     return (
-        <Grid verticalAlign="middle" centered style={{ height: '100vh', width: '100vw', backgroundColor: '#2185D0', padding: 0, margin: 0 }}>
+        <Grid id="LoginView" centered>
           {redirect && (
             <Redirect to={'/'}/>
           )}
           <Grid.Row>
-            <Grid.Column textAlign="center" verticalAlign="middle" mobile={12} tablet={8} computer={6} largeScreen={5}>
+            <Grid.Column textAlign="center" mobile={12} tablet={8} computer={6} largeScreen={5}>
+              <img src={logo} className="logo" alt="Shipyard Logo" />
               <Header as="h1" inverted>
                 Shipyard
               </Header>

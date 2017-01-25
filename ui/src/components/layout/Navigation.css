@@ -1,0 +1,23 @@
+#Navigation {
+  background-color: #06293A;
+}
+
+#Navigation .ui.container > .header.item {
+  text-align: center;
+}
+
+#Navigation .ui.container > .header.item:hover {
+  background-color: transparent;
+}
+
+#Navigation .ui.container > .header.item > img.logo {
+  height: 36px;
+  width: 105px;
+  margin-bottom: 0.5rem;
+}
+
+#Navigation .ui.container > .header.item > div {
+  font-family: 'Poiret One', cursive;
+  font-size: 1.5rem;
+}
+

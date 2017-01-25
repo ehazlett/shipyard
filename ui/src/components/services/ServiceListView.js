@@ -158,7 +158,7 @@ class ServiceListView extends React.Component {
           </Grid.Row>
           <Grid.Row>
             <Grid.Column className="sixteen wide">
-              {error && (<Message error>{error}</Message>)}
+              {error && (<Message error>{JSON.stringify(error)}</Message>)}
               <Table
                 className="ui compact celled sortable unstackable table"
                 ref="table"
