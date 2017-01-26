@@ -8,6 +8,12 @@ export const errorHandler = (response) => {
   return response;
 }
 
+export const textHandler = (response) => {
+  return response.text().then((body) => {
+    return { body, response };
+  });
+}
+
 export const jsonHandler = (response) => {
   return response.json().then((body) => {
     return { body, response };
