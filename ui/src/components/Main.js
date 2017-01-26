@@ -23,6 +23,7 @@ import CreateVolumeView from './volumes/CreateVolumeView';
 import AccountListView from './accounts/AccountListView';
 import AccountInspectView from './accounts/AccountInspectView';
 import SettingsView from './settings/SettingsView';
+import AddRegistryView from './registries/AddRegistryView';
 import RegistryListView from './registries/RegistryListView';
 import RegistryInspectView from './registries/RegistryInspectView';
 import SecretListView from './secrets/SecretListView';
@@ -111,25 +112,27 @@ class Main extends React.Component {
             <Match exactly pattern="/" render={() => <Redirect to="/services" />} />
 
             <MatchWhenAuthorized exactly pattern="/accounts" component={AccountListView} />
-            <MatchWhenAuthorized exactly pattern="/accounts/:id" component={AccountInspectView} />
+            <MatchWhenAuthorized exactly pattern="/accounts/inspect/:id" component={AccountInspectView} />
             <MatchWhenAuthorized exactly pattern="/containers" component={ContainerListView} />
-            <MatchWhenAuthorized exactly pattern="/containers/:id" component={ContainerInspectView} />
+            <MatchWhenAuthorized exactly pattern="/containers/inspect/:id" component={ContainerInspectView} />
             <MatchWhenAuthorized exactly pattern="/images" component={ImageListView} />
-            <MatchWhenAuthorized exactly pattern="/images/:id" component={ImageInspectView} />
+            <MatchWhenAuthorized exactly pattern="/images/inspect/:id" component={ImageInspectView} />
             <MatchWhenAuthorized exactly pattern="/networks" component={NetworkListView} />
-            <MatchWhenAuthorized exactly pattern="/networks/:id" component={NetworkInspectView} />
+            <MatchWhenAuthorized exactly pattern="/networks/inspect/:id" component={NetworkInspectView} />
             <MatchWhenAuthorized exactly pattern="/nodes" component={NodeListView} />
-            <MatchWhenAuthorized exactly pattern="/nodes/:id" component={NodeInspectView} />
+            <MatchWhenAuthorized exactly pattern="/nodes/inspect/:id" component={NodeInspectView} />
             <MatchWhenAuthorized exactly pattern="/registries" component={RegistryListView} />
-            <MatchWhenAuthorized exactly pattern="/registries/:id" component={RegistryInspectView} />
+            <MatchWhenAuthorized exactly pattern="/registries/inspect/:id" component={RegistryInspectView} />
+            <MatchWhenAuthorized exactly pattern="/registries/add" component={AddRegistryView} />
             <MatchWhenAuthorized exactly pattern="/secrets" component={SecretListView} />
-            <MatchWhenAuthorized exactly pattern="/secrets/:id" component={SecretInspectView} />
+            <MatchWhenAuthorized exactly pattern="/secrets/inspect/:id" component={SecretInspectView} />
             <MatchWhenAuthorized exactly pattern="/services" component={ServiceListView} />
             <MatchWhenAuthorized exactly pattern="/services/create" component={CreateServiceView} />
             <MatchWhenAuthorized exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
+            <MatchWhenAuthorized exactly pattern="/services/inspect/:serviceId/container/:id" component={ContainerInspectView} />
             <MatchWhenAuthorized exactly pattern="/settings" component={SettingsView} />
             <MatchWhenAuthorized exactly pattern="/volumes" component={VolumeListView} />
-            <MatchWhenAuthorized exactly pattern="/volumes/:name" component={VolumeInspectView} />
+            <MatchWhenAuthorized exactly pattern="/volumes/inspect/:name" component={VolumeInspectView} />
             <MatchWhenAuthorized exactly pattern="/volumes/create" component={CreateVolumeView} />
           </Container>
         </div>

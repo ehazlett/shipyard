@@ -22,3 +22,15 @@ export function inspectRegistries(id) {
     .then(errorHandler)
     .then(jsonHandler);
 }
+
+export function addRegistry(request) {
+  return fetch(`/api/registries`, {
+    method: 'POST',
+    body: JSON.stringify(request),
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}

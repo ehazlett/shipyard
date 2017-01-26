@@ -38,7 +38,7 @@ class AccountListView extends React.Component {
     return (
       <Tr key={account.id}>
         <Td column="Username">
-          <Link to={`/accounts/${account.username}`}>{account.username}</Link>
+          <Link to={`/accounts/inspect/${account.username}`}>{account.username}</Link>
         </Td>
         <Td column="First Name">{account.first_name}</Td>
         <Td column="Last Name">{account.last_name}</Td>

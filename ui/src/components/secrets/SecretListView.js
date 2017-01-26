@@ -38,7 +38,7 @@ class SecretListView extends React.Component {
     return (
       <Tr key={secret.ID}>
         <Td column="ID" className="collapsing">
-          <Link to={`/secrets/${secret.ID}`}>
+          <Link to={`/secrets/inspect/${secret.ID}`}>
             {secret.ID.substring(0, 12)}
           </Link>
         </Td>

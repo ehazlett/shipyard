@@ -90,13 +90,14 @@ class ServiceListView extends React.Component {
           <i className={`ui circle icon ${taskStates(t.Status.State)}`}></i>
         </Td>
         <Td column="ID" className="collapsing">
-          {/*<Link to={`/services/${s.ID}/tasks/${t.ID}`}>{t.ID.substring(0, 12)}</Link>*/}
           {t.ID.substring(0, 12)}
         </Td>
         <Td column="Container ID" className="collapsing">
-          {t.Status.ContainerStatus.ContainerID ?
-            t.Status.ContainerStatus.ContainerID.substring(0, 12) :
-            ''}
+          {
+            t.Status.ContainerStatus.ContainerID ?
+            <Link to={`/services/inspect/${s.ID}/container/${t.Status.ContainerStatus.ContainerID}`}>{t.Status.ContainerStatus.ContainerID.substring(0, 12)}</Link> :
+            null
+          }
         </Td>
         <Td column="Name">
           {`${s.Spec.Name}.${t.Slot}`}

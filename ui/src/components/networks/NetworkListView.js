@@ -38,7 +38,7 @@ class NetworkListView extends React.Component {
     return (
       <Tr key={network.Id}>
         <Td column="Id" className="collapsing">
-          <Link to={`/networks/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
+          <Link to={`/networks/inspect/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
         </Td>
         <Td column="Name">{network.Name}</Td>
         <Td column="Driver">{network.Driver}</Td>

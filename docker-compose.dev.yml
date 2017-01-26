@@ -42,3 +42,8 @@ services:
       - "3000:3000"
     depends_on:
       - controller
+
+  registry:
+    image: registry:2
+    ports:
+      - 5000:5000

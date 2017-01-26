@@ -41,7 +41,7 @@ class NodeListView extends React.Component {
           <Icon fitted className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
         </Td>
         <Td column="ID" className="collapsing">
-          <Link to={`/nodes/${node.ID}`}>{node.ID.substring(0, 12)}</Link>
+          <Link to={`/nodes/inspect/${node.ID}`}>{node.ID.substring(0, 12)}</Link>
         </Td>
         <Td column="Hostname">{node.Description.Hostname}</Td>
         <Td column="OS">

@@ -42,7 +42,7 @@ class ContainerListView extends React.Component {
           <Icon fitted className={`circle ${container.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
         </Td>
         <Td column="ID" className="collapsing">
-          <Link to={`/containers/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
+          <Link to={`/containers/inspect/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
         </Td>
         <Td column="Image">{shortenImageName(container.Image)}</Td>
         <Td column="Created" className="collapsing">

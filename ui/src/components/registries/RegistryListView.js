@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
+import { Link } from 'react-router';
 
 import { listRegistries } from '../../api';
 
@@ -76,7 +77,12 @@ class RegistryListView extends React.Component {
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column width={10} />
+            <Grid.Column width={10} textAlign="right">
+              <Link to="/registries/add" className="ui green button">
+                <Icon className="add" />
+                Add
+              </Link>
+            </Grid.Column>
           </Grid.Row>
           <Grid.Row>
             <Grid.Column width={16}>
