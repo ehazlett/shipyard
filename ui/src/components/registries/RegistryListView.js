@@ -2,23 +2,22 @@ import React from 'react';
 
 import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
-import { Link } from 'react-router';
 
-import { listNetworks } from '../../api';
+import { listRegistries } from '../../api';
 
-class NetworkListView extends React.Component {
+class RegistryListView extends React.Component {
   state = {
     error: null,
-    networks: [],
+    registries: [],
     loading: true,
   };
 
   componentDidMount() {
-    listNetworks()
-      .then((networks) => {
+    listRegistries()
+      .then((registries) => {
         this.setState({
           error: null,
-          networks: networks.body,
+          registries: registries.body,
           loading: false,
         });
       })
@@ -32,23 +31,36 @@ class NetworkListView extends React.Component {
 
   updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
-  };
+  }
 
-  renderNetwork = (network) => {
+  renderRow = (registry, tagIndex) => {
     return (
-      <Tr key={network.Id}>
-        <Td column="Id" className="collapsing">
-          <Link to={`/networks/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
+      <Tr key={registry.id}>
+        <Td column="ID" className="collapsing">
+          {registry.id.substring(0, 12)}
         </Td>
-        <Td column="Name">{network.Name}</Td>
-        <Td column="Driver">{network.Driver}</Td>
-        <Td column="Scope">{network.Scope}</Td>
+        <Td column="Name">
+          {registry.name}
+        </Td>
+        <Td column="Address">
+          {registry.addr}
+        </Td>
       </Tr>
     );
-  };
+  }
+
+  renderRegistry = (registry) => {
+    const rows = [];
+    if(registry.RepoTags) {
+      for (let i = 0; i < registry.RepoTags.length; i++) {
+        rows.push(this.renderRow(registry, i));
+      }
+    }
+    return rows;
+  }
 
   render() {
-    const { loading, error, networks } = this.state;
+    const { loading, error, registries } = this.state;
 
     if(loading) {
       return <div></div>;
@@ -64,7 +76,7 @@ class NetworkListView extends React.Component {
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column width={10} textAlign="right" />
+            <Grid.Column width={10} />
           </Grid.Row>
           <Grid.Row>
             <Grid.Column width={16}>
@@ -73,11 +85,11 @@ class NetworkListView extends React.Component {
                 ref="table"
                 className="ui compact celled sortable unstackable table"
                 sortable
-                filterable={['ID', 'Name', 'Driver', 'Scope']}
+                filterable={["ID", "Name", "Address"]}
                 hideFilterInput
-                noDataText="Couldn't find any networks"
+                noDataText="Couldn't find any registries"
               >
-                {Object.keys(networks).map( key => this.renderNetwork(networks[key]) )}
+                {registries.map(this.renderRow)}
               </Table>
             </Grid.Column>
           </Grid.Row>
@@ -87,4 +99,4 @@ class NetworkListView extends React.Component {
   }
 }
 
-export default NetworkListView;
+export default RegistryListView;

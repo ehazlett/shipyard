@@ -4,21 +4,21 @@ import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
-import { listNetworks } from '../../api';
+import { listSecrets } from '../../api';
 
-class NetworkListView extends React.Component {
+class SecretListView extends React.Component {
   state = {
     error: null,
-    networks: [],
+    secrets: [],
     loading: true,
   };
 
   componentDidMount() {
-    listNetworks()
-      .then((networks) => {
+    listSecrets()
+      .then((secrets) => {
         this.setState({
           error: null,
-          networks: networks.body,
+          secrets: secrets.body,
           loading: false,
         });
       })
@@ -32,23 +32,35 @@ class NetworkListView extends React.Component {
 
   updateFilter = (input) => {
     this.refs.table.filterBy(input.target.value);
-  };
+  }
 
-  renderNetwork = (network) => {
+  renderRow = (secret, tagIndex) => {
     return (
-      <Tr key={network.Id}>
-        <Td column="Id" className="collapsing">
-          <Link to={`/networks/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
+      <Tr key={secret.ID}>
+        <Td column="ID" className="collapsing">
+          <Link to={`/secrets/${secret.ID}`}>
+            {secret.ID.substring(0, 12)}
+          </Link>
         </Td>
-        <Td column="Name">{network.Name}</Td>
-        <Td column="Driver">{network.Driver}</Td>
-        <Td column="Scope">{network.Scope}</Td>
+        <Td column="Name">
+          {secret.Spec.Name}
+        </Td>
       </Tr>
     );
-  };
+  }
+
+  renderSecret = (secret) => {
+    const rows = [];
+    if(secret.RepoTags) {
+      for (let i = 0; i < secret.RepoTags.length; i++) {
+        rows.push(this.renderRow(secret, i));
+      }
+    }
+    return rows;
+  }
 
   render() {
-    const { loading, error, networks } = this.state;
+    const { loading, error, secrets } = this.state;
 
     if(loading) {
       return <div></div>;
@@ -64,7 +76,7 @@ class NetworkListView extends React.Component {
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
             </Grid.Column>
-            <Grid.Column width={10} textAlign="right" />
+            <Grid.Column width={10} />
           </Grid.Row>
           <Grid.Row>
             <Grid.Column width={16}>
@@ -73,11 +85,11 @@ class NetworkListView extends React.Component {
                 ref="table"
                 className="ui compact celled sortable unstackable table"
                 sortable
-                filterable={['ID', 'Name', 'Driver', 'Scope']}
+                filterable={["ID", "Name"]}
                 hideFilterInput
-                noDataText="Couldn't find any networks"
+                noDataText="Couldn't find any secrets"
               >
-                {Object.keys(networks).map( key => this.renderNetwork(networks[key]) )}
+                {secrets.map(this.renderRow)}
               </Table>
             </Grid.Column>
           </Grid.Row>
@@ -87,4 +99,4 @@ class NetworkListView extends React.Component {
   }
 }
 
-export default NetworkListView;
+export default SecretListView;

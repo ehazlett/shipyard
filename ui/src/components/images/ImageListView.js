@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
+import { Link } from 'react-router';
 
 import { listImages } from '../../api';
 
@@ -40,7 +41,7 @@ class ImageListView extends React.Component {
           {image.RepoTags[tagIndex].split(':')[0]}
         </Td>
         <Td column="Tag">
-          {image.RepoTags[tagIndex].split(':')[1]}
+          <Link to={`/images/${image.Id}`}>{image.RepoTags[tagIndex].split(':')[1]}</Link>
         </Td>
         <Td column="Image ID" className="collapsing">
           {image.Id.replace('sha256:', '').substring(0, 12)}

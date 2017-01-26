@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Message, Segment, Grid, Icon, Checkbox, Sidebar, Menu } from 'semantic-ui-react';
+import { Button, Message, Segment, Grid, Icon, Checkbox } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import taskStates from './TaskStates';
 import { Link } from 'react-router';
@@ -142,15 +142,23 @@ class ServiceListView extends React.Component {
               </div>
             </Grid.Column>
             <Grid.Column width={10} textAlign="right">
-              <Link to="/services/create" className="ui green button">
-                <Icon className="add" />
-                Create
-              </Link>
+
+              { _.isEmpty(selected) ?
+                <Link to="/services/create" className="ui green button">
+                  <Icon className="add" />
+                  Create
+                </Link> :
+                <span>
+                  <b>{selected.length} Services Selected: </b>
+                  <Button color="red" onClick={this.removeSelected}>Remove</Button>
+                </span>
+              }
+
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
             <Grid.Column className="sixteen wide">
-              {error && (<Message error>{error}</Message>)}
+              {error && (<Message error>{JSON.stringify(error)}</Message>)}
               <Table
                 className="ui compact celled sortable unstackable table"
                 ref="table"
@@ -163,16 +171,6 @@ class ServiceListView extends React.Component {
             </Grid.Column>
           </Grid.Row>
         </Grid>
-        <Sidebar as={Menu} className="blue labeled icon" animation='overlay' direction='bottom' visible={!_.isEmpty(selected)} inverted>
-          <Menu.Item header>
-            {selected.length}<br/><br/>
-            Selected
-          </Menu.Item>
-          <Menu.Item name="Remove" onClick={this.removeSelected}>
-            <Icon name="delete" />
-            Remove
-          </Menu.Item>
-        </Sidebar>
       </Segment>
     );
   }

@@ -8,7 +8,7 @@ import moment from 'moment';
 import { inspectContainer } from '../../api';
 import { shortenImageName } from '../../lib';
 
-class ContainerListView extends React.Component {
+class ContainerInspectView extends React.Component {
   state = {
     container: null,
     loading: true,
@@ -92,7 +92,7 @@ class ContainerListView extends React.Component {
                 </tbody>
               </table>
 
-              <div className="ui header">Task Template</div>
+              <div className="ui header">Details</div>
               <table className="ui very basic celled table">
                 <tbody>
                   <tr><td className="four wide column">Image</td><td>{shortenImageName(container.Config.Image)}</td></tr>
@@ -255,4 +255,4 @@ class ContainerListView extends React.Component {
   }
 }
 
-export default ContainerListView;
+export default ContainerInspectView;

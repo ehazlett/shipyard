@@ -1,0 +1,17 @@
+#LoginView {
+  background-color: #06293A;
+  height: 100vh;
+  width: 100vw;
+  padding: 0;
+  margin: 0;
+}
+
+#LoginView img.logo {
+  margin-top: 3rem;
+}
+
+#LoginView h1.header {
+  font-family: 'Poiret One', cursive;
+  font-size: 3.5rem;
+  margin-bottom: 2.5rem;
+}
