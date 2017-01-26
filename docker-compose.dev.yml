@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.build
-    entrypoint: /bin/bash
+    entrypoint: /bin/ash
     command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://proxy:2375"
     volumes:
       - ".:/usr/src/app"
@@ -32,8 +32,9 @@ services:
       - rethinkdb
 
   ui:
-    image: "node:7.4"
-    command: bash -c "npm install && npm run start"
+    image: node:7.4-alpine
+    entrypoint: /bin/ash
+    command: -c "npm install && npm run start"
     working_dir: /usr/src/app
     volumes:
       - "./ui:/usr/src/app"
