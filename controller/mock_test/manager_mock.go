@@ -148,7 +148,9 @@ func (m MockManager) Registry(name string) (*shipyard.Registry, error) {
 func (m MockManager) RemoveRegistry(registry *shipyard.Registry) error {
 	return nil
 }
-
+func (m MockManager) RegistryByAddress(addr string) (*shipyard.Registry, error){
+	return nil, nil
+}
 func (m MockManager) Nodes() ([]*shipyard.Node, error) {
 	return []*shipyard.Node{
 		TestNode,

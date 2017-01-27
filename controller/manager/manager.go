@@ -8,8 +8,10 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
+	"crypto/tls"
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/sessions"
 	"github.com/samalba/dockerclient"
@@ -37,6 +39,7 @@ const (
 )
 
 var (
+	ErrCannotPingRegistry         = errors.New("Cannot ping registry")
 	ErrLoginFailure               = errors.New("invalid username or password")
 	ErrAccountExists              = errors.New("account already exists")
 	ErrAccountDoesNotExist        = errors.New("account does not exist")
@@ -107,6 +110,7 @@ type (
 		RemoveRegistry(registry *shipyard.Registry) error
 		Registries() ([]*shipyard.Registry, error)
 		Registry(name string) (*shipyard.Registry, error)
+		RegistryByAddress(addr string) (*shipyard.Registry, error)
 
 		CreateConsoleSession(c *shipyard.ConsoleSession) error
 		RemoveConsoleSession(c *shipyard.ConsoleSession) error
@@ -236,6 +240,7 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 		errChan = make(chan (error))
 		resChan = make(chan (string))
 		result  = ScaleResult{Scaled: make([]string, 0), Errors: make([]string, 0)}
+		lock    sync.Mutex // when set container affinities to swarm cluster, must use mutex
 	)
 
 	containerInfo, err := m.Container(id)
@@ -252,6 +257,9 @@ func (m DefaultManager) ScaleContainer(id string, numInstances int) ScaleResult 
 			config.Hostname = ""
 			hostConfig := containerInfo.HostConfig
 			config.HostConfig = *hostConfig // sending hostconfig via the Start-endpoint is deprecated starting with docker-engine 1.12
+
+			lock.Lock()
+			defer lock.Unlock()
 			id, err := m.client.CreateContainer(config, "", nil)
 			if err != nil {
 				errChan <- err
@@ -701,8 +709,34 @@ func (m DefaultManager) Node(name string) (*shipyard.Node, error) {
 	return nil, nil
 }
 
-func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
-	resp, err := http.Get(fmt.Sprintf("%s/v1/search", registry.Addr))
+func (m DefaultManager) PingRegistry(registry *shipyard.Registry) error {
+
+	// TODO: Please note the trailing forward slash / which is needed for Artifactory, else you get a 404.
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/v2/", registry.Addr), nil)
+
+	if err != nil {
+		return err
+	}
+
+	req.SetBasicAuth(registry.Username, registry.Password)
+
+	var tlsConfig *tls.Config
+
+	tlsConfig = nil
+
+	if registry.TlsSkipVerify {
+		tlsConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+
+	// Create unsecured client
+	trans := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	client := &http.Client{Transport: trans}
+
+	resp, err := client.Do(req)
+
 	if err != nil {
 		return err
 	}
@@ -710,10 +744,24 @@ func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 		return errors.New(resp.Status)
 	}
 
-	if _, err := r.Table(tblNameRegistries).Insert(registry).RunWrite(m.session); err != nil {
+	return nil
+}
+
+func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
+
+	if err := registry.InitRegistryClient(); err != nil {
 		return err
 	}
 
+	// TODO: consider not doing a test on adding the record, perhaps have a pingRegistry route that does this through API.
+	if err := m.PingRegistry(registry); err != nil {
+		log.Error(err)
+		return ErrCannotPingRegistry
+	}
+
+	if _, err := r.Table(tblNameRegistries).Insert(registry).RunWrite(m.session); err != nil {
+		return err
+	}
 	m.logEvent("add-registry", fmt.Sprintf("name=%s endpoint=%s", registry.Name, registry.Addr), []string{"registry"})
 
 	return nil
@@ -721,6 +769,7 @@ func (m DefaultManager) AddRegistry(registry *shipyard.Registry) error {
 
 func (m DefaultManager) RemoveRegistry(registry *shipyard.Registry) error {
 	res, err := r.Table(tblNameRegistries).Get(registry.ID).Delete().Run(m.session)
+	defer res.Close()
 	if err != nil {
 		return err
 	}
@@ -736,6 +785,7 @@ func (m DefaultManager) RemoveRegistry(registry *shipyard.Registry) error {
 
 func (m DefaultManager) Registries() ([]*shipyard.Registry, error) {
 	res, err := r.Table(tblNameRegistries).OrderBy(r.Asc("name")).Run(m.session)
+	defer res.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -745,21 +795,18 @@ func (m DefaultManager) Registries() ([]*shipyard.Registry, error) {
 		return nil, err
 	}
 
-	registries := []*shipyard.Registry{}
-	for _, r := range regs {
-		reg, err := shipyard.NewRegistry(r.ID, r.Name, r.Addr)
-		if err != nil {
-			return nil, err
+	for _, registry := range regs {
+		if err := registry.InitRegistryClient(); err != nil {
+			log.Errorf("%s", err.Error())
 		}
-
-		registries = append(registries, reg)
 	}
 
-	return registries, nil
+	return regs, nil
 }
 
-func (m DefaultManager) Registry(name string) (*shipyard.Registry, error) {
-	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"name": name}).Run(m.session)
+func (m DefaultManager) Registry(id string) (*shipyard.Registry, error) {
+	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"id": id}).Run(m.session)
+	defer res.Close()
 	if err != nil {
 		return nil, err
 
@@ -772,12 +819,35 @@ func (m DefaultManager) Registry(name string) (*shipyard.Registry, error) {
 		return nil, err
 	}
 
-	registry, err := shipyard.NewRegistry(reg.ID, reg.Name, reg.Addr)
+	if err := reg.InitRegistryClient(); err != nil {
+		log.Errorf("%s", err.Error())
+		return reg, err
+	}
+
+	return reg, nil
+}
+
+func (m DefaultManager) RegistryByAddress(addr string) (*shipyard.Registry, error) {
+	res, err := r.Table(tblNameRegistries).Filter(map[string]string{"addr": addr}).Run(m.session)
+	defer res.Close()
 	if err != nil {
 		return nil, err
 	}
+	if res.IsNil() {
+		log.Debugf("Could not find registry with address %s", addr)
+		return nil, ErrRegistryDoesNotExist
+	}
+	var reg *shipyard.Registry
+	if err := res.One(&reg); err != nil {
+		return nil, err
+	}
 
-	return registry, nil
+	if err := reg.InitRegistryClient(); err != nil {
+		log.Error(err)
+		return reg, err
+	}
+
+	return reg, nil
 }
 
 func (m DefaultManager) CreateConsoleSession(c *shipyard.ConsoleSession) error {

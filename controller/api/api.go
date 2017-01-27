@@ -128,11 +128,11 @@ func (a *Api) Run() error {
 	apiRouter.HandleFunc("/api/events", a.purgeEvents).Methods("DELETE")
 	apiRouter.HandleFunc("/api/registries", a.registries).Methods("GET")
 	apiRouter.HandleFunc("/api/registries", a.addRegistry).Methods("POST")
-	apiRouter.HandleFunc("/api/registries/{name}", a.registry).Methods("GET")
-	apiRouter.HandleFunc("/api/registries/{name}", a.removeRegistry).Methods("DELETE")
-	apiRouter.HandleFunc("/api/registries/{name}/repositories", a.repositories).Methods("GET")
-	apiRouter.HandleFunc("/api/registries/{name}/repositories/{repo:.*}", a.repository).Methods("GET")
-	apiRouter.HandleFunc("/api/registries/{name}/repositories/{repo:.*}", a.deleteRepository).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registries/{registryId}", a.registry).Methods("GET")
+	apiRouter.HandleFunc("/api/registries/{registryId}", a.removeRegistry).Methods("DELETE")
+	apiRouter.HandleFunc("/api/registries/{registryId}/repositories", a.repositories).Methods("GET")
+	apiRouter.HandleFunc("/api/registries/{registryId}/repositories/{repo:.*}", a.repository).Methods("GET")
+	apiRouter.HandleFunc("/api/registries/{registryId}/repositories/{repo:.*}", a.deleteRepository).Methods("DELETE")
 	apiRouter.HandleFunc("/api/servicekeys", a.serviceKeys).Methods("GET")
 	apiRouter.HandleFunc("/api/servicekeys", a.addServiceKey).Methods("POST")
 	apiRouter.HandleFunc("/api/servicekeys", a.removeServiceKey).Methods("DELETE")
@@ -148,6 +148,7 @@ func (a *Api) Run() error {
 	globalMux.Handle("/", http.FileServer(http.Dir("static")))
 
 	auditExcludes := []string{
+		"^/networks",
 		"^/containers/json",
 		"^/images/json",
 		"^/api/events",
@@ -227,39 +228,42 @@ func (a *Api) Run() error {
 			"/networks/{id:.*}":               swarmRedirect,
 		},
 		"POST": {
-			"/auth":                         swarmRedirect,
-			"/commit":                       swarmRedirect,
-			"/build":                        swarmRedirect,
-			"/images/create":                swarmRedirect,
-			"/images/load":                  swarmRedirect,
-			"/images/{name:.*}/push":        swarmRedirect,
-			"/images/{name:.*}/tag":         swarmRedirect,
-			"/containers/create":            swarmRedirect,
-			"/containers/{name:.*}/kill":    swarmRedirect,
-			"/containers/{name:.*}/pause":   swarmRedirect,
-			"/containers/{name:.*}/unpause": swarmRedirect,
-			"/containers/{name:.*}/rename":  swarmRedirect,
-			"/containers/{name:.*}/restart": swarmRedirect,
-			"/containers/{name:.*}/start":   swarmRedirect,
-			"/containers/{name:.*}/stop":    swarmRedirect,
-			"/containers/{name:.*}/wait":    swarmRedirect,
-			"/containers/{name:.*}/resize":  swarmRedirect,
-			"/containers/{name:.*}/attach":  swarmHijack,
-			"/containers/{name:.*}/copy":    swarmRedirect,
-			"/containers/{name:.*}/exec":    swarmRedirect,
-			"/exec/{execid:.*}/start":       swarmHijack,
-			"/exec/{execid:.*}/resize":      swarmRedirect,
-			"/services/create":              swarmRedirect,
-			"/services/{id:.*}/update":      swarmRedirect,
-			"/secrets/{id:.*}":              swarmRedirect,
-			"/volumes/create":               swarmRedirect,
-			"/networks/create":              swarmRedirect,
-			"/swarm/init":                   swarmRedirect,
-			"/swarm/join":                   swarmRedirect,
-			"/swarm/leave":                  swarmRedirect,
-			"/swarm/update":                 swarmRedirect,
+			"/auth":                          swarmRedirect,
+			"/commit":                        swarmRedirect,
+			"/build":                         swarmRedirect,
+			"/images/create":                 swarmRedirect,
+			"/images/load":                   swarmRedirect,
+			"/images/{name:.*}/push":         swarmRedirect,
+			"/images/{name:.*}/tag":          swarmRedirect,
+			"/networks/create":               swarmRedirect,
+			"/networks/{name:.*}/connect":    swarmRedirect,
+			"/networks/{name:.*}/disconnect": swarmRedirect,
+			"/containers/create":             swarmRedirect,
+			"/containers/{name:.*}/kill":     swarmRedirect,
+			"/containers/{name:.*}/pause":    swarmRedirect,
+			"/containers/{name:.*}/unpause":  swarmRedirect,
+			"/containers/{name:.*}/rename":   swarmRedirect,
+			"/containers/{name:.*}/restart":  swarmRedirect,
+			"/containers/{name:.*}/start":    swarmRedirect,
+			"/containers/{name:.*}/stop":     swarmRedirect,
+			"/containers/{name:.*}/wait":     swarmRedirect,
+			"/containers/{name:.*}/resize":   swarmRedirect,
+			"/containers/{name:.*}/attach":   swarmHijack,
+			"/containers/{name:.*}/copy":     swarmRedirect,
+			"/containers/{name:.*}/exec":     swarmRedirect,
+			"/exec/{execid:.*}/start":        swarmHijack,
+			"/exec/{execid:.*}/resize":       swarmRedirect,
+			"/services/create":               swarmRedirect,
+			"/services/{id:.*}/update":       swarmRedirect,
+			"/secrets/{id:.*}":               swarmRedirect,
+			"/volumes/create":                swarmRedirect,
+			"/swarm/init":                    swarmRedirect,
+			"/swarm/join":                    swarmRedirect,
+			"/swarm/leave":                   swarmRedirect,
+			"/swarm/update":                  swarmRedirect,
 		},
 		"DELETE": {
+			"/networks/{name:.*}":   swarmRedirect,
 			"/containers/{name:.*}": swarmRedirect,
 			"/images/{name:.*}":     swarmRedirect,
 			"/services/{id:.*}":     swarmRedirect,
