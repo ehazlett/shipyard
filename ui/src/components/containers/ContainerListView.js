@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Input, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
@@ -48,7 +48,6 @@ class ContainerListView extends React.Component {
         <Td column="Created" className="collapsing">
           {new Date(container.Created * 1000).toLocaleString()}
         </Td>
-        <Td column="Status">{container.Status}</Td>
         <Td column="Name">{container.Names[0]}</Td>
       </Tr>
     );
@@ -62,34 +61,37 @@ class ContainerListView extends React.Component {
     }
 
     return (
-      <Segment basic>
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={6}>
-              <div className="ui fluid icon input">
-                <Icon className="search" />
-                <input placeholder="Search..." onChange={this.updateFilter}></input>
-              </div>
-            </Grid.Column>
-            <Grid.Column width={10} textAlign="right" />
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={16}>
-              {error && (<Message error>{error}</Message>)}
-              <Table
-                ref="table"
-                className="ui compact celled sortable unstackable table"
-                sortable
-                filterable={['ID', 'Image', 'Created', 'Status', 'Name']}
-                hideFilterInput
-                noDataText="Couldn't find any containers"
-              >
-                {Object.keys(containers).map( key => this.renderContainer(containers[key] ))}
-              </Table>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
+      <Grid padded>
+        <Grid.Row>
+          <Grid.Column width={6}>
+            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+          </Grid.Column>
+          <Grid.Column width={10} textAlign="right">
+            { /* _.isEmpty(selected) ?
+              <Button as={Link} to="/containers/create" color="green" icon="add" content="Create" /> :
+              <span>
+                <b>{selected.length} Containers Selected: </b>
+                <Button color="red" onClick={this.removeSelected} content="Remove" />
+              </span>
+            */}
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={16}>
+            {error && (<Message error>{error}</Message>)}
+            <Table
+              ref="table"
+              className="ui compact celled sortable unstackable table"
+              sortable
+              filterable={["ID", "Image", "Created", "Name"]}
+              hideFilterInput
+              noDataText="Couldn't find any containers"
+            >
+              {Object.keys(containers).map( key => this.renderContainer(containers[key] ))}
+            </Table>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

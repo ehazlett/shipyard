@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { Message, Form, Segment, Header } from 'semantic-ui-react';
+import { Message, Form, Segment } from 'semantic-ui-react';
 
 import { getSwarm, updateSwarm } from '../../api';
 
-class SettingsView extends React.Component {
+class JoinTokensForm extends React.Component {
   state = {
     swarm: null,
     error: null,
@@ -57,24 +57,17 @@ class SettingsView extends React.Component {
     }
 
     return (
-      <Form>
-        <Message error/>
-        {error && (<Message negative>{error}</Message>)}
-        <Segment className="basic">
-          <Header>Join Tokens</Header>
-          <Form.Field>
-            <label>Worker</label>
-            <input value={swarm.JoinTokens.Worker} readOnly />
-          </Form.Field>
-          <Form.Field>
-            <label>Manager</label>
-            <input value={swarm.JoinTokens.Manager} readOnly />
-          </Form.Field>
+      <Segment basic>
+        <Form>
+          <Message error/>
+          {error && (<Message negative>{error}</Message>)}
+          <Form.Input label="Worker" value={swarm.JoinTokens.Worker} readOnly />
+          <Form.Input label="Manager" value={swarm.JoinTokens.Manager} readOnly />
           <button className="ui blue button" onClick={this.refreshJoinTokens}>Refresh Join Tokens</button>
-        </Segment>
-      </Form>
+        </Form>
+      </Segment>
     );
   }
 }
 
-export default SettingsView;
+export default JoinTokensForm;

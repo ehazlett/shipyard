@@ -1,11 +1,13 @@
 import React from 'react';
 
-import { Header, Segment, Container, Grid, Message, Menu } from 'semantic-ui-react';
+import { Header, Segment, Button, Form, Container, Grid, Message, Menu } from 'semantic-ui-react';
 import { Link } from 'react-router';
 import _ from 'lodash';
 import moment from 'moment';
+import Terminal from 'xterm';
+import '../../../node_modules/xterm/dist/xterm.css';
 
-import { inspectContainer, logsContainer } from '../../api';
+import { inspectContainer, logsContainer, execContainer } from '../../api';
 import { shortenImageName } from '../../lib';
 
 class ContainerInspectView extends React.Component {
@@ -13,7 +15,9 @@ class ContainerInspectView extends React.Component {
     container: null,
     loading: true,
     activeSegment: 'config',
-    error: null
+    error: null,
+    term: null,
+    websocket: null,
   };
 
   componentDidMount() {
@@ -248,10 +252,8 @@ class ContainerInspectView extends React.Component {
     );
   };
 
-  logs = () => {
-    this.setState({
-      activeSegment: 'logs',
-    });
+  logs = (e) => {
+    e.preventDefault();
 
     const { id } = this.props.params;
     logsContainer(id)
@@ -268,13 +270,115 @@ class ContainerInspectView extends React.Component {
       });
   };
 
+  execContainer = (e, values) => {
+    e.preventDefault();
+
+    const { id } = this.props.params;
+
+    let cmd = values.formData.Command;
+    let termHeight = values.formData.TermHeight || 30;
+    let termWidth = values.formData.TermWidth || 79;
+
+    execContainer(id)
+      .then((session) => {
+        let wsScheme = window.location.protocol.replace('http', 'ws');
+        let wsAddr = `${wsScheme}//${window.location.hostname}:${window.location.port}/exec?id=${id}&cmd=${cmd}&h=${termHeight}&w=${termWidth}&token=${session.body.token}`;
+        let websocket = new WebSocket(wsAddr);
+
+        websocket.onopen = (evt) => {
+          let term = new Terminal({
+            cols: termWidth,
+            rows: termHeight,
+            screenKeys: true,
+            useStyle: true,
+            cursorBlink: true,
+          });
+
+          term.on('data', (data) => {
+            websocket.send(data);
+          });
+
+          term.open(document.getElementById('Terminal'));
+
+          websocket.onmessage = (evt) => {
+            term.write(evt.data);
+          };
+
+          websocket.onclose = (evt) => {
+            term.write("Session terminated");
+            term.destroy();
+          };
+
+          websocket.onerror = (evt) => {
+            console.error(evt)
+          }
+
+          this.setState({
+            term,
+            websocket,
+          });
+        };
+      })
+      .catch((error) => {
+        this.setState({
+          error,
+        });
+      });
+  };
+
+
+  // FIXME: Call disconnect terminal when navigating away from terminal page
+  disconnectTerminal = () => {
+    const { term, websocket } = this.state;
+    if(websocket) {
+      websocket.close();
+    }
+    if(term) {
+      term.destroy();
+    }
+    this.setState({
+      term: null,
+      websocket: null,
+    });
+  };
+
+  renderTerminal = () => {
+    const { term } = this.state;
+    return (
+      <Segment basic>
+        <Grid>
+          <Grid.Column width={16}>
+            { term !== null ?
+              <Button content="Disconnect" color='red' onClick={this.disconnectTerminal} /> :
+              <Form onSubmit={this.execContainer}>
+                <Form.Input name="Command" label="Command" placeholder="/bin/sh" required />
+                <Form.Button color="green">Connect</Form.Button>
+              </Form>
+            }
+          </Grid.Column>
+          <Grid.Column width={16}>
+            <div id="Terminal"></div>
+          </Grid.Column>
+        </Grid>
+      </Segment>
+    );
+  };
+
   renderLogs = () => {
     const { logs } = this.state;
     return (
       <Segment basic>
-        <pre>
-          <code>{logs}</code>
-        </pre>
+        <Grid>
+          <Grid.Column width={16}>
+            <Form onSubmit={this.logs}>
+              {/* Add fields to customize what is retrieved from logs API, e.g. which streams, tail, timestamps */}
+              <Form.Button color="green">Get Logs</Form.Button>
+            </Form>
+          </Grid.Column>
+          <Grid.Column width={16}>
+            <pre><code>{logs}</code></pre>
+          </Grid.Column>
+        </Grid>
       </Segment>
     );
   };
@@ -321,7 +425,8 @@ class ContainerInspectView extends React.Component {
                 <Menu.Item name='Labels' active={activeSegment === 'labels'} onClick={() => { this.changeSegment('labels'); }} />
                 <Menu.Item name='Mounts' active={activeSegment === 'mounts'} onClick={() => { this.changeSegment('mounts'); }} />
                 <Menu.Item name='Healthcheck' active={activeSegment === 'healthcheck'} onClick={() => { this.changeSegment('healthcheck'); }} />
-                <Menu.Item name='Logs' active={activeSegment === 'logs'} onClick={() => { this.logs(container); }} />
+                <Menu.Item name='Logs' active={activeSegment === 'logs'} onClick={() => { this.changeSegment('logs'); }} />
+                <Menu.Item name='Terminal' active={activeSegment === 'Terminal'} onClick={() => { this.changeSegment('terminal'); }} />
               </Menu>
 
               { activeSegment === 'config' ? this.renderConfig(container) : null }
@@ -332,6 +437,7 @@ class ContainerInspectView extends React.Component {
               { activeSegment === 'networking' ? this.renderNetworking(container) : null }
               { activeSegment === 'healthcheck' ? this.renderHealthcheck(container) : null }
               { activeSegment === 'logs' ? this.renderLogs() : null }
+              { activeSegment === 'terminal' ? this.renderTerminal() : null }
 
             </Grid.Column>
           </Grid.Row>

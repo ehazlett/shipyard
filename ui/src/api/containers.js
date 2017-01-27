@@ -37,6 +37,17 @@ export function logsContainer(id, stdout = 1, stderr = 1, timestamps = 0) {
     .then(textHandler);
 }
 
+export function execContainer(id) {
+  const url = `/api/consolesession/${id}`;
+  return fetch(url, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}
+
 export function stopContainer(id, timeout = 0) {
   const url = `/containers/${id}/stop?${timeout ? 't='+timeout : ''}`;
   return fetch(url, {
