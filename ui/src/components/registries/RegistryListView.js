@@ -38,7 +38,9 @@ class RegistryListView extends React.Component {
     return (
       <Tr key={registry.id}>
         <Td column="ID" className="collapsing">
-          {registry.id.substring(0, 12)}
+          <Link to={`/registries/inspect/${registry.id}`}>
+            {registry.id.substring(0, 8)}
+          </Link>
         </Td>
         <Td column="Name">
           {registry.name}

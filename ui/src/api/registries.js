@@ -13,8 +13,18 @@ export function listRegistries() {
     .then(jsonHandler);
 }
 
-export function inspectRegistries(id) {
+export function inspectRegistry(id) {
   return fetch(`/api/registries/${id}`, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}
+
+export function repositoriesRegistry(id) {
+  return fetch(`/api/registries/${id}/repositories`, {
     headers: {
       'X-Access-Token': getAuthToken(),
     },
@@ -31,6 +41,5 @@ export function addRegistry(request) {
       'X-Access-Token': getAuthToken(),
     },
   })
-    .then(errorHandler)
-    .then(jsonHandler);
+    .then(errorHandler);
 }
