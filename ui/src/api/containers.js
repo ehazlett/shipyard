@@ -26,6 +26,17 @@ export function inspectContainer(id) {
     .then(jsonHandler);
 }
 
+export function topContainer(id) {
+  const url = `/containers/${id}/top`;
+  return fetch(url, {
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+    .then(jsonHandler);
+}
+
 export function logsContainer(id, params) {
   const url = `/containers/${id}/logs?${queryString.stringify(params)}`;
   return fetch(url, {

@@ -4,10 +4,10 @@ import { Segment, Container, Grid } from 'semantic-ui-react';
 import { Link } from 'react-router';
 import _ from 'lodash';
 
-import ContainerInspect from './ContainerInspect';
+import ContainerInspect from '../containers/ContainerInspect';
 import { inspectContainer } from '../../api';
 
-class ContainerInspectView extends React.Component {
+class ServiceInspectTaskView extends React.Component {
   state = {
     container: null,
     loading: true,
@@ -31,8 +31,10 @@ class ContainerInspectView extends React.Component {
         });
       });
   }
+
   render() {
     const { loading, container } = this.state;
+    const { serviceId } = this.props.params;
 
     if(loading) {
       return <div></div>;
@@ -45,7 +47,9 @@ class ContainerInspectView extends React.Component {
             <Grid.Column width={16}>
               <Segment basic>
                 <div className="ui breadcrumb">
-                  <Link to="/containers" className="section">Containers</Link>
+                  <Link to="/services" className="section">Services</Link>
+                  <div className="divider"> / </div>
+                  <Link to={`/services/inspect/${serviceId}`} className="section">{serviceId.substring(0, 12)}</Link>
                   <div className="divider"> / </div>
                   <div className="active section">{container.Name.substring(1)}</div>
                 </div>
@@ -59,4 +63,4 @@ class ContainerInspectView extends React.Component {
   }
 }
 
-export default ContainerInspectView;
+export default ServiceInspectTaskView;

@@ -9,6 +9,7 @@ import WelcomeView from "./WelcomeView";
 import ServiceListView from "./services/ServiceListView";
 import CreateServiceView from "./services/CreateServiceView";
 import ServiceInspectView from "./services/ServiceInspectView";
+import ServiceInspectTaskView from "./services/ServiceInspectTaskView";
 import ContainerListView from "./containers/ContainerListView";
 import ContainerInspectView from "./containers/ContainerInspectView";
 import NodeListView from "./nodes/NodeListView";
@@ -132,7 +133,7 @@ class Main extends React.Component {
           <Match exactly pattern="/services" component={ServiceListView} />
           <Match exactly pattern="/services/create" component={CreateServiceView} />
           <Match exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
-          <Match exactly pattern="/services/inspect/:serviceId/container/:id" component={ContainerInspectView} />
+          <Match exactly pattern="/services/inspect/:serviceId/container/:id" component={ServiceInspectTaskView} />
           <Match exactly pattern="/settings" component={SettingsView} />
           <Match exactly pattern="/volumes" component={VolumeListView} />
           <Match exactly pattern="/volumes/inspect/:name" component={VolumeInspectView} />
