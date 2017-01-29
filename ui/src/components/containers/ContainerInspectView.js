@@ -14,6 +14,9 @@ import '../../../node_modules/react-datetime/css/react-datetime.css';
 import { inspectContainer, logsContainer, execContainer } from '../../api';
 import { shortenImageName } from '../../lib';
 
+const DATE_FORMAT = "YYYY-MM-DD";
+const TIME_FORMAT = "HH:mm:ss";
+
 class ContainerInspectView extends React.Component {
   state = {
     container: null,
@@ -263,7 +266,7 @@ class ContainerInspectView extends React.Component {
 			stdout: values.formData.options.indexOf("stdout") > -1 ? 1 : 0,
 			stderr: values.formData.options.indexOf("stderr") > -1 ? 1 : 0,
 			timestamps: values.formData.options.indexOf("timestamps") > -1 ? 1 : 0,
-			since: values.formData.since ? moment(values.formData.since).unix() : 0,
+			since: values.formData.since ? moment(values.formData.since, `${DATE_FORMAT} ${TIME_FORMAT}`).unix() : 0,
 		};
 
     const { id } = this.props.params;
@@ -395,7 +398,7 @@ class ContainerInspectView extends React.Component {
 								</Form.Field>
 								<Form.Field width={6}>
 									<label>Since</label>
-									<DateTime name="since" inputProps={{name: "since"}} />
+									<DateTime name="since" inputProps={{name: "since"}} dateFormat={DATE_FORMAT} timeFormat={TIME_FORMAT}/>
 								</Form.Field>
 								<Form.Field>
 									<label>&nbsp;</label>
