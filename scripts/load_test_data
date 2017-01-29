@@ -20,6 +20,13 @@ curl "${SHIPYARD_URL}/api/registries" \
 	-H "X-Access-Token: admin:${TOKEN}" \
 	--data-binary "{\"Name\":\"registry\",\"Addr\":\"${REGISTRY_URL}\"}"
 
+
+REGISTRY=$(echo "${REGISTRY_URL}" | cut -d'/' -f3)
+echo Add test image to registry
+docker pull redis
+docker tag redis "${REGISTRY}"/redis
+docker push "${REGISTRY}"/redis
+
 # Add some test users
 echo Add admin user called rick with password 'sanchez'
 curl "${SHIPYARD_URL}/api/accounts" \
