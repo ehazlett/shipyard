@@ -31,9 +31,16 @@ export default class TopNav extends React.Component {
               <Menu.Item name="networks" icon="sitemap" to="/networks" as={Link} active={location.pathname.indexOf("/networks") === 0} />
               <Menu.Item name="volumes" icon="disk outline" to="/volumes" as={Link} active={location.pathname.indexOf("/volumes") === 0} />
               <Menu.Item name="secrets" icon="privacy" to="/secrets" as={Link} active={location.pathname.indexOf("/secrets") === 0} />
-              <Menu.Item name="registries" icon="database" to="/registries" as={Link} active={location.pathname.indexOf("/registries") === 0} />
+            </Menu.Menu>
+          </Menu.Item>
+
+          <Menu.Item>
+            <div className="header">Shipyard</div>
+            <Menu.Menu>
               <Menu.Item name="accounts" icon="users" to="/accounts" as={Link} active={location.pathname.indexOf("/accounts") === 0} />
+              <Menu.Item name="registries" icon="database" to="/registries" as={Link} active={location.pathname.indexOf("/registries") === 0} />
               <Menu.Item name="settings" icon="settings" to="/settings" as={Link} active={location.pathname.indexOf("/settings") === 0} />
+              <Menu.Item name="about" icon="question circle outline" to="/about" as={Link} active={location.pathname.indexOf("/about") === 0} />
             </Menu.Menu>
           </Menu.Item>
 

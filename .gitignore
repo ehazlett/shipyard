@@ -2,8 +2,5 @@
 .env
 *.un*
 node_modules
-cli/cli
 controller/controller
 controller/static
-bower_components
-static.tar.gz

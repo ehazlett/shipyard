@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Input, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
@@ -41,7 +41,7 @@ class NodeListView extends React.Component {
           <Icon fitted className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
         </Td>
         <Td column="ID" className="collapsing">
-          <Link to={`/nodes/${node.ID}`}>{node.ID.substring(0, 12)}</Link>
+          <Link to={`/nodes/inspect/${node.ID}`}>{node.ID.substring(0, 12)}</Link>
         </Td>
         <Td column="Hostname">{node.Description.Hostname}</Td>
         <Td column="OS">
@@ -61,34 +61,37 @@ class NodeListView extends React.Component {
     }
 
     return (
-      <Segment basic>
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={6}>
-              <div className="ui fluid icon input">
-                <Icon className="search" />
-                <input placeholder="Search..." onChange={this.updateFilter}></input>
-              </div>
-            </Grid.Column>
-            <Grid.Column textAlign="right" width={10}/>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={16}>
-              {error && (<Message error>{error}</Message>)}
-              <Table
-                ref="table"
-                className="ui compact celled sortable unstackable table"
-                sortable
-                filterable={['Hostname', 'OS', 'Engine', 'Type']}
-                hideFilterInput
-                noDataText="Couldn't find any nodes"
-              >
-                {Object.keys(nodes).map( key => this.renderNode(nodes[key]) )}
-              </Table>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
+      <Grid padded>
+        <Grid.Row>
+          <Grid.Column width={6}>
+            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+          </Grid.Column>
+          <Grid.Column width={10} textAlign="right">
+            { /* _.isEmpty(selected) ?
+              <Button color="green" icon="add" content="Add Node" /> :
+              <span>
+                <b>{selected.length} Nodes Selected: </b>
+                <Button color="red" onClick={this.removeSelected} content="Remove" />
+              </span>
+            */}
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={16}>
+            {error && (<Message error>{error}</Message>)}
+            <Table
+              ref="table"
+              className="ui compact celled sortable unstackable table"
+              sortable
+              filterable={["ID", "Hostname", "OS", "Engine", "Type"]}
+              hideFilterInput
+              noDataText="Couldn't find any nodes"
+            >
+              {Object.keys(nodes).map( key => this.renderNode(nodes[key]) )}
+            </Table>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

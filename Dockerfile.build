@@ -1,14 +1,14 @@
-FROM golang:1.5
+FROM golang:1.7.4-alpine
 
-ENV DOCKER_VERSION 1.7.0
+ENV DOCKER_VERSION 1.13.0
 ENV TAG latest
 ENV PATH $PATH:/go/bin:/usr/local/go/bin
 
+RUN apk -v add --update ca-certificates curl make git
 RUN go get github.com/tools/godep
 
-ADD https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION} /usr/local/bin/docker
-RUN chmod +x /usr/local/bin/docker
-
+RUN curl -L https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION}.tgz | tar -zxO docker/docker > /usr/local/bin/docker && \
+	chmod +x /usr/local/bin/docker
 
 COPY . /go/src/github.com/shipyard/shipyard
 WORKDIR /go/src/github.com/shipyard/shipyard

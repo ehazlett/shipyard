@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Input, Grid, Button } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
+import { Link } from 'react-router';
 
 import { listRegistries } from '../../api';
 
@@ -37,7 +38,9 @@ class RegistryListView extends React.Component {
     return (
       <Tr key={registry.id}>
         <Td column="ID" className="collapsing">
-          {registry.id.substring(0, 12)}
+          <Link to={`/registries/inspect/${registry.id}`}>
+            {registry.id.substring(0, 8)}
+          </Link>
         </Td>
         <Td column="Name">
           {registry.name}
@@ -67,34 +70,37 @@ class RegistryListView extends React.Component {
     }
 
     return (
-      <Segment basic>
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={6}>
-              <div className="ui fluid icon input">
-                <Icon className="search" />
-                <input placeholder="Search..." onChange={this.updateFilter}></input>
-              </div>
-            </Grid.Column>
-            <Grid.Column width={10} />
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={16}>
-              {error && (<Message error>{error}</Message>)}
-              <Table
-                ref="table"
-                className="ui compact celled sortable unstackable table"
-                sortable
-                filterable={["ID", "Name", "Address"]}
-                hideFilterInput
-                noDataText="Couldn't find any registries"
-              >
-                {registries.map(this.renderRow)}
-              </Table>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
+      <Grid padded>
+        <Grid.Row>
+          <Grid.Column width={6}>
+            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+          </Grid.Column>
+          <Grid.Column width={10} textAlign="right">
+            <Button as={Link} to="/registries/add" color="green" icon="add" content="Add" />
+            { /* _.isEmpty(selected) ?
+              <span>
+                <b>{selected.length} Registries Selected: </b>
+                <Button color="red" onClick={this.removeSelected} content="Remove" />
+              </span>
+            */}
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={16}>
+            {error && (<Message error>{error}</Message>)}
+            <Table
+              ref="table"
+              className="ui compact celled sortable unstackable table"
+              sortable
+              filterable={["ID", "Name", "Address"]}
+              hideFilterInput
+              noDataText="Couldn't find any registries"
+            >
+              {registries.map(this.renderRow)}
+            </Table>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

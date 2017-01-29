@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+if [ -z "$SHIPYARD_URL" ]; then
+	SHIPYARD_URL=http://controller:8080
+fi
+
+if [ -z "$REGISTRY_URL" ]; then
+	REGISTRY_URL=http://registry:5000
+fi
+
+
+# Get admin token
+echo Getting admin token
+TOKEN=$(curl -sL "${SHIPYARD_URL}/auth/login" --data-binary '{"username":"admin","password":"shipyard"}' | jq -r .auth_token)
+
+# Add Test Registry
+echo Adding test registry
+curl "${SHIPYARD_URL}/api/registries" -H "X-Access-Token: admin:${TOKEN}" --data-binary "{\"Name\":\"registry\",\"Addr\":\"${REGISTRY_URL}\"}"

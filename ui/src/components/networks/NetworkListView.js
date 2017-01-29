@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
+import { Message, Input, Grid } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
@@ -38,7 +38,7 @@ class NetworkListView extends React.Component {
     return (
       <Tr key={network.Id}>
         <Td column="Id" className="collapsing">
-          <Link to={`/networks/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
+          <Link to={`/networks/inspect/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
         </Td>
         <Td column="Name">{network.Name}</Td>
         <Td column="Driver">{network.Driver}</Td>
@@ -55,34 +55,37 @@ class NetworkListView extends React.Component {
     }
 
     return (
-      <Segment basic>
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={6}>
-              <div className="ui fluid icon input">
-                <Icon className="search" />
-                <input placeholder="Search..." onChange={this.updateFilter}></input>
-              </div>
-            </Grid.Column>
-            <Grid.Column width={10} textAlign="right" />
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={16}>
-              {error && (<Message error>{error}</Message>)}
-              <Table
-                ref="table"
-                className="ui compact celled sortable unstackable table"
-                sortable
-                filterable={['ID', 'Name', 'Driver', 'Scope']}
-                hideFilterInput
-                noDataText="Couldn't find any networks"
-              >
-                {Object.keys(networks).map( key => this.renderNetwork(networks[key]) )}
-              </Table>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
+      <Grid padded>
+        <Grid.Row>
+          <Grid.Column width={6}>
+            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+          </Grid.Column>
+          <Grid.Column width={10} textAlign="right">
+            { /* _.isEmpty(selected) ?
+              <Button as={Link} to="/networks/create" color="green" icon="add" content="Create" /> :
+              <span>
+                <b>{selected.length} Networks Selected: </b>
+                <Button color="red" onClick={this.removeSelected} content="Remove" />
+              </span>
+            */}
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={16}>
+            {error && (<Message error>{error}</Message>)}
+            <Table
+              ref="table"
+              className="ui compact celled sortable unstackable table"
+              sortable
+              filterable={['ID', 'Name', 'Driver', 'Scope']}
+              hideFilterInput
+              noDataText="Couldn't find any networks"
+            >
+              {Object.keys(networks).map( key => this.renderNetwork(networks[key]) )}
+            </Table>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }

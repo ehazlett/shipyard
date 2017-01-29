@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 
-import { Button, Message, Segment, Grid, Icon, Checkbox } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
-import taskStates from './TaskStates';
-import { Link } from 'react-router';
-import _ from 'lodash';
+import { Input, Button, Message, Grid, Checkbox } from "semantic-ui-react";
+import { Table, Tr, Td } from "reactable";
+import taskStates from "./TaskStates";
+import { Link } from "react-router";
+import _ from "lodash";
 
-import { listServices, listTasks, removeService } from '../../api';
-import { shortenImageName } from '../../lib';
+import { listServices, listTasks, removeService } from "../../api";
+import { shortenImageName } from "../../lib";
 
 class ServiceListView extends React.Component {
   state = {
@@ -90,14 +90,14 @@ class ServiceListView extends React.Component {
   renderService(service, summary = {}) {
     let selected = this.state.selected.indexOf(service.ID) > -1;
     return (
-      <Tr className={selected ? 'active' : ''} key={service.ID}>
+      <Tr className={selected ? "active" : ""} key={service.ID}>
         <Td column="" className="collapsing">
           <Checkbox checked={selected} onChange={() => { this.selectItem(service.ID) }} />
         </Td>
         <Td column="Tasks" className="collapsing">
           <div>
-            {(summary.green ? summary.green : '0')}
-            {(service.Spec.Mode.Replicated ? ` / ${service.Spec.Mode.Replicated.Replicas}` : '')}
+            {(summary.green ? summary.green : "0")}
+            {(service.Spec.Mode.Replicated ? ` / ${service.Spec.Mode.Replicated.Replicas}` : "")}
           </div>
         </Td>
         <Td column="ID" className="collapsing">
@@ -132,46 +132,36 @@ class ServiceListView extends React.Component {
     }
 
     return (
-      <Segment basic>
-        <Grid>
-          <Grid.Row>
-            <Grid.Column width={6}>
-              <div className="ui fluid icon input">
-                <Icon className="search" />
-                <input placeholder="Search..." onChange={this.updateFilter}></input>
-              </div>
-            </Grid.Column>
-            <Grid.Column width={10} textAlign="right">
-
-              { _.isEmpty(selected) ?
-                <Link to="/services/create" className="ui green button">
-                  <Icon className="add" />
-                  Create
-                </Link> :
-                <span>
-                  <b>{selected.length} Services Selected: </b>
-                  <Button color="red" onClick={this.removeSelected}>Remove</Button>
-                </span>
-              }
-
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column className="sixteen wide">
-              {error && (<Message error>{JSON.stringify(error)}</Message>)}
-              <Table
-                className="ui compact celled sortable unstackable table"
-                ref="table"
-                sortable
-                filterable={['ID', 'Name', 'Image']}
-                hideFilterInput
-                noDataText="Couldn't find any services">
-                {Object.keys(services).map(key => this.renderService(services[key], taskSummaryByService[services[key].ID]))}
-              </Table>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
+      <Grid padded>
+        <Grid.Row>
+          <Grid.Column width={6}>
+            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+          </Grid.Column>
+          <Grid.Column width={10} textAlign="right">
+            { _.isEmpty(selected) ?
+              <Button as={Link} to="/services/create" color="green" icon="add" content="Create" /> :
+              <span>
+                <b>{selected.length} Services Selected: </b>
+                <Button color="red" onClick={this.removeSelected} content="Remove" />
+              </span>
+            }
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column width={16}>
+            {error && (<Message error>{JSON.stringify(error)}</Message>)}
+            <Table
+              className="ui compact celled sortable unstackable table"
+              ref="table"
+              sortable
+              filterable={["ID", "Name", "Image"]}
+              hideFilterInput
+              noDataText="Couldn't find any services">
+              {Object.keys(services).map(key => this.renderService(services[key], taskSummaryByService[services[key].ID]))}
+            </Table>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     );
   }
 }
