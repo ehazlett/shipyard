@@ -269,6 +269,7 @@ func (a *Api) Run() error {
 			"/services/{id:.*}":     swarmRedirect,
 			"/nodes/{id:.*}":        swarmRedirect,
 			"/secrets/{id:.*}":      swarmRedirect,
+			"/volumes/{name:.*}":    swarmRedirect,
 		},
 		"OPTIONS": {
 			"": swarmRedirect,
