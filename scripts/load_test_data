@@ -16,4 +16,29 @@ TOKEN=$(curl -sL "${SHIPYARD_URL}/auth/login" --data-binary '{"username":"admin"
 
 # Add Test Registry
 echo Adding test registry
-curl "${SHIPYARD_URL}/api/registries" -H "X-Access-Token: admin:${TOKEN}" --data-binary "{\"Name\":\"registry\",\"Addr\":\"${REGISTRY_URL}\"}"
+curl "${SHIPYARD_URL}/api/registries" \
+	-H "X-Access-Token: admin:${TOKEN}" \
+	--data-binary "{\"Name\":\"registry\",\"Addr\":\"${REGISTRY_URL}\"}"
+
+
+REGISTRY=$(echo "${REGISTRY_URL}" | cut -d'/' -f3)
+echo Add test image to registry
+docker pull redis
+docker tag redis "${REGISTRY}"/redis
+docker push "${REGISTRY}"/redis
+
+# Add some test users
+echo Add admin user called rick with password 'sanchez'
+curl "${SHIPYARD_URL}/api/accounts" \
+	-H "X-Access-Token: admin:${TOKEN}" \
+	--data-binary "{\"Username\":\"rick\",\"first_name\":\"Rick\",\"last_name\":\"Sanchez\",\"roles\":[\"admin\"],\"password\":\"sanchez\"}"
+
+echo Add R/W user called morty with password 'smith'
+curl "${SHIPYARD_URL}/api/accounts" \
+	-H "X-Access-Token: admin:${TOKEN}" \
+	--data-binary "{\"Username\":\"morty\",\"first_name\":\"Morty\",\"last_name\":\"Smith\",\"roles\":[\"containers:rw\",\"images:rw\",\"events:rw\",\"registries:rw\",\"nodes:rw\"],\"password\":\"smith\"}"
+
+echo Add RO user called jerry with password 'smith'
+curl "${SHIPYARD_URL}/api/accounts" \
+	-H "X-Access-Token: admin:${TOKEN}" \
+	--data-binary "{\"username\":\"jerry\",\"first_name\":\"Jerry\",\"last_name\":\"Smith\",\"roles\":[\"containers:ro\",\"images:ro\",\"events:ro\",\"registries:ro\",\"nodes:ro\"],\"password\":\"smith\"}"

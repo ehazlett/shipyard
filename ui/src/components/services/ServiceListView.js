@@ -19,7 +19,12 @@ class ServiceListView extends React.Component {
   };
 
   componentDidMount() {
-    listServices()
+    this.getServices();
+    this.getTasks();
+  }
+
+  getServices = () => {
+    return listServices()
       .then((services) => {
         this.setState({
           error: null,
@@ -33,8 +38,10 @@ class ServiceListView extends React.Component {
           loading: false,
         });
       });
+  }
 
-    listTasks()
+  getTasks = () => {
+    return listTasks()
       .then((tasks) => {
         this.setState({
           error: null,
@@ -57,21 +64,16 @@ class ServiceListView extends React.Component {
 
     Promise.all(promises)
       .then(() => {
-        // FIXME: trigger a refresh without calling componentDidMount
-        this.componentDidMount();
+        this.getServices();
+        this.getTasks();
       })
       .catch((err) => {
         this.setState({
           error: err,
         });
-
-        // FIXME: trigger a refresh without calling componentDidMount
-        this.componentDidMount();
+        this.getServices();
+        this.getTasks();
       });
-  }
-
-  updateFilter = (input) => {
-    this.refs.table.filterBy(input.target.value);
   }
 
   selectItem = (id) => {
@@ -85,6 +87,10 @@ class ServiceListView extends React.Component {
         selected: [...this.state.selected, id]
       });
     }
+  }
+
+  updateFilter = (input) => {
+    this.refs.table.filterBy(input.target.value);
   }
 
   renderService(service, summary = {}) {

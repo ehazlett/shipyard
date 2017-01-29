@@ -36,3 +36,14 @@ export function inspectVolume(name) {
     .then(errorHandler)
     .then(jsonHandler);
 }
+
+export function removeVolume(name) {
+  const url = `/volumes/${name}`;
+  return fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler);
+}

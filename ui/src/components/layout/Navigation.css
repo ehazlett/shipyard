@@ -1,5 +1,16 @@
+/*
+ * Uses http://react.semantic-ui.com/ for inspiration
+ * for the fixed left navigation with scroll
+*/
 #Navigation {
   background-color: #06293A;
+  position: fixed;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  width: 225px;
+  padding-bottom: 1em;
+  overflow-y: auto;
 }
 
 #Navigation .ui.container > .header.item {
