@@ -267,6 +267,7 @@ class ContainerInspectView extends React.Component {
 			stderr: values.formData.options.indexOf("stderr") > -1 ? 1 : 0,
 			timestamps: values.formData.options.indexOf("timestamps") > -1 ? 1 : 0,
 			since: values.formData.since ? moment(values.formData.since, `${DATE_FORMAT} ${TIME_FORMAT}`).unix() : 0,
+			tail: values.formData.tail,
 		};
 
     const { id } = this.props.params;
@@ -396,15 +397,16 @@ class ContainerInspectView extends React.Component {
 										<Form.Checkbox label="timestamps" name="options" value="timestamps" defaultChecked={false} />
 									</Form.Group>
 								</Form.Field>
-								<Form.Field width={6}>
+								<Form.Field width={4}>
 									<label>Since</label>
 									<DateTime name="since" inputProps={{name: "since"}} dateFormat={DATE_FORMAT} timeFormat={TIME_FORMAT}/>
 								</Form.Field>
-								<Form.Field>
-									<label>&nbsp;</label>
-									<Form.Button color="green">Get Logs</Form.Button>
+								<Form.Field width={4}>
+									<label>Line limit (tail)</label>
+									<input name="tail" type="number" />
 								</Form.Field>
 							</Form.Group>
+							<Form.Button color="green">Get Logs</Form.Button>
 						</Form>
           </Grid.Column>
           <Grid.Column width={16}>
