@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Link } from 'react-router';
-import { Button, Message, Input, Grid, Checkbox } from 'semantic-ui-react';
+import { Button, Input, Grid, Checkbox } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import _ from 'lodash';
 
@@ -9,7 +9,6 @@ import { listVolumes, removeVolume } from '../../api';
 
 class VolumeListView extends React.Component {
   state = {
-    error: null,
     volumes: [],
     loading: true,
     selected: [],
@@ -23,14 +22,13 @@ class VolumeListView extends React.Component {
     return listVolumes()
       .then((volumes) => {
         this.setState({
-          error: null,
           volumes: volumes.body.Volumes || [],
           loading: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        /* TODO: If something went wrong here, should probably redirect to an error page. */
         this.setState({
-          error,
           loading: false,
         });
       });
@@ -48,9 +46,10 @@ class VolumeListView extends React.Component {
         this.getVolumes();
       })
       .catch((err) => {
-      console.log(err.response);
-        this.setState({
-          error: err,
+        global.notification.addNotification({
+          message: err.toString(),
+          level: 'error',
+          autoDismiss: 0,
         });
         this.getVolumes();
       });
@@ -88,7 +87,7 @@ class VolumeListView extends React.Component {
   }
 
   render() {
-    const { selected, loading, error, volumes } = this.state;
+    const { selected, loading, volumes } = this.state;
 
     if(loading) {
       return <div></div>;
@@ -112,7 +111,6 @@ class VolumeListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
               className="ui compact celled unstackable table"

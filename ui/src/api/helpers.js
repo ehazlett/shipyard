@@ -1,11 +1,12 @@
 export const errorHandler = (response) => {
-  if (!response.ok) {
-    const error = new Error(response.statusText);
-    error.response = response;
-    throw error;
+  if(response.ok) {
+    return Promise.resolve(response);
   }
 
-  return response;
+  return response.json().then(json => {
+    const error = new Error(json.message || response.statusText)
+    return Promise.reject(Object.assign(error, { response }));
+  })
 }
 
 export const textHandler = (response) => {
