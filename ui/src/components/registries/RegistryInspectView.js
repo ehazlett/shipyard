@@ -94,7 +94,7 @@ class RegistryInspectView extends React.Component {
               hideFilterInput
               noDataText="Couldn't find any registries"
             >
-              {repositories.map(this.renderRepo)}
+              { !_.isEmpty(repositories) ? repositories.map(this.renderRepo) : null }
             </Table>
           </Grid.Column>
         </Grid.Row>
