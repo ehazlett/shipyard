@@ -4,8 +4,12 @@ import { Header, Segment, Button, Form, Container, Grid, Message, Menu } from 's
 import { Link } from 'react-router';
 import _ from 'lodash';
 import moment from 'moment';
+
 import Terminal from 'xterm';
 import '../../../node_modules/xterm/dist/xterm.css';
+
+import DateTime from 'react-datetime';
+import '../../../node_modules/react-datetime/css/react-datetime.css';
 
 import { inspectContainer, logsContainer, execContainer } from '../../api';
 import { shortenImageName } from '../../lib';
@@ -252,11 +256,18 @@ class ContainerInspectView extends React.Component {
     );
   };
 
-  logs = (e) => {
+  logs = (e, values) => {
     e.preventDefault();
 
+		let logOpts = {
+			stdout: values.formData.options.indexOf("stdout") > -1 ? 1 : 0,
+			stderr: values.formData.options.indexOf("stderr") > -1 ? 1 : 0,
+			timestamps: values.formData.options.indexOf("timestamps") > -1 ? 1 : 0,
+			since: values.formData.since ? moment(values.formData.since).unix() : 0,
+		};
+
     const { id } = this.props.params;
-    logsContainer(id)
+    logsContainer(id, logOpts)
       .then((logs) => {
         this.setState({
           logs: logs.body,
@@ -351,8 +362,10 @@ class ContainerInspectView extends React.Component {
             { term !== null ?
               <Button content="Disconnect" color='red' onClick={this.disconnectTerminal} /> :
               <Form onSubmit={this.execContainer}>
-                <Form.Input name="Command" label="Command" placeholder="/bin/sh" required />
-                <Form.Button color="green">Connect</Form.Button>
+								<Form.Group>
+									<Form.Input name="Command" label="Command" placeholder="/bin/sh" required width={13} />
+									<Form.Button label="&nbsp;" color="green">Connect</Form.Button>
+								</Form.Group>
               </Form>
             }
           </Grid.Column>
@@ -370,10 +383,26 @@ class ContainerInspectView extends React.Component {
       <Segment basic>
         <Grid>
           <Grid.Column width={16}>
-            <Form onSubmit={this.logs}>
-              {/* Add fields to customize what is retrieved from logs API, e.g. which streams, tail, timestamps */}
-              <Form.Button color="green">Get Logs</Form.Button>
-            </Form>
+						<Form onSubmit={this.logs}>
+							<Form.Group>
+								<Form.Field width={7}>
+									<label>Options</label>
+									<Form.Group inline>
+										<Form.Checkbox label="stdout" name="options" value="stdout" defaultChecked={true} />
+										<Form.Checkbox label="stderr" name="options" value="stderr" defaultChecked={true} />
+										<Form.Checkbox label="timestamps" name="options" value="timestamps" defaultChecked={false} />
+									</Form.Group>
+								</Form.Field>
+								<Form.Field width={6}>
+									<label>Since</label>
+									<DateTime name="since" inputProps={{name: "since"}} />
+								</Form.Field>
+								<Form.Field>
+									<label>&nbsp;</label>
+									<Form.Button color="green">Get Logs</Form.Button>
+								</Form.Field>
+							</Form.Group>
+						</Form>
           </Grid.Column>
           <Grid.Column width={16}>
             <pre><code>{logs}</code></pre>

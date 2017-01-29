@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import $ from 'jquery';
+import queryString from 'query-string';
 
 import { errorHandler, jsonHandler, textHandler } from './helpers.js';
 import { getAuthToken } from '../services/auth';
@@ -26,8 +26,8 @@ export function inspectContainer(id) {
     .then(jsonHandler);
 }
 
-export function logsContainer(id, stdout = 1, stderr = 1, timestamps = 0) {
-  const url = `/containers/${id}/logs?&stdout=${stdout}&stderr=${stderr}&timestamps=${timestamps}`;
+export function logsContainer(id, params) {
+  const url = `/containers/${id}/logs?${queryString.stringify(params)}`;
   return fetch(url, {
     headers: {
       'X-Access-Token': getAuthToken(),
@@ -75,7 +75,7 @@ export function removeContainer(id, volumes = false, force = false) {
     v: volumes,
     force
   };
-  const url = `/containers/${id}?${$.param(params)}`;
+  const url = `/containers/${id}?${queryString.stringify(params)}`;
   return fetch(url, {
     method: 'DELETE',
     headers: {
