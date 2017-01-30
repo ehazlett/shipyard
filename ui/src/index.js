@@ -37,7 +37,6 @@ class Root extends React.Component {
     global.notification = this.refs.notificationSystem;
   }
 
-
   render() {
     return (
       <HashRouter>

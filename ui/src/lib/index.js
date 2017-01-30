@@ -42,3 +42,19 @@ export const getReadableFileSizeString = (fileSizeInBytes) => {
   } while (fileSizeInBytes > 1024);
   return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
 }
+
+export const showError = (err) => {
+  global.notification.addNotification({
+    message: err.toString() || err,
+    level: 'error',
+    autoDismiss: 0,
+  });
+}
+
+export const showSuccess = (msg) => {
+  global.notification.addNotification({
+    message: msg,
+    level: 'success',
+    autoDismiss: 5,
+  });
+}

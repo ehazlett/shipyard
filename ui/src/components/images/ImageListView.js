@@ -1,34 +1,69 @@
 import React from 'react';
 
-import { Message, Grid, Input } from 'semantic-ui-react';
+import { Button, Checkbox, Input, Grid } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
+import _ from 'lodash';
 
-import { listImages } from '../../api';
-import { getReadableFileSizeString } from '../../lib';
+import { listImages, removeImage } from '../../api';
+import { showError, getReadableFileSizeString } from '../../lib';
 
 class ImageListView extends React.Component {
   state = {
-    error: null,
     images: [],
+    selected: [],
     loading: true,
   };
 
   componentDidMount() {
-    listImages()
+    this.getImages();
+  }
+
+  getImages = () => {
+    return listImages()
       .then((images) => {
         this.setState({
-          error: null,
           images: images.body,
           loading: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        /* TODO: If something went wrong here, should probably redirect to an error page. */
+        showError(err);
         this.setState({
-          error,
           loading: false,
         });
       });
+  };
+
+  removeSelected = () => {
+    let promises = _.map(this.state.selected, removeImage);
+
+    this.setState({
+      selected: []
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        this.getImages();
+      })
+      .catch((err) => {
+        showError(err);
+        this.getImages();
+      });
+  }
+
+  selectItem = (id) => {
+    let i = this.state.selected.indexOf(id);
+    if (i > -1) {
+      this.setState({
+        selected: this.state.selected.slice(i+1, 1)
+      });
+    } else {
+      this.setState({
+        selected: [...this.state.selected, id]
+      });
+    }
   }
 
   updateFilter = (input) => {
@@ -36,8 +71,12 @@ class ImageListView extends React.Component {
   }
 
   renderRow = (image, tagIndex) => {
+    let selected = this.state.selected.indexOf(image.Id) > -1;
     return (
-      <Tr key={image.Id}>
+      <Tr className={selected ? "active" : ""} key={image.Id}>
+        <Td column="" className="collapsing">
+          <Checkbox checked={selected} onChange={() => { this.selectItem(image.Id) }} />
+        </Td>
         <Td column="Repository">
           {image.RepoTags[tagIndex].split(':')[0]}
         </Td>
@@ -68,7 +107,7 @@ class ImageListView extends React.Component {
   }
 
   render() {
-    const { loading, error, images } = this.state;
+    const { loading, selected, images } = this.state;
 
     if(loading) {
       return <div></div>;
@@ -81,18 +120,18 @@ class ImageListView extends React.Component {
             <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
-            { /* _.isEmpty(selected) ?
-              <Button color="green" icon="add" content="Pull Image" /> :
-              <span>
-                <b>{selected.length} Images Selected: </b>
-                <Button color="red" onClick={this.removeSelected} content="Remove" />
-              </span>
-            */}
+            {
+              _.isEmpty(selected) ?
+                <Button color="green" icon="add" content="Pull Image" /> :
+                <span>
+                  <b>{selected.length} Images Selected: </b>
+                  <Button color="red" onClick={this.removeSelected} content="Remove" />
+                </span>
+            }
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
               className="ui compact celled unstackable table"

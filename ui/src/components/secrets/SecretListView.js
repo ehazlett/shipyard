@@ -1,33 +1,69 @@
 import React from 'react';
 
-import { Message, Input, Grid } from 'semantic-ui-react';
+import { Button, Checkbox, Input, Grid } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
+import _ from 'lodash';
 
-import { listSecrets } from '../../api';
+import { listSecrets, removeSecret } from '../../api';
+import { showError } from '../../lib';
 
 class SecretListView extends React.Component {
   state = {
-    error: null,
     secrets: [],
+    selected: [],
     loading: true,
   };
 
   componentDidMount() {
+    this.getSecrets();
+  }
+
+  getSecrets = () => {
     listSecrets()
       .then((secrets) => {
         this.setState({
-          error: null,
           secrets: secrets.body,
           loading: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        /* TODO: If something went wrong here, should probably redirect to an error page. */
+        showError(err);
         this.setState({
-          error,
           loading: false,
         });
       });
+  };
+
+  removeSelected = () => {
+    let promises = _.map(this.state.selected, removeSecret);
+
+    this.setState({
+      selected: []
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        this.getSecrets();
+      })
+      .catch((err) => {
+        showError(err);
+        this.getSecrets();
+      });
+  }
+
+  selectItem = (id) => {
+    let i = this.state.selected.indexOf(id);
+    if (i > -1) {
+      this.setState({
+        selected: this.state.selected.slice(i+1, 1)
+      });
+    } else {
+      this.setState({
+        selected: [...this.state.selected, id]
+      });
+    }
   }
 
   updateFilter = (input) => {
@@ -35,8 +71,12 @@ class SecretListView extends React.Component {
   }
 
   renderRow = (secret, tagIndex) => {
+    let selected = this.state.selected.indexOf(secret.ID) > -1;
     return (
-      <Tr key={secret.ID}>
+      <Tr className={selected ? "active" : ""} key={secret.ID}>
+        <Td column="" className="collapsing">
+          <Checkbox checked={selected} onChange={() => { this.selectItem(secret.ID) }} />
+        </Td>
         <Td column="ID" value={secret.ID} className="collapsing">
           <Link to={`/secrets/inspect/${secret.ID}`}>
             {secret.ID.substring(0, 12)}
@@ -60,7 +100,7 @@ class SecretListView extends React.Component {
   }
 
   render() {
-    const { loading, error, secrets } = this.state;
+    const { loading, secrets, selected } = this.state;
 
     if(loading) {
       return <div></div>;
@@ -73,18 +113,18 @@ class SecretListView extends React.Component {
             <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
-            { /* _.isEmpty(selected) ?
-              <Button as={Link} to="/secrets/create" color="green" icon="add" content="Create" /> :
-              <span>
-                <b>{selected.length} Secrets Selected: </b>
-                <Button color="red" onClick={this.removeSelected} content="Remove" />
-              </span>
-            */}
+            {
+              _.isEmpty(selected) ?
+                <Button as={Link} to="/secrets/create" color="green" icon="add" content="Create" /> :
+                <span>
+                  <b>{selected.length} Secrets Selected: </b>
+                  <Button color="red" onClick={this.removeSelected} content="Remove" />
+                </span>
+            }
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
               className="ui compact celled unstackable table"

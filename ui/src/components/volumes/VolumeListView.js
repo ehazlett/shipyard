@@ -6,6 +6,7 @@ import { Table, Tr, Td } from 'reactable';
 import _ from 'lodash';
 
 import { listVolumes, removeVolume } from '../../api';
+import { showError } from '../../lib';
 
 class VolumeListView extends React.Component {
   state = {
@@ -28,6 +29,7 @@ class VolumeListView extends React.Component {
       })
       .catch((err) => {
         /* TODO: If something went wrong here, should probably redirect to an error page. */
+        showError(err);
         this.setState({
           loading: false,
         });
@@ -46,11 +48,7 @@ class VolumeListView extends React.Component {
         this.getVolumes();
       })
       .catch((err) => {
-        global.notification.addNotification({
-          message: err.toString(),
-          level: 'error',
-          autoDismiss: 0,
-        });
+        showError(err);
         this.getVolumes();
       });
   }
