@@ -1,0 +1,11 @@
+.ui.sortable.table thead th:after {
+  display: inline;
+}
+
+table.sortable th.reactable-header-sort-asc:after {
+  content: '\25BC' !important;
+}
+
+table.sortable th.reactable-header-sort-desc:after {
+  content: '\25B2' !important;
+}
