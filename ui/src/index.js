@@ -12,6 +12,7 @@ import Main from './components/Main';
 import LoginView from './components/login/LoginView';
 
 import './css/fonts.css';
+import './css/reactable.css';
 
 const Root = () => {
   return (
