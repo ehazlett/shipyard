@@ -24,11 +24,21 @@ export const getUnhandledProps = (Component, props) => {
 
 // FIXME: This is pretty hacky
 export const shortenImageName = (image) => {
-  var splitImage = image.split('@');
+  const splitImage = image.split('@');
   if(splitImage.length > 1) {
-  	var splitSha = splitImage[1].split(':');
+  	const splitSha = splitImage[1].split(':');
     return `${splitImage[0]}@${splitSha[0]}:${splitSha[1].substring(0, 12)}`;
   } else {
   	return image;
   }
+}
+
+export const getReadableFileSizeString = (fileSizeInBytes) => {
+  let i = -1;
+  const byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
+  do {
+    fileSizeInBytes /= 1024;
+    i++;
+  } while (fileSizeInBytes > 1024);
+  return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
 }

@@ -6,6 +6,7 @@ import _ from 'lodash';
 import moment from 'moment';
 
 import { inspectImage, historyImage } from '../../api';
+import { getReadableFileSizeString } from '../../lib';
 
 class ImageInspectView extends React.Component {
   state = {
@@ -114,8 +115,8 @@ class ImageInspectView extends React.Component {
                   <tr><td>Author</td><td>{image.Author}</td></tr>
                   <tr><td>Comment</td><td>{image.Comment}</td></tr>
                   <tr><td>Docker Version</td><td>{image.DockerVersion}</td></tr>
-                  <tr><td>Size</td><td>{image.Size}</td></tr>
-                  <tr><td>Virtual Size</td><td>{image.VirtualSize}</td></tr>
+                  <tr><td>Size</td><td>{getReadableFileSizeString(image.Size)}</td></tr>
+                  <tr><td>Virtual Size</td><td>{getReadableFileSizeString(image.VirtualSize)}</td></tr>
                 </tbody>
               </table>
 

@@ -5,6 +5,7 @@ import { Table, Tr, Td } from 'reactable';
 import { Link } from 'react-router';
 
 import { listImages } from '../../api';
+import { getReadableFileSizeString } from '../../lib';
 
 class ImageListView extends React.Component {
   state = {
@@ -50,7 +51,7 @@ class ImageListView extends React.Component {
           {new Date(image.Created * 1000).toLocaleString()}
         </Td>
         <Td column="Size">
-          {image.Size}
+          {getReadableFileSizeString(image.Size)}
         </Td>
       </Tr>
     );
@@ -95,7 +96,7 @@ class ImageListView extends React.Component {
             <Table
               ref="table"
               className="ui compact celled unstackable table"
-              sortable
+              sortable={['Repository', 'Tag', 'Image ID', 'Created']}
               filterable={['Repository', 'Tag', 'Image ID', 'Created', 'Size']}
               hideFilterInput
               noDataText="Couldn't find any images"

@@ -18,10 +18,10 @@
     "react": "^15.4.0",
     "react-datetime": "^2.8.3",
     "react-dom": "^15.4.0",
-    "react-router": "^4.0.0-alpha.6",
+    "react-router": "4.0.0-alpha.6",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
-    "reactable": "^0.14.0",
+    "reactable": "^0.14.1",
     "semantic-ui-css": "^2.2.4",
     "semantic-ui-react": "^0.64.3",
     "xterm": "^2.2.3"
