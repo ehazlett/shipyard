@@ -94,7 +94,7 @@ class ImageListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
+              className="ui compact celled unstackable table"
               sortable
               filterable={['Repository', 'Tag', 'Image ID', 'Created', 'Size']}
               hideFilterInput
