@@ -4,7 +4,7 @@ import { Redirect, Match } from "react-router";
 import { Loader, Dimmer } from "semantic-ui-react";
 
 import Navigation from "./layout/Navigation";
-import Layout from "./layout/Layout.css";
+import "./layout/Layout.css";
 
 import WelcomeView from "./WelcomeView";
 import ServiceListView from "./services/ServiceListView";
