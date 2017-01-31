@@ -101,6 +101,8 @@ class ImageListView extends React.Component {
               filterable={['Repository', 'Tag', 'Image ID', 'Created', 'Size']}
               hideFilterInput
               noDataText="Couldn't find any images"
+              itemsPerPage={10}
+              pageButtonLimit={10}
             >
               {Object.keys(images).map( key => this.renderImage(images[key]) )}
             </Table>
