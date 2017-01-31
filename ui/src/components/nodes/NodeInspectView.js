@@ -203,10 +203,11 @@ class NodeListView extends React.Component {
                   <input placeholder="Search..." onChange={this.updateFilter}></input>
                 </div>
                 <Table
-                  className="ui compact celled sortable unstackable table"
+                  className="ui compact celled unstackable table"
                   ref="table"
-                  sortable
-                  filterable={['ID', 'Name', 'Image', 'Command']}
+                  sortable={["Service", "ID", "Container ID", "Name", "Image", "Last Status Update"]}
+                  defaultSort={{column: "Name", direction: "asc"}}
+                  filterable={["ID", "Container ID", "Name", "Image"]}
                   hideFilterInput
                   noDataText="Couldn't find any tasks"
                 >

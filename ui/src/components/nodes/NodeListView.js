@@ -40,11 +40,11 @@ class NodeListView extends React.Component {
         <Td column="" className="collapsing">
           <Icon fitted className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
         </Td>
-        <Td column="ID" className="collapsing">
+        <Td column="ID" value={node.ID} className="collapsing">
           <Link to={`/nodes/inspect/${node.ID}`}>{node.ID.substring(0, 12)}</Link>
         </Td>
         <Td column="Hostname">{node.Description.Hostname}</Td>
-        <Td column="OS">
+        <Td column="OS" value={node.Description.Platform.OS+" "+node.Description.Platform.Architecture}>
           <span>{node.Description.Platform.OS} {node.Description.Platform.Architecture}</span>
         </Td>
         <Td column="Engine">{node.Description.Engine.EngineVersion}</Td>
@@ -81,8 +81,9 @@ class NodeListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
+              className="ui compact celled unstackable table"
+              sortable={["ID", "Hostname", "OS", "Engine", "Type"]}
+              defaultSort={{column: 'Hostname', direction: 'asc'}}
               filterable={["ID", "Hostname", "OS", "Engine", "Type"]}
               hideFilterInput
               noDataText="Couldn't find any nodes"

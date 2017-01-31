@@ -37,7 +37,7 @@ class AccountListView extends React.Component {
   renderAccount = (account) => {
     return (
       <Tr key={account.id}>
-        <Td column="Username">
+        <Td column="Username" value={account.username}>
           <Link to={`/accounts/inspect/${account.username}`}>{account.username}</Link>
         </Td>
         <Td column="First Name">{account.first_name}</Td>
@@ -75,8 +75,9 @@ class AccountListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
+              className="ui compact celled unstackable table"
+              sortable={["Username", "First Name", "Last Name", "Roles"]}
+              defaultSort={{column: "Username", direction: "asc"}}
               filterable={["Username", "First Name", "Last Name", "Roles"]}
               hideFilterInput
               noDataText="Couldn't find any accounts"

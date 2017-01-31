@@ -37,7 +37,7 @@ class SecretListView extends React.Component {
   renderRow = (secret, tagIndex) => {
     return (
       <Tr key={secret.ID}>
-        <Td column="ID" className="collapsing">
+        <Td column="ID" value={secret.ID} className="collapsing">
           <Link to={`/secrets/inspect/${secret.ID}`}>
             {secret.ID.substring(0, 12)}
           </Link>
@@ -87,8 +87,9 @@ class SecretListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
+              className="ui compact celled unstackable table"
+              sortable={["ID", "Name"]}
+              defaultSort={{column: 'Name', direction: 'asc'}}
               filterable={["ID", "Name"]}
               hideFilterInput
               noDataText="Couldn't find any secrets"

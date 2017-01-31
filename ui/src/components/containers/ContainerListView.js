@@ -41,11 +41,13 @@ class ContainerListView extends React.Component {
         <Td column="" className="collapsing">
           <Icon fitted className={`circle ${container.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
         </Td>
-        <Td column="ID" className="collapsing">
+        <Td column="ID" value={container.Id} className="collapsing">
           <Link to={`/containers/inspect/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
         </Td>
-        <Td column="Image">{shortenImageName(container.Image)}</Td>
-        <Td column="Created" className="collapsing">
+        <Td column="Image" value={container.Image}>
+          {shortenImageName(container.Image)}
+        </Td>
+        <Td column="Created" value={container.Created} className="collapsing">
           {new Date(container.Created * 1000).toLocaleString()}
         </Td>
         <Td column="Name">{container.Names[0]}</Td>
@@ -81,8 +83,9 @@ class ContainerListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
+              className="ui compact celled unstackable table"
+              sortable={["ID", "Image", "Created", "Name"]}
+              defaultSort={{column: "Name", direction: "asc"}}
               filterable={["ID", "Image", "Created", "Name"]}
               hideFilterInput
               noDataText="Couldn't find any containers"

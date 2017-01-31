@@ -37,7 +37,7 @@ class NetworkListView extends React.Component {
   renderNetwork = (network) => {
     return (
       <Tr key={network.Id}>
-        <Td column="Id" className="collapsing">
+        <Td column="Id" value={network.Id} className="collapsing">
           <Link to={`/networks/inspect/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
         </Td>
         <Td column="Name">{network.Name}</Td>
@@ -75,9 +75,10 @@ class NetworkListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
-              filterable={['ID', 'Name', 'Driver', 'Scope']}
+              className="ui compact celled unstackable table"
+              sortable={['Id', 'Name', 'Driver', 'Scope']}
+              defaultSort={{column: 'Name', direction: 'asc'}}
+              filterable={['Id', 'Name', 'Driver', 'Scope']}
               hideFilterInput
               noDataText="Couldn't find any networks"
             >
