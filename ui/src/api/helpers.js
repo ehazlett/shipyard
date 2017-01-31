@@ -1,6 +1,14 @@
+import { removeAuthToken } from '../services/auth';
+
 export const errorHandler = (response) => {
   if(response.ok) {
     return Promise.resolve(response);
+  } else if(response.status === 401) {
+    // FIXME: Force user back to the login screen when they
+    // have an invalid token, there should be a more graceful
+    // way of doing this I think.
+    removeAuthToken();
+    location.href = '/#/login';
   }
 
   return response.json().then(json => {

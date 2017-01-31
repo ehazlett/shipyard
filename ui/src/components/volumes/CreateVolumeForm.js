@@ -2,7 +2,7 @@ import React from 'react';
 
 import _ from 'lodash';
 import { Form, Header } from 'semantic-ui-react';
-import { Redirect } from 'react-router';
+import { Redirect } from "react-router-dom";
 
 import { createVolume } from '../../api';
 

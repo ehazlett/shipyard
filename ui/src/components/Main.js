@@ -1,34 +1,22 @@
 import React from "react";
 
-import { Redirect, Match } from "react-router";
+import { Redirect, Route } from "react-router-dom";
 import { Loader, Dimmer } from "semantic-ui-react";
 
 import Navigation from "./layout/Navigation";
-
 import WelcomeView from "./WelcomeView";
-import ServiceListView from "./services/ServiceListView";
-import CreateServiceView from "./services/CreateServiceView";
-import ServiceInspectView from "./services/ServiceInspectView";
-import ServiceInspectTaskView from "./services/ServiceInspectTaskView";
-import ContainerListView from "./containers/ContainerListView";
-import ContainerInspectView from "./containers/ContainerInspectView";
-import NodeListView from "./nodes/NodeListView";
-import NodeInspectView from "./nodes/NodeInspectView";
-import ImageListView from "./images/ImageListView";
-import ImageInspectView from "./images/ImageInspectView";
-import NetworkInspectView from "./networks/NetworkInspectView";
-import NetworkListView from "./networks/NetworkListView";
-import VolumeListView from "./volumes/VolumeListView";
-import VolumeInspectView from "./volumes/VolumeInspectView";
-import CreateVolumeView from "./volumes/CreateVolumeView";
-import AccountListView from "./accounts/AccountListView";
-import AccountInspectView from "./accounts/AccountInspectView";
+
+import ServicesView from "./services/ServicesView";
+import ContainersView from "./containers/ContainersView";
+import ImagesView from "./images/ImagesView";
+import NodesView from "./nodes/NodesView";
+import NetworksView from "./networks/NetworksView";
+import VolumesView from "./volumes/VolumesView";
+import SecretsView from "./secrets/SecretsView";
+
+import AccountsView from "./accounts/AccountsView";
+import RegistriesView from "./registries/RegistriesView";
 import SettingsView from "./settings/SettingsView";
-import AddRegistryView from "./registries/AddRegistryView";
-import RegistryListView from "./registries/RegistryListView";
-import RegistryInspectView from "./registries/RegistryInspectView";
-import SecretListView from "./secrets/SecretListView";
-import SecretInspectView from "./secrets/SecretInspectView";
 import AboutView from "./about/AboutView";
 
 import { getSwarm } from "../api";
@@ -106,39 +94,26 @@ class Main extends React.Component {
 
     return (
       <div id="Main">
-        <Match pattern="/welcome" component={WelcomeView} />
+        <Route path="/welcome" component={WelcomeView} />
 
         {location.pathname !== "/welcome" && (<Navigation signOut={this.signOut} username={"admin"} location={location} />)}
 
         <div className="ContentPane">
           {/* Default route for authorized user is the service list view */}
-          <Match exactly pattern="/" render={() => <Redirect to="/services" />} />
+          <Route exact path="/" render={() => <Redirect to="/services" />} />
 
+          <Route path="/services" component={ServicesView} />
+          <Route path="/containers" component={ContainersView} />
+          <Route path="/images" component={ImagesView} />
+          <Route path="/nodes" component={NodesView} />
+          <Route path="/networks" component={NetworksView} />
+          <Route path="/volumes" component={VolumesView} />
+          <Route path="/secrets" component={SecretsView} />
 
-          <Match exactly pattern="/accounts" component={AccountListView} />
-          <Match exactly pattern="/accounts/inspect/:id" component={AccountInspectView} />
-          <Match exactly pattern="/images" component={ImageListView} />
-          <Match exactly pattern="/images/inspect/:id" component={ImageInspectView} />
-          <Match exactly pattern="/containers" component={ContainerListView} />
-          <Match exactly pattern="/containers/inspect/:id" component={ContainerInspectView} />
-          <Match exactly pattern="/networks" component={NetworkListView} />
-          <Match exactly pattern="/networks/inspect/:id" component={NetworkInspectView} />
-          <Match exactly pattern="/nodes" component={NodeListView} />
-          <Match exactly pattern="/nodes/inspect/:id" component={NodeInspectView} />
-          <Match exactly pattern="/registries" component={RegistryListView} />
-          <Match exactly pattern="/registries/inspect/:id" component={RegistryInspectView} />
-          <Match exactly pattern="/registries/add" component={AddRegistryView} />
-          <Match exactly pattern="/secrets" component={SecretListView} />
-          <Match exactly pattern="/secrets/inspect/:id" component={SecretInspectView} />
-          <Match exactly pattern="/services" component={ServiceListView} />
-          <Match exactly pattern="/services/create" component={CreateServiceView} />
-          <Match exactly pattern="/services/inspect/:id" component={ServiceInspectView} />
-          <Match exactly pattern="/services/inspect/:serviceId/container/:id" component={ServiceInspectTaskView} />
-          <Match exactly pattern="/settings" component={SettingsView} />
-          <Match exactly pattern="/volumes" component={VolumeListView} />
-          <Match exactly pattern="/volumes/inspect/:name" component={VolumeInspectView} />
-          <Match exactly pattern="/volumes/create" component={CreateVolumeView} />
-          <Match exactly pattern="/about" component={AboutView} />
+          <Route path="/accounts" component={AccountsView} />
+          <Route path="/registries" component={RegistriesView} />
+          <Route exact path="/settings" component={SettingsView} />
+          <Route exact path="/about" component={AboutView} />
         </div>
         {redirect && <Redirect to={redirectTo}/>}
       </div>

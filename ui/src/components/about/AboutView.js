@@ -58,7 +58,7 @@ class SettingsView extends React.Component {
   };
 
   render() {
-    var { version, info, loading, activeSegment } = this.state;
+    const { version, info, loading, activeSegment } = this.state;
 
     if(loading) {
       return <div></div>;

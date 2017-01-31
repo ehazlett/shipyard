@@ -3,7 +3,7 @@ import React from "react";
 import { Input, Button, Grid, Checkbox } from "semantic-ui-react";
 import { Table, Tr, Td } from "reactable";
 import taskStates from "./TaskStates";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import _ from "lodash";
 
 import { listServices, listTasks, removeService } from "../../api";

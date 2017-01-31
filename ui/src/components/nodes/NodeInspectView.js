@@ -3,7 +3,7 @@ import React from 'react';
 import { Message, Container, Grid, Icon } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import TaskStates from '../services/TaskStates';
-import { Link } from 'react-router';
+import { Link } from "react-router-dom";
 import _ from 'lodash';
 import moment from 'moment';
 

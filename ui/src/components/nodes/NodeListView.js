@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button, Icon, Checkbox, Input, Grid } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
-import { Link } from 'react-router';
+import { Link } from "react-router-dom";
 import _ from 'lodash';
 
 import { listNodes, removeNode } from '../../api';

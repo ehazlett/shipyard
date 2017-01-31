@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Link } from 'react-router';
+import { Link } from "react-router-dom";
 import { Button, Input, Grid, Checkbox } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
 import _ from 'lodash';
