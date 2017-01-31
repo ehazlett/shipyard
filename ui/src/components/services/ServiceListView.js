@@ -100,13 +100,13 @@ class ServiceListView extends React.Component {
         <Td column="" className="collapsing">
           <Checkbox checked={selected} onChange={() => { this.selectItem(service.ID) }} />
         </Td>
-        <Td column="Tasks" className="collapsing">
+        <Td column="Tasks" className="collapsing" value={summary.green ? summary.green : "0"}>
           <div>
             {(summary.green ? summary.green : "0")}
             {(service.Spec.Mode.Replicated ? ` / ${service.Spec.Mode.Replicated.Replicas}` : "")}
           </div>
         </Td>
-        <Td column="ID" className="collapsing">
+        <Td column="ID" className="collapsing" value={service.ID}>
           <Link to={`/services/inspect/${service.ID}`}>{service.ID.substring(0, 12)}</Link>
         </Td>
         <Td column="Name">{service.Spec.Name}</Td>
@@ -157,9 +157,10 @@ class ServiceListView extends React.Component {
           <Grid.Column width={16}>
             {error && (<Message error>{JSON.stringify(error)}</Message>)}
             <Table
-              className="ui compact celled sortable unstackable table"
+              className="ui compact celled unstackable table"
               ref="table"
-              sortable
+              sortable={["Tasks", "ID", "Name", "Image"]}
+              defaultSort={{column: 'Name', direction: 'asc'}}
               filterable={["ID", "Name", "Image"]}
               hideFilterInput
               noDataText="Couldn't find any services">

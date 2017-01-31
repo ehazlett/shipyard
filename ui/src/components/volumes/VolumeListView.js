@@ -81,7 +81,7 @@ class VolumeListView extends React.Component {
           <Checkbox checked={selected} onChange={() => { this.selectItem(volume.Name) }} />
         </Td>
         <Td column="Driver">{volume.Driver}</Td>
-        <Td column="Name"><Link to={`/volumes/inspect/${volume.Name}`}>{volume.Name}</Link></Td>
+        <Td column="Name" value={volume.Name}><Link to={`/volumes/inspect/${volume.Name}`}>{volume.Name}</Link></Td>
         <Td column="Scope">{volume.Scope}</Td>
       </Tr>
     );
@@ -115,8 +115,9 @@ class VolumeListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
+              className="ui compact celled unstackable table"
+              sortable={["Driver", "Name", "Scope"]}
+              defaultSort={{column: 'Name', direction: 'asc'}}
               filterable={[]}
               noDataText="Couldn't find any volumes"
             >

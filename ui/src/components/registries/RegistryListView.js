@@ -37,7 +37,7 @@ class RegistryListView extends React.Component {
   renderRow = (registry, tagIndex) => {
     return (
       <Tr key={registry.id}>
-        <Td column="ID" className="collapsing">
+        <Td column="ID" value={registry.id} className="collapsing">
           <Link to={`/registries/inspect/${registry.id}`}>
             {registry.id.substring(0, 8)}
           </Link>
@@ -90,8 +90,9 @@ class RegistryListView extends React.Component {
             {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
+              className="ui compact celled unstackable table"
+              sortable={["ID", "Name", "Address"]}
+              defaultSort={{column: 'Name', direction: 'asc'}}
               filterable={["ID", "Name", "Address"]}
               hideFilterInput
               noDataText="Couldn't find any registries"

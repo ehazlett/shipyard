@@ -88,8 +88,9 @@ class RegistryInspectView extends React.Component {
           <Grid.Column className="ui sixteen wide basic segment">
             <Table
               ref="table"
-              className="ui compact celled sortable unstackable table"
-              sortable
+              className="ui compact celled unstackable table"
+              defaultSort={{column: 'Name', direction: 'asc'}}
+              sortable={["Name", "Tag"]}
               filterable={["Name"]}
               hideFilterInput
               noDataText="Couldn't find any registries"

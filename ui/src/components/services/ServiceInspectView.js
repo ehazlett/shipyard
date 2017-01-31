@@ -92,7 +92,7 @@ class ServiceListView extends React.Component {
         <Td column="ID" className="collapsing">
           {t.ID.substring(0, 12)}
         </Td>
-        <Td column="Container ID" className="collapsing">
+        <Td column="Container ID" value={t.Status.ContainerStatus.ContainerID} className="collapsing">
           {
             t.Status.ContainerStatus.ContainerID ?
             <Link to={`/services/inspect/${s.ID}/container/${t.Status.ContainerStatus.ContainerID}`}>{t.Status.ContainerStatus.ContainerID.substring(0, 12)}</Link> :
@@ -105,10 +105,10 @@ class ServiceListView extends React.Component {
         <Td column="Image">
           {shortenImageName(t.Spec.ContainerSpec.Image)}
         </Td>
-        <Td column="Last Status Update" className="collapsing">
+        <Td column="Last Status Update" value={t.Status.Timestamp} className="collapsing">
           {new Date(t.Status.Timestamp).toLocaleString()}
         </Td>
-        <Td column="Node">
+        <Td column="Node" value={this.state.nodes[t.NodeID]}>
           {this.state.nodes[t.NodeID] ? this.state.nodes[t.NodeID].Description.Hostname : null}
         </Td>
       </Tr>
@@ -414,9 +414,10 @@ class ServiceListView extends React.Component {
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
               <Table
-                className="ui compact celled sortable unstackable table"
+                className="ui compact celled unstackable table"
                 ref="table"
-                sortable
+                sortable={["ID", "Container ID", "Name", "Image", "Last Status Update", "Node"]}
+                defaultSort={{column: 'Name', direction: 'asc'}}
                 filterable={['ID', 'Name', 'Image', 'Command']}
                 hideFilterInput
                 noDataText="Couldn't find any tasks"
