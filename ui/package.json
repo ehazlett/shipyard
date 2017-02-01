@@ -24,6 +24,7 @@
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
     "reactable": "^0.14.1",
+    "react-table": "^3.1.0",
     "semantic-ui-css": "^2.2.4",
     "semantic-ui-react": "^0.64.3",
     "xterm": "^2.2.3"

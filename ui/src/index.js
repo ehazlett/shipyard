@@ -1,6 +1,7 @@
 import './vendor.js';
 import '../node_modules/semantic-ui-css/semantic.css';
 import '../node_modules/semantic-ui-css/semantic.js';
+import '../node_modules/react-table/react-table.css';
 
 import React from 'react';
 import { render } from 'react-dom';
