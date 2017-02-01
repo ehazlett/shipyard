@@ -15,7 +15,7 @@ class VolumeInspectView extends React.Component {
   };
 
   componentDidMount() {
-    const { name } = this.props.params;
+    const { name } = this.props.match.params;
     inspectVolume(name)
       .then((volume) => {
         this.setState({

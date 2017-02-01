@@ -5,6 +5,7 @@ import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
+import Loader from "../common/Loader";
 import { listContainers, removeContainer } from '../../api';
 import { shortenImageName, showError } from '../../lib';
 
@@ -16,7 +17,17 @@ class ContainerListView extends React.Component {
   };
 
   componentDidMount() {
-    this.getContainers();
+    this.getContainers()
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   }
 
   getContainers = () => {
@@ -24,15 +35,11 @@ class ContainerListView extends React.Component {
       .then((containers) => {
         this.setState({
           containers: containers.body,
-          loading: false,
         });
       })
       .catch((err) => {
         /* TODO: If something went wrong here, should probably redirect to an error page. */
         showError(err);
-        this.setState({
-          loading: false,
-        });
       });
   }
 
@@ -74,7 +81,7 @@ class ContainerListView extends React.Component {
     const { loading, selected, containers } = this.state;
 
     if(loading) {
-      return <div></div>;
+      return <Loader />;
     }
 
     const columns = [{

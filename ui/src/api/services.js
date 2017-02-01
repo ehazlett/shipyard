@@ -35,8 +35,8 @@ export function createService(spec) {
     .then(jsonHandler);
 }
 
-export function updateService(id, spec) {
-  const url = `/services/${id}/update`;
+export function updateService(id, spec, version) {
+  const url = `/services/${id}/update?version=${version}`;
   return fetch(url, {
     method: 'POST',
     headers: {

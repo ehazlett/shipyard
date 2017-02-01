@@ -15,7 +15,7 @@ class SecretInspectView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
     inspectSecret(id)
       .then((secret) => {
         this.setState({

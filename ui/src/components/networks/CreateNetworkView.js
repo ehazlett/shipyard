@@ -3,22 +3,22 @@ import React from 'react';
 import { Container, Grid, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
-import CreateVolumeForm from './CreateVolumeForm';
+import CreateNetworkForm from './CreateNetworkForm';
 
-const CreateVolumeView = (props) => (
+const CreateNetworkView = (props) => (
   <Container>
     <Grid>
       <Grid.Row>
         <Grid.Column width={16}>
           <Segment basic>
             <div className="ui breadcrumb">
-              <Link to="/volumes" className="section">Volumes</Link>
+              <Link to="/networks" className="section">Networks</Link>
               <div className="divider"> / </div>
-              <div className="active section">Create a new volume</div>
+              <div className="active section">Create a new network</div>
             </div>
           </Segment>
           <Segment basic>
-            <CreateVolumeForm {...props} />
+            <CreateNetworkForm {...props} />
           </Segment>
         </Grid.Column>
       </Grid.Row>
@@ -26,4 +26,4 @@ const CreateVolumeView = (props) => (
   </Container>
 );
 
-export default CreateVolumeView;
+export default CreateNetworkView;

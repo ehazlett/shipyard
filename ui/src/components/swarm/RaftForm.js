@@ -1,55 +1,57 @@
-import React from 'react';
+import React, { PropTypes, Component } from 'react';
 
-import { Message, Form, Segment } from 'semantic-ui-react';
+import _ from 'lodash';
 
-import { getSwarm } from '../../api';
+import { Form as FormsyForm } from 'formsy-react';
+import { Input } from 'formsy-semantic-ui-react';
+import { Form, Segment } from 'semantic-ui-react';
 
-class RaftForm extends React.Component {
-  state = {
-    swarm: null,
-    error: null,
-    loading: true,
+import { updateSpecFromInput } from '../../lib';
+
+class RaftForm extends Component {
+
+  static PropTypes = {
+    swarm: PropTypes.object.isRequired,
   };
 
-  componentDidMount() {
-    this.getSwarmSettings();
+  // When we detect a change, pass the changes to the parent
+  onChangeHandler = (e, input) => {
+    if(this.props.onChange) {
+      this.props.onChange(e, updateSpecFromInput(input, this.props.swarm.Spec));
+    }
   }
 
-  getSwarmSettings = () => {
-    getSwarm()
-      .then((swarm) => {
-        this.setState({
-          error: null,
-          swarm: swarm.body,
-          loading: false,
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          error,
-          loading: false,
-        });
-      });
-  };
-
   render() {
-    const { swarm, error, loading } = this.state;
+    const { Spec } = this.props.swarm;
 
-    if(loading) {
+    if(!Spec) {
       return <div></div>;
     }
 
     return (
       <Segment basic>
-        <Form>
-          <Message error/>
-          {error && (<Message negative>{error}</Message>)}
-          <Form.Input label="Election tick" value={swarm.Spec.Raft.ElectionTick} type="number" readOnly />
-          <Form.Input label="Heartbeat tick" value={swarm.Spec.Raft.HeartbeatTick} type="number" readOnly />
-          <Form.Input label="Snapshot interval" value={swarm.Spec.Raft.SnapshotInterval} type="number" readOnly />
-          <Form.Input label="Number of old snapshots to keep" value={swarm.Spec.Raft.KeepOldSnapshots} type="number" readOnly />
-          <Form.Input label="Log entries for slow followers" value={swarm.Spec.Raft.LogEntriesForSlowFollowers} type="number" readOnly />
-        </Form>
+        <FormsyForm className="ui form">
+          <Form.Field>
+            <label>Election Tick</label>
+            <Input name="Raft.ElectionTick" value={_.get(Spec, "Raft.ElectionTick", "")} onChange={this.onChangeHandler} type="number" />
+          </Form.Field>
+          <Form.Field>
+            <label>Heartbeat Tick</label>
+            <Input name="Raft.HeartbeatTick" value={_.get(Spec, "Raft.HeartbeatTick", "")} onChange={this.onChangeHandler} type="number" />
+          </Form.Field>
+          <Form.Field>
+            <label>Snapshot Interval</label>
+            <Input name="Raft.SnapshotInterval" value={_.get(Spec, "Raft.SnapshotInterval", "")} onChange={this.onChangeHandler} type="number" />
+          </Form.Field>
+          <Form.Field>
+            <label>Number of Old Snapshots to Keep</label>
+            <Input name="Raft.KeepOldSnapshots" value={_.get(Spec, "Raft.KeepOldSnapshots", "")} onChange={this.onChangeHandler} type="number" />
+          </Form.Field>
+          <Form.Field>
+            <label>Log Entries for Slow Followers</label>
+            <Input name="Raft.LogEntriesForSlowFollowers" value={_.get(Spec, "Raft.LogEntriesForSlowFollowers", "")} onChange={this.onChangeHandler} type="number" />
+          </Form.Field>
+        </FormsyForm>
       </Segment>
     );
   }

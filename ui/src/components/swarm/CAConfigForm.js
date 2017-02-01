@@ -1,56 +1,43 @@
+import React, { PropTypes, Component } from 'react';
 
-import React from 'react';
+import _ from 'lodash';
 
-import { Message, Form, Segment } from 'semantic-ui-react';
+import { Form as FormsyForm } from 'formsy-react';
+import { Input } from 'formsy-semantic-ui-react';
+import { Form, Segment } from 'semantic-ui-react';
 
-import { getSwarm } from '../../api';
+import { updateSpecFromInput } from '../../lib';
 
-class CAConfigForm extends React.Component {
-  state = {
-    swarm: null,
-    error: null,
-    loading: true,
+export default class CAConfigForm extends Component {
+
+  static PropTypes = {
+    swarm: PropTypes.object.isRequired,
   };
 
-  componentDidMount() {
-    this.getSwarmSettings();
+  // When we detect a change, pass the changes to the parent
+  onChangeHandler = (e, input) => {
+    if(this.props.onChange) {
+      this.props.onChange(e, updateSpecFromInput(input, this.props.swarm.Spec));
+    }
   }
 
-  getSwarmSettings = () => {
-    getSwarm()
-      .then((swarm) => {
-        this.setState({
-          error: null,
-          swarm: swarm.body,
-          loading: false,
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          error,
-          loading: false,
-        });
-      });
-  };
-
   render() {
-    const { swarm, error, loading } = this.state;
+    const { Spec } = this.props.swarm;
 
-    if(loading) {
+    if(!Spec) {
       return <div></div>;
     }
 
     return (
       <Segment basic>
-        <Form>
-          <Message error/>
-          {error && (<Message negative>{error}</Message>)}
-          <Form.Input label="Node cert expiration time" value={swarm.Spec.CAConfig.NodeCertExpiry} readOnly />
+        <FormsyForm className="ui form">
+          <Form.Field>
+            <label>Node Certificate Expiration Time (seconds)</label>
+            <Input name="CAConfig.NodeCertExpiry" value={_.get(Spec, "CAConfig.NodeCertExpiry", "")} onChange={this.onChangeHandler} type="number" />
+          </Form.Field>
           {/* TODO: ExternalCAs configuration */}
-        </Form>
+        </FormsyForm>
       </Segment>
     );
   }
 }
-
-export default CAConfigForm;

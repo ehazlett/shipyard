@@ -15,7 +15,7 @@ class NetworkInspectView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
     inspectNetwork(id)
       .then((network) => {
         this.setState({

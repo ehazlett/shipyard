@@ -20,7 +20,7 @@ class NodeListView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
 
     inspectNode(id)
       .then((node) => {

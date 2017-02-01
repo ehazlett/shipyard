@@ -5,6 +5,7 @@ import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
+import Loader from "../common/Loader";
 import { listNetworks, removeNetwork } from '../../api';
 import { showError } from '../../lib';
 
@@ -16,7 +17,17 @@ class NetworkListView extends React.Component {
   };
 
   componentDidMount() {
-    this.getNetworks();
+    this.getNetworks()
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   }
 
   getNetworks = () => {
@@ -74,7 +85,7 @@ class NetworkListView extends React.Component {
     const { loading, networks, selected } = this.state;
 
     if(loading) {
-      return <div></div>;
+      return <Loader />;
     }
 
     const columns = [{

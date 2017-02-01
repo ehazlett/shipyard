@@ -14,7 +14,7 @@ class AccountInspectView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
     inspectAccount(id)
       .then((account) => {
         this.setState({

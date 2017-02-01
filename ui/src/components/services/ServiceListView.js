@@ -6,6 +6,7 @@ import taskStates from "./TaskStates";
 import { Link } from "react-router-dom";
 import _ from "lodash";
 
+import Loader from "../common/Loader";
 import { listServices, listTasks, removeService } from "../../api";
 import { shortenImageName, showError } from "../../lib";
 
@@ -18,8 +19,18 @@ class ServiceListView extends React.Component {
   };
 
   componentDidMount() {
-    this.getServices();
-    this.getTasks();
+    Promise.all(
+      this.getServices(),
+      this.getTasks()
+    ).then(() => {
+      this.setState({
+        loading: false,
+      });
+    }).catch(() => {
+      this.setState({
+        loading: false,
+      });
+    });
   }
 
   getServices = () => {
@@ -27,15 +38,11 @@ class ServiceListView extends React.Component {
       .then((services) => {
         this.setState({
           services: services.body,
-          loading: false,
         });
       })
       .catch((err) => {
         /* TODO: If something went wrong here, should probably redirect to an error page. */
         showError(err);
-        this.setState({
-          loading: false,
-        });
       });
   }
 
@@ -107,7 +114,7 @@ class ServiceListView extends React.Component {
     });
 
     if(loading) {
-      return <div></div>;
+      return <Loader />;
     }
 
     const columns = [{
@@ -121,7 +128,7 @@ class ServiceListView extends React.Component {
           header: 'ID',
           accessor: 'ID',
           render: row => {
-            return <Link to={`/containers/inspect/${row.row.ID}`}>{row.row.ID.substring(0, 12)}</Link>
+            return <Link to={`/services/inspect/${row.row.ID}`}>{row.row.ID.substring(0, 12)}</Link>
           },
           sortable: true
         }, {

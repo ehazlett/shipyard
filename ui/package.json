@@ -11,6 +11,8 @@
   },
   "proxy": "http://controller:8080",
   "dependencies": {
+    "formsy-react": "^0.19.2",
+    "formsy-semantic-ui-react": "^0.1.4",
     "jquery": "^2.2.3 || ^3.0.0",
     "lodash": "^4.16.6",
     "moment": "^2.16.0",

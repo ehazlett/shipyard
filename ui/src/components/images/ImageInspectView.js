@@ -17,7 +17,7 @@ class ImageInspectView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
     inspectImage(id)
       .then((image) => {
         this.setState({

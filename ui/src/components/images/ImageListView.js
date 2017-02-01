@@ -5,6 +5,7 @@ import ReactTable from 'react-table';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
+import Loader from "../common/Loader";
 import { listImages, removeImage } from '../../api';
 import { showError, getReadableFileSizeString } from '../../lib';
 
@@ -16,7 +17,17 @@ class ImageListView extends React.Component {
   };
 
   componentDidMount() {
-    this.getImages();
+    this.getImages()
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   }
 
   getImages = () => {
@@ -24,15 +35,11 @@ class ImageListView extends React.Component {
       .then((images) => {
         this.setState({
           images: images.body,
-          loading: false,
         });
       })
       .catch((err) => {
         /* TODO: If something went wrong here, should probably redirect to an error page. */
         showError(err);
-        this.setState({
-          loading: false,
-        });
       });
   };
 
@@ -73,7 +80,7 @@ class ImageListView extends React.Component {
     const { loading, selected, images } = this.state;
 
     if(loading) {
-      return <div></div>;
+      return <Loader />;
     }
 
     const columns = [{

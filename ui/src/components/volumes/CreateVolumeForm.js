@@ -3,62 +3,67 @@ import React from 'react';
 import _ from 'lodash';
 import { Form, Header } from 'semantic-ui-react';
 import { Redirect } from "react-router-dom";
+import { Form as FormsyForm } from 'formsy-react';
+import { Input } from 'formsy-semantic-ui-react';
 
+import InputGroup from '../common/InputGroup';
+import { showError, showSuccess } from '../../lib';
 import { createVolume } from '../../api';
 
 export default class CreateVolumeForm extends React.Component {
   state = {
-    error: null,
     loading: false,
     redirect: false,
     redirectTo: '',
   };
 
 
-  createVolume = (e, values) => {
-    const driverOpts = {};
-
-    if (values.formData.DriverOpts !== '') {
-      const opts = values.formData.DriverOpts.split(' ');
-      _.forEach(opts, (o) => {
-        const opt = o.split('=');
-        driverOpts[opt[0]] = opt[1];
-      });
-    }
-
+  createVolume = (values) => {
     createVolume({
-      Name: values.formData.Name,
-      Driver: values.formData.Driver,
-      DriverOpts: driverOpts,
+      Name: values.Name,
+      Driver: values.Driver,
+      DriverOpts: _.chain(values.DriverOptions)
+        .filter(v => { return v.Name })
+        .keyBy('Name')
+        .mapValues(v => { return v.Value })
+        .value(),
     }).then((success) => {
         this.setState({
-          error: null,
-          loading: false,
           redirect: true,
           redirectTo: `/volumes`,
         });
+        showSuccess("Successfully created volume");
       })
-      .catch((error) => {
-        this.setState({
-          error,
-          loading: false
-        });
+      .catch((err) => {
+        showError(err);
       });
-
-    e.preventDefault();
   }
 
   render() {
     const {redirect, redirectTo} = this.state;
     return (
-      <Form className="ui form" onSubmit={this.createVolume}>
+      <FormsyForm className="ui form" onValidSubmit={this.createVolume}>
         {redirect && <Redirect to={redirectTo}/>}
+
         <Header>Create a Volume</Header>
-        <Form.Input name="Name" label="Name" placeholder="volume-name"></Form.Input>
-        <Form.Input name="Driver" label="Driver" placeholder="local" defaultValue="local"></Form.Input>
-        <Form.Input name="DriverOpts" label="Driver Options" placeholder="e.g. key1=value1 key2=value2"></Form.Input>
+
+        <Form.Field>
+          <label>Name</label>
+          <Input name="Name" placeholder="volume-name" required></Input>
+        </Form.Field>
+
+        <Form.Field>
+          <label>Volume Driver</label>
+          <Input name="Driver" placeholder="local"></Input>
+        </Form.Field>
+
+        <Form.Field>
+          <Header size="tiny">Driver Options</Header>
+          <InputGroup inputName="DriverOptions" friendlyName="Driver Option" columns={["Name", "Value"]} />
+        </Form.Field>
+
         <Form.Button color="green">Create Volume</Form.Button>
-      </Form>
+      </FormsyForm>
     );
   }
 }
