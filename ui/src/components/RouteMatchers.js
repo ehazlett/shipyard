@@ -1,12 +1,12 @@
 import React from 'react';
-import { Match, Redirect } from 'react-router';
+import { Route, Redirect } from "react-router-dom";
 import { Breadcrumb, Segment } from 'semantic-ui-react'
 
 import { getAuthToken } from '../services/auth';
 
-export const MatchWhenAuthorized = ({ component: Component, user, ...rest }) => {
+export const RouteWhenAuthorized = ({ component: Component, user, ...rest }) => {
   return (
-    <Match {...rest} render={props => (
+    <Route {...rest} render={props => (
       getAuthToken() ? (
         <Component {...props}/>
       ) : (
@@ -24,9 +24,9 @@ export const MatchWhenAuthorized = ({ component: Component, user, ...rest }) => 
 //   { key: 'info', content: 'Personal Information', active: true },
 // ];
 //
-export const MatchWithBreadcrumbs = ({ component: Component, breadcrumbs, ...rest }) => {
+export const RouteWithBreadcrumbs = ({ component: Component, breadcrumbs, ...rest }) => {
   return (
-    <Match {...rest} render={props => {
+    <Route {...rest} render={props => {
         return (
           <Segment basic>
             <Breadcrumb divider='/' sections={breadcrumbs} />

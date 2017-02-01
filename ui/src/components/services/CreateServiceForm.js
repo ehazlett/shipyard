@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Message, Header, Divider, List, Button } from "semantic-ui-react";
-import { Redirect } from "react-router";
+import { Redirect } from "react-router-dom";
 
 import Form from "../common/Form";
 import { createService, dockerErrorHandler } from "../../api";

@@ -1,30 +1,25 @@
 import React from 'react';
 
-import { Message, Grid, Header, Form, Container } from 'semantic-ui-react';
-import { Redirect } from 'react-router';
+import { Accordion, Icon, Grid, Header, Form, Container } from 'semantic-ui-react';
+import { Redirect } from "react-router-dom";
 
 import { initSwarm } from '../api/swarm';
+import { showError, showSuccess } from '../lib';
 
 export default class WelcomeView extends React.Component {
   state = {
-    error: null,
     initialized: false,
   };
 
   handleSwarmInitSuccess = () => {
     this.setState({
-      error: null,
       initialized: true,
     });
+    showSuccess('Successfully initialized swarm mode');
   };
 
-  handleSwarmInitError = (error) => {
-    error.response.json()
-      .then((json) => {
-        this.setState({
-          error: json.message,
-        });
-      });
+  handleSwarmInitError = (err) => {
+    showError(err);
   };
 
   swarmInit = (e, values) => {
@@ -46,30 +41,40 @@ export default class WelcomeView extends React.Component {
   };
 
   render() {
-    const { error, initialized } = this.state;
+    const { initialized } = this.state;
     return (
       <Container className="center middle aligned">
         {initialized && <Redirect to="/" />}
-        <Grid centered>
-          <Grid.Row>
-            <Grid.Column width={8} textAlign="center">
-              <Header as="h2">
-                <Header.Content>Welcome to Shipyard!</Header.Content>
-                <Header.Subheader>To start using Docker Swarm you will need to initialize your swarm cluster, press the button below to get started.</Header.Subheader>
-              </Header>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Column width={8}>
-              <Form onSubmit={this.swarmInit}>
-                <Message error />
-                {error && <Message negative>{error}</Message>}
-                <Form.Input name="advertiseAddr" label="Advertise Address" placeholder="Auto-detect advertise address" />
-                <Form.Button fluid color="green">Initialize</Form.Button>
-              </Form>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
+        <Form onSubmit={this.swarmInit}>
+          <Grid centered>
+            <Grid.Row>
+              <Grid.Column width={8} textAlign="center">
+                <Header as="h2">
+                  <Header.Content>Welcome to Shipyard!</Header.Content>
+                  <Header.Subheader>To start using Docker Swarm you will need to initialize your swarm cluster, press the button below to get started.</Header.Subheader>
+                </Header>
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column width={8}>
+                <Accordion fluid styled>
+                  <Accordion.Title>
+                    <Icon name='dropdown'></Icon>
+                    Advanced Options
+                  </Accordion.Title>
+                  <Accordion.Content>
+                    <Form.Input name="advertiseAddr" label="Advertise Address" placeholder="Auto-detect advertise address" />
+                  </Accordion.Content>
+                </Accordion>
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Column width={8}>
+                  <Form.Button fluid color="green">Initialize</Form.Button>
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Form>
       </Container>
     );
   }

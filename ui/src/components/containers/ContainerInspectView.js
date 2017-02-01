@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Segment, Container, Grid } from 'semantic-ui-react';
-import { Link } from 'react-router';
+import { Link } from "react-router-dom";
 import _ from 'lodash';
 
 import ContainerInspect from './ContainerInspect';

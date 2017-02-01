@@ -1,33 +1,69 @@
 import React from 'react';
 
-import { Message, Input, Grid, Icon } from 'semantic-ui-react';
+import { Button, Icon, Checkbox, Input, Grid } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
-import { Link } from 'react-router';
+import { Link } from "react-router-dom";
+import _ from 'lodash';
 
-import { listNodes } from '../../api';
+import { listNodes, removeNode } from '../../api';
+import { showError } from '../../lib';
 
 class NodeListView extends React.Component {
   state = {
-    error: null,
     nodes: [],
+    selected: [],
     loading: true,
   };
 
   componentDidMount() {
-    listNodes()
+    this.getNodes();
+  }
+
+  getNodes = () => {
+    return listNodes()
       .then((nodes) => {
         this.setState({
-          error: null,
           nodes: nodes.body,
           loading: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        /* TODO: If something went wrong here, should probably redirect to an error page. */
+        showError(err);
         this.setState({
-          error,
           loading: false,
         });
       });
+  };
+
+  removeSelected = () => {
+    let promises = _.map(this.state.selected, removeNode);
+
+    this.setState({
+      selected: []
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        this.getNodes();
+      })
+      .catch((err) => {
+        showError(err);
+        this.getNodes();
+      });
+  }
+
+  selectItem = (id) => {
+    let i = this.state.selected.indexOf(id);
+    if (i > -1) {
+      this.setState({
+        selected: this.state.selected.slice(i+1, 1)
+      });
+    } else {
+      this.setState({
+        selected: [...this.state.selected, id]
+      });
+    }
   }
 
   updateFilter = (input) => {
@@ -35,8 +71,12 @@ class NodeListView extends React.Component {
   }
 
   renderNode = (node) => {
+    let selected = this.state.selected.indexOf(node.ID) > -1;
     return (
-      <Tr key={node.ID}>
+      <Tr className={selected ? "active" : ""} key={node.ID}>
+        <Td column="&nbsp;" className="collapsing">
+          <Checkbox checked={selected} onChange={() => { this.selectItem(node.ID) }} />
+        </Td>
         <Td column="" className="collapsing">
           <Icon fitted className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
         </Td>
@@ -54,7 +94,7 @@ class NodeListView extends React.Component {
   }
 
   render() {
-    const { loading, error, nodes } = this.state;
+    const { loading, selected, nodes } = this.state;
 
     if(loading) {
       return <div></div>;
@@ -67,18 +107,18 @@ class NodeListView extends React.Component {
             <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
-            { /* _.isEmpty(selected) ?
-              <Button color="green" icon="add" content="Add Node" /> :
-              <span>
-                <b>{selected.length} Nodes Selected: </b>
-                <Button color="red" onClick={this.removeSelected} content="Remove" />
-              </span>
-            */}
+            {
+              _.isEmpty(selected) ?
+                <Button color="green" icon="add" content="Add Node" /> :
+                <span>
+                  <b>{selected.length} Nodes Selected: </b>
+                  <Button color="red" onClick={this.removeSelected} content="Remove" />
+                </span>
+            }
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
               className="ui compact celled unstackable table"

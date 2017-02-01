@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Redirect } from 'react-router';
+import { Redirect } from "react-router-dom";
 import { Divider, Grid, Header } from 'semantic-ui-react';
 
 import LoginForm from "./LoginForm";

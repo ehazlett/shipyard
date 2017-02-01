@@ -1,33 +1,69 @@
 import React from 'react';
 
-import { Message, Input, Grid } from 'semantic-ui-react';
+import { Button, Checkbox, Input, Grid } from 'semantic-ui-react';
 import { Table, Tr, Td } from 'reactable';
-import { Link } from 'react-router';
+import { Link } from "react-router-dom";
+import _ from 'lodash';
 
-import { listNetworks } from '../../api';
+import { listNetworks, removeNetwork } from '../../api';
+import { showError } from '../../lib';
 
 class NetworkListView extends React.Component {
   state = {
-    error: null,
     networks: [],
+    selected: [],
     loading: true,
   };
 
   componentDidMount() {
-    listNetworks()
+    this.getNetworks();
+  }
+
+  getNetworks = () => {
+    return listNetworks()
       .then((networks) => {
         this.setState({
-          error: null,
           networks: networks.body,
           loading: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        /* TODO: If something went wrong here, should probably redirect to an error page. */
+        showError(err);
         this.setState({
-          error,
           loading: false,
         });
       });
+  };
+
+  removeSelected = () => {
+    let promises = _.map(this.state.selected, removeNetwork);
+
+    this.setState({
+      selected: []
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        this.getNetworks();
+      })
+      .catch((err) => {
+        showError(err);
+        this.getNetworks();
+      });
+  }
+
+  selectItem = (id) => {
+    let i = this.state.selected.indexOf(id);
+    if (i > -1) {
+      this.setState({
+        selected: this.state.selected.slice(i+1, 1)
+      });
+    } else {
+      this.setState({
+        selected: [...this.state.selected, id]
+      });
+    }
   }
 
   updateFilter = (input) => {
@@ -35,8 +71,12 @@ class NetworkListView extends React.Component {
   };
 
   renderNetwork = (network) => {
+    let selected = this.state.selected.indexOf(network.Id) > -1;
     return (
-      <Tr key={network.Id}>
+      <Tr className={selected ? "active" : ""} key={network.Id}>
+        <Td column="" className="collapsing">
+          <Checkbox checked={selected} onChange={() => { this.selectItem(network.Id) }} />
+        </Td>
         <Td column="Id" value={network.Id} className="collapsing">
           <Link to={`/networks/inspect/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
         </Td>
@@ -48,7 +88,7 @@ class NetworkListView extends React.Component {
   };
 
   render() {
-    const { loading, error, networks } = this.state;
+    const { loading, networks, selected } = this.state;
 
     if(loading) {
       return <div></div>;
@@ -61,18 +101,18 @@ class NetworkListView extends React.Component {
             <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
-            { /* _.isEmpty(selected) ?
-              <Button as={Link} to="/networks/create" color="green" icon="add" content="Create" /> :
-              <span>
-                <b>{selected.length} Networks Selected: </b>
-                <Button color="red" onClick={this.removeSelected} content="Remove" />
-              </span>
-            */}
+            {
+              _.isEmpty(selected) ?
+                <Button as={Link} to="/networks/create" color="green" icon="add" content="Create" /> :
+                <span>
+                  <b>{selected.length} Networks Selected: </b>
+                  <Button color="red" onClick={this.removeSelected} content="Remove" />
+                </span>
+            }
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            {error && (<Message error>{error}</Message>)}
             <Table
               ref="table"
               className="ui compact celled unstackable table"

@@ -1,20 +1,19 @@
 import React from "react";
 
-import { Input, Button, Message, Grid, Checkbox } from "semantic-ui-react";
+import { Input, Button, Grid, Checkbox } from "semantic-ui-react";
 import { Table, Tr, Td } from "reactable";
 import taskStates from "./TaskStates";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import _ from "lodash";
 
 import { listServices, listTasks, removeService } from "../../api";
-import { shortenImageName } from "../../lib";
+import { shortenImageName, showError } from "../../lib";
 
 class ServiceListView extends React.Component {
   state = {
     services: [],
     tasks: [],
     loading: true,
-    error: null,
     selected: [],
   };
 
@@ -27,14 +26,14 @@ class ServiceListView extends React.Component {
     return listServices()
       .then((services) => {
         this.setState({
-          error: null,
           services: services.body,
           loading: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        /* TODO: If something went wrong here, should probably redirect to an error page. */
+        showError(err);
         this.setState({
-          error,
           loading: false,
         });
       });
@@ -44,14 +43,12 @@ class ServiceListView extends React.Component {
     return listTasks()
       .then((tasks) => {
         this.setState({
-          error: null,
           tasks: tasks.body,
         });
       })
-      .catch((error) => {
-        this.setState({
-          error,
-        });
+      .catch((err) => {
+        /* TODO: If something went wrong here, should probably redirect to an error page. */
+        showError(err);
       });
   }
 
@@ -68,9 +65,7 @@ class ServiceListView extends React.Component {
         this.getTasks();
       })
       .catch((err) => {
-        this.setState({
-          error: err,
-        });
+        showError(err);
         this.getServices();
         this.getTasks();
       });
@@ -116,7 +111,7 @@ class ServiceListView extends React.Component {
   }
 
   render() {
-    const { loading, error, services, tasks, selected } = this.state;
+    const { loading, services, tasks, selected } = this.state;
 
     const tasksByService = {};
     _.forEach(tasks, function (task) {
@@ -155,7 +150,6 @@ class ServiceListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            {error && (<Message error>{JSON.stringify(error)}</Message>)}
             <Table
               className="ui compact celled unstackable table"
               ref="table"
