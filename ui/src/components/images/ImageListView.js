@@ -74,6 +74,14 @@ class ImageListView extends React.Component {
     }
 
     const columns = [{
+      render: row => {
+        let selected = this.state.selected.indexOf(row.rowValues.Id) > -1;
+        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.rowValues.Id) }}
+                  className={selected ? "active" : ""} key={row.rowValues.Id}/>
+      },
+      sortable: false
+    },
+    {
       header: 'Repository',
       accessor: 'RepoTags[0]',
       render: row => {
@@ -131,7 +139,6 @@ class ImageListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            {error && (<Message error>{error}</Message>)}
             <ReactTable
                   data={images}
                   columns={columns}
