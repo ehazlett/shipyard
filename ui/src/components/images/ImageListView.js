@@ -66,6 +66,9 @@ class ImageListView extends React.Component {
     }
   }
 
+  updateFilter = (input) => {
+  }
+
   render() {
     const { loading, selected, images } = this.state;
 
@@ -118,13 +121,13 @@ class ImageListView extends React.Component {
         return <span>{getReadableFileSizeString(row.value)}</span>
       },
       sortable: true
-    }]
+    }];
 
     return (
       <Grid padded>
         <Grid.Row>
           <Grid.Column width={6}>
-            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+            { /* <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} /> */ }
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
             {
@@ -144,6 +147,7 @@ class ImageListView extends React.Component {
                   columns={columns}
                   defaultPageSize={10}
                   pageSize={10}
+                  minRows={0}
               />
           </Grid.Column>
         </Grid.Row>

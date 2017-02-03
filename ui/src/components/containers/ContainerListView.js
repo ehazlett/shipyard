@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, Checkbox, Input, Grid, Icon } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
+import ReactTable from 'react-table'
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
@@ -70,30 +70,6 @@ class ContainerListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   };
 
-  renderContainer = (container) => {
-    let selected = this.state.selected.indexOf(container.Id) > -1;
-    return (
-      <Tr className={selected ? "active" : ""} key={container.Id}>
-        <Td column="&nbsp;" className="collapsing">
-          <Checkbox checked={selected} onChange={() => { this.selectItem(container.Id) }} />
-        </Td>
-        <Td column="" className="collapsing">
-          <Icon fitted className={`circle ${container.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
-        </Td>
-        <Td column="ID" value={container.Id} className="collapsing">
-          <Link to={`/containers/inspect/${container.Id}`}>{container.Id.substring(0, 12)}</Link>
-        </Td>
-        <Td column="Image" value={container.Image}>
-          {shortenImageName(container.Image)}
-        </Td>
-        <Td column="Created" value={container.Created} className="collapsing">
-          {new Date(container.Created * 1000).toLocaleString()}
-        </Td>
-        <Td column="Name">{container.Names[0]}</Td>
-      </Tr>
-    );
-  }
-
   render() {
     const { loading, selected, containers } = this.state;
 
@@ -101,11 +77,54 @@ class ContainerListView extends React.Component {
       return <div></div>;
     }
 
+    const columns = [{
+      render: row => {
+        let selected = this.state.selected.indexOf(row.rowValues.Id) > -1;
+        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.Id) }}
+                  className={selected ? "active" : ""} key={row.row.Id}/>
+      },
+      sortable: false
+    }, {
+      render: row => {
+        return <Icon fitted className={`circle ${row.row.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
+      },
+      sortable: false
+    }, {
+      header: 'ID',
+      accessor: 'Id',
+      render: row => {
+        return <Link to={`/containers/inspect/${row.row.Id}`}>{row.row.Id.substring(0, 12)}</Link>
+      },
+      sortable: true
+    }, {
+      header: 'Image',
+      accessor: 'Image',
+      render: row => {
+        return <span>{shortenImageName(row.row.Image)}</span>
+      },
+      sortable: true
+    }, {
+      header: 'Created',
+      accessor: 'Created',
+      render: row => {
+        return <span>{new Date(row.row.Created * 1000).toLocaleString()}</span>
+      },
+      sortable: true
+    }, {
+      header: 'Name',
+      accessor: 'Names[0]',
+      render: row => {
+        return <span>{row.row.Names[0]}</span>
+      },
+      sortable: true,
+      sort: 'asc'
+    }];
+
     return (
       <Grid padded>
         <Grid.Row>
           <Grid.Column width={6}>
-            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+            { /*<Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} /> */ }
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
             {
@@ -120,17 +139,13 @@ class ContainerListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            <Table
-              ref="table"
-              className="ui compact celled unstackable table"
-              sortable={["ID", "Image", "Created", "Name"]}
-              defaultSort={{column: "Name", direction: "asc"}}
-              filterable={["ID", "Image", "Created", "Name"]}
-              hideFilterInput
-              noDataText="Couldn't find any containers"
-            >
-              {Object.keys(containers).map( key => this.renderContainer(containers[key] ))}
-            </Table>
+            <ReactTable
+                  data={containers}
+                  columns={columns}
+                  defaultPageSize={10}
+                  pageSize={10}
+                  minRows={0}
+              />
           </Grid.Column>
         </Grid.Row>
       </Grid>
