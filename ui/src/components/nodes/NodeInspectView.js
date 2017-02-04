@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Message, Container, Grid, Icon } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
+import ReactTable from 'react-table';
 import TaskStates from '../services/TaskStates';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
@@ -69,46 +69,68 @@ class NodeListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   }
 
-  renderTask(s, t, services = {}) {
-    return (
-      <Tr key={t.ID}>
-        <Td column="" className="collapsing">
-          <i className={`ui circle icon ${TaskStates(t.Status.State)}`}></i>
-        </Td>
-        <Td column="Service" className="collapsing">
-          <Link to={`/services/${t.ServiceID}`}>
-            {services[t.ServiceID] ? services[t.ServiceID].Spec.Name : ''}
-          </Link>
-        </Td>
-        <Td column="ID" className="collapsing">
-          {t.ID.substring(0, 12)}
-        </Td>
-        <Td column="Container ID" className="collapsing">
-          {t.Status.ContainerStatus.ContainerID ?
-            <Link to={`/containers/${t.Status.ContainerStatus.ContainerID}`}>
-              {t.Status.ContainerStatus.ContainerID.substring(0, 12)}
-            </Link> :
-              <span className="weak">N/A</span>}
-            </Td>
-            <Td column="Name">
-              {services[t.ServiceID] ? `${services[t.ServiceID].Spec.Name}.${t.Slot}` : ''}
-            </Td>
-            <Td column="Image">
-              {shortenImageName(t.Spec.ContainerSpec.Image)}
-            </Td>
-            <Td column="Last Status Update" className="collapsing">
-              {new Date(t.Status.Timestamp).toLocaleString()}
-            </Td>
-          </Tr>
-    );
-  }
-
   render() {
     const { node, services, tasks, error, loading } = this.state;
 
     if (loading) {
       return <div></div>;
     }
+
+        const columns = [{
+          header: '',
+          accessor: 'Status.State',
+          render: row => {
+            return <i className={`ui circle icon ${TaskStates(row.row.Status.State)}`}></i>;
+          },
+          sortable: false
+        }, {
+          header: 'Service',
+          accessor: 'ServiceID',
+          render: row => {
+            return <Link to={`/services/${row.row.ServiceID}`}>
+              {services[row.row.ServiceID] ? services[row.row.ServiceID].Spec.Name : ''};
+            </Link>;
+          },
+          sortable: true
+        }, {
+          header: 'ID',
+          accessor: 'ID',
+          render: row => {
+            return <span>{row.row.ID.substring(0, 12)}</span>;
+          },
+          sortable: true
+        }, {
+          header: 'Container ID',
+          id: 'Roles',
+          accessor: d => d.Status.ContainerStatus.ContainerID ? d.Status.ContainerStatus.ContainerID : 'N/A',
+          render:  row => {
+            return <span>{row.row.Status.ContainerStatus.ContainerID ?
+                               <Link to={`/containers/${row.row.Status.ContainerStatus.ContainerID}`}>
+                                 {row.row.Status.ContainerStatus.ContainerID.substring(0, 12)}
+                               </Link> :
+                               <span className="weak">N/A</span>}</span>
+          },
+          sortable: true
+        }, {
+          header: 'Name',
+          id: 'Name',
+          accessor: d => services[d.ServiceID] ? services[d.ServiceID].Spec.Name.$d.Slot : '',
+          sortable: true,
+          sort: 'asc'
+        }, {
+          header: 'Image',
+          accessor: 'Spec.ContainerSpec.Image',
+          render: row => {
+            return <span>{shortenImageName(row.row.Spec.ContainerSpec.Image)}</span>
+          },
+          sortable: true
+        }, {
+          header: 'Last Status Update',
+          accessor: 'Status.Timestamp',
+          render: row => {
+            return <span>{new Date(row.row.Status.Timestamp).toLocaleString()}</span>
+          }
+        }];
 
     return (
       <Container>
@@ -202,17 +224,13 @@ class NodeListView extends React.Component {
                   <Icon className="search" />
                   <input placeholder="Search..." onChange={this.updateFilter}></input>
                 </div>
-                <Table
-                  className="ui compact celled unstackable table"
-                  ref="table"
-                  sortable={["Service", "ID", "Container ID", "Name", "Image", "Last Status Update"]}
-                  defaultSort={{column: "Name", direction: "asc"}}
-                  filterable={["ID", "Container ID", "Name", "Image"]}
-                  hideFilterInput
-                  noDataText="Couldn't find any tasks"
-                >
-                  {tasks.map((t) => this.renderTask(node, t, services))}
-                </Table>
+                <ReactTable
+                      data={tasks}
+                      columns={columns}
+                      defaultPageSize={10}
+                      pageSize={10}
+                      minRows={0}
+                  />
               </div>
             </Grid.Column>
           </Grid.Row>

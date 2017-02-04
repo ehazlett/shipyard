@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Table, Tr, Td } from 'reactable';
+import ReactTable from 'react-table';
 import { Grid, Message  } from 'semantic-ui-react';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
@@ -48,21 +48,23 @@ class RegistryInspectView extends React.Component {
       });
   }
 
-  renderRepo = (repo) => {
-    return (
-      <Tr key={`${repo.name}:${repo.tag}`}>
-        <Td column="Name">{repo.name}</Td>
-        <Td column="Tag">{repo.tag}</Td>
-      </Tr>
-    );
-  };
-
   render() {
     const { loading, registry, repositories, error } = this.state;
 
     if(loading) {
       return <div></div>;
     }
+
+    const columns = [{
+      header: 'Name',
+      accessor: 'name',
+      sortable: true,
+      sort: 'asc'
+    }, {
+      header: 'Tag',
+      accessor: 'tag',
+      sortable: true
+    }];
 
     return (
       <Grid padded>
@@ -86,17 +88,13 @@ class RegistryInspectView extends React.Component {
             </table>
           </Grid.Column>
           <Grid.Column className="ui sixteen wide basic segment">
-            <Table
-              ref="table"
-              className="ui compact celled unstackable table"
-              defaultSort={{column: 'Name', direction: 'asc'}}
-              sortable={["Name", "Tag"]}
-              filterable={["Name"]}
-              hideFilterInput
-              noDataText="Couldn't find any registries"
-            >
-              { !_.isEmpty(repositories) ? repositories.map(this.renderRepo) : null }
-            </Table>
+            <ReactTable
+                  data={repositories}
+                  columns={columns}
+                  defaultPageSize={10}
+                  pageSize={10}
+                  minRows={0}
+              />
           </Grid.Column>
         </Grid.Row>
       </Grid>

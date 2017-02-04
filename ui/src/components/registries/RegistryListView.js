@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Button, Checkbox, Input, Grid } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
+import { Button, Checkbox, /*Input,*/ Grid } from 'semantic-ui-react';
+import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
@@ -70,38 +70,6 @@ class RegistryListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   }
 
-  renderRow = (registry, tagIndex) => {
-    let selected = this.state.selected.indexOf(registry.id) > -1;
-    return (
-      <Tr key={registry.id}>
-        <Td column="" className="collapsing">
-          <Checkbox checked={selected} onChange={() => { this.selectItem(registry.id) }} />
-        </Td>
-        <Td column="ID" value={registry.id} className="collapsing">
-          <Link to={`/registries/inspect/${registry.id}`}>
-            {registry.id.substring(0, 8)}
-          </Link>
-        </Td>
-        <Td column="Name">
-          {registry.name}
-        </Td>
-        <Td column="Address">
-          {registry.addr}
-        </Td>
-      </Tr>
-    );
-  }
-
-  renderRegistry = (registry) => {
-    const rows = [];
-    if(registry.RepoTags) {
-      for (let i = 0; i < registry.RepoTags.length; i++) {
-        rows.push(this.renderRow(registry, i));
-      }
-    }
-    return rows;
-  }
-
   render() {
     const { loading, registries, selected } = this.state;
 
@@ -109,11 +77,36 @@ class RegistryListView extends React.Component {
       return <div></div>;
     }
 
+    const columns = [{
+      render: row => {
+        let selected = this.state.selected.indexOf(row.row.id) > -1;
+        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.id) }}
+                  className={selected ? "active" : ""} key={row.row.id}/>
+      },
+      sortable: false
+    }, {
+      header: 'ID',
+      accessor: 'id',
+      render: row => {
+        return <Link to={`/registries/inspect/${row.row.id}`}>{row.row.id.substring(0, 8)}</Link>
+      },
+      sortable: true
+    }, {
+      header: 'Name',
+      accessor: 'name',
+      sortable: true,
+      sort: 'asc'
+    }, {
+      header: 'Address',
+      accessor: 'addr',
+      sortable: true
+    }];
+
     return (
       <Grid padded>
         <Grid.Row>
           <Grid.Column width={6}>
-            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+            { /*<Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />*/ }
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
             {
@@ -128,17 +121,13 @@ class RegistryListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            <Table
-              ref="table"
-              className="ui compact celled unstackable table"
-              sortable={["ID", "Name", "Address"]}
-              defaultSort={{column: 'Name', direction: 'asc'}}
-              filterable={["ID", "Name", "Address"]}
-              hideFilterInput
-              noDataText="Couldn't find any registries"
-            >
-              {registries.map(this.renderRow)}
-            </Table>
+            <ReactTable
+                  data={registries}
+                  columns={columns}
+                  defaultPageSize={10}
+                  pageSize={10}
+                  minRows={0}
+              />
           </Grid.Column>
         </Grid.Row>
       </Grid>

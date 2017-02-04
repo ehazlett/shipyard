@@ -1,7 +1,0 @@
-th.reactable-header-sort-asc:after {
-  content: '\25BC';
-}
-
-th.reactable-header-sort-desc:after {
-  content: '\25B2';
-}

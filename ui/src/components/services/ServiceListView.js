@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Input, Button, Grid, Checkbox } from "semantic-ui-react";
-import { Table, Tr, Td } from "reactable";
+import { /*Input,*/ Button, Grid, Checkbox } from "semantic-ui-react";
+import ReactTable from 'react-table';
 import taskStates from "./TaskStates";
 import { Link } from "react-router-dom";
 import _ from "lodash";
@@ -88,28 +88,6 @@ class ServiceListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   }
 
-  renderService(service, summary = {}) {
-    let selected = this.state.selected.indexOf(service.ID) > -1;
-    return (
-      <Tr className={selected ? "active" : ""} key={service.ID}>
-        <Td column="" className="collapsing">
-          <Checkbox checked={selected} onChange={() => { this.selectItem(service.ID) }} />
-        </Td>
-        <Td column="Tasks" className="collapsing" value={summary.green ? summary.green : "0"}>
-          <div>
-            {(summary.green ? summary.green : "0")}
-            {(service.Spec.Mode.Replicated ? ` / ${service.Spec.Mode.Replicated.Replicas}` : "")}
-          </div>
-        </Td>
-        <Td column="ID" className="collapsing" value={service.ID}>
-          <Link to={`/services/inspect/${service.ID}`}>{service.ID.substring(0, 12)}</Link>
-        </Td>
-        <Td column="Name">{service.Spec.Name}</Td>
-        <Td column="Image">{shortenImageName(service.Spec.TaskTemplate.ContainerSpec.Image)}</Td>
-      </Tr>
-    );
-  }
-
   render() {
     const { loading, services, tasks, selected } = this.state;
 
@@ -132,11 +110,39 @@ class ServiceListView extends React.Component {
       return <div></div>;
     }
 
+    const columns = [{
+          render: row => {
+            let selected = this.state.selected.indexOf(row.row.ID) > -1;
+            return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.ID) }}
+                      className={selected ? "active" : ""} key={row.row.ID}/>
+          },
+          sortable: false
+        }, {
+          header: 'ID',
+          accessor: 'ID',
+          render: row => {
+            return <Link to={`/containers/inspect/${row.row.ID}`}>{row.row.ID.substring(0, 12)}</Link>
+          },
+          sortable: true
+        }, {
+          header: 'Name',
+          accessor: 'Spec.Name',
+          sortable: true,
+          sort: 'asc'
+        }, {
+          header: 'Image',
+          accessor: 'Spec.TaskTemplate.ContainerSpec.Image',
+          render: row => {
+            return <span>{shortenImageName(row.row.Spec.TaskTemplate.ContainerSpec.Image)}</span>
+          },
+          sortable: true
+        }];
+
     return (
       <Grid padded>
         <Grid.Row>
           <Grid.Column width={6}>
-            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+            { /*<Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />*/ }
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
             { _.isEmpty(selected) ?
@@ -150,16 +156,13 @@ class ServiceListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            <Table
-              className="ui compact celled unstackable table"
-              ref="table"
-              sortable={["Tasks", "ID", "Name", "Image"]}
-              defaultSort={{column: 'Name', direction: 'asc'}}
-              filterable={["ID", "Name", "Image"]}
-              hideFilterInput
-              noDataText="Couldn't find any services">
-              {Object.keys(services).map(key => this.renderService(services[key], taskSummaryByService[services[key].ID]))}
-            </Table>
+            <ReactTable
+                  data={services}
+                  columns={columns}
+                  defaultPageSize={10}
+                  pageSize={10}
+                  minRows={0}
+              />
           </Grid.Column>
         </Grid.Row>
       </Grid>

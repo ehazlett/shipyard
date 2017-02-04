@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Button, Checkbox, Input, Grid, Icon } from 'semantic-ui-react';
-import ReactTable from 'react-table'
+import { Button, Checkbox, /*Input,*/ Grid, Icon } from 'semantic-ui-react';
+import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
@@ -79,7 +79,7 @@ class ContainerListView extends React.Component {
 
     const columns = [{
       render: row => {
-        let selected = this.state.selected.indexOf(row.rowValues.Id) > -1;
+        let selected = this.state.selected.indexOf(row.row.Id) > -1;
         return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.Id) }}
                   className={selected ? "active" : ""} key={row.row.Id}/>
       },

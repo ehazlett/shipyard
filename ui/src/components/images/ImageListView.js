@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Button, Checkbox, Input, Grid } from 'semantic-ui-react';
-import ReactTable from 'react-table'
+import { Button, Checkbox, /*Input,*/ Grid } from 'semantic-ui-react';
+import ReactTable from 'react-table';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
 
@@ -83,10 +83,10 @@ class ImageListView extends React.Component {
                   className={selected ? "active" : ""} key={row.rowValues.Id}/>
       },
       sortable: false
-    },
-    {
+    }, {
       header: 'Repository',
-      accessor: 'RepoTags[0]',
+      id: 'Repository',
+      accessor: d => (d.RepoTags === undefined || d.RepoTags === null) ? '' : d.RepoTags[0],
       render: row => {
         return <span>{row.value.split(':')[0]}</span>
       },
@@ -94,7 +94,8 @@ class ImageListView extends React.Component {
       sort: 'asc'
     }, {
       header: 'Tag',
-      accessor: 'RepoTags[0]',
+      id: 'Tag',
+      accessor: d => (d.RepoTags === undefined || d.RepoTags === null) ? '' : d.RepoTags[0],
       render: row => {
         return <Link to={`/images/inspect/${row.rowValues.Id}`}>{row.value.split(':')[1]}</Link>
       },
