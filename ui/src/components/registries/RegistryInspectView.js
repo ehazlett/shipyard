@@ -1,58 +1,69 @@
 import React from 'react';
 
 import ReactTable from 'react-table';
-import { Grid, Message  } from 'semantic-ui-react';
+import { Grid } from 'semantic-ui-react';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
+import Loader from "../common/Loader";
 import { repositoriesRegistry, inspectRegistry } from '../../api';
+import { showError } from '../../lib';
 
 class RegistryInspectView extends React.Component {
   state = {
     registry: null,
     repositories: null,
     loading: true,
-    error: null
   };
 
   componentDidMount() {
-    const { id } = this.props.match.params;
-    inspectRegistry(id)
-      .then((registry) => {
+    Promise.all([
+      this.getRepos(),
+      this.getRegistry(),
+    ])
+      .then(() => {
         this.setState({
-          error: null,
-          registry: registry.body,
           loading: false,
         });
       })
-      .catch((error) => {
+      .catch(() => {
         this.setState({
-          error,
           loading: false,
         });
-      });
+      })
+  }
 
-    repositoriesRegistry(id)
+  getRepos = () => {
+    const { id } = this.props.match.params;
+    return repositoriesRegistry(id)
       .then((repositories) => {
         this.setState({
-          error: null,
           repositories: repositories.body,
-          loading: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        showError(err);
+      });
+  }
+
+  getRegistry = () => {
+    const { id } = this.props.match.params;
+    return inspectRegistry(id)
+      .then((registry) => {
         this.setState({
-          error,
-          loading: false,
+          registry: registry.body,
         });
+      })
+      .catch((err) => {
+        showError(err);
       });
   }
 
   render() {
-    const { loading, registry, repositories, error } = this.state;
+    const { loading, registry, repositories } = this.state;
 
     if(loading) {
-      return <div></div>;
+      return <Loader />;
     }
 
     const columns = [{
@@ -77,7 +88,6 @@ class RegistryInspectView extends React.Component {
             </div>
           </Grid.Column>
           <Grid.Column className="ui sixteen wide basic segment">
-            {error && (<Message error>{error}</Message>)}
             <div className="ui header">Details</div>
             <table className="ui very basic celled table">
               <tbody>
@@ -89,11 +99,11 @@ class RegistryInspectView extends React.Component {
           </Grid.Column>
           <Grid.Column className="ui sixteen wide basic segment">
             <ReactTable
-                  data={repositories}
-                  columns={columns}
-                  defaultPageSize={10}
-                  pageSize={10}
-                  minRows={0}
+              data={repositories}
+              columns={columns}
+              defaultPageSize={10}
+              pageSize={10}
+              minRows={0}
               />
           </Grid.Column>
         </Grid.Row>
