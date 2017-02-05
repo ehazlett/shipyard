@@ -24,6 +24,19 @@ export function inspectAccount(id) {
     .then(jsonHandler);
 }
 
+export function updateAccount(account) {
+  return fetch("/api/accounts", {
+    method: "POST",
+    body: JSON.stringify(account),
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Access-Token": getAuthToken(),
+    },
+  })
+    .then(errorHandler)
+}
+
 export function createAccount(account) {
   return fetch("/api/accounts", {
     method: "POST",

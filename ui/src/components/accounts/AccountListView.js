@@ -95,7 +95,7 @@ class AccountListView extends React.Component {
       header: 'username',
       accessor: 'username',
       render: row => {
-        return <Link to={`/accounts/inspect/${row.row.id}`}>{row.row.username}</Link>
+        return <Link to={`/accounts/inspect/${row.row.username}`}>{row.row.username}</Link>
       },
       sortable: true,
       sort: 'asc'
@@ -110,7 +110,7 @@ class AccountListView extends React.Component {
     }, {
       header: 'Roles',
       id: 'Roles',
-      accessor: d => d.roles.join(', '),
+      accessor: d => d.roles ? d.roles.join(', ') : "",
       sortable: true
     }];
 

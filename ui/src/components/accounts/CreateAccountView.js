@@ -3,22 +3,22 @@ import React from 'react';
 import { Container, Grid, Segment } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 
-import AddRegistryForm from './AddRegistryForm';
+import CreateAccountForm from './CreateAccountForm';
 
-const AddRegistryView = (props) => (
+const CreateAccountView = (props) => (
   <Container>
     <Grid>
       <Grid.Row>
         <Grid.Column width={16}>
           <Segment basic>
             <div className="ui breadcrumb">
-              <Link to="/registries" className="section">Registries</Link>
+              <Link to="/accounts" className="section">Accounts</Link>
               <div className="divider"> / </div>
-              <div className="active section">Create a new registry</div>
+              <div className="active section">Create a new account</div>
             </div>
           </Segment>
           <Segment basic>
-            <AddRegistryForm {...props} />
+            <CreateAccountForm {...props} />
           </Segment>
         </Grid.Column>
       </Grid.Row>
@@ -26,4 +26,4 @@ const AddRegistryView = (props) => (
   </Container>
 );
 
-export default AddRegistryView;
+export default CreateAccountView;
