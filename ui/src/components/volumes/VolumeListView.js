@@ -99,7 +99,7 @@ class VolumeListView extends React.Component {
       header: 'Name',
       accessor: 'Name',
       render: row => {
-        return <Link to={`/volumes/inspect/${row.rowValues.Name}`}>${row.rowValues.Name}</Link>
+        return <Link to={`/volumes/inspect/${row.rowValues.Name}`}>{row.rowValues.Name}</Link>
       },
       sortable: true,
       sort: 'asc'
