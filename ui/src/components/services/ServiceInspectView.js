@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Message, Segment, Grid, Icon } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
+import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 import moment from 'moment';
@@ -83,37 +83,32 @@ class ServiceListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   };
 
-  renderTask = (s, t) => {
-    return (
-      <Tr key={t.ID}>
-        <Td column="" className="collapsing">
-          <i className={`ui circle icon ${taskStates(t.Status.State)}`}></i>
-        </Td>
-        <Td column="ID" className="collapsing">
-          {t.ID.substring(0, 12)}
-        </Td>
-        <Td column="Container ID" value={t.Status.ContainerStatus.ContainerID} className="collapsing">
-          {
-            t.Status.ContainerStatus.ContainerID ?
-            <Link to={`/services/inspect/${s.ID}/container/${t.Status.ContainerStatus.ContainerID}`}>{t.Status.ContainerStatus.ContainerID.substring(0, 12)}</Link> :
-            null
-          }
-        </Td>
-        <Td column="Name">
-          {`${s.Spec.Name}.${t.Slot}`}
-        </Td>
-        <Td column="Image">
-          {shortenImageName(t.Spec.ContainerSpec.Image)}
-        </Td>
-        <Td column="Last Status Update" value={t.Status.Timestamp} className="collapsing">
-          {new Date(t.Status.Timestamp).toLocaleString()}
-        </Td>
-        <Td column="Node" value={this.state.nodes[t.NodeID]}>
-          {this.state.nodes[t.NodeID] ? this.state.nodes[t.NodeID].Description.Hostname : null}
-        </Td>
-      </Tr>
-    );
-  }
+//      <Tr key={t.ID}>
+//        <Td column="" className="collapsing">
+//          <i className={`ui circle icon ${taskStates(t.Status.State)}`}></i>
+//        </Td>
+//        <Td column="ID" className="collapsing">
+//          {t.ID.substring(0, 12)}
+//        </Td>
+//        <Td column="Container ID" value={t.Status.ContainerStatus.ContainerID} className="collapsing">
+//          {
+//            t.Status.ContainerStatus.ContainerID ?
+//            <Link to={`/services/inspect/${s.ID}/container/${t.Status.ContainerStatus.ContainerID}`}>{t.Status.ContainerStatus.ContainerID.substring(0, 12)}</Link> :
+//            null
+//          }
+//        </Td>
+//        <Td column="Name">
+//          {`${s.Spec.Name}.${t.Slot}`}
+//        </Td>
+//        <Td column="Image">
+//          {shortenImageName(t.Spec.ContainerSpec.Image)}
+//        </Td>
+//        <Td column="Last Status Update" value={t.Status.Timestamp} className="collapsing">
+//          {new Date(t.Status.Timestamp).toLocaleString()}
+//        </Td>
+//        <Td column="Node" value={this.state.nodes[t.NodeID]}>
+//          {this.state.nodes[t.NodeID] ? this.state.nodes[t.NodeID].Description.Hostname : null}
+
 
   render() {
     const { loading, service, tasks, networks, error } = this.state;
@@ -121,6 +116,57 @@ class ServiceListView extends React.Component {
     if(loading) {
       return <div></div>;
     }
+
+    const columns = [{
+      render: row => {
+        return <i className={`ui circle icon ${taskStates(row.row.Status.State)}`}></i>
+      },
+      sortable: false
+    }, {
+      header: 'ID',
+      accessor: 'ID',
+      render: row => {
+        return <span>{row.row.ID.substring(0, 12)}</span>
+      },
+      sortable: true
+    }, {
+      header: 'Container ID',
+      accessor: 'Status.ContainerStatus.ContainerID',
+      render: row => {
+        return <span>{row.row.Status.ContainerStatus.ContainerID ?
+                  <Link to={`/services/inspect/${row.row.ID}/container/${row.row.Status.ContainerStatus.ContainerID}`}>{row.row.Status.ContainerStatus.ContainerID.substring(0, 12)}</Link> :
+                  <span>null</span>}
+                </span>;
+      },
+      sortable: true
+    }, {
+      header: 'Name',
+      id: 'Name',
+      accessor: d => d.Spec.Name+"."+d.Slot,
+      sortable: true,
+      sort: 'asc'
+    }, {
+      header: 'Image',
+      accessor: 'Spec.ContainerSpec.Image',
+      render: row => {
+        return <span>{shortenImageName(row.row.Spec.ContainerSpec.Image)}</span>;
+      },
+      sortable: true
+    }, {
+      header: 'Last Status Update',
+      accessor: 'Status.Timestamp',
+      render: row => {
+        return <span>{new Date(row.row.Status.Timestamp).toLocaleString()}</span>
+      },
+      sortable: true
+    }, {
+      header: 'Node',
+      accessor: 'this.state.nodes[t.NodeID]',
+      render: row => {
+        return <span>{this.state.nodes[row.row.NodeID] ? this.state.nodes[row.row.NodeID].Description.Hostname : null}</span>
+      },
+      sortable: true
+    }];
 
     return (
       <Segment basic>
@@ -413,17 +459,13 @@ class ServiceListView extends React.Component {
                 <Icon className="search" />
                 <input placeholder="Search..." onChange={this.updateFilter}></input>
               </div>
-              <Table
-                className="ui compact celled unstackable table"
-                ref="table"
-                sortable={["ID", "Container ID", "Name", "Image", "Last Status Update", "Node"]}
-                defaultSort={{column: 'Name', direction: 'asc'}}
-                filterable={['ID', 'Name', 'Image', 'Command']}
-                hideFilterInput
-                noDataText="Couldn't find any tasks"
-              >
-                {tasks ? tasks.map((t) => this.renderTask(service, t)) : []}
-              </Table>
+              <ReactTable
+                    data={tasks}
+                    columns={columns}
+                    defaultPageSize={10}
+                    pageSize={10}
+                    minRows={0}
+                />
             </Grid.Column>
           </Grid.Row>
         </Grid>

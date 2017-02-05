@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { Link } from "react-router-dom";
-import { Button, Input, Grid, Checkbox } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
+import { Button, /*Input,*/ Grid, Checkbox } from 'semantic-ui-react';
+import ReactTable from 'react-table';
 import _ from 'lodash';
 
 import { listVolumes, removeVolume } from '../../api';
@@ -70,20 +70,6 @@ class VolumeListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   };
 
-  renderVolume = (volume) => {
-    let selected = this.state.selected.indexOf(volume.Name) > -1;
-    return (
-      <Tr className={selected ? "active" : ""} key={volume.Name}>
-        <Td column="" className="collapsing">
-          <Checkbox checked={selected} onChange={() => { this.selectItem(volume.Name) }} />
-        </Td>
-        <Td column="Driver">{volume.Driver}</Td>
-        <Td column="Name" value={volume.Name}><Link to={`/volumes/inspect/${volume.Name}`}>{volume.Name}</Link></Td>
-        <Td column="Scope">{volume.Scope}</Td>
-      </Tr>
-    );
-  }
-
   render() {
     const { selected, loading, volumes } = this.state;
 
@@ -91,11 +77,36 @@ class VolumeListView extends React.Component {
       return <div></div>;
     }
 
+    const columns = [{
+      render: row => {
+        let selected = this.state.selected.indexOf(row.rowValues.Name) > -1;
+        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.rowValues.Name) }}
+                  className={selected ? "active" : ""} key={row.rowValues.Name}/>
+      },
+      sortable: false
+    }, {
+      header: 'Driver',
+      accessor: 'Driver',
+      sortable: true
+    }, {
+      header: 'Name',
+      accessor: 'Name',
+      render: row => {
+        return <Link to={`/volumes/inspect/${row.rowValues.Name}`}>${row.rowValues.Name}</Link>
+      },
+      sortable: true,
+      sort: 'asc'
+    }, {
+      header: 'Scope',
+      accessor: 'Scope',
+      sortable: true
+     }];
+
     return (
       <Grid padded>
         <Grid.Row>
           <Grid.Column width={6}>
-            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+            { /*<Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />*/ }
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
             { _.isEmpty(selected) ?
@@ -109,16 +120,13 @@ class VolumeListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            <Table
-              ref="table"
-              className="ui compact celled unstackable table"
-              sortable={["Driver", "Name", "Scope"]}
-              defaultSort={{column: 'Name', direction: 'asc'}}
-              filterable={[]}
-              noDataText="Couldn't find any volumes"
-            >
-              {Object.keys(volumes).map( key => this.renderVolume(volumes[key]) )}
-            </Table>
+            <ReactTable
+                  data={volumes}
+                  columns={columns}
+                  defaultPageSize={10}
+                  pageSize={10}
+                  minRows={0}
+              />
           </Grid.Column>
         </Grid.Row>
       </Grid>

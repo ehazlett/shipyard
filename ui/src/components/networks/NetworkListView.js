@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Button, Checkbox, Input, Grid } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
+import { Button, Checkbox, /*Input,*/ Grid } from 'semantic-ui-react';
+import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
@@ -70,23 +70,6 @@ class NetworkListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   };
 
-  renderNetwork = (network) => {
-    let selected = this.state.selected.indexOf(network.Id) > -1;
-    return (
-      <Tr className={selected ? "active" : ""} key={network.Id}>
-        <Td column="" className="collapsing">
-          <Checkbox checked={selected} onChange={() => { this.selectItem(network.Id) }} />
-        </Td>
-        <Td column="Id" value={network.Id} className="collapsing">
-          <Link to={`/networks/inspect/${network.Id}`}>{network.Id.substring(0, 12)}</Link>
-        </Td>
-        <Td column="Name">{network.Name}</Td>
-        <Td column="Driver">{network.Driver}</Td>
-        <Td column="Scope">{network.Scope}</Td>
-      </Tr>
-    );
-  };
-
   render() {
     const { loading, networks, selected } = this.state;
 
@@ -94,11 +77,40 @@ class NetworkListView extends React.Component {
       return <div></div>;
     }
 
+    const columns = [{
+      render: row => {
+        let selected = this.state.selected.indexOf(row.row.Id) > -1;
+        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.Id) }}
+                  className={selected ? "active" : ""} key={row.row.Id}/>
+      },
+      sortable: false
+    }, {
+      header: 'ID',
+      accessor: 'Id',
+      render: row => {
+        return <Link to={`/networks/inspect/${row.row.Id}`}>{row.row.Id.substring(0, 12)}</Link>
+      },
+      sortable: true
+    }, {
+      header: 'Name',
+      accessor: 'Name',
+      sortable: true,
+      sort: 'asc'
+    }, {
+      header: 'Driver',
+      accessor: 'Driver',
+      sortable: true
+    }, {
+      header: 'Scope',
+      accessor: 'Scope',
+      sortable: true
+    }];
+
     return (
       <Grid padded>
         <Grid.Row>
           <Grid.Column width={6}>
-            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+            { /*<Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />*/ }
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
             {
@@ -113,17 +125,13 @@ class NetworkListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            <Table
-              ref="table"
-              className="ui compact celled unstackable table"
-              sortable={['Id', 'Name', 'Driver', 'Scope']}
-              defaultSort={{column: 'Name', direction: 'asc'}}
-              filterable={['Id', 'Name', 'Driver', 'Scope']}
-              hideFilterInput
-              noDataText="Couldn't find any networks"
-            >
-              {Object.keys(networks).map( key => this.renderNetwork(networks[key]) )}
-            </Table>
+            <ReactTable
+                  data={networks}
+                  columns={columns}
+                  defaultPageSize={10}
+                  pageSize={10}
+                  minRows={0}
+              />
           </Grid.Column>
         </Grid.Row>
       </Grid>

@@ -1,6 +1,7 @@
 import './vendor.js';
 import '../node_modules/semantic-ui-css/semantic.css';
 import '../node_modules/semantic-ui-css/semantic.js';
+import '../node_modules/react-table/react-table.css';
 
 import React from 'react';
 import { render } from 'react-dom';
@@ -13,7 +14,6 @@ import Main from './components/Main';
 import LoginView from './components/login/LoginView';
 
 import './css/fonts.css';
-import './css/reactable.css';
 
 class Root extends React.Component {
 

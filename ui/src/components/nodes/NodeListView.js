@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Button, Icon, Checkbox, Input, Grid } from 'semantic-ui-react';
-import { Table, Tr, Td } from 'reactable';
+import { Button, Icon, Checkbox, /*Input,*/ Grid } from 'semantic-ui-react';
+import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
@@ -70,29 +70,6 @@ class NodeListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   }
 
-  renderNode = (node) => {
-    let selected = this.state.selected.indexOf(node.ID) > -1;
-    return (
-      <Tr className={selected ? "active" : ""} key={node.ID}>
-        <Td column="&nbsp;" className="collapsing">
-          <Checkbox checked={selected} onChange={() => { this.selectItem(node.ID) }} />
-        </Td>
-        <Td column="" className="collapsing">
-          <Icon fitted className={`circle ${node.Status.State === 'ready' ? 'green' : 'red'}`} />
-        </Td>
-        <Td column="ID" value={node.ID} className="collapsing">
-          <Link to={`/nodes/inspect/${node.ID}`}>{node.ID.substring(0, 12)}</Link>
-        </Td>
-        <Td column="Hostname">{node.Description.Hostname}</Td>
-        <Td column="OS" value={node.Description.Platform.OS+" "+node.Description.Platform.Architecture}>
-          <span>{node.Description.Platform.OS} {node.Description.Platform.Architecture}</span>
-        </Td>
-        <Td column="Engine">{node.Description.Engine.EngineVersion}</Td>
-        <Td column="Type">{node.ManagerStatus ? 'Manager' : 'Worker'}</Td>
-      </Tr>
-    );
-  }
-
   render() {
     const { loading, selected, nodes } = this.state;
 
@@ -100,11 +77,53 @@ class NodeListView extends React.Component {
       return <div></div>;
     }
 
+    const columns = [{
+      render: row => {
+        let selected = this.state.selected.indexOf(row.row.ID) > -1;
+        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.ID) }}
+                  className={selected ? "active" : ""} key={row.row.ID}/>
+      },
+      sortable: false
+    }, {
+      render: row => {
+        return <Icon fitted className={`circle ${row.row.Status.State.indexOf('Up') === 0 ? 'green' : 'red'}`} />
+      },
+      sortable: false
+    }, {
+      header: 'ID',
+      accessor: 'ID',
+      render: row => {
+        return <Link to={`/nodes/inspect/${row.row.ID}`}>{row.row.ID.substring(0, 12)}</Link>
+      },
+      sortable: true
+    }, {
+      header: 'Hostname',
+      accessor: 'Description.Hostname',
+      sortable: true,
+      sort: 'asc'
+    }, {
+      header: 'OS',
+      id: 'OS',
+      accessor: d => d.Description.Platform.OS+" "+d.Description.Platform.Architecture,
+      sortable: true
+    }, {
+      header: 'Engine',
+      accessor: 'Description.Engine.EngineVersion',
+      sortable: true
+    }, {
+      header: 'Type',
+      accessor: 'ManagerStatus',
+      render: row => {
+        return <span>{row.row.ManagerStatus ? 'Manager' : 'Worker'}</span>
+      },
+      sortable: true
+    }];
+
     return (
       <Grid padded>
         <Grid.Row>
           <Grid.Column width={6}>
-            <Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />
+            { /*<Input fluid icon="search" placeholder="Search..." onChange={this.updateFilter} />*/ }
           </Grid.Column>
           <Grid.Column width={10} textAlign="right">
             {
@@ -119,17 +138,13 @@ class NodeListView extends React.Component {
         </Grid.Row>
         <Grid.Row>
           <Grid.Column width={16}>
-            <Table
-              ref="table"
-              className="ui compact celled unstackable table"
-              sortable={["ID", "Hostname", "OS", "Engine", "Type"]}
-              defaultSort={{column: 'Hostname', direction: 'asc'}}
-              filterable={["ID", "Hostname", "OS", "Engine", "Type"]}
-              hideFilterInput
-              noDataText="Couldn't find any nodes"
-            >
-              {Object.keys(nodes).map( key => this.renderNode(nodes[key]) )}
-            </Table>
+            <ReactTable
+                  data={nodes}
+                  columns={columns}
+                  defaultPageSize={10}
+                  pageSize={10}
+                  minRows={0}
+              />
           </Grid.Column>
         </Grid.Row>
       </Grid>
