@@ -1,6 +1,5 @@
 import React from "react";
 
-
 import _ from 'lodash';
 import { Form, Header, Divider } from 'semantic-ui-react';
 import { Form as FormsyForm } from 'formsy-react';
@@ -9,7 +8,6 @@ import { Redirect } from "react-router-dom";
 
 import ControlledInputGroup from '../common/ControlledInputGroup';
 import Loader from '../common/Loader';
-
 import { updateSpecFromInput, showError, showSuccess } from '../../lib';
 import { createService } from "../../api";
 
@@ -43,7 +41,7 @@ export default class CreateServiceForm extends React.Component {
       .catch((err) => {
 				showError(err);
 				this.setState({
-					loading: true,
+					loading: false,
 				});
       });
   }
