@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Form as FormsyForm } from 'formsy-react';
 import { Menu, Button, Container, Header, Segment, Grid, Icon } from 'semantic-ui-react';
-import { Input } from 'formsy-semantic-ui-react';
+import { Input, Select, Checkbox } from 'formsy-semantic-ui-react';
 import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
@@ -11,7 +11,7 @@ import moment from 'moment';
 import taskStates from './TaskStates';
 
 import { updateService, inspectService, listTasksForService, listNodes, listNetworks } from '../../api';
-import { shortenImageName, showSuccess, showError } from '../../lib';
+import { updateSpecFromInput, shortenImageName, showSuccess, showError } from '../../lib';
 
 class ServiceListView extends React.Component {
   state = {
@@ -113,23 +113,18 @@ class ServiceListView extends React.Component {
       });
   }
 
-  onChangeHandler = (e, input) => {
-    const { service } = this.state;
-    const updatedService = Object.assign({}, service);
-
-    if(input.type === "number") {
-      const num = parseFloat(input.value);
-      if(isNaN(num)) {
-        _.set(updatedService, input.name, null);
-      } else {
-        _.set(updatedService, input.name, num);
-      }
-    } else {
-      _.set(updatedService, input.name, input.value);
-    }
-
+	// TODO: Find a new home for this
+	stringAsArrayChangeHandler = (e, input) => {
+		const updatedService = Object.assign({}, this.state.service);
+		_.set(updatedService, input.name, input.value.split(" "));
     this.setState({
       service: updatedService,
+    });
+	}
+
+  onChangeHandler = (e, input) => {
+    this.setState({
+      service: _.merge({}, updateSpecFromInput(input, this.state.service)),
       modified: true,
     });
   }
@@ -192,7 +187,7 @@ class ServiceListView extends React.Component {
       sortable: true
     }];
 
-    return (
+  return (
       <Container>
         <Grid>
           <Grid.Row>
@@ -262,16 +257,113 @@ class ServiceListView extends React.Component {
                     <Segment basic>
                       <table className="ui very basic celled table">
                         <tbody>
-                          <tr><td className="four wide column">Image</td><td>{shortenImageName(service.Spec.TaskTemplate.ContainerSpec.Image)}</td></tr>
-                          <tr><td>Command</td><td>{service.Spec.TaskTemplate.ContainerSpec.Command}</td></tr>
-                          <tr><td>Args</td><td>{service.Spec.TaskTemplate.ContainerSpec.Args ? service.Spec.TaskTemplate.ContainerSpec.Args.join(' ') : null}</td></tr>
-                          <tr><td>Working Directory</td><td>{service.Spec.TaskTemplate.ContainerSpec.Dir}</td></tr>
-                          <tr><td>User</td><td>{service.Spec.TaskTemplate.ContainerSpec.User}</td></tr>
-                          <tr><td>Groups</td><td>{service.Spec.TaskTemplate.ContainerSpec.Groups ? service.Spec.TaskTemplate.ContainerSpec.Groups.join(' ') : null}</td></tr>
-                          <tr><td>Hostname</td><td>{service.Spec.TaskTemplate.ContainerSpec.Hostname}</td></tr>
-                          <tr><td>TTY</td><td>{service.Spec.TaskTemplate.ContainerSpec.TTY ? 'Yes' : 'No'}</td></tr>
-                          <tr><td>Open Stdin</td><td>{service.Spec.TaskTemplate.ContainerSpec.OpenStdin ? 'Yes' : 'No'}</td></tr>
-                          <tr><td>Stop Grace Period</td><td>{service.Spec.TaskTemplate.ContainerSpec.StopGracePeriod}</td></tr>
+                          <tr>
+                            <td className="four wide column">Image</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.Image"
+                                size="tiny"
+                                value={_.get(service, "Spec.TaskTemplate.ContainerSpec.Image", "")}
+                                onChange={this.onChangeHandler}
+                                fluid
+                              />
+                           </td>
+                         </tr>
+                         <tr>
+                            <td className="four wide column">Command</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.Command"
+                                size="tiny"
+                                value={_.chain(service).get("Spec.TaskTemplate.ContainerSpec.Command", "").join(" ").value()}
+                                onChange={this.stringAsArrayChangeHandler}
+                                fluid
+                              />
+                           </td>
+                         </tr>
+                         <tr>
+                            <td className="four wide column">Args</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.Args"
+                                size="tiny"
+                                value={_.chain(service).get("Spec.TaskTemplate.ContainerSpec.Args", "").join(" ").value()}
+                                onChange={this.stringAsArrayChangeHandler}
+                                fluid
+                              />
+                           </td>
+                         </tr>
+                          <tr>
+                            <td className="four wide column">Working Directory</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.Dir"
+                                size="tiny"
+                                value={_.get(service, "Spec.TaskTemplate.ContainerSpec.Dir", "")}
+                                onChange={this.onChangeHandler}
+                                fluid
+                              />
+                           </td>
+                          </tr>
+                          <tr>
+                            <td className="four wide column">User</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.User"
+                                size="tiny"
+                                value={_.get(service, "Spec.TaskTemplate.ContainerSpec.User", "")}
+                                onChange={this.onChangeHandler}
+                                fluid
+                              />
+                           </td>
+                          </tr>
+                         <tr>
+                            <td className="four wide column">Groups</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.Groups"
+                                size="tiny"
+                                value={_.chain(service).get("Spec.TaskTemplate.ContainerSpec.Groups", "").join(" ").value()}
+                                onChange={this.stringAsArrayChangeHandler}
+                                fluid
+                              />
+                           </td>
+                         </tr>
+                          <tr>
+                            <td className="four wide column">Hostname</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.Hostname"
+                                size="tiny"
+                                value={_.get(service, "Spec.TaskTemplate.ContainerSpec.Hostname", "")}
+                                onChange={this.onChangeHandler}
+                                fluid
+                              />
+                           </td>
+                          </tr>
+                          <tr>
+                            <td className="four wide column">Stop Grace Period</td>
+                            <td>
+                              <Input
+                                name="Spec.TaskTemplate.ContainerSpec.StopGracePeriod"
+                                size="tiny"
+                                value={_.get(service, "Spec.TaskTemplate.ContainerSpec.StopGracePeriod", "")}
+                                onChange={this.onChangeHandler}
+                                fluid
+                              />
+                           </td>
+                          </tr>
+                          <tr>
+                            <td>TTY</td>
+                            <td>
+                              <Checkbox
+                                label="Attach TTY"
+                                name="Spec.TaskTemplate.ContainerSpec.TTY"
+                                checked={_.get(service, "Spec.TaskTemplate.ContainerSpec.TTY", false)}
+                                onChange={this.onChangeHandler}
+                                />
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                       <Header size="small">Healthcheck</Header>
@@ -352,27 +444,70 @@ class ServiceListView extends React.Component {
                                 name="Spec.UpdateConfig.Parallelism"
                                 size="tiny"
                                 type="number"
-                                value={service.Spec.UpdateConfig ? (service.Spec.UpdateConfig.Parallelism || "")  : ""}
+                                value={_.get(service, "Spec.UpdateConfig.Parallelism", "")}
                                 onChange={this.onChangeHandler}
                                 validations="isUnsignedInt"
+                                fluid
                               />
    </td>
                           </tr>
                           <tr>
                             <td>Delay</td>
-                            <td>{service.Spec.UpdateConfig ? service.Spec.UpdateConfig.Delay : null}</td>
+                            <td>
+                              <Input
+                                name="Spec.UpdateConfig.Delay"
+                                size="tiny"
+                                type="number"
+                                value={_.get(service, "Spec.UpdateConfig.Delay", "")}
+                                onChange={this.onChangeHandler}
+                                validations="isUnsignedInt"
+                                fluid
+                              />
+                            </td>
                           </tr>
                           <tr>
                             <td>Monitor</td>
-                            <td>{service.Spec.UpdateConfig ? service.Spec.UpdateConfig.Monitor : null}</td>
+                            <td>
+                              <Input
+                                name="Spec.UpdateConfig.Monitor"
+                                size="tiny"
+                                type="number"
+                                value={_.get(service, "Spec.UpdateConfig.Monitor", "")}
+                                onChange={this.onChangeHandler}
+                                validations="isUnsignedInt"
+                                fluid
+                              />
+                            </td>
                           </tr>
                           <tr>
                             <td>Failure Action</td>
-                            <td>{service.Spec.UpdateConfig ? service.Spec.UpdateConfig.FailureAction : null}</td>
+                            <td>
+                              <Select
+                                name="Spec.UpdateConfig.FailureAction"
+                                size="tiny"
+                                options={[
+                                  {text: "", value: ""},
+                                  {text: "Pause", value: "pause"},
+                                  {text: "Continue", value: "continue"}
+                                ]}
+                                value={_.get(service, "Spec.UpdateConfig.FailureAction", "")}
+                                onChange={this.onChangeHandler}
+                                fluid
+                              />
+                            </td>
                           </tr>
                           <tr>
                             <td>Max Failure Ratio</td>
-                            <td>{service.Spec.UpdateConfig ? service.Spec.UpdateConfig.MaxFailureRatio : null}</td>
+                            <td>
+                              <Input
+                                name="Spec.UpdateConfig.MaxFailureRatio"
+                                size="tiny"
+                                type="number"
+                                value={_.get(service, "Spec.UpdateConfig.MaxFailureRatio", "")}
+                                onChange={this.onChangeHandler}
+                                fluid
+                              />
+                            </td>
                           </tr>
                         </tbody>
                       </table>
