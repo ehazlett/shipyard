@@ -7,6 +7,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { HashRouter, Route } from "react-router-dom";
 import NotificationSystem from 'react-notification-system';
+import Formsy from 'formsy-react';
 
 import { RouteWhenAuthorized } from './components/RouteMatchers';
 
@@ -31,6 +32,25 @@ class Root extends React.Component {
         }
       }
     };
+
+
+    // TODO: Move custom formsy validations into their own module
+    Formsy.addValidationRule('isUnsignedInt', function (values, value) {
+      // Empty values are valid
+      if(value === "") {
+        return true;
+      }
+
+      const num = parseInt(value, 10);
+      if(isNaN(num)) {
+        return false;
+      }
+      if(num < 0) {
+        return false
+      }
+
+      return true;
+    });
   }
 
   componentDidMount() {

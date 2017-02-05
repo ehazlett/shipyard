@@ -5,6 +5,7 @@ import { Button, /*Input,*/ Grid, Checkbox } from 'semantic-ui-react';
 import ReactTable from 'react-table';
 import _ from 'lodash';
 
+import Loader from "../common/Loader";
 import { listVolumes, removeVolume } from '../../api';
 import { showError } from '../../lib';
 
@@ -16,7 +17,17 @@ class VolumeListView extends React.Component {
   };
 
   componentDidMount() {
-    this.getVolumes();
+    this.getVolumes()
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   }
 
   getVolumes = () => {
@@ -24,15 +35,11 @@ class VolumeListView extends React.Component {
       .then((volumes) => {
         this.setState({
           volumes: volumes.body.Volumes || [],
-          loading: false,
         });
       })
       .catch((err) => {
         /* TODO: If something went wrong here, should probably redirect to an error page. */
         showError(err);
-        this.setState({
-          loading: false,
-        });
       });
   };
 
@@ -74,7 +81,7 @@ class VolumeListView extends React.Component {
     const { selected, loading, volumes } = this.state;
 
     if(loading) {
-      return <div></div>;
+      return <Loader />;
     }
 
     const columns = [{

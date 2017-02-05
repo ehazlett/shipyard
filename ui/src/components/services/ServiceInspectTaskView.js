@@ -15,7 +15,7 @@ class ServiceInspectTaskView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
     inspectContainer(id)
       .then((container) => {
         this.setState({
@@ -34,7 +34,7 @@ class ServiceInspectTaskView extends React.Component {
 
   render() {
     const { loading, container } = this.state;
-    const { serviceId } = this.props.params;
+    const { serviceId } = this.props.match.params;
 
     if(loading) {
       return <div></div>;

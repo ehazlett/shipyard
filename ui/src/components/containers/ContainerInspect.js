@@ -83,7 +83,7 @@ class ContainerInspect extends React.Component {
               {
                 top.Titles.map(t => {
                   return (
-                    <th>{t}</th>
+                    <th key={t}>{t}</th>
                   );
                 })
               }
@@ -93,10 +93,10 @@ class ContainerInspect extends React.Component {
             {
               top.Processes.map(p => {
                 return (
-                  <tr>
+                  <tr key={top.Processes.indexOf(p)}>
                     {
                       p.map(c => {
-                        return (<td>{c}</td>);
+                        return (<td key={p.indexOf(c)}>{c}</td>);
                       })
                     }
                   </tr>

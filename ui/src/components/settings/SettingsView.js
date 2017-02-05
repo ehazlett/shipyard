@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Segment, Message, Grid, Menu } from 'semantic-ui-react';
-import moment from 'moment';
+import { Button, Divider, Container, Segment, Grid, Menu } from 'semantic-ui-react';
+import { Redirect, Switch, Route, Link } from 'react-router-dom';
+import _ from 'lodash';
 
 import JoinTokensForm from '../swarm/JoinTokensForm';
 import RaftForm from '../swarm/RaftForm';
@@ -10,84 +11,99 @@ import CAConfigForm from '../swarm/CAConfigForm';
 import EncryptionForm from '../swarm/EncryptionForm';
 import DispatcherForm from '../swarm/DispatcherForm';
 
-import { getSwarm } from '../../api';
+import { getSwarm, updateSwarm } from '../../api';
+import { showSuccess, showError } from '../../lib';
 
 
 class SettingsView extends React.Component {
   state = {
     swarm: null,
-    error: null,
     loading: true,
-    activeSegment: 'join tokens',
+    modified: false,
   };
 
   componentDidMount() {
-    this.getSwarmSettings();
+    this.refresh();
   }
 
-  getSwarmSettings = () => {
+  refresh = () => {
     getSwarm()
       .then((swarm) => {
         this.setState({
-          error: null,
           swarm: swarm.body,
           loading: false,
+          modified: false,
         });
       })
-      .catch((error) => {
+      .catch((err) => {
+        showError(err);
         this.setState({
-          error,
           loading: false,
+          modified: false,
         });
       });
   };
 
-  changeSegment = (name) => {
+  onChangeHandler = (e, updatedState) => {
     this.setState({
-      activeSegment: name,
+      swarm: _.merge({}, this.state.swarm, { Spec: updatedState }),
+      modified: true,
     });
-  };
+  }
+
+  saveSettings = () => {
+    const { swarm } = this.state;
+    updateSwarm(swarm.Spec, swarm.Version.Index)
+      .then((success) => {
+        showSuccess('Successfully updated swarm settings');
+        this.refresh();
+      })
+      .catch((err) => {
+        showError(err);
+      });
+  }
 
   render() {
-    const { swarm, loading, error, activeSegment } = this.state;
+    const { location } = this.props;
+    const { swarm, loading, modified } = this.state;
 
     if(loading) {
       return <div></div>;
     }
 
     return (
-      <Grid>
-        <Grid.Column width={16}>
-          <Segment basic>
-            {error && (<Message error>{error}</Message>)}
-            <table className="ui very basic compact celled table">
-              <tbody>
-                <tr><td>Name</td><td>{swarm.Spec.Name}</td></tr>
-                <tr><td>Created</td><td>{moment(swarm.CreatedAt).toString()}</td></tr>
-                <tr><td>Last Updated</td><td>{moment(swarm.UpdatedAt).toString()}</td></tr>
-              </tbody>
-            </table>
-          </Segment>
-        </Grid.Column>
-        <Grid.Column width={16}>
-          <Menu pointing secondary>
-            <Menu.Item name='Join Tokens' active={activeSegment === 'join tokens'} onClick={() => { this.changeSegment('join tokens'); }} />
-            <Menu.Item name='Raft' active={activeSegment === 'raft'} onClick={() => { this.changeSegment('raft'); }} />
-            <Menu.Item name='TaskDefaults' active={activeSegment === 'taskdefaults'} onClick={() => { this.changeSegment('taskdefaults'); }} />
-            <Menu.Item name='CAConfig' active={activeSegment === 'caconfig'} onClick={() => { this.changeSegment('caconfig'); }} />
-            <Menu.Item name='Encryption' active={activeSegment === 'encryption'} onClick={() => { this.changeSegment('encryption'); }} />
-            <Menu.Item name='Dispatcher' active={activeSegment === 'dispatcher'} onClick={() => { this.changeSegment('dispatcher'); }} />
-          </Menu>
+      <Container>
+        <Grid>
+          <Grid.Row>
+            <Grid.Column width={16}>
+              <Segment basic>
+                <Menu pointing secondary>
+                  <Menu.Item name='Join Tokens' as={Link} to="/settings/tokens" active={location.pathname.indexOf("/settings/tokens") === 0} />
+                  <Menu.Item name='Raft' as={Link} to="/settings/raft" active={location.pathname.indexOf("/settings/raft") === 0} />
+                  <Menu.Item name='TaskDefaults' as={Link} to="/settings/taskdefaults" active={location.pathname.indexOf("/settings/taskdefaults") === 0} />
+                  <Menu.Item name='CAConfig' as={Link} to="/settings/caconfig" active={location.pathname.indexOf("/settings/caconfig") === 0} />
+                  <Menu.Item name='Encryption' as={Link} to="/settings/encryption" active={location.pathname.indexOf("/settings/encryption") === 0} />
+                  <Menu.Item name='Dispatcher' as={Link} to="/settings/dispatcher" active={location.pathname.indexOf("/settings/dispatcher") === 0} />
+                </Menu>
 
-          {/* TODO: Fetch the swarm config once at the SettingsView level and pass it into the child forms */}
-          { activeSegment === 'join tokens' ? <JoinTokensForm /> : null }
-          { activeSegment === 'raft' ? <RaftForm /> : null }
-          { activeSegment === 'taskdefaults' ? <TaskDefaultsForm /> : null }
-          { activeSegment === 'caconfig' ? <CAConfigForm /> : null }
-          { activeSegment === 'encryption' ? <EncryptionForm /> : null }
-          { activeSegment === 'dispatcher' ? <DispatcherForm /> : null }
-        </Grid.Column>
-      </Grid>
+                <Switch>
+                  <Route exact path="/settings/tokens" component={() => <JoinTokensForm swarm={swarm} onChange={this.onChangeHandler} />} />
+                  <Route exact path="/settings/raft" component={() => <RaftForm swarm={swarm} onChange={this.onChangeHandler} />} />
+                  <Route exact path="/settings/taskdefaults" component={() => <TaskDefaultsForm swarm={swarm} onChange={this.onChangeHandler} />} />
+                  <Route exact path="/settings/caconfig" component={() => <CAConfigForm swarm={swarm} onChange={this.onChangeHandler} />} />
+                  <Route exact path="/settings/encryption" component={() => <EncryptionForm swarm={swarm} onChange={this.onChangeHandler} />} />
+                  <Route exact path="/settings/dispatcher" component={() => <DispatcherForm swarm={swarm} onChange={this.onChangeHandler} />} />
+                  <Route render={() => <Redirect to="/settings/tokens" />} />
+                </Switch>
+
+                <Divider hidden />
+
+                { modified && <Button color="green" onClick={this.saveSettings}>Save Settings</Button> }
+              </Segment>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Container>
     );
   }
 }

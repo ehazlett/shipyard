@@ -15,7 +15,7 @@ class ContainerInspectView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
     inspectContainer(id)
       .then((container) => {
         this.setState({

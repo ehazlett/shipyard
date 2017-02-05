@@ -16,7 +16,7 @@ class RegistryInspectView extends React.Component {
   };
 
   componentDidMount() {
-    const { id } = this.props.params;
+    const { id } = this.props.match.params;
     inspectRegistry(id)
       .then((registry) => {
         this.setState({

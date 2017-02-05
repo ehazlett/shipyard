@@ -14,7 +14,7 @@ class ServicesView extends React.Component {
         <Route exact path="/services" component={ServiceListView} />
         <Route exact path="/services/create" component={CreateServiceView} />
         <Route exact path="/services/inspect/:id" component={ServiceInspectView} />
-        <Route exact path="/services/inspect/:serviceId/service/:id" component={ServiceInspectTaskView} />
+        <Route exact path="/services/inspect/:serviceId/container/:id" component={ServiceInspectTaskView} />
 				<Route render={() => <Redirect to="/services" />} />
       </Switch>
     );

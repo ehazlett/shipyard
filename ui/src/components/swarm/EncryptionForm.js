@@ -1,51 +1,40 @@
-import React from 'react';
+import React, { PropTypes, Component } from 'react';
 
-import { Message, Form, Segment } from 'semantic-ui-react';
+import _ from 'lodash';
 
-import { getSwarm } from '../../api';
+import { Form as FormsyForm } from 'formsy-react';
+import { Checkbox } from 'formsy-semantic-ui-react';
+import { Form, Segment } from 'semantic-ui-react';
 
-class EncryptionForm extends React.Component {
-  state = {
-    swarm: null,
-    error: null,
-    loading: true,
+import { updateSpecFromInput } from '../../lib';
+
+class EncryptionForm extends Component {
+
+  static PropTypes = {
+    swarm: PropTypes.object.isRequired,
   };
 
-  componentDidMount() {
-    this.getSwarmSettings();
+  // When we detect a change, pass the changes to the parent
+  onChangeHandler = (e, input) => {
+    if(this.props.onChange) {
+      this.props.onChange(e, updateSpecFromInput(input, this.props.swarm.Spec));
+    }
   }
 
-  getSwarmSettings = () => {
-    getSwarm()
-      .then((swarm) => {
-        this.setState({
-          error: null,
-          swarm: swarm.body,
-          loading: false,
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          error,
-          loading: false,
-        });
-      });
-  };
-
   render() {
-    const { swarm, error, loading } = this.state;
+    const { Spec } = this.props.swarm;
 
-    if(loading) {
+    if(!Spec) {
       return <div></div>;
     }
 
     return (
       <Segment basic>
-        <Form>
-          <Message error/>
-          {error && (<Message negative>{error}</Message>)}
-          <Form.Checkbox label="Auto-lock managers" checked={swarm.Spec.Encryption ? swarm.Spec.Encryption.AutoLockManagers : false} readOnly />
-        </Form>
+        <FormsyForm className="ui form">
+          <Form.Field>
+            <Checkbox label="Node Certificate Expiration Time (seconds)" name="EncryptionConfig.AutoLockManagers" checked={_.get(Spec, "EncryptionConfig.AutoLockManagers", false)} onChange={this.onChangeHandler} />
+          </Form.Field>
+        </FormsyForm>
       </Segment>
     );
   }

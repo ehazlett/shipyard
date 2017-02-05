@@ -1,32 +1,15 @@
 import React from 'react';
 
-import { Message } from 'semantic-ui-react';
+import { Label, Form, Message } from 'semantic-ui-react';
+import { Form as FormsyForm } from 'formsy-react' ;
+import { Input } from 'formsy-semantic-ui-react';
 
-import Form from "../common/Form";
 import { login } from '../../api';
-
-const VALIDATION_CONFIG = {
-  Username: {
-    identifier: "Username",
-    rules: [{
-      type: "empty",
-      prompt: "Please enter a username",
-    }],
-  },
-  Password: {
-    identifier: "Password",
-    rules: [{
-      type: "empty",
-      prompt: "Please enter a password",
-    }],
-  },
-};
 
 export default class LoginForm extends React.Component {
   state = {
     error: null,
     loading: false,
-    validationConfig: VALIDATION_CONFIG,
   };
 
   handleLoginError = (error) => {
@@ -39,29 +22,41 @@ export default class LoginForm extends React.Component {
       });
   };
 
-  tryLogin = (e, values) => {
+  tryLogin = (values) => {
     this.setState({
       error: null,
       loading: true,
     });
 
-    login(values.formData.Username, values.formData.Password)
+    login(values.Username, values.Password)
       .then(this.props.successHandler)
       .catch(this.handleLoginError);
-
-    e.preventDefault();
   };
 
   render() {
     const { error } = this.state;
+    const el = <Label color="red" pointing="bottom" basic />;
     return (
-      <Form inline={false} fields={this.state.validationConfig} onSubmit={this.tryLogin}>
+      <FormsyForm className="ui form" onValidSubmit={this.tryLogin} noValidate>
         {error && (<Message negative>{this.state.error}</Message>)}
         <Message error />
-        <Form.Input name="Username" icon="user" iconPosition="left" placeholder="Username" autoFocus />
-        <Form.Input name="Password" icon="lock" iconPosition="left" placeholder="Password" type="password" />
-        <Form.Button fluid inverted basic type="submit">Login</Form.Button>
-      </Form>
+        <Form.Field>
+          <Input name="Username" icon="user" iconPosition="left" placeholder="Username" autoFocus validationErrors={{
+							isDefaultRequiredValue: 'Username is required',
+            }}
+            errorLabel={el}
+            required />
+        </Form.Field>
+        <Form.Field>
+          <Input name="Password" icon="lock" iconPosition="left" placeholder="Password" type="password" validationErrors={{
+							isDefaultRequiredValue: 'Password is required',
+            }}
+            errorLabel={el}
+						required
+						/>
+        </Form.Field>
+        <Form.Button fluid inverted basic type="submit" >Login</Form.Button>
+      </FormsyForm>
     );
   }
 }

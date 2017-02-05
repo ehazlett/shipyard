@@ -112,8 +112,8 @@ class Main extends React.Component {
 
           <Route path="/accounts" component={AccountsView} />
           <Route path="/registries" component={RegistriesView} />
-          <Route exact path="/settings" component={SettingsView} />
-          <Route exact path="/about" component={AboutView} />
+          <Route path="/settings" component={SettingsView} location={location} />
+          <Route path="/about" component={AboutView} />
         </div>
         {redirect && <Redirect to={redirectTo}/>}
       </div>

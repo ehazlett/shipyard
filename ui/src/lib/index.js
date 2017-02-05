@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const pushUnique = (source, target) => source.forEach(x => {
   if (target.indexOf(x) === -1) target.push(x)
 })
@@ -57,4 +59,21 @@ export const showSuccess = (msg) => {
     level: 'success',
     autoDismiss: 5,
   });
+}
+
+export const updateSpecFromInput = (input, spec) => {
+  const updatedSpec = Object.assign({}, spec);
+  if(input.type === "number") {
+    const num = parseFloat(input.value);
+    if(isNaN(num)) {
+      _.set(updatedSpec, input.name, null);
+    } else {
+      _.set(updatedSpec, input.name, num);
+    }
+  } else if(input.type === "checkbox") {
+    _.set(updatedSpec, input.name, input.checked);
+  } else {
+    _.set(updatedSpec, input.name, input.value);
+  }
+  return updatedSpec;
 }

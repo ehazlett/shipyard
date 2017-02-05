@@ -5,6 +5,7 @@ import ReactTable from 'react-table';
 import { Link } from "react-router-dom";
 import _ from 'lodash';
 
+import Loader from "../common/Loader";
 import { listAccounts, removeAccount } from '../../api';
 import { showError } from '../../lib';
 
@@ -16,7 +17,17 @@ class AccountListView extends React.Component {
   };
 
   componentDidMount() {
-    this.getAccounts();
+    this.getAccounts()
+      .then(() => {
+        this.setState({
+          loading: false,
+        });
+      })
+      .catch(() => {
+        this.setState({
+          loading: false,
+        });
+      });
   }
 
   getAccounts = () => {
@@ -24,15 +35,11 @@ class AccountListView extends React.Component {
       .then((accounts) => {
         this.setState({
           accounts: accounts.body,
-          loading: false,
         });
       })
       .catch((err) => {
         /* TODO: If something went wrong here, should probably redirect to an error page. */
         showError(err);
-        this.setState({
-          loading: false,
-        });
       });
   };
 
@@ -53,15 +60,15 @@ class AccountListView extends React.Component {
       });
   }
 
-  selectItem = (id) => {
-    let i = this.state.selected.indexOf(id);
+  selectItem = (username) => {
+    let i = this.state.selected.indexOf(username);
     if (i > -1) {
       this.setState({
         selected: this.state.selected.slice(i+1, 1)
       });
     } else {
       this.setState({
-        selected: [...this.state.selected, id]
+        selected: [...this.state.selected, username]
       });
     }
   }
@@ -70,34 +77,17 @@ class AccountListView extends React.Component {
     this.refs.table.filterBy(input.target.value);
   };
 
-//  renderAccount = (account) => {
-//    let selected = this.state.selected.indexOf(account.id) > -1;
-//    return (
-//      <Tr className={selected ? "active" : ""} key={account.id}>
-//        <Td column="" className="collapsing">
-//          <Checkbox checked={selected} onChange={() => { this.selectItem(account.id) }} />
-//        </Td>
-//        <Td column="Username" value={account.username}>
-//          <Link to={`/accounts/inspect/${account.username}`}>{account.username}</Link>
-//        </Td>
-//        <Td column="First Name">{account.first_name}</Td>
-//        <Td column="Last Name">{account.last_name}</Td>
-//        <Td column="Roles">{account.roles.join(', ')}</Td>
-//      </Tr>
-//    );
-//  };
-
   render() {
     const { loading, selected, accounts } = this.state;
 
     if(loading) {
-      return <div></div>;
+      return <Loader />;
     }
 
     const columns = [{
       render: row => {
-        let selected = this.state.selected.indexOf(row.row.id) > -1;
-        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.id) }}
+        let selected = this.state.selected.indexOf(row.row.username) > -1;
+        return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.username) }}
                   className={selected ? "active" : ""} key={row.row.id}/>
       },
       sortable: false

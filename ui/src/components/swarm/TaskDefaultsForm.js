@@ -1,52 +1,41 @@
-import React from 'react';
+import React, { PropTypes, Component } from 'react';
 
-import { Message, Form, Segment } from 'semantic-ui-react';
+import _ from 'lodash';
 
-import { getSwarm } from '../../api';
+import { Form as FormsyForm } from 'formsy-react';
+import { Input } from 'formsy-semantic-ui-react';
+import { Form, Segment } from 'semantic-ui-react';
 
-class TaskDefaultsForm extends React.Component {
-  state = {
-    swarm: null,
-    error: null,
-    loading: true,
+import { updateSpecFromInput } from '../../lib';
+
+class TaskDefaultsForm extends Component {
+
+  static PropTypes = {
+    swarm: PropTypes.object.isRequired,
   };
 
-  componentDidMount() {
-    this.getSwarmSettings();
+  // When we detect a change, pass the changes to the parent
+  onChangeHandler = (e, input) => {
+    if(this.props.onChange) {
+      this.props.onChange(e, updateSpecFromInput(input, this.props.swarm.Spec));
+    }
   }
 
-  getSwarmSettings = () => {
-    getSwarm()
-      .then((swarm) => {
-        this.setState({
-          error: null,
-          swarm: swarm.body,
-          loading: false,
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          error,
-          loading: false,
-        });
-      });
-  };
-
   render() {
-    const { swarm, error, loading } = this.state;
+    const { Spec } = this.props.swarm;
 
-    if(loading) {
+    if(!Spec) {
       return <div></div>;
     }
 
     return (
       <Segment basic>
-        <Form>
-          <Message error/>
-          {error && (<Message negative>{error}</Message>)}
-          <Form.Input label="Log Driver" value={swarm.Spec.TaskDefaults.LogDriver ? swarm.Spec.TaskDefaults.LogDriver.Name : ""} />
-          {/* TODO: LogDriver Options*/}
-        </Form>
+        <FormsyForm className="ui form">
+          <Form.Field>
+            <label>Log Driver</label>
+            <Input name="TaskDefaults.LogDriver" value={_.get(Spec, "TaskDefaults.LogDriver", "")} onChange={this.onChangeHandler} />
+          </Form.Field>
+        </FormsyForm>
       </Segment>
     );
   }
