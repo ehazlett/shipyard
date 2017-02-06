@@ -35,7 +35,7 @@ export default class LoginForm extends React.Component {
 
   render() {
     const { error } = this.state;
-    const el = <Label color="red" pointing="bottom" basic />;
+    const el = <Label color="red" pointing basic />;
     return (
       <FormsyForm className="ui form" onValidSubmit={this.tryLogin} noValidate>
         {error && (<Message negative>{this.state.error}</Message>)}

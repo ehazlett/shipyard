@@ -10,7 +10,7 @@ import { updateSpecFromInput } from '../../lib';
 export default class ControlledInputGroup extends Component {
   static PropTypes = {
     value: PropTypes.array.isRequired,
-    columns: PropTypes.object.isRequired,
+    columns: PropTypes.array.isRequired,
     name: PropTypes.string.isRequired,
     singleColumn: PropTypes.boolean,
   };
@@ -27,14 +27,22 @@ export default class ControlledInputGroup extends Component {
   }
 
   add = () => {
-    const { value, singleColumn } = this.props;
-    this.changed([...value, singleColumn ? "": {} ]);
+    const { value, columns, singleColumn } = this.props;
+    if(singleColumn) {
+      this.changed([...value, ""]);
+    } else {
+      const newRow = {};
+      _.forEach(columns, (c) => {
+        newRow[c.accessor] = "";
+      });
+      this.changed([...value, newRow]);
+    }
   }
 
   remove = (row) => {
     const { value } = this.props;
     const idx = value.indexOf(row);
-    this.changed([...value.splice(0, idx), ...value.splice(idx+1, value.length)]);
+    this.changed([...value.splice(0, idx), ...value.splice(idx + 1, value.length)]);
   }
 
   onChangeHandler = (e, input) => {
