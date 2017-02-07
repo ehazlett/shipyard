@@ -119,6 +119,7 @@ class ServiceListView extends React.Component {
 		_.set(updatedService, input.name, input.value.split(" "));
     this.setState({
       service: updatedService,
+      modified: true,
     });
 	}
 
