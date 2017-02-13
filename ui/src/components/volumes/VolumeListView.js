@@ -80,8 +80,6 @@ class VolumeListView extends React.Component {
   render() {
     const { selected, loading, volumes } = this.state;
 
-console.log(volumes);
-
     if(loading) {
       return <Loader />;
     }
