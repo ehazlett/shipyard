@@ -90,7 +90,8 @@ class AccountListView extends React.Component {
         return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.username) }}
                   className={selected ? "active" : ""} key={row.row.id}/>
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       header: 'username',
       accessor: 'username',

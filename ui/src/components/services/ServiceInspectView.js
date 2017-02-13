@@ -141,7 +141,8 @@ class ServiceListView extends React.Component {
       render: row => {
         return <i className={`ui circle icon ${taskStates(row.row.Status.State)}`}></i>
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       header: 'ID',
       accessor: 'ID',

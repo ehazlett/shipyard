@@ -80,6 +80,8 @@ class VolumeListView extends React.Component {
   render() {
     const { selected, loading, volumes } = this.state;
 
+console.log(volumes);
+
     if(loading) {
       return <Loader />;
     }
@@ -90,7 +92,8 @@ class VolumeListView extends React.Component {
         return <Checkbox checked={selected} onChange={() => { this.selectItem(row.rowValues.Name) }}
                   className={selected ? "active" : ""} key={row.rowValues.Name}/>
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       header: 'Driver',
       accessor: 'Driver',
