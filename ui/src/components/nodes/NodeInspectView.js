@@ -82,7 +82,8 @@ class NodeListView extends React.Component {
           render: row => {
             return <i className={`ui circle icon ${TaskStates(row.row.Status.State)}`}></i>;
           },
-          sortable: false
+          sortable: false,
+          width: 30
         }, {
           header: 'Service',
           accessor: 'ServiceID',

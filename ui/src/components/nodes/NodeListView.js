@@ -90,12 +90,14 @@ class NodeListView extends React.Component {
         return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.ID) }}
                   className={selected ? "active" : ""} key={row.row.ID}/>
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       render: row => {
         return <Icon fitted className={`circle ${row.row.Status.State.indexOf('Up') === 0 ? 'green' : 'red'}`} />
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       header: 'ID',
       accessor: 'ID',

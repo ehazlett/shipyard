@@ -89,7 +89,8 @@ class ImageListView extends React.Component {
         return <Checkbox checked={selected} onChange={() => { this.selectItem(row.rowValues.Id) }}
                   className={selected ? "active" : ""} key={row.rowValues.Id}/>
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       header: 'Repository',
       id: 'Repository',

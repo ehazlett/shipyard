@@ -94,7 +94,8 @@ class NetworkListView extends React.Component {
         return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.Id) }}
                   className={selected ? "active" : ""} key={row.row.Id}/>
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       header: 'ID',
       accessor: 'Id',

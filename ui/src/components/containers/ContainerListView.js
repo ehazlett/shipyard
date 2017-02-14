@@ -90,12 +90,14 @@ class ContainerListView extends React.Component {
         return <Checkbox checked={selected} onChange={() => { this.selectItem(row.row.Id) }}
                   className={selected ? "active" : ""} key={row.row.Id}/>
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       render: row => {
         return <Icon fitted className={`circle ${row.row.Status.indexOf('Up') === 0 ? 'green' : 'red'}`} />
       },
-      sortable: false
+      sortable: false,
+      width: 30
     }, {
       header: 'ID',
       accessor: 'Id',
