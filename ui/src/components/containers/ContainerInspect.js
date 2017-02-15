@@ -13,7 +13,7 @@ import '../../../node_modules/react-datetime/css/react-datetime.css';
 import { logsContainer, execContainer, topContainer } from '../../api';
 import { shortenImageName, showError, showSuccess } from '../../lib';
 
-import { stopContainer, startContainer, pauseContainer, unpauseContainer, killContainer, removeContainer } from '../../api';
+import { stopContainer, startContainer, pauseContainer, unpauseContainer, killContainer, removeContainer, restartContainer } from '../../api';
 
 
 const DATE_FORMAT = "YYYY-MM-DD";
@@ -476,9 +476,7 @@ class ContainerInspect extends React.Component {
     };
 
   stop = () => {
-    console.log("click received");
     const { container } = this.props;
-    console.log("container:" + container);
       stopContainer(container.Id)
           .then((success) => {
               showSuccess('Successfully stopped container');
@@ -492,11 +490,7 @@ class ContainerInspect extends React.Component {
 
     restart = () => {
         const { container } = this.props;
-        stopContainer(container.Id)
-            .then((success) => {
-                this.props.refresh();
-                return startContainer(container.Id);
-            })
+        restartContainer(container.Id)
             .then((success) => {
                 showSuccess('Successfully started container');
                 this.props.refresh();
