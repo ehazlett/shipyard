@@ -60,6 +60,7 @@ export function execContainer(id) {
 }
 
 export function stopContainer(id, timeout = 0) {
+  console.log("id stopcontainer" + id);
   const url = `/containers/${id}/stop?${timeout ? 't='+timeout : ''}`;
   return fetch(url, {
     method: 'POST',
@@ -79,6 +80,39 @@ export function startContainer(id) {
     },
   })
     .then(errorHandler);
+}
+
+export function pauseContainer(id) {
+    const url = `/containers/${id}/pause`;
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Access-Token': getAuthToken(),
+        },
+    })
+        .then(errorHandler);
+}
+
+export function unpauseContainer(id) {
+    const url = `/containers/${id}/unpause`;
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Access-Token': getAuthToken(),
+        },
+    })
+        .then(errorHandler);
+}
+
+export function killContainer(id) {
+    const url = `/containers/${id}/kill`;
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-Access-Token': getAuthToken(),
+        },
+    })
+        .then(errorHandler);
 }
 
 export function removeContainer(id, volumes = false, force = false) {

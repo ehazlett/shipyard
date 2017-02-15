@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Label, Header, Segment, Button, Form, Grid, Message, Menu } from 'semantic-ui-react';
+import { Label, Header, Segment, Button, Form, Grid, Message, Menu, Dropdown } from 'semantic-ui-react';
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -11,7 +11,10 @@ import DateTime from 'react-datetime';
 import '../../../node_modules/react-datetime/css/react-datetime.css';
 
 import { logsContainer, execContainer, topContainer } from '../../api';
-import { shortenImageName } from '../../lib';
+import { shortenImageName, showError, showSuccess } from '../../lib';
+
+import { stopContainer, startContainer, pauseContainer, unpauseContainer, killContainer, removeContainer } from '../../api';
+
 
 const DATE_FORMAT = "YYYY-MM-DD";
 const TIME_FORMAT = "HH:mm:ss";
@@ -29,6 +32,12 @@ class ContainerInspect extends React.Component {
       activeSegment: name,
     });
   };
+
+  componentWillReceiveProps(nextProps) {
+      this.setState({
+          props: nextProps
+      });
+  }
 
   renderEnvVars = (container) => {
     return (
@@ -110,7 +119,7 @@ class ContainerInspect extends React.Component {
   };
 
   changeSegmentTop = () => {
-    const { container } = this.props;
+    const { container } = this.props.container;
     topContainer(container.Id)
       .then((top) => {
         this.setState({
@@ -453,6 +462,122 @@ class ContainerInspect extends React.Component {
     );
   };
 
+    start = () => {
+        const { container } = this.props;
+        startContainer(container.Id)
+            .then((success) => {
+                showSuccess('Successfully started container');
+                this.props.refresh();
+            })
+            .catch((err) => {
+                showError(err);
+                this.props.refresh();
+            });
+    };
+
+  stop = () => {
+    console.log("click received");
+    const { container } = this.props;
+    console.log("container:" + container);
+      stopContainer(container.Id)
+          .then((success) => {
+              showSuccess('Successfully stopped container');
+              this.props.refresh();
+          })
+          .catch((err) => {
+              showError(err)
+              this.props.refresh();
+          });
+  };
+
+    restart = () => {
+        const { container } = this.props;
+        stopContainer(container.Id)
+            .then((success) => {
+                this.props.refresh();
+                return startContainer(container.Id);
+            })
+            .then((success) => {
+                showSuccess('Successfully started container');
+                this.props.refresh();
+            })
+            .catch((err) => {
+                showError(err);
+                this.props.refresh();
+            });
+    };
+
+    pause = () => {
+        const { container } = this.props;
+        pauseContainer(container.Id)
+            .then((success) => {
+                showSuccess('Successfully paused container');
+                this.props.refresh();
+            })
+            .catch((err) => {
+                showError(err);
+                this.props.refresh();
+            });
+    };
+
+    unpause = () => {
+        const { container } = this.props;
+        unpauseContainer(container.Id)
+            .then((success) => {
+                showSuccess('Successfully unpaused container');
+                this.props.refresh();
+            })
+            .catch((err) => {
+                showError(err);
+                this.props.refresh();
+            });
+    };
+
+    remove = () => {
+        const { container } = this.props;
+        removeContainer(container.Id)
+            .then((success) => {
+                showSuccess('Successfully removed container');
+                //TODO redirect to container list page?
+                this.props.refresh();
+            })
+            .catch((err) => {
+                showError(err);
+                this.props.refresh();
+            });
+    };
+
+    kill = () => {
+        const { container } = this.props;
+        killContainer(container.Id)
+            .then((success) => {
+                showSuccess('Successfully killed container');
+                this.props.refresh();
+            })
+            .catch((err) => {
+                showError(err);
+                this.props.refresh();
+            });
+    };
+
+  renderActions = () => {
+      return (
+          <div>
+            <Dropdown text='Container action'>
+              <Dropdown.Menu>
+                <Dropdown.Item text='Stop' onClick={this.stop}/>
+                <Dropdown.Item text='Start' onClick={this.start}/>
+                <Dropdown.Item text='Restart' onClick={this.restart}/>
+                <Dropdown.Item text='Pause' onClick={this.pause}/>
+                <Dropdown.Item text='Unpause' onClick={this.unpause}/>
+                <Dropdown.Item text='Remove' onClick={this.remove}/>
+                <Dropdown.Item text='Kill' onClick={this.kill}/>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+      );
+  };
+
   render() {
     const { error, activeSegment } = this.state;
     const { container } = this.props;
@@ -460,6 +585,7 @@ class ContainerInspect extends React.Component {
     return (
       <Grid>
         <Grid.Column width={16}>
+          {this.renderActions()}
           <Segment basic>
             {error && (<Message error>{error}</Message>)}
             <table className="ui very basic compact celled table">
