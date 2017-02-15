@@ -119,7 +119,7 @@ class ContainerInspect extends React.Component {
   };
 
   changeSegmentTop = () => {
-    const { container } = this.props.container;
+    const { container } = this.props;
     topContainer(container.Id)
       .then((top) => {
         this.setState({
