@@ -462,114 +462,122 @@ class ContainerInspect extends React.Component {
     );
   };
 
-    start = () => {
-        const { container } = this.props;
-        startContainer(container.Id)
-            .then((success) => {
-                showSuccess('Successfully started container');
-                this.props.refresh();
-            })
-            .catch((err) => {
-                showError(err);
-                this.props.refresh();
-            });
-    };
+  start = () => {
+    const { container } = this.props;
+    if (container.State.Status === 'running') {
+      showError("Can't start an already running container");
+    } else {
+      startContainer(container.Id)
+        .then((success) => {
+          showSuccess('Successfully started container');
+          this.props.refresh();
+        })
+        .catch((err) => {
+          showError(err);
+          this.props.refresh();
+        });
+    }
+  };
 
   stop = () => {
     const { container } = this.props;
+    if (container.State.Status === 'exited') {
+      showError("Can't stop an already stopped container");
+    } else {
       stopContainer(container.Id)
-          .then((success) => {
-              showSuccess('Successfully stopped container');
-              this.props.refresh();
-          })
-          .catch((err) => {
-              showError(err)
-              this.props.refresh();
-          });
+        .then((success) => {
+          showSuccess('Successfully stopped container');
+          this.props.refresh();
+        })
+        .catch((err) => {
+          showError(err)
+          this.props.refresh();
+        });
+    }
   };
 
     restart = () => {
-        const { container } = this.props;
-        restartContainer(container.Id)
-            .then((success) => {
-                showSuccess('Successfully started container');
-                this.props.refresh();
-            })
-            .catch((err) => {
-                showError(err);
-                this.props.refresh();
-            });
+      const { container } = this.props;
+      restartContainer(container.Id)
+        .then((success) => {
+          showSuccess('Successfully started container');
+          this.props.refresh();
+        })
+        .catch((err) => {
+          showError(err);
+          this.props.refresh();
+        });
     };
 
     pause = () => {
-        const { container } = this.props;
-        pauseContainer(container.Id)
-            .then((success) => {
-                showSuccess('Successfully paused container');
-                this.props.refresh();
-            })
-            .catch((err) => {
-                showError(err);
-                this.props.refresh();
-            });
+      const { container } = this.props;
+      pauseContainer(container.Id)
+        .then((success) => {
+          showSuccess('Successfully paused container');
+          this.props.refresh();
+        })
+        .catch((err) => {
+          showError(err);
+          this.props.refresh();
+        });
     };
 
     unpause = () => {
-        const { container } = this.props;
-        unpauseContainer(container.Id)
-            .then((success) => {
-                showSuccess('Successfully unpaused container');
-                this.props.refresh();
-            })
-            .catch((err) => {
-                showError(err);
-                this.props.refresh();
-            });
+      const { container } = this.props;
+      unpauseContainer(container.Id)
+        .then((success) => {
+            showSuccess('Successfully unpaused container');
+            this.props.refresh();
+        })
+        .catch((err) => {
+            showError(err);
+            this.props.refresh();
+        });
     };
 
     remove = () => {
-        const { container } = this.props;
-        removeContainer(container.Id)
-            .then((success) => {
-                showSuccess('Successfully removed container');
-                //TODO redirect to container list page?
-                this.props.refresh();
-            })
-            .catch((err) => {
-                showError(err);
-                this.props.refresh();
-            });
+      const { container } = this.props;
+      removeContainer(container.Id)
+        .then((success) => {
+            showSuccess('Successfully removed container');
+            //TODO redirect to container list page?
+            this.props.refresh();
+        })
+        .catch((err) => {
+            showError(err);
+            this.props.refresh();
+        });
     };
 
     kill = () => {
-        const { container } = this.props;
-        killContainer(container.Id)
-            .then((success) => {
-                showSuccess('Successfully killed container');
-                this.props.refresh();
-            })
-            .catch((err) => {
-                showError(err);
-                this.props.refresh();
-            });
+      const { container } = this.props;
+      killContainer(container.Id)
+        .then((success) => {
+            showSuccess('Successfully killed container');
+            this.props.refresh();
+        })
+        .catch((err) => {
+            showError(err);
+            this.props.refresh();
+        });
     };
 
   renderActions = () => {
-      return (
-          <div>
-            <Dropdown text='Container action'>
-              <Dropdown.Menu>
-                <Dropdown.Item text='Stop' onClick={this.stop}/>
-                <Dropdown.Item text='Start' onClick={this.start}/>
-                <Dropdown.Item text='Restart' onClick={this.restart}/>
-                <Dropdown.Item text='Pause' onClick={this.pause}/>
-                <Dropdown.Item text='Unpause' onClick={this.unpause}/>
-                <Dropdown.Item text='Remove' onClick={this.remove}/>
-                <Dropdown.Item text='Kill' onClick={this.kill}/>
-              </Dropdown.Menu>
-            </Dropdown>
-          </div>
-      );
+    return (
+      <div>
+        <Dropdown text='Container action'>
+          <Dropdown.Menu>
+            <Dropdown.Item text='Stop' onClick={this.stop}/>
+            <Dropdown.Item text='Start' disabled={false} onClick={this.start}/>
+            <Dropdown.Item text='Restart' onClick={this.restart}/>
+            <Dropdown.Item text='Pause' onClick={this.pause}/>
+            <Dropdown.Item text='Unpause' onClick={this.unpause}/>
+            <Dropdown.Item text='Remove' onClick={this.remove}/>
+            <Dropdown.Item text='Kill' onClick={this.kill}/>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+    );
   };
 
   render() {
