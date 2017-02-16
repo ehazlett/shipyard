@@ -15,22 +15,27 @@ class ContainerInspectView extends React.Component {
   };
 
   componentDidMount() {
+    this.refreshContainer();
+  }
+
+  refreshContainer = () => {
     const { id } = this.props.match.params;
     inspectContainer(id)
       .then((container) => {
-        this.setState({
-          error: null,
-          container: container.body,
-          loading: false,
-        });
+          this.setState({
+              error: null,
+              container: container.body,
+              loading: false,
+          });
       })
       .catch((error) => {
-        this.setState({
-          error,
-          loading: false,
-        });
+          this.setState({
+              error,
+              loading: false,
+          });
       });
-  }
+  };
+
   render() {
     const { loading, container } = this.state;
 
@@ -50,7 +55,7 @@ class ContainerInspectView extends React.Component {
                   <div className="active section">{container.Name.substring(1)}</div>
                 </div>
               </Segment>
-              <ContainerInspect container={container} />
+              <ContainerInspect container={container} refresh={this.refreshContainer} />
             </Grid.Column>
           </Grid.Row>
         </Grid>

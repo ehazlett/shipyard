@@ -81,6 +81,50 @@ export function startContainer(id) {
     .then(errorHandler);
 }
 
+export function restartContainer(id) {
+  const url = `/containers/${id}/restart`;
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+        'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler);
+}
+
+export function pauseContainer(id) {
+  const url = `/containers/${id}/pause`;
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+        'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler);
+}
+
+export function unpauseContainer(id) {
+  const url = `/containers/${id}/unpause`;
+  return fetch(url, {
+      method: 'POST',
+      headers: {
+          'X-Access-Token': getAuthToken(),
+      },
+  })
+    .then(errorHandler);
+}
+
+export function killContainer(id) {
+  const url = `/containers/${id}/kill`;
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+        'X-Access-Token': getAuthToken(),
+    },
+  })
+    .then(errorHandler);
+}
+
 export function removeContainer(id, volumes = false, force = false) {
   const params = {
     v: volumes,
