@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import { Container, Grid, Segment } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Container, Grid, Segment } from "semantic-ui-react";
+import { Link } from "react-router-dom";
 
-import CreateVolumeForm from './CreateVolumeForm';
+import CreateVolumeForm from "./CreateVolumeForm";
 
-const CreateVolumeView = (props) => (
+const CreateVolumeView = props => (
   <Container>
     <Grid>
       <Grid.Row>

@@ -1,41 +1,41 @@
-import React from 'react';
+import React from "react";
 
-import { Segment, Container, Grid } from 'semantic-ui-react';
+import { Segment, Container, Grid } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import _ from 'lodash';
+import _ from "lodash";
 
-import ContainerInspect from './ContainerInspect';
-import { inspectContainer } from '../../api';
+import ContainerInspect from "./ContainerInspect";
+import { inspectContainer } from "../../api";
 
 class ContainerInspectView extends React.Component {
   state = {
     container: null,
     loading: true,
-    error: null,
+    error: null
   };
 
   componentDidMount() {
     const { id } = this.props.match.params;
     inspectContainer(id)
-      .then((container) => {
+      .then(container => {
         this.setState({
           error: null,
           container: container.body,
-          loading: false,
+          loading: false
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({
           error,
-          loading: false,
+          loading: false
         });
       });
   }
   render() {
     const { loading, container } = this.state;
 
-    if(loading) {
-      return <div></div>;
+    if (loading) {
+      return <div />;
     }
 
     return (
@@ -47,7 +47,9 @@ class ContainerInspectView extends React.Component {
                 <div className="ui breadcrumb">
                   <Link to="/containers" className="section">Containers</Link>
                   <div className="divider"> / </div>
-                  <div className="active section">{container.Name.substring(1)}</div>
+                  <div className="active section">
+                    {container.Name.substring(1)}
+                  </div>
                 </div>
               </Segment>
               <ContainerInspect container={container} />

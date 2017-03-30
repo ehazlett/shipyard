@@ -1,98 +1,98 @@
-import React from 'react';
+import React from "react";
 
-import _ from 'lodash';
-import { Grid, Button, Form, Header, Divider } from 'semantic-ui-react';
-import { Form as FormsyForm } from 'formsy-react';
-import { Input, Checkbox } from 'formsy-semantic-ui-react';
+import _ from "lodash";
+import { Grid, Button, Form, Header, Divider } from "semantic-ui-react";
+import { Form as FormsyForm } from "formsy-react";
+import { Input, Checkbox } from "formsy-semantic-ui-react";
 import { Redirect } from "react-router-dom";
 
-import Loader from '../common/Loader';
-import ControlledInputGroup from '../common/ControlledInputGroup';
+import Loader from "../common/Loader";
+import ControlledInputGroup from "../common/ControlledInputGroup";
 
-import { updateSpecFromInput, showError, showSuccess } from '../../lib';
-import { createNetwork } from '../../api';
-import { keyValueColumns, keyValueValue } from '../common/ControlledInputGroupHelpers';
+import { updateSpecFromInput, showError, showSuccess } from "../../lib";
+import { createNetwork } from "../../api";
+import {
+  keyValueColumns,
+  keyValueValue
+} from "../common/ControlledInputGroupHelpers";
 
 export default class CreateNetworkForm extends React.Component {
   state = {
     redirect: false,
-    redirectTo: '',
+    redirectTo: "",
     loading: false,
-    network: {},
+    network: {}
   };
 
-  createNetwork = (values) => {
+  createNetwork = values => {
     this.setState({
-      loading: true,
+      loading: true
     });
     const { network } = this.state;
     createNetwork(network)
-      .then((success) => {
-        showSuccess('Successfully created network');
+      .then(success => {
+        showSuccess("Successfully created network");
         this.setState({
           redirect: true,
           redirectTo: `/networks`,
-          loading: false,
+          loading: false
         });
       })
-      .catch((err) => {
+      .catch(err => {
         showError(err);
         this.setState({
-          loading: false,
+          loading: false
         });
       });
-  }
+  };
 
   onChangeHandler = (e, input) => {
     this.setState({
-      network: _.merge({}, updateSpecFromInput(input, this.state.network)),
+      network: _.merge({}, updateSpecFromInput(input, this.state.network))
     });
-  }
+  };
 
-	keyValueChangeHandler = (e, input) => {
-		const updatedNetwork = Object.assign({}, this.state.network);
+  keyValueChangeHandler = (e, input) => {
+    const updatedNetwork = Object.assign({}, this.state.network);
     _.set(
       updatedNetwork,
       input.name,
-      _.mapValues(
-        _.keyBy(input.value, "key"),
-        (v) => v.value || ""
-      )
+      _.mapValues(_.keyBy(input.value, "key"), v => v.value || "")
     );
     this.setState({
-      network: updatedNetwork,
+      network: updatedNetwork
     });
-	}
+  };
 
   ipamConfigColumns = [
-		{
-			name: "Subnet",
-			accessor: "Subnet",
-		},
-		{
-			name: "IP Range",
-			accessor: "IPRange",
-		},
-		{
-			name: "Gateway",
-			accessor: "Gateway",
-		},
-		{
-			name: "Aux Address",
-			accessor: "AuxAddress",
-		},
+    {
+      name: "Subnet",
+      accessor: "Subnet"
+    },
+    {
+      name: "IP Range",
+      accessor: "IPRange"
+    },
+    {
+      name: "Gateway",
+      accessor: "Gateway"
+    },
+    {
+      name: "Aux Address",
+      accessor: "AuxAddress"
+    }
   ];
 
   render() {
     const { loading, network, redirect, redirectTo } = this.state;
 
-    if(loading) {
+    if (loading) {
       return <Loader />;
     }
 
     return (
       <FormsyForm className="ui form" onValidSubmit={this.createNetwork}>
-        {redirect && <Redirect to={redirectTo}/>}
+        {redirect && <Redirect to={redirectTo} />}
         <Header>Create a Network</Header>
         <Form.Field>
           <label>Name</label>
@@ -112,7 +112,7 @@ export default class CreateNetworkForm extends React.Component {
               checked={_.get(network, "Internal", false)}
               onChange={this.onChangeHandler}
             />
-            </Form.Field>
+          </Form.Field>
           <Form.Field>
             <Checkbox
               name="EnableIPv6"

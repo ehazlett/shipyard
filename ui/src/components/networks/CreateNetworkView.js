@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import { Container, Grid, Segment } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Container, Grid, Segment } from "semantic-ui-react";
+import { Link } from "react-router-dom";
 
-import CreateNetworkForm from './CreateNetworkForm';
+import CreateNetworkForm from "./CreateNetworkForm";
 
-const CreateNetworkView = (props) => (
+const CreateNetworkView = props => (
   <Container>
     <Grid>
       <Grid.Row>

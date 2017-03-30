@@ -1,17 +1,16 @@
-import React from 'react';
+import React from "react";
 
-import { Grid, Menu } from 'semantic-ui-react';
+import { Grid, Menu } from "semantic-ui-react";
 
-import { getVersion, getInfo } from '../../api';
-
+import { getVersion, getInfo } from "../../api";
 
 class SettingsView extends React.Component {
   state = {
     info: null,
     version: null,
     error: null,
-    activeSegment: 'info',
-    loading: true,
+    activeSegment: "info",
+    loading: true
   };
 
   componentDidMount() {
@@ -21,58 +20,75 @@ class SettingsView extends React.Component {
 
   getSwarmVersion = () => {
     getVersion()
-      .then((version) => {
+      .then(version => {
         this.setState({
           error: null,
-          version: version.body,
+          version: version.body
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({
-          error,
+          error
         });
       });
   };
 
   getSwarmInfo = () => {
     getInfo()
-      .then((info) => {
+      .then(info => {
         this.setState({
           error: null,
           info: info.body,
-          loading: false,
+          loading: false
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({
           error,
-          loading: false,
+          loading: false
         });
       });
   };
 
-  changeSegment = (name) => {
+  changeSegment = name => {
     this.setState({
-      activeSegment: name,
+      activeSegment: name
     });
   };
 
   render() {
     const { version, info, loading, activeSegment } = this.state;
 
-    if(loading) {
-      return <div></div>;
+    if (loading) {
+      return <div />;
     }
 
     return (
       <Grid padded>
         <Grid.Column width={16}>
           <Menu pointing secondary>
-            <Menu.Item name='Info' active={activeSegment === 'info'} onClick={() => { this.changeSegment('info'); }} />
-            <Menu.Item name='Version' active={activeSegment === 'version'} onClick={() => { this.changeSegment('version'); }} />
+            <Menu.Item
+              name="Info"
+              active={activeSegment === "info"}
+              onClick={() => {
+                this.changeSegment("info");
+              }}
+            />
+            <Menu.Item
+              name="Version"
+              active={activeSegment === "version"}
+              onClick={() => {
+                this.changeSegment("version");
+              }}
+            />
           </Menu>
 
-          <pre>{ activeSegment === 'info' ? JSON.stringify(info, null, '  ') : null }{ activeSegment === 'version' ? JSON.stringify(version, null, '  ') : null }</pre>
+          <pre>
+            {activeSegment === "info" ? JSON.stringify(info, null, "  ") : null}
+            {activeSegment === "version"
+              ? JSON.stringify(version, null, "  ")
+              : null}
+          </pre>
         </Grid.Column>
       </Grid>
     );

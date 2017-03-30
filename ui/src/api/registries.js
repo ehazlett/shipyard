@@ -1,13 +1,13 @@
-import fetch from 'isomorphic-fetch';
+import fetch from "isomorphic-fetch";
 
-import { errorHandler, jsonHandler } from './helpers.js';
-import { getAuthToken } from '../services/auth';
+import { errorHandler, jsonHandler } from "./helpers.js";
+import { getAuthToken } from "../services/auth";
 
 export function listRegistries() {
-  return fetch('/api/registries', {
+  return fetch("/api/registries", {
     headers: {
-      'X-Access-Token': getAuthToken(),
-    },
+      "X-Access-Token": getAuthToken()
+    }
   })
     .then(errorHandler)
     .then(jsonHandler);
@@ -16,8 +16,8 @@ export function listRegistries() {
 export function inspectRegistry(id) {
   return fetch(`/api/registries/${id}`, {
     headers: {
-      'X-Access-Token': getAuthToken(),
-    },
+      "X-Access-Token": getAuthToken()
+    }
   })
     .then(errorHandler)
     .then(jsonHandler);
@@ -26,8 +26,8 @@ export function inspectRegistry(id) {
 export function repositoriesRegistry(id) {
   return fetch(`/api/registries/${id}/repositories`, {
     headers: {
-      'X-Access-Token': getAuthToken(),
-    },
+      "X-Access-Token": getAuthToken()
+    }
   })
     .then(errorHandler)
     .then(jsonHandler);
@@ -35,11 +35,10 @@ export function repositoriesRegistry(id) {
 
 export function addRegistry(request) {
   return fetch(`/api/registries`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(request),
     headers: {
-      'X-Access-Token': getAuthToken(),
-    },
-  })
-    .then(errorHandler);
+      "X-Access-Token": getAuthToken()
+    }
+  }).then(errorHandler);
 }
