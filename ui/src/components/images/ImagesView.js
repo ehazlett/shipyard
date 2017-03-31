@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 import { Route, Switch, Redirect } from "react-router-dom";
 
-import ImageListView from './ImageListView';
-import ImageInspectView from './ImageInspectView';
+import ImageListView from "./ImageListView";
+import ImageInspectView from "./ImageInspectView";
 
 class ImagesView extends React.Component {
   render() {

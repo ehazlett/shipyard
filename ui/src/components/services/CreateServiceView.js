@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import { Container, Grid, Segment } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Container, Grid, Segment } from "semantic-ui-react";
+import { Link } from "react-router-dom";
 
-import CreateServiceForm from './CreateServiceForm';
+import CreateServiceForm from "./CreateServiceForm";
 
-const CreateServiceView = (props) => (
+const CreateServiceView = props => (
   <Container>
     <Grid>
       <Grid.Row>

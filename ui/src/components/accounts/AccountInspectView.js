@@ -1,34 +1,34 @@
-import React from 'react';
+import React from "react";
 
-import { Button, Grid } from 'semantic-ui-react';
+import { Button, Grid } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import { Form as FormsyForm } from 'formsy-react';
-import { Input, Select } from 'formsy-semantic-ui-react';
-import _ from 'lodash';
+import { Form as FormsyForm } from "formsy-react";
+import { Input, Select } from "formsy-semantic-ui-react";
+import _ from "lodash";
 
-import Loader from '../common/Loader';
+import Loader from "../common/Loader";
 
-import { updateSpecFromInput, showError, showSuccess } from '../../lib';
-import { inspectAccount, updateAccount } from '../../api';
+import { updateSpecFromInput, showError, showSuccess } from "../../lib";
+import { inspectAccount, updateAccount } from "../../api";
 import { accountRoles } from "./AccountFormHelpers";
 
 class AccountInspectView extends React.Component {
   state = {
     account: null,
     loading: true,
-    modified: false,
+    modified: false
   };
 
   componentDidMount() {
     this.refresh()
       .then(() => {
         this.setState({
-          loading: false,
+          loading: false
         });
       })
       .catch(() => {
         this.setState({
-          loading: false,
+          loading: false
         });
       });
   }
@@ -36,40 +36,40 @@ class AccountInspectView extends React.Component {
   refresh = () => {
     const { id } = this.props.match.params;
     return inspectAccount(id)
-      .then((account) => {
+      .then(account => {
         this.setState({
           account: account.body,
-          modified: false,
+          modified: false
         });
       })
-      .catch((err) => {
-				showError(err);
+      .catch(err => {
+        showError(err);
       });
-  }
+  };
 
   saveAccountChanges = () => {
     const { account } = this.state;
     updateAccount(account)
-      .then((success) => {
-        showSuccess('Successfully updated account');
+      .then(success => {
+        showSuccess("Successfully updated account");
         this.refresh();
       })
-      .catch((err) => {
+      .catch(err => {
         showError(err);
       });
-  }
+  };
 
   onChangeHandler = (e, input) => {
     this.setState({
       account: _.merge({}, updateSpecFromInput(input, this.state.account)),
-      modified: true,
+      modified: true
     });
-  }
+  };
 
   render() {
     const { loading, account, modified } = this.state;
 
-    if(loading) {
+    if (loading) {
       return <Loader />;
     }
 
@@ -85,10 +85,16 @@ class AccountInspectView extends React.Component {
           </Grid.Column>
           <Grid.Column className="ui sixteen wide basic segment">
             <div className="ui header">Details</div>
-            <FormsyForm className="ui form" onValidSubmit={this.saveAccountChanges}>
+            <FormsyForm
+              className="ui form"
+              onValidSubmit={this.saveAccountChanges}
+            >
               <table className="ui very basic celled table">
                 <tbody>
-                  <tr><td className="four wide column">Id</td><td>{account.id}</td></tr>
+                  <tr>
+                    <td className="four wide column">Id</td>
+                    <td>{account.id}</td>
+                  </tr>
                   <tr><td>Username</td><td>{account.username}</td></tr>
                   <tr>
                     <td>First Name</td>
@@ -123,12 +129,18 @@ class AccountInspectView extends React.Component {
                         value={_.get(account, "roles", [])}
                         onChange={this.onChangeHandler}
                         fluid
-                        />
+                      />
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <Button color="green" disabled={!modified} onClick={this.saveSettings}>Save Settings</Button>
+              <Button
+                color="green"
+                disabled={!modified}
+                onClick={this.saveSettings}
+              >
+                Save Settings
+              </Button>
             </FormsyForm>
           </Grid.Column>
         </Grid.Row>

@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 import { Route, Switch, Redirect } from "react-router-dom";
 
-import NodeListView from './NodeListView';
-import NodeInspectView from './NodeInspectView';
+import NodeListView from "./NodeListView";
+import NodeInspectView from "./NodeInspectView";
 
 class NodesView extends React.Component {
   render() {

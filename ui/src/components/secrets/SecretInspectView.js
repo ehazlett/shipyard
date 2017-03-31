@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import { Container, Grid, Message  } from 'semantic-ui-react';
+import { Container, Grid, Message } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import _ from 'lodash';
-import moment from 'moment';
+import _ from "lodash";
+import moment from "moment";
 
-import { inspectSecret } from '../../api';
+import { inspectSecret } from "../../api";
 
 class SecretInspectView extends React.Component {
   state = {
@@ -17,17 +17,17 @@ class SecretInspectView extends React.Component {
   componentDidMount() {
     const { id } = this.props.match.params;
     inspectSecret(id)
-      .then((secret) => {
+      .then(secret => {
         this.setState({
           error: null,
           secret: secret.body,
-          loading: false,
+          loading: false
         });
       })
-      .catch((error) => {
+      .catch(error => {
         this.setState({
           error,
-          loading: false,
+          loading: false
         });
       });
   }
@@ -35,8 +35,8 @@ class SecretInspectView extends React.Component {
   render() {
     const { loading, secret, error } = this.state;
 
-    if(loading) {
-      return <div></div>;
+    if (loading) {
+      return <div />;
     }
 
     return (
@@ -47,18 +47,28 @@ class SecretInspectView extends React.Component {
               <div className="ui breadcrumb">
                 <Link to="/secrets" className="section">Secrets</Link>
                 <div className="divider"> / </div>
-                <div className="active section">{secret.ID.substring(0, 12)}</div>
+                <div className="active section">
+                  {secret.ID.substring(0, 12)}
+                </div>
               </div>
             </Grid.Column>
             <Grid.Column className="ui sixteen wide basic segment">
-              {error && (<Message error>{error}</Message>)}
+              {error && <Message error>{error}</Message>}
               <div className="ui header">Details</div>
               <table className="ui very basic celled table">
                 <tbody>
-                  <tr><td className="four wide column">Id</td><td>{secret.ID}</td></tr>
+                  <tr>
+                    <td className="four wide column">Id</td><td>{secret.ID}</td>
+                  </tr>
                   <tr><td>Name</td><td>{secret.Spec.Name}</td></tr>
-                  <tr><td>Created</td><td>{moment(secret.CreatedAt).toString()}</td></tr>
-                  <tr><td>Last Updated</td><td>{moment(secret.UpdatedAt).toString()}</td></tr>
+                  <tr>
+                    <td>Created</td>
+                    <td>{moment(secret.CreatedAt).toString()}</td>
+                  </tr>
+                  <tr>
+                    <td>Last Updated</td>
+                    <td>{moment(secret.UpdatedAt).toString()}</td>
+                  </tr>
                 </tbody>
               </table>
             </Grid.Column>

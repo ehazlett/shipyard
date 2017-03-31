@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
-import { Container, Grid, Segment } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Container, Grid, Segment } from "semantic-ui-react";
+import { Link } from "react-router-dom";
 
-import AddRegistryForm from './AddRegistryForm';
+import AddRegistryForm from "./AddRegistryForm";
 
-const AddRegistryView = (props) => (
+const AddRegistryView = props => (
   <Container>
     <Grid>
       <Grid.Row>

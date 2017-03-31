@@ -21,49 +21,48 @@ import AboutView from "./about/AboutView";
 
 import { getSwarm } from "../api";
 import { removeAuthToken } from "../services/auth";
-import './Main.css';
+import "./Main.css";
 
 class Main extends React.Component {
   state = {
     redirect: false,
     redirectTo: null,
-    loading: true,
+    loading: true
   };
 
   componentDidMount() {
     getSwarm()
-      .then((swarm) => {
+      .then(swarm => {
         this.setState({
-          loading: false,
+          loading: false
         });
       })
-      .catch((error) => {
+      .catch(error => {
         // Check if our token is valid
-        if(error.response && error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
           this.signOut();
-        }
-        // If we get a 406, a cluster isn't initialized
-        else if(error.response && error.response.status === 503) {
+        } else if (error.response && error.response.status === 503) {
+          // If we get a 406, a cluster isn't initialized
           this.welcome();
         }
 
         this.setState({
-          loading: false,
+          loading: false
         });
       });
   }
 
-  redirect = (to) => {
+  redirect = to => {
     this.setState({
       redirect: true,
-      redirectTo: to,
+      redirectTo: to
     });
-  }
+  };
 
   welcome = () => {
     this.setState({
       redirect: true,
-      redirectTo: "/welcome",
+      redirectTo: "/welcome"
     });
   };
 
@@ -71,7 +70,7 @@ class Main extends React.Component {
     removeAuthToken();
     this.setState({
       redirect: true,
-      redirectTo: "/login",
+      redirectTo: "/login"
     });
   };
 
@@ -88,7 +87,7 @@ class Main extends React.Component {
     const { location } = this.props;
 
     // Until we have a response from swarm, show a loading screen
-    if(loading) {
+    if (loading) {
       return this.renderLoader();
     }
 
@@ -96,7 +95,12 @@ class Main extends React.Component {
       <div id="Main">
         <Route path="/welcome" component={WelcomeView} />
 
-        {location.pathname !== "/welcome" && (<Navigation signOut={this.signOut} username={"admin"} location={location} />)}
+        {location.pathname !== "/welcome" &&
+          <Navigation
+            signOut={this.signOut}
+            username={"admin"}
+            location={location}
+          />}
 
         <div className="ContentPane">
           {/* Default route for authorized user is the service list view */}
@@ -112,10 +116,14 @@ class Main extends React.Component {
 
           <Route path="/accounts" component={AccountsView} />
           <Route path="/registries" component={RegistriesView} />
-          <Route path="/settings" component={SettingsView} location={location} />
+          <Route
+            path="/settings"
+            component={SettingsView}
+            location={location}
+          />
           <Route path="/about" component={AboutView} />
         </div>
-        {redirect && <Redirect to={redirectTo}/>}
+        {redirect && <Redirect to={redirectTo} />}
       </div>
     );
   }

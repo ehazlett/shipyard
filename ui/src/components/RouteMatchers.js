@@ -1,18 +1,22 @@
-import React from 'react';
+import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import { Breadcrumb, Segment } from 'semantic-ui-react'
+import { Breadcrumb, Segment } from "semantic-ui-react";
 
-import { getAuthToken } from '../services/auth';
+import { getAuthToken } from "../services/auth";
 
-export const RouteWhenAuthorized = ({ component: Component, user, ...rest }) => {
+export const RouteWhenAuthorized = (
+  { component: Component, user, ...rest }
+) => {
   return (
-    <Route {...rest} render={props => (
-      getAuthToken() ? (
-        <Component {...props}/>
-      ) : (
-        <Redirect to={{ pathname: '/login', state: { from: props.location } }}/>
-      )
-    )}/>
+    <Route
+      {...rest}
+      render={props =>
+        getAuthToken()
+          ? <Component {...props} />
+          : <Redirect
+              to={{ pathname: "/login", state: { from: props.location } }}
+            />}
+    />
   );
 };
 
@@ -24,16 +28,20 @@ export const RouteWhenAuthorized = ({ component: Component, user, ...rest }) => 
 //   { key: 'info', content: 'Personal Information', active: true },
 // ];
 //
-export const RouteWithBreadcrumbs = ({ component: Component, breadcrumbs, ...rest }) => {
+export const RouteWithBreadcrumbs = (
+  { component: Component, breadcrumbs, ...rest }
+) => {
   return (
-    <Route {...rest} render={props => {
+    <Route
+      {...rest}
+      render={props => {
         return (
           <Segment basic>
-            <Breadcrumb divider='/' sections={breadcrumbs} />
+            <Breadcrumb divider="/" sections={breadcrumbs} />
             <Component {...props} />
           </Segment>
         );
       }}
     />
   );
-}
+};

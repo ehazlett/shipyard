@@ -1,4 +1,4 @@
-	// TODO: Provide a backend API to get a list of available roles
+// TODO: Provide a backend API to get a list of available roles
 export const accountRoles = [
   { text: "Administrator", value: "admin" },
   { text: "Containers Read-Only", value: "containers:ro" },
@@ -10,5 +10,5 @@ export const accountRoles = [
   { text: "Registries Read-Only", value: "registries:ro" },
   { text: "Registries Read/Write", value: "registries:rw" },
   { text: "Events Read-Only", value: "events:ro" },
-  { text: "Events Read/Write", value: "events:rw" },
+  { text: "Events Read/Write", value: "events:rw" }
 ];
