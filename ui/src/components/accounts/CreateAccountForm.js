@@ -1,7 +1,7 @@
 import React from "react";
 
 import _ from "lodash";
-import { Form, Header, Divider } from "semantic-ui-react";
+import { Form, Header, Divider, Select as FormSelect } from "semantic-ui-react";
 import { Form as FormsyForm } from "formsy-react";
 import { Input, Select } from "formsy-semantic-ui-react";
 import { Redirect } from "react-router-dom";
@@ -98,6 +98,7 @@ export default class CreateAccountForm extends React.Component {
           <label>Roles</label>
           <Select
             name="roles"
+            as={FormSelect}
             placeholder="Select user roles"
             multiple
             options={accountRoles}

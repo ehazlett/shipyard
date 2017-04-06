@@ -1,0 +1,395 @@
+exports[`test CreateAccountForm snapshot matches 1`] = `
+<form
+  className="ui form"
+  noValidate={true}
+  onSubmit={[Function]}>
+  <div
+    className="ui header">
+    Create an Account
+  </div>
+  <div
+    className="field required">
+    <label>
+      Username
+    </label>
+    <div
+      className="field">
+      <div
+        className="ui input">
+        <input
+          name="username"
+          onBlur={[Function]}
+          onChange={[Function]}
+          required={true}
+          type="text"
+          value="" />
+      </div>
+    </div>
+  </div>
+  <div
+    className="equal width fields">
+    <div
+      className="field">
+      <label>
+        First Name
+      </label>
+      <div
+        className="field">
+        <div
+          className="ui input">
+          <input
+            name="first_name"
+            onBlur={[Function]}
+            onChange={[Function]}
+            placeholder=""
+            type="text"
+            value="" />
+        </div>
+      </div>
+    </div>
+    <div
+      className="field">
+      <label>
+        Last Name
+      </label>
+      <div
+        className="field">
+        <div
+          className="ui input">
+          <input
+            name="last_name"
+            onBlur={[Function]}
+            onChange={[Function]}
+            placeholder=""
+            type="text"
+            value="" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="field">
+    <label>
+      Roles
+    </label>
+    <div
+      className="field">
+      <div
+        aria-busy={undefined}
+        aria-disabled={undefined}
+        aria-expanded={false}
+        aria-multiselectable={true}
+        className="ui fluid multiple selection dropdown"
+        onBlur={[Function]}
+        onChange={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onMouseDown={[Function]}
+        role="listbox"
+        tabIndex={0}>
+        <select
+          aria-hidden="true"
+          multiple={true}
+          name="roles"
+          type="hidden"
+          value={Array []}>
+          <option
+            value="" />
+          <option
+            value="admin">
+            Administrator
+          </option>
+          <option
+            value="containers:ro">
+            Containers Read-Only
+          </option>
+          <option
+            value="containers:rw">
+            Containers Read/Write
+          </option>
+          <option
+            value="images:ro">
+            Images Read-Only
+          </option>
+          <option
+            value="images:rw">
+            Images Read/Write
+          </option>
+          <option
+            value="nodes:ro">
+            Nodes Read-Only
+          </option>
+          <option
+            value="nodes:rw">
+            Nodes Read/Write
+          </option>
+          <option
+            value="registries:ro">
+            Registries Read-Only
+          </option>
+          <option
+            value="registries:rw">
+            Registries Read/Write
+          </option>
+          <option
+            value="events:ro">
+            Events Read-Only
+          </option>
+          <option
+            value="events:rw">
+            Events Read/Write
+          </option>
+        </select>
+        <div
+          className="default text">
+          Select user roles
+        </div>
+        <i
+          aria-hidden="true"
+          className="dropdown icon" />
+        <div
+          className="menu transition">
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={true}
+            className="selected item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Administrator
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Containers Read-Only
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Containers Read/Write
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Images Read-Only
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Images Read/Write
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Nodes Read-Only
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Nodes Read/Write
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Registries Read-Only
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Registries Read/Write
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Events Read-Only
+            </span>
+          </div>
+          <div
+            aria-checked={false}
+            aria-disabled={undefined}
+            aria-selected={false}
+            className="item"
+            onClick={[Function]}
+            role="option"
+            style={
+              Object {
+                "pointerEvents": "all",
+              }
+            }>
+            <span
+              className="text">
+              Events Read/Write
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="field required">
+    <label>
+      Password
+    </label>
+    <div
+      className="field">
+      <div
+        className="ui input">
+        <input
+          name="password"
+          onBlur={[Function]}
+          onChange={[Function]}
+          required={true}
+          type="password"
+          value="" />
+      </div>
+    </div>
+  </div>
+  <div
+    className="field required">
+    <label>
+      Repeat Password
+    </label>
+    <div
+      className="field">
+      <div
+        className="ui input">
+        <input
+          name="passwordConfirm"
+          onBlur={[Function]}
+          onChange={[Function]}
+          required={true}
+          type="password"
+          value="" />
+      </div>
+    </div>
+  </div>
+  <div
+    className="ui hidden divider" />
+  <div
+    className="field">
+    <button
+      className="ui green button"
+      onClick={[Function]}
+      required={undefined}
+      tabIndex={undefined}
+      type={undefined}>
+      Create Account
+    </button>
+  </div>
+</form>
+`;
