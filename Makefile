@@ -6,7 +6,7 @@ COMMIT=`git rev-parse --short HEAD`
 
 UI_BUILD_IMAGE=shipyard-ui-build
 
-all: build media
+all: build ui
 
 clean:
 	@rm -rf controller/controller && \
@@ -21,19 +21,24 @@ remote-build:
 	@rm -f ./controller/controller
 	@cd controller && docker run --rm -w /go/src/github.com/shipyard/shipyard --entrypoint /bin/bash shipyard-build -c "make build 1>&2 && cd controller && tar -czf - controller" | tar zxf -
 
-media:
-	@docker build -t $(UI_BUILD_IMAGE) -f ui/Dockerfile.build ui && \
-		mkdir -p controller/static/ && \
-		docker run --rm -i $(UI_BUILD_IMAGE) | tar xvzf - -C controller/static/
+ui-build:
+	@docker build -t "${UI_BUILD_IMAGE}" -f ui/Dockerfile.build ui
 
-image: media build
-	@echo Building Shipyard image $(TAG)
+ui-test: ui-build
+	@docker run -e "CI=true" --rm -i "${UI_BUILD_IMAGE}" npm test
+
+ui: ui-build ui-test
+	@mkdir -p controller/static/ && \
+		docker run --rm -i "${UI_BUILD_IMAGE}" | tar xvzf - -C controller/static/
+
+image: ui build
+	@echo Building Shipyard image "${TAG}"
 	@cd controller && docker build -t shipyard/shipyard:$(TAG) .
 
 release: build image
-	@docker push shipyard/shipyard:$(TAG)
+	@docker push shipyard/shipyard:"${TAG}"
 
 test: clean
 	@godep go test -v ./...
 
-.PHONY: all build clean media image test release
+.PHONY: all clean build remote-build ui image release test 

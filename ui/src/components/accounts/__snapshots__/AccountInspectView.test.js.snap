@@ -1,0 +1,14 @@
+exports[`test AccountInspectView snapshot matches 1`] = `
+<div
+  className="ui active transition visible inverted dimmer"
+  onClick={[Function]}>
+  <div
+    className="content">
+    <div
+      className="center">
+      <div
+        className="ui loader" />
+    </div>
+  </div>
+</div>
+`;

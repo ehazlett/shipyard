@@ -7,7 +7,8 @@
     "lint-staged": "^3.4.0",
     "npm-check-updates": "^2.8.6",
     "prettier": "^0.22.0",
-    "react-scripts": "0.9.5"
+    "react-scripts": "0.9.5",
+    "react-test-renderer": "^15.4.2"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -15,7 +16,7 @@
   "proxy": "http://controller:8080",
   "dependencies": {
     "formsy-react": "^0.19.2",
-    "formsy-semantic-ui-react": "^0.1.4",
+    "formsy-semantic-ui-react": "^0.2.0",
     "jquery": "^2.2.3 || ^3.0.0",
     "lodash": "^4.16.6",
     "moment": "^2.16.0",
@@ -26,9 +27,9 @@
     "react-notification-system": "^0.2.11",
     "react-router": "4.0.0",
     "react-router-dom": "4.0.0",
+    "react-table": "5.5.0",
     "react-transform-catch-errors": "^1.0.2",
     "react-transform-hmr": "^1.0.4",
-    "react-table": "5.4.0",
     "semantic-ui-css": "^2.2.4",
     "semantic-ui-react": "^0.67.2",
     "xterm": "^2.2.3"
@@ -41,10 +42,14 @@
     "format": "prettier --write 'src/**/*.js'",
     "precommit": "lint-staged"
   },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom" : ["src/**/*.{js,jsx}", "!**/node_modules/**", "!**/vendor/**"]
+  },
   "lint-staged": {
     "gitDir": "../",
     "*.js": [
-      "prettier --write",
+      "prettier --write 'src/**/*.js'",
       "git add"
     ]
   }
