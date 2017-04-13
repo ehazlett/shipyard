@@ -197,8 +197,9 @@ class ServiceListView extends React.Component {
               data={services}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No services found. Why not create one?'
             />
           </Grid.Column>
         </Grid.Row>

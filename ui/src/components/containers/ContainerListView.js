@@ -188,8 +188,9 @@ class ContainerListView extends React.Component {
               data={containers}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No containers found. Why not create one?'
             />
           </Grid.Column>
         </Grid.Row>

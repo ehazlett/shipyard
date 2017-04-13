@@ -158,8 +158,9 @@ class RegistryListView extends React.Component {
               data={registries}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No registries found. Why not add one?'
             />
           </Grid.Column>
         </Grid.Row>
