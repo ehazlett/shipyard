@@ -106,7 +106,6 @@ class RegistryInspectView extends React.Component {
               data={repositories}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
               minRows={0}
             />
           </Grid.Column>

@@ -158,7 +158,6 @@ class VolumeListView extends React.Component {
               data={volumes}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
               minRows={0}
             />
           </Grid.Column>

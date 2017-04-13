@@ -181,7 +181,6 @@ class NodeListView extends React.Component {
               data={nodes}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
               minRows={0}
             />
           </Grid.Column>

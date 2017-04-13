@@ -153,7 +153,6 @@ class SecretListView extends React.Component {
               data={secrets}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
               minRows={0}
             />
           </Grid.Column>

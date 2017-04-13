@@ -167,7 +167,6 @@ class NetworkListView extends React.Component {
               data={networks}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
               minRows={0}
             />
           </Grid.Column>

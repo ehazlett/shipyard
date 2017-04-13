@@ -308,7 +308,6 @@ class NodeListView extends React.Component {
                   data={tasks}
                   columns={columns}
                   defaultPageSize={10}
-                  pageSize={10}
                   minRows={0}
                 />
               </div>

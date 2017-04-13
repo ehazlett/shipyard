@@ -164,7 +164,6 @@ class AccountListView extends React.Component {
               data={accounts}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
               minRows={0}
             />
           </Grid.Column>

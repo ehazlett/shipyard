@@ -188,7 +188,6 @@ class ContainerListView extends React.Component {
               data={containers}
               columns={columns}
               defaultPageSize={10}
-              pageSize={10}
               minRows={0}
             />
           </Grid.Column>
