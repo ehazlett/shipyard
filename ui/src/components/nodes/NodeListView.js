@@ -181,7 +181,9 @@ class NodeListView extends React.Component {
               data={nodes}
               columns={columns}
               defaultPageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No nodes found. Why not add one?'
             />
           </Grid.Column>
         </Grid.Row>

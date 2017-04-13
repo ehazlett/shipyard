@@ -950,7 +950,9 @@ class ServiceListView extends React.Component {
                       data={tasks}
                       columns={columns}
                       defaultPageSize={10}
-                      minRows={0}
+                      minRows={3}
+                      loadingText='Loading...'
+                      noDataText='No tasks found.'
                     />
                   </Segment>}
               </FormsyForm>

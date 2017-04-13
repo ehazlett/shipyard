@@ -167,7 +167,9 @@ class NetworkListView extends React.Component {
               data={networks}
               columns={columns}
               defaultPageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No networks found. Why not create one?'
             />
           </Grid.Column>
         </Grid.Row>

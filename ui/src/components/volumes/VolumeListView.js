@@ -158,7 +158,9 @@ class VolumeListView extends React.Component {
               data={volumes}
               columns={columns}
               defaultPageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No volumes found. Why not create one?'
             />
           </Grid.Column>
         </Grid.Row>

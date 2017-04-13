@@ -164,7 +164,9 @@ class AccountListView extends React.Component {
               data={accounts}
               columns={columns}
               defaultPageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No accounts found. Why not create one?'
             />
           </Grid.Column>
         </Grid.Row>

@@ -153,7 +153,9 @@ class SecretListView extends React.Component {
               data={secrets}
               columns={columns}
               defaultPageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No secrets found. Why not create one?'
             />
           </Grid.Column>
         </Grid.Row>

@@ -181,7 +181,9 @@ class ImageListView extends React.Component {
               data={images}
               columns={columns}
               defaultPageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No images found. Why not pull one?'
             />
           </Grid.Column>
         </Grid.Row>

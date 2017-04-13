@@ -106,7 +106,9 @@ class RegistryInspectView extends React.Component {
               data={repositories}
               columns={columns}
               defaultPageSize={10}
-              minRows={0}
+              minRows={3}
+              loadingText='Loading...'
+              noDataText='No repositories found.'
             />
           </Grid.Column>
         </Grid.Row>
