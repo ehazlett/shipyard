@@ -1,5 +1,0 @@
-*.sw*
-*.un*
-cli/cli
-controller/controller
-bower_components
