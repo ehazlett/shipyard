@@ -4,8 +4,6 @@ what became Docker Universal Control Plane and I no longer have time to manage t
 I asked for new maintainers but there
 seemed to be no interest.
 
-![Call For Maintainers](./call-for-maintainers.png)
-
 I want to thank all of the [contributors](https://github.com/shipyard/shipyard/graphs/contributors)
 for all of your help.  Thank you.
 
