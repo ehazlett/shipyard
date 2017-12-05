@@ -1,8 +1,10 @@
 # Shipyard Project
 After a long time I have decided to retire this project.  It formed the foundation for
 what became Docker Universal Control Plane and I no longer have time to manage this.
-I [asked for new maintainers](https://github.com/shipyard/shipyard/issues/1004) but there
+I asked for new maintainers but there
 seemed to be no interest.
+
+![Call For Maintainers](./call-for-maintainers.png)
 
 I want to thank all of the [contributors](https://github.com/shipyard/shipyard/graphs/contributors)
 for all of your help.  Thank you.
