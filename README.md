@@ -4,6 +4,8 @@ what became Docker Universal Control Plane and I no longer have time to manage t
 I asked for new maintainers but there
 seemed to be no interest.
 
+**WARNING**: as the project retired I no longer maintained the domain.  Someone else has setup a duplicate site that is not official and is carrying an invalid SSL certificate.  PLEASE DO NOT GO TO THE DOMAIN shipyard-project.com.  I cannot endorse it nor vouch for the security or content of the site.
+
 I want to thank all of the [contributors](https://github.com/shipyard/shipyard/graphs/contributors)
 for all of your help.  Thank you.
 
