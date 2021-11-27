@@ -19,4 +19,4 @@ applications available:
 - [Docker UI](https://github.com/kevana/ui-for-docker)
 - [Portainer](https://portainer.io/)
 
-Thank you.
+Thank you. Eric
